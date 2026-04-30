@@ -1,0 +1,25 @@
+{
+  "name": "surreysocieties",
+  "private": true,
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:ai": "npm run dev -w apps/ai",
+    "dev:business": "npm run dev -w apps/business",
+    "dev:neurotech": "npm run dev -w apps/neurotech",
+    "build:ai": "npm run build -w apps/ai",
+    "build:business": "npm run build -w apps/business",
+    "build:neurotech": "npm run build -w apps/neurotech",
+    "build:all": "npm run build -w apps/ai && npm run build -w apps/business && npm run build -w apps/neurotech"
+  },
+  "overrides": {
+    "vite": "^7.3.2"
+  }
+}

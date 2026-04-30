@@ -1,0 +1,10 @@
+{
+  "name": "@surreysocieties/ui",
+  "private": true,
+  "type": "module",
+  "version": "0.0.1",
+  "exports": {
+    ".": "./src/index.ts",
+    "./components/*": "./src/components/*.astro"
+  }
+}

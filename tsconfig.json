@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  },
+  "references": [
+    { "path": "./apps/ai" },
+    { "path": "./apps/business" },
+    { "path": "./apps/neurotech" },
+    { "path": "./packages/ui" }
+  ],
+  "include": [],
+  "exclude": ["node_modules"]
+}

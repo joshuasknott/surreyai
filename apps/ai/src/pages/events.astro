@@ -1,0 +1,76 @@
+---
+import Layout from '../layouts/Layout.astro';
+import '../styles/global.css';
+
+const events = [
+  {
+    title: 'Intro to AI at Surrey',
+    description: 'Our opening event for the year. What is AI? Why does it matter? What will we be doing? Open to all students — no experience needed.',
+    type: 'Coming Soon',
+    format: 'Talk + Q&A',
+  },
+  {
+    title: 'Practical AI Build Night',
+    description: 'A hands-on evening where you build something with AI tools. Bring a laptop, we provide the guidance. Beginners welcome.',
+    type: 'Planned Format',
+    format: 'Workshop',
+  },
+  {
+    title: 'Responsible AI Discussion',
+    description: 'An open discussion on the ethics and societal implications of AI. What should we be thinking about as the next generation of technologists?',
+    type: 'Planned Format',
+    format: 'Panel / Discussion',
+  },
+  {
+    title: 'Careers in AI',
+    description: 'Exploring career paths in artificial intelligence — from research to industry, startups to big tech. What does it actually look like?',
+    type: 'Planned Format',
+    format: 'Careers Event',
+  },
+];
+---
+
+<Layout title="Events" description="Upcoming and planned events from Surrey AI Society — workshops, build nights, discussions, and careers events.">
+
+  <!-- Header -->
+  <section class="bg-navy text-text-on-dark py-16 sm:py-20 px-6">
+    <div class="mx-auto max-w-6xl">
+      <div class="inline-flex items-center gap-2 mb-4">
+        <span class="w-8 h-px bg-gold"></span>
+        <span class="text-gold text-sm font-semibold uppercase tracking-wider">Events</span>
+      </div>
+      <h1 class="text-4xl sm:text-5xl font-black tracking-tight">Events</h1>
+      <p class="mt-4 text-text-on-dark-secondary text-lg max-w-2xl">What we're planning for the year ahead. Dates will be announced on our socials.</p>
+    </div>
+  </section>
+
+  <!-- Events List -->
+  <section class="py-16 sm:py-20 px-6">
+    <div class="mx-auto max-w-6xl">
+      <div class="grid sm:grid-cols-2 gap-6">
+        {events.map(event => (
+          <div class="bg-surface-card rounded-xl p-6 border border-navy/5 hover:border-gold/20 transition-colors shadow-sm">
+            <div class="flex items-center gap-3 mb-4">
+              <span class="inline-block text-xs font-medium text-gold bg-gold/10 px-3 py-1 rounded-full">{event.type}</span>
+              <span class="text-xs text-text-muted">Date TBC</span>
+            </div>
+            <h3 class="font-semibold text-lg mb-2">{event.title}</h3>
+            <p class="text-text-secondary text-sm leading-relaxed mb-4">{event.description}</p>
+            <div class="text-xs text-text-muted">
+              Format: {event.format}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div class="mt-12 bg-surface-alt rounded-xl p-8 border border-navy/5 text-center">
+        <h3 class="font-semibold text-lg mb-2">Want to suggest an event?</h3>
+        <p class="text-text-secondary text-sm mb-4">We're always open to ideas. If there's a topic you'd like us to cover, let us know.</p>
+        <a href="/join" class="text-gold hover:text-gold-dark text-sm font-semibold transition-colors">
+          Get in touch →
+        </a>
+      </div>
+    </div>
+  </section>
+
+</Layout>

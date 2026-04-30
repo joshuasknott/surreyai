@@ -1,0 +1,170 @@
+---
+import Layout from '../layouts/Layout.astro';
+import '../styles/global.css';
+---
+
+<Layout title="Home" description="Surrey AI Society — A student-led community for learning, building, and discussing artificial intelligence at the University of Surrey.">
+
+  <!-- Hero -->
+  <section class="bg-navy text-text-on-dark relative overflow-hidden flex items-center min-h-[85vh]">
+    <!-- Circular Seal Motifs -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border border-white/5 rounded-full"></div>
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[1200px] border border-white/5 rounded-full"></div>
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1600px] h-[1600px] border border-white/5 rounded-full"></div>
+      <!-- Subtle Nodes -->
+      <div class="absolute top-[20%] left-[25%] node-dot"></div>
+      <div class="absolute top-[60%] right-[20%] node-dot"></div>
+      <div class="absolute bottom-[25%] left-[30%] node-dot"></div>
+    </div>
+    <div class="mx-auto max-w-6xl px-6 py-24 sm:py-32 relative z-10 w-full">
+      <div class="flex flex-col items-center text-center max-w-3xl mx-auto">
+        <div class="relative mb-8">
+          <div class="absolute inset-0 rounded-full ring-1 ring-accent-blue/20 ring-offset-4 ring-offset-navy animate-pulse"></div>
+          <img src="/logos/ai-logo.png" alt="Surrey AI Society logo" class="w-32 h-32 sm:w-40 sm:h-40 rounded-full shadow-2xl ring-2 ring-white/10" />
+        </div>
+        <h1 class="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tight leading-[1.1]">
+          Surrey <span class="text-accent-blue">AI</span> Society
+        </h1>
+        <p class="mt-6 text-lg sm:text-xl text-text-on-dark-secondary leading-relaxed max-w-2xl font-medium">
+          A student-led community for learning, building, and exploring artificial intelligence at Surrey.
+        </p>
+        <div class="mt-10 flex flex-col sm:flex-row gap-4">
+          <a href="/join" class="px-8 py-3.5 bg-accent-blue hover:bg-accent-blue-dark text-white font-semibold rounded-lg transition-all hover:shadow-lg hover:shadow-accent-blue/20 ring-1 ring-white/10">
+            Join the Society
+          </a>
+          <a href="/events" class="px-8 py-3.5 bg-white/5 hover:bg-white/10 text-text-on-dark font-semibold rounded-lg border border-white/10 transition-all">
+            View Events
+          </a>
+          <a href="/about" class="px-8 py-3.5 text-text-on-dark-secondary hover:text-white font-semibold rounded-lg transition-colors underline underline-offset-4 decoration-white/20 hover:decoration-white/50">
+            Explore Projects
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- What We Do -->
+  <section class="py-20 sm:py-24 px-6">
+    <div class="mx-auto max-w-6xl">
+      <div class="text-center mb-14">
+        <div class="inline-flex items-center gap-4 mb-4">
+          <span class="w-12 h-px bg-border-subtle"></span>
+          <span class="text-accent-blue text-xs font-bold uppercase tracking-widest">What We Do</span>
+          <span class="w-12 h-px bg-border-subtle"></span>
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-black tracking-tight">Explore AI Together</h2>
+        <p class="mt-4 text-text-secondary max-w-xl mx-auto">From foundational concepts to hands-on projects, we create space for students to engage with AI at every level.</p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-surface-card rounded-xl p-6 border border-border-subtle hover:border-accent-blue/30 transition-all shadow-sm hover:shadow-md relative overflow-hidden group">
+          <div class="absolute top-0 right-0 w-16 h-16 bg-surface-alt rounded-bl-full -z-10 group-hover:scale-150 transition-transform duration-500"></div>
+          <div class="w-8 h-8 rounded border border-border-subtle flex items-center justify-center text-accent-blue mb-5 text-xs font-bold font-mono bg-surface-alt">01</div>
+          <h3 class="font-bold text-lg mb-2">Learn</h3>
+          <p class="text-text-secondary text-sm leading-relaxed">Workshops covering machine learning, neural networks, NLP, and more — beginner to advanced.</p>
+        </div>
+        <div class="bg-surface-card rounded-xl p-6 border border-border-subtle hover:border-accent-blue/30 transition-all shadow-sm hover:shadow-md relative overflow-hidden group">
+          <div class="absolute top-0 right-0 w-16 h-16 bg-surface-alt rounded-bl-full -z-10 group-hover:scale-150 transition-transform duration-500"></div>
+          <div class="w-8 h-8 rounded border border-border-subtle flex items-center justify-center text-accent-blue mb-5 text-xs font-bold font-mono bg-surface-alt">02</div>
+          <h3 class="font-bold text-lg mb-2">Build</h3>
+          <p class="text-text-secondary text-sm leading-relaxed">Collaborative projects, build nights, and hackathons where you create real things with AI.</p>
+        </div>
+        <div class="bg-surface-card rounded-xl p-6 border border-border-subtle hover:border-accent-blue/30 transition-all shadow-sm hover:shadow-md relative overflow-hidden group">
+          <div class="absolute top-0 right-0 w-16 h-16 bg-surface-alt rounded-bl-full -z-10 group-hover:scale-150 transition-transform duration-500"></div>
+          <div class="w-8 h-8 rounded border border-border-subtle flex items-center justify-center text-accent-blue mb-5 text-xs font-bold font-mono bg-surface-alt">03</div>
+          <h3 class="font-bold text-lg mb-2">Discuss</h3>
+          <p class="text-text-secondary text-sm leading-relaxed">Open conversations about AI ethics, policy, careers, and the broader impact of intelligent systems.</p>
+        </div>
+        <div class="bg-surface-card rounded-xl p-6 border border-border-subtle hover:border-accent-blue/30 transition-all shadow-sm hover:shadow-md relative overflow-hidden group">
+          <div class="absolute top-0 right-0 w-16 h-16 bg-surface-alt rounded-bl-full -z-10 group-hover:scale-150 transition-transform duration-500"></div>
+          <div class="w-8 h-8 rounded border border-border-subtle flex items-center justify-center text-accent-blue mb-5 text-xs font-bold font-mono bg-surface-alt">04</div>
+          <h3 class="font-bold text-lg mb-2">Connect</h3>
+          <p class="text-text-secondary text-sm leading-relaxed">Meet students from every discipline who share a curiosity about artificial intelligence.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Events Preview -->
+  <section class="bg-surface-alt py-20 sm:py-24 px-6">
+    <div class="mx-auto max-w-6xl">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-12 gap-4">
+        <div>
+          <div class="inline-flex items-center gap-4 mb-4">
+            <span class="w-12 h-px bg-border-subtle"></span>
+            <span class="text-accent-blue text-xs font-bold uppercase tracking-widest">Events</span>
+          </div>
+          <h2 class="text-3xl sm:text-4xl font-black tracking-tight">What's Coming Up</h2>
+        </div>
+        <a href="/events" class="text-accent-blue hover:text-accent-blue-dark text-sm font-semibold transition-colors">
+          View all events →
+        </a>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-6">
+        <div class="bg-surface-card rounded-xl p-6 border border-border-subtle shadow-sm hover:shadow-md transition-shadow">
+          <span class="inline-block text-[10px] font-bold text-accent-blue bg-accent-blue/10 px-3 py-1 rounded-sm mb-4 uppercase tracking-wider border border-accent-blue/20">Coming Soon</span>
+          <h3 class="font-bold text-lg mb-2">Intro to AI at Surrey</h3>
+          <p class="text-text-secondary text-sm">Our opening event — what AI is, why it matters, and what we'll be doing this year. Open to all students.</p>
+        </div>
+        <div class="bg-surface-card rounded-xl p-6 border border-border-subtle shadow-sm hover:shadow-md transition-shadow">
+          <span class="inline-block text-[10px] font-bold text-accent-blue bg-accent-blue/10 px-3 py-1 rounded-sm mb-4 uppercase tracking-wider border border-accent-blue/20">Planned Format</span>
+          <h3 class="font-bold text-lg mb-2">Practical AI Build Night</h3>
+          <p class="text-text-secondary text-sm">Hands-on session where you build something with AI tools — no prior experience required.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Committee Preview -->
+  <section class="py-20 sm:py-24 px-6">
+    <div class="mx-auto max-w-6xl">
+      <div class="text-center mb-14">
+        <div class="inline-flex items-center gap-4 mb-4">
+          <span class="w-12 h-px bg-border-subtle"></span>
+          <span class="text-accent-blue text-xs font-bold uppercase tracking-widest">Our Team</span>
+          <span class="w-12 h-px bg-border-subtle"></span>
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-black tracking-tight">Meet the Committee</h2>
+        <p class="mt-4 text-text-secondary max-w-lg mx-auto">The students behind Surrey AI Society.</p>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+        {['President', 'Vice President', 'Treasurer', 'Events Lead', 'Technical Workshops Lead'].map(role => (
+          <div class="text-center p-4">
+            <div class="w-16 h-16 rounded-full bg-surface-alt border border-border-subtle mx-auto mb-3 flex items-center justify-center text-accent-blue text-xs font-bold font-mono tracking-tighter">
+              {role.split(' ').map(w => w[0]).join('')}
+            </div>
+            <p class="text-sm font-semibold">{role}</p>
+            <p class="text-xs text-text-muted mt-1">Name TBC</p>
+          </div>
+        ))}
+      </div>
+
+      <div class="text-center mt-8">
+        <a href="/committee" class="text-accent-blue hover:text-accent-blue-dark text-sm font-semibold transition-colors">
+          View full committee →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Join CTA -->
+  <section class="bg-navy text-text-on-dark py-20 sm:py-28 px-6 relative overflow-hidden">
+    <!-- Background Rings -->
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border border-white/5 rounded-full pointer-events-none"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border border-white/5 rounded-full pointer-events-none"></div>
+    
+    <div class="mx-auto max-w-3xl text-center relative z-10">
+      <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight mb-6">Ready to get involved?</h2>
+      <p class="text-text-on-dark-secondary text-lg mb-10 max-w-xl mx-auto leading-relaxed">
+        Whether you're studying computer science, business, psychology, or anything else — if you're curious about AI, you're welcome here.
+      </p>
+      <a href="/join" class="inline-block px-10 py-4 bg-accent-blue hover:bg-accent-blue-dark text-white font-semibold rounded-lg transition-all hover:shadow-lg hover:shadow-accent-blue/20 ring-1 ring-white/10">
+        Join Surrey AI Society
+      </a>
+    </div>
+  </section>
+
+</Layout>

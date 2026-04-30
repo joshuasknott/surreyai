@@ -1,0 +1,141 @@
+---
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+const currentPath = Astro.url.pathname;
+
+const navLinks = [
+  { href: '/', label: 'Home' },
+  { href: '/about', label: 'About' },
+  { href: '/committee', label: 'Committee' },
+  { href: '/events', label: 'Events' },
+  { href: '/join', label: 'Join' },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <title>{title} — Surrey AI Society</title>
+  </head>
+  <body class="bg-surface text-text-primary font-sans min-h-screen flex flex-col">
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-navy border-b border-border-subtle/20">
+      <div class="mx-auto max-w-6xl px-6 h-16 flex items-center justify-between">
+        <a href="/" class="flex items-center gap-3">
+          <img src="/logos/ai-logo.png" alt="Surrey AI Society" class="h-9 w-9 rounded-full ring-2 ring-navy ring-offset-1 ring-offset-accent-blue/30" />
+          <span class="text-text-on-dark font-bold text-lg tracking-tight hidden sm:block">
+            Surrey <span class="text-accent-blue">AI</span> Society
+          </span>
+        </a>
+
+        <!-- Desktop nav -->
+        <div class="hidden md:flex items-center gap-1">
+          {navLinks.map(link => (
+            <a
+              href={link.href}
+              class:list={[
+                'px-4 py-2 text-sm font-medium rounded-lg transition-colors border border-transparent',
+                currentPath === link.href || (link.href !== '/' && currentPath.startsWith(link.href))
+                  ? 'text-accent-blue bg-accent-blue/10 border-accent-blue/20'
+                  : 'text-text-on-dark-secondary hover:text-text-on-dark hover:bg-white/5',
+              ]}
+            >
+              {link.label}
+            </a>
+          ))}
+        </div>
+
+        <!-- Mobile menu button -->
+        <button
+          id="mobile-menu-btn"
+          class="md:hidden text-text-on-dark p-2 hover:bg-white/10 rounded-lg transition-colors"
+          aria-label="Toggle navigation menu"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path id="menu-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Mobile nav -->
+      <div id="mobile-menu" class="hidden md:hidden border-t border-border-subtle/20 bg-navy-deep">
+        <div class="px-6 py-3 flex flex-col gap-1">
+          {navLinks.map(link => (
+            <a
+              href={link.href}
+              class:list={[
+                'px-4 py-2.5 text-sm font-medium rounded-lg transition-colors border border-transparent',
+                currentPath === link.href || (link.href !== '/' && currentPath.startsWith(link.href))
+                  ? 'text-accent-blue bg-accent-blue/10 border-accent-blue/20'
+                  : 'text-text-on-dark-secondary hover:text-text-on-dark hover:bg-white/5',
+              ]}
+            >
+              {link.label}
+            </a>
+          ))}
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main content -->
+    <main class="flex-1">
+      <slot />
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-navy text-text-on-dark-secondary">
+      <div class="mx-auto max-w-6xl px-6 py-12">
+        <div class="grid sm:grid-cols-3 gap-8 mb-8">
+          <div>
+            <div class="flex items-center gap-3 mb-4">
+              <img src="/logos/ai-logo.png" alt="" class="h-8 w-8 rounded-full ring-2 ring-navy ring-offset-1 ring-offset-accent-blue/30" />
+              <span class="text-text-on-dark font-bold tracking-tight">Surrey AI Society</span>
+            </div>
+            <p class="text-sm leading-relaxed">
+              A student-led society under Surrey Students' Union at the University of Surrey. Exploring AI through learning, building, and open discussion.
+            </p>
+          </div>
+          <div>
+            <h4 class="text-text-on-dark font-semibold mb-3 text-sm uppercase tracking-widest text-accent-blue">Pages</h4>
+            <div class="flex flex-col gap-2">
+              {navLinks.map(link => (
+                <a href={link.href} class="text-sm hover:text-accent-blue transition-colors">{link.label}</a>
+              ))}
+            </div>
+          </div>
+          <div>
+            <h4 class="text-text-on-dark font-semibold mb-3 text-sm uppercase tracking-widest text-accent-blue">Connect</h4>
+            <div class="flex flex-col gap-2 text-sm">
+              <span>Instagram — coming soon</span>
+              <span>Email — coming soon</span>
+              <span>Surrey Students' Union</span>
+            </div>
+          </div>
+        </div>
+        <div class="border-t border-border-subtle/20 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+          <p>&copy; 2025 Surrey AI Society. A student society at the University of Surrey.</p>
+          <p class="text-accent-blue/80 font-medium tracking-wide">surreyaisociety.org</p>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      const btn = document.getElementById('mobile-menu-btn');
+      const menu = document.getElementById('mobile-menu');
+      btn?.addEventListener('click', () => {
+        menu?.classList.toggle('hidden');
+      });
+    </script>
+  </body>
+</html>
