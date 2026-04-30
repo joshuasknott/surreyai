@@ -6,9 +6,14 @@ let dbInitialized = false;
 
 async function initDb() {
   if (dbInitialized) return;
-  runMigrations();
-  await seedDatabase();
-  dbInitialized = true;
+  try {
+    runMigrations();
+    await seedDatabase();
+    dbInitialized = true;
+    console.log(`[middleware:${SOCIETY_ID}] Database initialized`);
+  } catch (error) {
+    console.error(`[middleware:${SOCIETY_ID}] DB init failed:`, error);
+  }
 }
 
 export const onRequest = defineMiddleware(async (context, next) => {

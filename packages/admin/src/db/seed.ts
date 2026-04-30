@@ -8,14 +8,20 @@ import { v4 as uuidv4 } from 'uuid';
  * Only runs if the database is empty (no admin users exist).
  */
 export async function seedDatabase(): Promise<void> {
-  const db = getDb();
+  try {
+    const db = getDb();
 
-  // Run migrations first
-  runMigrations();
+    // Run migrations first
+    runMigrations();
 
-  // Check if already seeded
-  const existingUsers = db.prepare('SELECT COUNT(*) as count FROM admin_users').get() as { count: number };
-  if (existingUsers.count > 0) return;
+    // Check if already seeded
+    const existingUsers = db.prepare('SELECT COUNT(*) as count FROM admin_users').get() as { count: number };
+    if (existingUsers.count > 0) {
+      console.log(`[admin] Database already seeded (${existingUsers.count} users)`);
+      return;
+    }
+
+    console.log('[admin] Seeding database...');
 
   // ─── Owner / Developer Admin ──────────────────────────────────────────────
   const ownerHash = await hashPassword('admin123');
@@ -230,5 +236,10 @@ export async function seedDatabase(): Promise<void> {
       INSERT INTO committee_members (id, society_id, name, role, display_order, is_active, created_at, updated_at)
       VALUES (?, 'business', ?, ?, ?, 1, ?, ?)
     `).run(uuidv4(), member.name, member.role, member.displayOrder, now, now);
+  }
+
+    console.log('[admin] Database seeded successfully');
+  } catch (error) {
+    console.error('[admin] Failed to seed database:', error);
   }
 }
