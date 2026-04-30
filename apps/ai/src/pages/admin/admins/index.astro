@@ -1,0 +1,101 @@
+---
+export const prerender = false;
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { getAdmins, getInvitations, canManageAdmins } from '@surreysocieties/admin';
+
+const SOCIETY_ID = 'ai';
+const user = Astro.locals.user!;
+const admins = getAdmins(SOCIETY_ID);
+const invitations = getInvitations(SOCIETY_ID);
+const pendingInvitations = invitations.filter(i => i.status === 'pending');
+const isManager = canManageAdmins(user);
+
+const success = Astro.url.searchParams.get('success');
+const invited = Astro.url.searchParams.get('invited');
+---
+<AdminLayout title="Admin Users" societyId={SOCIETY_ID} currentPath="/admin/admins">
+
+  <div class="admin-page-header">
+    <h1 class="admin-page-title">Admin Users</h1>
+    {isManager && <a href="/admin/admins/invite" class="btn btn-primary">Invite Admin</a>}
+  </div>
+
+  {success && <div class="alert alert-success">Admin action completed.</div>}
+  {invited && <div class="alert alert-success">Invitation sent.</div>}
+
+  <div class="admin-table-wrapper" style="margin-bottom: 2rem;">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Status</th>
+          {isManager && <th>Actions</th>}
+        </tr>
+      </thead>
+      <tbody>
+        {admins.map(admin => (
+          <tr>
+            <td style="font-weight: 600;">{admin.name}</td>
+            <td>{admin.email}</td>
+            <td><span class={`pill pill-${admin.role}`}>{admin.role}</span></td>
+            <td><span class={`pill pill-${admin.status}`}>{admin.status}</span></td>
+            {isManager && (
+              <td>
+                {admin.role !== 'owner' && admin.id !== user.id && (
+                  <form method="POST" action="/api/admin/admins/remove" style="display:inline;" onsubmit="return confirm('Remove admin access for this user?')">
+                    <input type="hidden" name="userId" value={admin.id} />
+                    <button type="submit" class="btn btn-ghost btn-sm" style="color: var(--color-admin-danger);">Remove</button>
+                  </form>
+                )}
+              </td>
+            )}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  {pendingInvitations.length > 0 && (
+    <>
+      <h2 style="font-size: 1.125rem; font-weight: 700; margin-bottom: 1rem;">Pending Invitations</h2>
+      <div class="admin-table-wrapper">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Expires</th>
+              <th>Invite Link</th>
+              {isManager && <th>Actions</th>}
+            </tr>
+          </thead>
+          <tbody>
+            {pendingInvitations.map(inv => (
+              <tr>
+                <td>{inv.email}</td>
+                <td><span class={`pill pill-${inv.role}`}>{inv.role}</span></td>
+                <td>{new Date(inv.expiresAt).toLocaleDateString()}</td>
+                <td>
+                  <code style="font-size: 0.7rem; background: #f1f5f9; padding: 0.125rem 0.5rem; border-radius: 0.25rem; word-break: break-all;">
+                    /admin/invite/accept?token={inv.token}
+                  </code>
+                </td>
+                {isManager && (
+                  <td>
+                    <form method="POST" action="/api/admin/admins/revoke" style="display:inline;">
+                      <input type="hidden" name="invitationId" value={inv.id} />
+                      <button type="submit" class="btn btn-ghost btn-sm" style="color: var(--color-admin-danger);">Revoke</button>
+                    </form>
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
+  )}
+
+</AdminLayout>

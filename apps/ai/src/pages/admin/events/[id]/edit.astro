@@ -1,0 +1,121 @@
+---
+export const prerender = false;
+import AdminLayout from '../../../../layouts/AdminLayout.astro';
+import { getEventById, updateEvent, validateEventInput, EVENT_CATEGORIES } from '@surreysocieties/admin';
+
+const SOCIETY_ID = 'ai';
+const { id } = Astro.params;
+let event = getEventById(SOCIETY_ID, id!);
+
+if (!event) return Astro.redirect('/admin/events');
+
+let errors: Record<string, string> = {};
+
+if (Astro.request.method === 'POST') {
+  const formData = await Astro.request.formData();
+  const input = {
+    title: formData.get('title')?.toString() || '',
+    description: formData.get('description')?.toString() || '',
+    date: formData.get('date')?.toString() || '',
+    startTime: formData.get('startTime')?.toString() || '',
+    endTime: formData.get('endTime')?.toString() || '',
+    location: formData.get('location')?.toString() || '',
+    category: formData.get('category')?.toString() || 'Other',
+    image: formData.get('image')?.toString() || '',
+    registrationUrl: formData.get('registrationUrl')?.toString() || '',
+    status: (formData.get('status')?.toString() || 'draft') as 'draft' | 'published',
+    isFeatured: formData.get('isFeatured') === 'on',
+  };
+
+  const validation = validateEventInput(input, true);
+  if (validation.valid) {
+    updateEvent(SOCIETY_ID, id!, input);
+    return Astro.redirect('/admin/events?success=1');
+  }
+  errors = validation.errors;
+  event = { ...event, ...input };
+}
+---
+<AdminLayout title="Edit Event" societyId={SOCIETY_ID} currentPath="/admin/events">
+
+  <div class="admin-page-header">
+    <h1 class="admin-page-title">Edit Event</h1>
+    <a href="/admin/events" class="btn btn-outline">← Back to Events</a>
+  </div>
+
+  <div class="form-card">
+    <form method="POST">
+      <div class="form-group">
+        <label for="title" class="form-label">Title *</label>
+        <input type="text" id="title" name="title" class="form-input" value={event.title} required />
+        {errors.title && <div class="form-error">{errors.title}</div>}
+      </div>
+
+      <div class="form-group">
+        <label for="description" class="form-label">Description</label>
+        <textarea id="description" name="description" class="form-textarea">{event.description}</textarea>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+        <div class="form-group">
+          <label for="date" class="form-label">Date</label>
+          <input type="date" id="date" name="date" class="form-input" value={event.date} />
+        </div>
+        <div class="form-group">
+          <label for="startTime" class="form-label">Start Time</label>
+          <input type="time" id="startTime" name="startTime" class="form-input" value={event.startTime} />
+        </div>
+        <div class="form-group">
+          <label for="endTime" class="form-label">End Time</label>
+          <input type="time" id="endTime" name="endTime" class="form-input" value={event.endTime} />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="location" class="form-label">Location</label>
+        <input type="text" id="location" name="location" class="form-input" value={event.location} />
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="form-group">
+          <label for="category" class="form-label">Category</label>
+          <select id="category" name="category" class="form-select">
+            {EVENT_CATEGORIES.map(cat => (
+              <option value={cat} selected={event.category === cat}>{cat}</option>
+            ))}
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="status" class="form-label">Status</label>
+          <select id="status" name="status" class="form-select">
+            <option value="draft" selected={event.status === 'draft'}>Draft</option>
+            <option value="published" selected={event.status === 'published'}>Published</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="registrationUrl" class="form-label">Registration URL</label>
+        <input type="url" id="registrationUrl" name="registrationUrl" class="form-input" value={event.registrationUrl} placeholder="https://" />
+      </div>
+
+      <div class="form-group">
+        <label for="image" class="form-label">Image URL</label>
+        <input type="text" id="image" name="image" class="form-input" value={event.image} />
+      </div>
+
+      <div class="form-group">
+        <label class="form-checkbox-row">
+          <input type="checkbox" name="isFeatured" checked={event.isFeatured} />
+          <span class="form-label" style="margin-bottom: 0;">Featured event</span>
+        </label>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a href="/admin/events" class="btn btn-outline">Cancel</a>
+      </div>
+    </form>
+  </div>
+
+</AdminLayout>

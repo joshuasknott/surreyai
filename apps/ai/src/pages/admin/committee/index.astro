@@ -1,0 +1,65 @@
+---
+export const prerender = false;
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { getCommittee } from '@surreysocieties/admin';
+
+const SOCIETY_ID = 'ai';
+const members = getCommittee(SOCIETY_ID);
+const success = Astro.url.searchParams.get('success');
+const deleted = Astro.url.searchParams.get('deleted');
+---
+<AdminLayout title="Committee" societyId={SOCIETY_ID} currentPath="/admin/committee">
+
+  <div class="admin-page-header">
+    <h1 class="admin-page-title">Committee Members</h1>
+    <a href="/admin/committee/new" class="btn btn-primary">+ Add Member</a>
+  </div>
+
+  {success && <div class="alert alert-success">Committee member saved.</div>}
+  {deleted && <div class="alert alert-success">Committee member removed.</div>}
+
+  {members.length === 0 ? (
+    <div class="admin-table-wrapper">
+      <div class="empty-state">
+        <div class="empty-state-icon">👥</div>
+        <div class="empty-state-title">No committee members yet</div>
+        <p>Add your first committee member.</p>
+        <a href="/admin/committee/new" class="btn btn-primary" style="margin-top: 1rem;">+ Add Member</a>
+      </div>
+    </div>
+  ) : (
+    <div class="admin-table-wrapper">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Order</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {members.map(member => (
+            <tr>
+              <td style="font-weight: 600;">{member.name}</td>
+              <td>{member.role}</td>
+              <td><span class={`pill pill-${member.isActive ? 'active' : 'inactive'}`}>{member.isActive ? 'Active' : 'Inactive'}</span></td>
+              <td>{member.displayOrder}</td>
+              <td>
+                <div class="table-actions">
+                  <a href={`/admin/committee/${member.id}/edit`} class="btn btn-outline btn-sm">Edit</a>
+                  <form method="POST" action="/api/admin/committee/delete" style="display:inline;" onsubmit="return confirm('Remove this committee member?')">
+                    <input type="hidden" name="id" value={member.id} />
+                    <button type="submit" class="btn btn-ghost btn-sm" style="color: var(--color-admin-danger);">Remove</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+
+</AdminLayout>

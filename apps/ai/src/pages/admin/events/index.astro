@@ -1,0 +1,68 @@
+---
+export const prerender = false;
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { getEvents } from '@surreysocieties/admin';
+
+const SOCIETY_ID = 'ai';
+const events = getEvents(SOCIETY_ID);
+
+const success = Astro.url.searchParams.get('success');
+const deleted = Astro.url.searchParams.get('deleted');
+---
+<AdminLayout title="Events" societyId={SOCIETY_ID} currentPath="/admin/events">
+
+  <div class="admin-page-header">
+    <h1 class="admin-page-title">Events</h1>
+    <a href="/admin/events/new" class="btn btn-primary">+ Add Event</a>
+  </div>
+
+  {success && <div class="alert alert-success">Event saved successfully.</div>}
+  {deleted && <div class="alert alert-success">Event deleted.</div>}
+
+  {events.length === 0 ? (
+    <div class="admin-table-wrapper">
+      <div class="empty-state">
+        <div class="empty-state-icon">📅</div>
+        <div class="empty-state-title">No events yet</div>
+        <p>Create your first event to get started.</p>
+        <a href="/admin/events/new" class="btn btn-primary" style="margin-top: 1rem;">+ Add Event</a>
+      </div>
+    </div>
+  ) : (
+    <div class="admin-table-wrapper">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Date</th>
+            <th>Category</th>
+            <th>Status</th>
+            <th>Featured</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {events.map(event => (
+            <tr>
+              <td style="font-weight: 600;">{event.title}</td>
+              <td>{event.date || '—'}</td>
+              <td>{event.category}</td>
+              <td><span class={`pill pill-${event.status}`}>{event.status}</span></td>
+              <td>{event.isFeatured ? <span class="pill pill-featured">Featured</span> : '—'}</td>
+              <td>
+                <div class="table-actions">
+                  <a href={`/admin/events/${event.id}/edit`} class="btn btn-outline btn-sm">Edit</a>
+                  <form method="POST" action="/api/admin/events/delete" style="display:inline;" onsubmit="return confirm('Delete this event?')">
+                    <input type="hidden" name="id" value={event.id} />
+                    <button type="submit" class="btn btn-ghost btn-sm" style="color: var(--color-admin-danger);">Delete</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+
+</AdminLayout>

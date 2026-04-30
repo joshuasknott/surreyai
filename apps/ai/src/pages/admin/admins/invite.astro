@@ -1,0 +1,67 @@
+---
+export const prerender = false;
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { canManageAdmins, inviteAdmin, validateInviteInput } from '@surreysocieties/admin';
+
+const SOCIETY_ID = 'ai';
+const user = Astro.locals.user!;
+
+if (!canManageAdmins(user)) return Astro.redirect('/admin/admins');
+
+let errors: Record<string, string> = {};
+let values: Record<string, string> = {};
+
+if (Astro.request.method === 'POST') {
+  const formData = await Astro.request.formData();
+  const input = {
+    email: formData.get('email')?.toString() || '',
+    role: formData.get('role')?.toString() as any || 'editor',
+  };
+  values = input;
+
+  const validation = validateInviteInput(input);
+  if (validation.valid) {
+    inviteAdmin(SOCIETY_ID, input, user.id);
+    return Astro.redirect('/admin/admins?invited=1');
+  }
+  errors = validation.errors;
+}
+---
+<AdminLayout title="Invite Admin" societyId={SOCIETY_ID} currentPath="/admin/admins">
+
+  <div class="admin-page-header">
+    <h1 class="admin-page-title">Invite Admin</h1>
+    <a href="/admin/admins" class="btn btn-outline">← Back</a>
+  </div>
+
+  <div class="form-card" style="max-width: 500px;">
+    <p style="color: var(--color-admin-text-secondary); font-size: 0.875rem; margin-bottom: 1.5rem;">
+      Send an invitation to a new admin user. They will receive an invite link to set up their account.
+      <br /><br />
+      <strong>Note:</strong> Email sending is not configured yet. The invite link will be shown in the admin users list for you to share manually.
+    </p>
+
+    <form method="POST">
+      <div class="form-group">
+        <label for="email" class="form-label">Email *</label>
+        <input type="email" id="email" name="email" class="form-input" value={values.email || ''} required />
+        {errors.email && <div class="form-error">{errors.email}</div>}
+      </div>
+
+      <div class="form-group">
+        <label for="role" class="form-label">Role *</label>
+        <select id="role" name="role" class="form-select">
+          <option value="editor" selected={values.role !== 'societyAdmin'}>Editor — Can manage events and committee</option>
+          <option value="societyAdmin" selected={values.role === 'societyAdmin'}>Society Admin — Can also manage admin users</option>
+        </select>
+        {errors.role && <div class="form-error">{errors.role}</div>}
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+        <button type="submit" class="btn btn-primary">Send Invitation</button>
+        <a href="/admin/admins" class="btn btn-outline">Cancel</a>
+      </div>
+    </form>
+  </div>
+
+</AdminLayout>

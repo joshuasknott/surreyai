@@ -1,0 +1,83 @@
+---
+export const prerender = false;
+import '../styles/admin.css';
+import { getSocietyById } from '@surreysocieties/admin';
+
+interface Props {
+  title: string;
+  societyId: string;
+  currentPath: string;
+}
+
+const { title, societyId, currentPath } = Astro.props;
+const user = Astro.locals.user;
+const society = getSocietyById(societyId);
+
+const navItems = [
+  { href: '/admin', label: 'Dashboard', icon: 'grid' },
+  { href: '/admin/events', label: 'Events', icon: 'calendar' },
+  { href: '/admin/committee', label: 'Committee', icon: 'users' },
+  { href: '/admin/admins', label: 'Admins', icon: 'shield' },
+];
+
+function isActive(href: string): boolean {
+  if (href === '/admin') return currentPath === '/admin' || currentPath === '/admin/';
+  return currentPath.startsWith(href);
+}
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <title>{title} — {society?.name || 'Admin'}</title>
+  </head>
+  <body class="admin-body">
+    <div class="admin-layout">
+      <!-- Sidebar -->
+      <aside class="admin-sidebar" id="admin-sidebar">
+        <div class="admin-sidebar-logo">
+          <img src={society?.logo || '/favicon.svg'} alt="" />
+          <span>{society?.shortName || 'Admin'}</span>
+        </div>
+        <nav class="admin-sidebar-nav">
+          {navItems.map(item => (
+            <a href={item.href} class:list={['admin-sidebar-link', { active: isActive(item.href) }]}>
+              {item.icon === 'grid' && <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25a2.25 2.25 0 0 1-2.25-2.25v-2.25Z" /></svg>}
+              {item.icon === 'calendar' && <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" /></svg>}
+              {item.icon === 'users' && <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" /></svg>}
+              {item.icon === 'shield' && <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" /></svg>}
+              {item.label}
+            </a>
+          ))}
+        </nav>
+        <div style="padding: 0.75rem; border-top: 1px solid rgba(255,255,255,0.1);">
+          <a href="/" class="admin-sidebar-link" style="font-size: 0.75rem; color: rgba(255,255,255,0.5);">
+            ← Back to public site
+          </a>
+        </div>
+      </aside>
+
+      <!-- Main -->
+      <div class="admin-main">
+        <header class="admin-topbar">
+          <div class="admin-topbar-user">
+            <span>{user?.name || 'Admin'}</span>
+            <span style="color: var(--color-admin-text-muted);">({user?.role})</span>
+            <form method="POST" action="/api/admin/auth/logout" style="display:inline;">
+              <button type="submit" class="btn btn-ghost btn-sm">Logout</button>
+            </form>
+          </div>
+        </header>
+        <div class="admin-content">
+          <slot />
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

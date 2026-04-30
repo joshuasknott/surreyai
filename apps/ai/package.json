@@ -10,6 +10,8 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/node": "^10.0.6",
+    "@surreysocieties/admin": "*",
     "@surreysocieties/ui": "*",
     "@tailwindcss/vite": "^4.2.4",
     "astro": "^6.1.10",

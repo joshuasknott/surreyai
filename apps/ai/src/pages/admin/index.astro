@@ -1,0 +1,52 @@
+---
+export const prerender = false;
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { getEvents, getCommittee, getAdmins } from '@surreysocieties/admin';
+
+const SOCIETY_ID = 'ai';
+const user = Astro.locals.user!;
+
+const events = getEvents(SOCIETY_ID);
+const committee = getCommittee(SOCIETY_ID);
+const admins = getAdmins(SOCIETY_ID);
+
+const publishedEvents = events.filter(e => e.status === 'published');
+const draftEvents = events.filter(e => e.status === 'draft');
+const upcomingEvents = publishedEvents.filter(e => !e.date || new Date(e.date) >= new Date());
+const activeMembers = committee.filter(m => m.isActive);
+---
+<AdminLayout title="Dashboard" societyId={SOCIETY_ID} currentPath="/admin">
+
+  <div class="admin-page-header">
+    <h1 class="admin-page-title">Dashboard</h1>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-card-label">Upcoming Events</div>
+      <div class="stat-card-value">{upcomingEvents.length}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">Draft Events</div>
+      <div class="stat-card-value">{draftEvents.length}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">Active Committee</div>
+      <div class="stat-card-value">{activeMembers.length}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">Admin Users</div>
+      <div class="stat-card-value">{admins.length}</div>
+    </div>
+  </div>
+
+  <h2 style="font-size: 1rem; font-weight: 700; margin-bottom: 1rem;">Quick Actions</h2>
+  <div class="quick-actions">
+    <a href="/admin/events/new" class="btn btn-primary">+ Add Event</a>
+    <a href="/admin/committee/new" class="btn btn-primary">+ Add Committee Member</a>
+    {(user.role === 'owner' || user.role === 'societyAdmin') && (
+      <a href="/admin/admins/invite" class="btn btn-outline">Invite Admin</a>
+    )}
+  </div>
+
+</AdminLayout>

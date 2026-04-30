@@ -11,7 +11,8 @@
     { "path": "./apps/ai" },
     { "path": "./apps/business" },
     { "path": "./apps/neurotech" },
-    { "path": "./packages/ui" }
+    { "path": "./packages/ui" },
+    { "path": "./packages/admin" }
   ],
   "include": [],
   "exclude": ["node_modules"]
