@@ -43,11 +43,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Node decoration - for AI-specific circuit dot motif */
+/* Node decoration — square for tech-brutalism aesthetic */
 .node-dot {
   width: 6px;
   height: 6px;
-  border-radius: 50%;
   background: var(--color-accent-blue);
 }
 
