@@ -1,19 +1,24 @@
 ---
 export const prerender = false;
 import AdminLayout from '../../../layouts/AdminLayout.astro';
-import { validateInviteInput } from '@surreysocieties/admin';
+import { validateInviteInput, generateCsrfToken, verifyCsrfToken } from '@surreysocieties/admin';
 
 const SOCIETY_ID = 'ai';
 const user = Astro.locals.user!;
 
 if (user.role !== 'protectedAdmin' && user.role !== 'admin') return Astro.redirect('/admin/admins');
 
+const csrfToken = generateCsrfToken(user._id);
 let errors: Record<string, string> = {};
 let values: Record<string, string> = {};
 
 if (Astro.request.method === 'POST') {
   const client = Astro.locals.convexClient;
   const formData = await Astro.request.formData();
+
+  if (!verifyCsrfToken(formData.get('_csrf')?.toString(), user._id)) {
+    errors._csrf = 'Invalid or expired form submission. Please try again.';
+  } else {
   const input = {
     email: formData.get('email')?.toString() || '',
     role: formData.get('role')?.toString() as any || 'member',
@@ -29,7 +34,8 @@ if (Astro.request.method === 'POST') {
     });
     return Astro.redirect('/admin/admins?invited=1');
   }
-  errors = validation.errors;
+    errors = validation.errors;
+  }
 }
 ---
 <AdminLayout title="Invite Admin" societyId={SOCIETY_ID} currentPath="/admin/admins">
@@ -47,6 +53,7 @@ if (Astro.request.method === 'POST') {
     </p>
 
     <form method="POST">
+      <input type="hidden" name="_csrf" value={csrfToken} />
       <div class="form-group">
         <label for="email" class="form-label">Email *</label>
         <input type="email" id="email" name="email" class="form-input" value={values.email || ''} required />

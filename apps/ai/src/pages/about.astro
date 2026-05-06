@@ -1,14 +1,29 @@
 ---
 export const prerender = true;
 import Layout from '../layouts/Layout.astro';
+import { Picture } from "astro:assets";
+import studentsWhiteboardCoding from "../assets/images/studentswhiteboardcoding.jpg";
+import studentsCodingWorkshop from "../assets/images/studentscodingworkshop.jpg";
 import '../styles/global.css';
 ---
 
 <Layout title="About" description="Learn about Surrey Artificial Intelligence Society — our mission, values, and what members can expect from our student-led AI community.">
 
   <!-- Header -->
-  <section class="bg-navy text-text-on-dark py-16 sm:py-20 px-6">
-    <div class="mx-auto max-w-6xl">
+  <section class="bg-navy text-text-on-dark py-16 sm:py-20 px-6 relative overflow-hidden">
+    <div class="absolute inset-0 z-0 opacity-20 pointer-events-none">
+      <Picture
+        src={studentsWhiteboardCoding}
+        alt="Students collaborating at a whiteboard"
+        widths={[768, 1280, 1920]}
+        sizes="100vw"
+        class="w-full h-full object-cover"
+        style={{ objectPosition: 'center 30%' }}
+        pictureAttributes={{ class: 'w-full h-full block overflow-hidden' }}
+      />
+      <div class="absolute inset-0 bg-gradient-to-r from-navy via-navy/90 to-navy/40"></div>
+    </div>
+    <div class="mx-auto max-w-6xl relative z-10">
       <div class="inline-flex items-center gap-2 mb-4">
         <span class="w-8 h-px bg-accent-blue"></span>
         <span class="text-accent-blue text-sm font-semibold uppercase tracking-wider">About Us</span>
@@ -30,9 +45,21 @@ import '../styles/global.css';
           <p class="text-text-secondary leading-relaxed mb-4">
             We believe AI literacy will be important across every discipline. Whether you're studying computer science, law, medicine, business, or the arts, understanding how AI works and what it means for your field matters.
           </p>
+        <div class="flex flex-col gap-6">
           <p class="text-text-secondary leading-relaxed">
             We're a student-led society under Surrey Students' Union, run by students who are passionate about technology and want to build a space where anyone can learn and contribute.
           </p>
+          <div class="mt-4 relative h-64 sm:h-80 w-full overflow-hidden border border-border-subtle shadow-md">
+            <Picture
+              src={studentsCodingWorkshop}
+              alt="Students coding together in a workshop"
+              widths={[768, 1280]}
+              sizes="(max-width: 768px) 100vw, 50vw"
+              class="w-full h-full object-cover"
+              pictureAttributes={{ class: 'absolute inset-0 w-full h-full block overflow-hidden' }}
+            />
+          </div>
+        </div>
         </div>
         <div class="bg-surface-alt rounded-xl p-8 border border-navy/5">
           <h3 class="font-semibold text-lg mb-6 text-navy">What to Expect</h3>

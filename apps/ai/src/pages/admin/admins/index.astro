@@ -1,6 +1,7 @@
 ---
 export const prerender = false;
 import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { actions } from 'astro:actions';
 
 const SOCIETY_ID = 'ai';
 const user = Astro.locals.user!;
@@ -13,6 +14,10 @@ const isManager = user.role === 'protectedAdmin' || user.role === 'admin';
 
 const success = Astro.url.searchParams.get('success');
 const invited = Astro.url.searchParams.get('invited');
+
+const removeResult = Astro.getActionResult(actions.admin.removeAdmin);
+const revokeResult = Astro.getActionResult(actions.admin.revokeInvite);
+const actionSuccess = (removeResult && !removeResult.error) || (revokeResult && !revokeResult.error);
 ---
 <AdminLayout title="Admin Users" societyId={SOCIETY_ID} currentPath="/admin/admins">
 
@@ -21,7 +26,7 @@ const invited = Astro.url.searchParams.get('invited');
     {isManager && <a href="/admin/admins/invite" class="btn btn-primary">Invite Admin</a>}
   </div>
 
-  {success && <div class="alert alert-success">Admin action completed.</div>}
+  {(success || actionSuccess) && <div class="alert alert-success">Admin action completed.</div>}
   {invited && <div class="alert alert-success">Invitation sent.</div>}
 
   <div class="admin-table-wrapper" style="margin-bottom: 2rem;">
@@ -43,7 +48,7 @@ const invited = Astro.url.searchParams.get('invited');
             {isManager && (
               <td>
                 {member.role !== 'protectedAdmin' && member.user?._id !== user._id && (
-                  <form method="POST" action="/api/admin/admins/remove" style="display:inline;" onsubmit="return confirm('Remove admin access for this user?')">
+                  <form method="POST" action={actions.admin.removeAdmin} style="display:inline;" onsubmit="return confirm('Remove admin access for this user?')">
                     <input type="hidden" name="userId" value={member.user?._id} />
                     <button type="submit" class="btn btn-ghost btn-sm" style="color: var(--color-admin-danger);">Remove</button>
                   </form>
@@ -83,7 +88,7 @@ const invited = Astro.url.searchParams.get('invited');
                 </td>
                 {isManager && (
                   <td>
-                    <form method="POST" action="/api/admin/admins/revoke" style="display:inline;">
+                    <form method="POST" action={actions.admin.revokeInvite} style="display:inline;">
                       <input type="hidden" name="invitationId" value={inv._id} />
                       <button type="submit" class="btn btn-ghost btn-sm" style="color: var(--color-admin-danger);">Revoke</button>
                     </form>

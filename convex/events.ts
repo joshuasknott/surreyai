@@ -1,6 +1,6 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
-import { requireContentEditor, logAction } from "./permissions";
+import { requireContentEditor, requireMembership, logAction } from "./permissions";
 
 export const list = query({
   args: { societySlug: v.string() },
@@ -10,6 +10,8 @@ export const list = query({
       .withIndex("by_slug", (q) => q.eq("slug", societySlug))
       .first();
     if (!society) return [];
+
+    await requireMembership(ctx, society._id);
 
     return await ctx.db
       .query("events")
@@ -60,7 +62,11 @@ export const listFeatured = query({
 export const getById = query({
   args: { id: v.id("events") },
   handler: async (ctx, { id }) => {
-    return await ctx.db.get(id);
+    const event = await ctx.db.get(id);
+    if (!event) return null;
+
+    await requireMembership(ctx, event.societyId);
+    return event;
   },
 });
 

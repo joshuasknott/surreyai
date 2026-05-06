@@ -1,0 +1,98 @@
+---
+/**
+ * SiteHead — shared <head> fragment for all society public layouts.
+ *
+ * Callers must NOT wrap this in a <head> tag; they should render it
+ * inside their own <head> with any extra app-specific <link> / <meta>
+ * tags in the default slot.
+ */
+interface Props {
+  /** Page-level title (suffix like " — Surrey AI Society" is added by the caller). */
+  title: string;
+  /** Meta description & og:description */
+  description: string;
+  /**
+   * Absolute URL to the Open Graph share image.
+   * Defaults to undefined — callers should supply a 1200×630 image.
+   */
+  ogImage?: string;
+  /**
+   * Canonical URL for this page.
+   * Pass `Astro.url` (a URL object) and it will be serialised automatically.
+   */
+  canonicalUrl?: URL | string;
+  /**
+   * og:type — defaults to 'website'.
+   * Use 'article' for blog-post-style pages.
+   */
+  ogType?: string;
+  /**
+   * Twitter card type. Defaults to 'summary_large_image' when ogImage is
+   * provided, 'summary' otherwise.
+   */
+  twitterCard?: 'summary' | 'summary_large_image';
+  /**
+   * Extra Google Fonts <link> tags appended after the shared Inter link.
+   * Pass the full href string, e.g.
+   *   "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+   */
+  extraFontHrefs?: string[];
+  /**
+   * htmlClass — additional classes for <html>. e.g. 'scroll-smooth'
+   */
+  htmlClass?: string;
+}
+
+const {
+  title,
+  description,
+  ogImage,
+  canonicalUrl,
+  ogType = 'website',
+  twitterCard,
+  extraFontHrefs = [],
+  htmlClass,
+} = Astro.props;
+
+const resolvedCanonical = canonicalUrl ? canonicalUrl.toString() : undefined;
+const resolvedTwitterCard = twitterCard ?? (ogImage ? 'summary_large_image' : 'summary');
+---
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="generator" content={Astro.generator} />
+<title>{title}</title>
+<meta name="description" content={description} />
+
+{/* Canonical */}
+{resolvedCanonical && <link rel="canonical" href={resolvedCanonical} />}
+
+{/* Open Graph */}
+<meta property="og:type" content={ogType} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+{resolvedCanonical && <meta property="og:url" content={resolvedCanonical} />}
+{ogImage && <meta property="og:image" content={ogImage} />}
+
+{/* Twitter Card */}
+<meta name="twitter:card" content={resolvedTwitterCard} />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+{ogImage && <meta name="twitter:image" content={ogImage} />}
+
+{/* Favicon */}
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+{/* Google Fonts — Inter is always loaded */}
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+  rel="stylesheet"
+/>
+{extraFontHrefs.map((href) => (
+  <link href={href} rel="stylesheet" />
+))}
+
+{/* App-specific head content (extra meta, inline styles, etc.) */}
+<slot />

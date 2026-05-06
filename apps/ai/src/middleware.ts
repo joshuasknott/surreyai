@@ -13,7 +13,7 @@ const isPublicAdminRoute = createRouteMatcher([
 export const onRequest = clerkMiddleware(async (auth, context) => {
   const { pathname } = new URL(context.request.url);
 
-  if (!pathname.startsWith('/admin') && !pathname.startsWith('/api/admin')) {
+  if (!pathname.startsWith('/admin') && !pathname.startsWith('/api/admin') && !pathname.startsWith('/_actions/')) {
     return;
   }
 
@@ -24,7 +24,7 @@ export const onRequest = clerkMiddleware(async (auth, context) => {
   const { userId } = auth();
 
   if (!userId) {
-    if (pathname.startsWith('/api/admin')) {
+    if (pathname.startsWith('/api/admin') || pathname.startsWith('/_actions/')) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' },
@@ -41,7 +41,7 @@ export const onRequest = clerkMiddleware(async (auth, context) => {
   });
 
   if (!membership) {
-    if (pathname.startsWith('/api/admin')) {
+    if (pathname.startsWith('/api/admin') || pathname.startsWith('/_actions/')) {
       return new Response(JSON.stringify({ error: 'Forbidden' }), {
         status: 403,
         headers: { 'Content-Type': 'application/json' },

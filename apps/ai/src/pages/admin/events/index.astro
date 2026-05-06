@@ -1,6 +1,7 @@
 ---
 export const prerender = false;
 import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { actions } from 'astro:actions';
 
 const SOCIETY_ID = 'ai';
 const client = Astro.locals.convexClient;
@@ -8,6 +9,9 @@ const events: any[] = await client.query("events:list", { societySlug: SOCIETY_I
 
 const success = Astro.url.searchParams.get('success');
 const deleted = Astro.url.searchParams.get('deleted');
+
+const actionResult = Astro.getActionResult(actions.admin.deleteEvent);
+const actionDeleted = actionResult && !actionResult.error;
 ---
 <AdminLayout title="Events" societyId={SOCIETY_ID} currentPath="/admin/events">
 
@@ -17,7 +21,7 @@ const deleted = Astro.url.searchParams.get('deleted');
   </div>
 
   {success && <div class="alert alert-success">Event saved successfully.</div>}
-  {deleted && <div class="alert alert-success">Event deleted.</div>}
+  {(deleted || actionDeleted) && <div class="alert alert-success">Event deleted.</div>}
 
   {events.length === 0 ? (
     <div class="admin-table-wrapper">
@@ -52,7 +56,7 @@ const deleted = Astro.url.searchParams.get('deleted');
               <td>
                 <div class="table-actions">
                   <a href={`/admin/events/${event._id}/edit`} class="btn btn-outline btn-sm">Edit</a>
-                  <form method="POST" action="/api/admin/events/delete" style="display:inline;" onsubmit="return confirm('Delete this event?')">
+                  <form method="POST" action={actions.admin.deleteEvent} style="display:inline;" onsubmit="return confirm('Delete this event?')">
                     <input type="hidden" name="id" value={event._id} />
                     <button type="submit" class="btn btn-ghost btn-sm" style="color: var(--color-admin-danger);">Delete</button>
                   </form>

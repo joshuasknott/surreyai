@@ -1,41 +1,54 @@
 ---
-export const prerender = true;
+export const prerender = false;
 import Layout from '../layouts/Layout.astro';
+import { createConvexClient } from '@surreysocieties/admin';
+import { Picture } from "astro:assets";
+import studentHackathon from "../assets/images/studenthackathon.jpg";
 import '../styles/global.css';
 
-const events = [
-  {
-    title: 'Intro to AI at Surrey',
-    description: 'Our opening event for the year. What is AI? Why does it matter? What will we be doing? Open to all students — no experience needed.',
-    type: 'Coming Soon',
-    format: 'Talk + Q&A',
-  },
-  {
-    title: 'Practical AI Build Night',
-    description: 'A hands-on evening where you build something with AI tools. Bring a laptop, we provide the guidance. Beginners welcome.',
-    type: 'Planned Format',
-    format: 'Workshop',
-  },
-  {
-    title: 'Responsible AI Discussion',
-    description: 'An open discussion on the ethics and societal implications of AI. What should we be thinking about as the next generation of technologists?',
-    type: 'Planned Format',
-    format: 'Panel / Discussion',
-  },
-  {
-    title: 'Careers in AI',
-    description: 'Exploring career paths in artificial intelligence — from research to industry, startups to big tech. What does it actually look like?',
-    type: 'Planned Format',
-    format: 'Careers Event',
-  },
-];
+const SOCIETY_ID = 'ai';
+const client = createConvexClient();
+const events: any[] = (await client.query("events:listPublished", { societySlug: SOCIETY_ID }))
+  .filter((event: any) => event.status === 'published');
+
+const formatEventDate = (date?: string) => {
+  if (!date) return 'Date TBC';
+
+  const parsed = new Date(`${date}T00:00:00`);
+  if (Number.isNaN(parsed.getTime())) return date;
+
+  return parsed.toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+};
+
+const getEventDetails = (event: any) => {
+  if (event.location) return `Location: ${event.location}`;
+  if (event.startTime && event.endTime) return `Time: ${event.startTime}-${event.endTime}`;
+  if (event.startTime) return `Time: ${event.startTime}`;
+  return `Category: ${event.category || 'Event'}`;
+};
 ---
 
 <Layout title="Events" description="Upcoming and planned events from Surrey Artificial Intelligence Society — workshops, build nights, discussions, and careers events.">
 
   <!-- Header -->
-  <section class="bg-navy text-text-on-dark py-16 sm:py-20 px-6">
-    <div class="mx-auto max-w-6xl">
+  <section class="bg-navy text-text-on-dark py-16 sm:py-20 px-6 relative overflow-hidden">
+    <div class="absolute inset-0 z-0 opacity-20 pointer-events-none">
+      <Picture
+        src={studentHackathon}
+        alt="Students participating in a hackathon"
+        widths={[768, 1280, 1920]}
+        sizes="100vw"
+        class="w-full h-full object-cover"
+        style={{ objectPosition: 'center 40%' }}
+        pictureAttributes={{ class: 'w-full h-full block overflow-hidden' }}
+      />
+      <div class="absolute inset-0 bg-gradient-to-r from-navy via-navy/90 to-navy/40"></div>
+    </div>
+    <div class="mx-auto max-w-6xl relative z-10">
       <div class="inline-flex items-center gap-2 mb-4">
         <span class="w-8 h-px bg-accent-blue"></span>
         <span class="text-accent-blue text-sm font-semibold uppercase tracking-wider">Events</span>
@@ -48,21 +61,28 @@ const events = [
   <!-- Events List -->
   <section class="py-16 sm:py-20 px-6">
     <div class="mx-auto max-w-6xl">
-      <div class="grid sm:grid-cols-2 gap-6">
-        {events.map(event => (
-          <div class="bg-surface-card rounded-xl p-6 border border-navy/5 hover:border-accent-blue/20 transition-colors shadow-sm">
-            <div class="flex items-center gap-3 mb-4">
-              <span class="inline-block text-xs font-medium text-accent-blue bg-accent-blue/10 px-3 py-1 rounded-full">{event.type}</span>
-              <span class="text-xs text-text-muted">Date TBC</span>
+      {events.length === 0 ? (
+        <div class="bg-surface-card rounded-xl p-8 border border-navy/5 shadow-sm text-center">
+          <h3 class="font-semibold text-lg mb-2">No published events yet</h3>
+          <p class="text-text-secondary text-sm leading-relaxed">Check back soon for upcoming Surrey Artificial Intelligence Society events.</p>
+        </div>
+      ) : (
+        <div class="grid sm:grid-cols-2 gap-6">
+          {events.map(event => (
+            <div class="bg-surface-card rounded-xl p-6 border border-navy/5 hover:border-accent-blue/20 transition-colors shadow-sm">
+              <div class="flex items-center gap-3 mb-4">
+                <span class="inline-block text-xs font-medium text-accent-blue bg-accent-blue/10 px-3 py-1 rounded-full">{event.category || 'Event'}</span>
+                <span class="text-xs text-text-muted">{formatEventDate(event.date)}</span>
+              </div>
+              <h3 class="font-semibold text-lg mb-2">{event.title}</h3>
+              <p class="text-text-secondary text-sm leading-relaxed mb-4">{event.description || 'Details coming soon.'}</p>
+              <div class="text-xs text-text-muted">
+                {getEventDetails(event)}
+              </div>
             </div>
-            <h3 class="font-semibold text-lg mb-2">{event.title}</h3>
-            <p class="text-text-secondary text-sm leading-relaxed mb-4">{event.description}</p>
-            <div class="text-xs text-text-muted">
-              Format: {event.format}
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       <div class="mt-12 bg-surface-alt rounded-xl p-8 border border-navy/5 text-center">
         <h3 class="font-semibold text-lg mb-2">Want to suggest an event?</h3>

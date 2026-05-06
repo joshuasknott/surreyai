@@ -2,7 +2,8 @@
 export const prerender = true;
 import Layout from "../layouts/Layout.astro";
 import BackgroundVideo from "@surreysocieties/ui/components/BackgroundVideo";
-import ResponsiveImageFrame from "@surreysocieties/ui/components/ResponsiveImageFrame";
+import { Picture } from "astro:assets";
+import aiGptHero from "../assets/images/ai-gpt-hero.png";
 import "../styles/global.css";
 ---
 
@@ -53,14 +54,15 @@ import "../styles/global.css";
             objectPosition="center 40%"
             overlayClass="bg-navy-deep/45"
           />
-          <ResponsiveImageFrame
-            src="/images/optimized/ai-students-1920.webp"
-            fallbackSrc="/images/optimized/ai-students-1920.jpg"
-            alt="AI Society students collaborating during a campus session"
-            objectPosition="center 40%"
-            loading="eager"
-            className="absolute inset-x-8 bottom-8 h-40 border border-accent-blue/30 shadow-[0_0_24px_rgba(6,182,212,0.18)]"
+          <Picture
+            src={aiGptHero}
+            alt="AI Society conceptual representation of artificial intelligence and community"
+            widths={[768, 1280, 1920]}
             sizes="420px"
+            loading="eager"
+            class="w-full h-full object-cover"
+            style={{ objectPosition: 'center 40%' }}
+            pictureAttributes={{ class: 'absolute inset-x-8 bottom-8 h-40 border border-accent-blue/30 shadow-[0_0_24px_rgba(6,182,212,0.18)] block overflow-hidden' }}
           />
           <div class="absolute left-6 top-6 font-mono-tech text-[10px] uppercase tracking-widest text-accent-blue bg-navy-deep/80 border border-accent-blue/30 px-3 py-1.5">
             Student-led AI Lab

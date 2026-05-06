@@ -1,20 +1,26 @@
 ---
-export const prerender = true;
+export const prerender = false;
 import Layout from '../layouts/Layout.astro';
+import { createConvexClient } from '@surreysocieties/admin';
 import '../styles/global.css';
 
-const committee = [
-  { role: 'President', initials: 'P' },
-  { role: 'Vice President', initials: 'VP' },
-  { role: 'Treasurer', initials: 'T' },
-  { role: 'Events Lead', initials: 'EL' },
-  { role: 'Technical Workshops Lead', initials: 'TW' },
-  { role: 'Marketing & Communications Lead', initials: 'MC' },
-  { role: 'Partnerships & Sponsorships Lead', initials: 'PS' },
-  { role: 'AI Policy & Ethics Lead', initials: 'PE' },
-  { role: 'Projects Lead', initials: 'PL' },
-  { role: 'First Year Representative', initials: 'FY' },
-];
+const SOCIETY_ID = 'ai';
+const client = createConvexClient();
+const committee: any[] = (await client.query("committee:listActive", { societySlug: SOCIETY_ID }))
+  .sort((a: any, b: any) =>
+    (a.displayOrder ?? Number.MAX_SAFE_INTEGER) - (b.displayOrder ?? Number.MAX_SAFE_INTEGER)
+    || (a.name || '').localeCompare(b.name || '')
+  );
+
+const getInitials = (name?: string, role?: string) => {
+  const source = (name || role || '?').trim();
+  const words = source.split(/\s+/).filter(Boolean);
+
+  if (words.length === 0) return '?';
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+
+  return words.slice(0, 2).map((word) => word[0]).join('').toUpperCase();
+};
 ---
 
 <Layout title="Committee" description="Meet the student committee running Surrey Artificial Intelligence Society — the team behind our workshops, events, and community.">
@@ -34,19 +40,26 @@ const committee = [
   <!-- Committee Grid -->
   <section class="py-16 sm:py-20 px-6">
     <div class="mx-auto max-w-6xl">
-      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {committee.map(member => (
-          <div class="bg-surface-card rounded-xl p-6 border border-navy/5 hover:border-accent-blue/20 transition-colors shadow-sm flex items-start gap-4">
-            <div class="w-14 h-14 rounded-full bg-navy/5 border-2 border-accent-blue/20 flex items-center justify-center text-accent-blue font-bold text-sm shrink-0">
-              {member.initials}
+      {committee.length === 0 ? (
+        <div class="bg-surface-card rounded-xl p-8 border border-navy/5 shadow-sm text-center">
+          <h3 class="font-semibold text-lg mb-2">Committee details coming soon</h3>
+          <p class="text-text-secondary text-sm leading-relaxed">Check back soon to meet the Surrey Artificial Intelligence Society committee.</p>
+        </div>
+      ) : (
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {committee.map(member => (
+            <div class="bg-surface-card rounded-xl p-6 border border-navy/5 hover:border-accent-blue/20 transition-colors shadow-sm flex items-start gap-4">
+              <div class="w-14 h-14 rounded-full bg-navy/5 border-2 border-accent-blue/20 flex items-center justify-center text-accent-blue font-bold text-sm shrink-0">
+                {getInitials(member.name, member.role)}
+              </div>
+              <div>
+                <h3 class="font-semibold text-lg">{member.role}</h3>
+                <p class="text-text-muted text-sm mt-1">{member.name}</p>
+              </div>
             </div>
-            <div>
-              <h3 class="font-semibold text-lg">{member.role}</h3>
-              <p class="text-text-muted text-sm mt-1">Name TBC</p>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       <div class="mt-12 bg-surface-alt rounded-xl p-8 border border-navy/5 text-center">
         <h3 class="font-semibold text-lg mb-2">Interested in joining the committee?</h3>

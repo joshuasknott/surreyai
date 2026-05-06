@@ -7,7 +7,9 @@
     ".": "./src/index.ts",
     "./validation": "./src/validation/index.ts",
     "./config": "./src/config.ts",
-    "./types": "./src/types.ts"
+    "./types": "./src/types.ts",
+    "./csrf": "./src/csrf.ts",
+    "./actionGuard": "./src/actionGuard.ts"
   },
   "dependencies": {
     "convex": "^1.37.0"

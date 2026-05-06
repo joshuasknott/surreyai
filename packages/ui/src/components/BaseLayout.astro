@@ -1,35 +1,70 @@
 ---
+/**
+ * BaseLayout — minimal structural shell shared by all public society layouts.
+ *
+ * Renders the full HTML document. App-specific layouts compose on top of this
+ * by passing their own nav/footer in the named slots, or simply using the
+ * default slot for full-page control.
+ *
+ * Props are forwarded to SiteHead — see SiteHead.astro for full docs.
+ */
+import SiteHead from './SiteHead.astro';
+
 interface Props {
   title: string;
   description: string;
-  accentColor?: string;
+  ogImage?: string;
+  canonicalUrl?: URL | string;
+  ogType?: string;
+  twitterCard?: 'summary' | 'summary_large_image';
+  extraFontHrefs?: string[];
+  /** Additional class(es) on <html>, e.g. 'scroll-smooth'. */
+  htmlClass?: string;
+  /** Additional class(es) on <body>. */
+  bodyClass?: string;
 }
 
-const { title, description, accentColor = '#6366f1' } = Astro.props;
+const {
+  title,
+  description,
+  ogImage,
+  canonicalUrl = Astro.url,
+  ogType,
+  twitterCard,
+  extraFontHrefs,
+  htmlClass,
+  bodyClass,
+} = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" class:list={[htmlClass]}>
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content={description} />
-    <meta name="generator" content={Astro.generator} />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
-      rel="stylesheet"
+    <SiteHead
+      title={title}
+      description={description}
+      ogImage={ogImage}
+      canonicalUrl={canonicalUrl}
+      ogType={ogType}
+      twitterCard={twitterCard}
+      extraFontHrefs={extraFontHrefs}
     />
-    <title>{title}</title>
-    <style define:vars={{ accentColor }}>
-      :root {
-        --accent: var(--accentColor);
-      }
-    </style>
+    {/* App-specific <head> additions (inline styles, extra scripts, etc.) */}
+    <slot name="head" />
   </head>
-  <body>
+  <body class:list={[bodyClass]}>
     <slot />
+
+    {/*
+      Shared mobile-menu toggle. Works for any nav that uses the ids
+      'mobile-menu-btn' and 'mobile-menu'.
+    */}
+    <script>
+      const btn = document.getElementById('mobile-menu-btn');
+      const menu = document.getElementById('mobile-menu');
+      btn?.addEventListener('click', () => {
+        menu?.classList.toggle('hidden');
+      });
+    </script>
   </body>
 </html>

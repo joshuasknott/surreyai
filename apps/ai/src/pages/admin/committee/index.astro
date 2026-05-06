@@ -1,12 +1,16 @@
 ---
 export const prerender = false;
 import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { actions } from 'astro:actions';
 
 const SOCIETY_ID = 'ai';
 const client = Astro.locals.convexClient;
 const members: any[] = await client.query("committee:list", { societySlug: SOCIETY_ID });
 const success = Astro.url.searchParams.get('success');
 const deleted = Astro.url.searchParams.get('deleted');
+
+const actionResult = Astro.getActionResult(actions.admin.deleteCommitteeMember);
+const actionDeleted = actionResult && !actionResult.error;
 ---
 <AdminLayout title="Committee" societyId={SOCIETY_ID} currentPath="/admin/committee">
 
@@ -16,7 +20,7 @@ const deleted = Astro.url.searchParams.get('deleted');
   </div>
 
   {success && <div class="alert alert-success">Committee member saved.</div>}
-  {deleted && <div class="alert alert-success">Committee member removed.</div>}
+  {(deleted || actionDeleted) && <div class="alert alert-success">Committee member removed.</div>}
 
   {members.length === 0 ? (
     <div class="admin-table-wrapper">
@@ -49,7 +53,7 @@ const deleted = Astro.url.searchParams.get('deleted');
               <td>
                 <div class="table-actions">
                   <a href={`/admin/committee/${member._id}/edit`} class="btn btn-outline btn-sm">Edit</a>
-                  <form method="POST" action="/api/admin/committee/delete" style="display:inline;" onsubmit="return confirm('Remove this committee member?')">
+                  <form method="POST" action={actions.admin.deleteCommitteeMember} style="display:inline;" onsubmit="return confirm('Remove this committee member?')">
                     <input type="hidden" name="id" value={member._id} />
                     <button type="submit" class="btn btn-ghost btn-sm" style="color: var(--color-admin-danger);">Remove</button>
                   </form>

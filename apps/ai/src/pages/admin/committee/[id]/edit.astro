@@ -1,7 +1,7 @@
 ---
 export const prerender = false;
 import AdminLayout from '../../../../layouts/AdminLayout.astro';
-import { validateCommitteeInput } from '@surreysocieties/admin';
+import { validateCommitteeInput, generateCsrfToken, verifyCsrfToken } from '@surreysocieties/admin';
 
 const SOCIETY_ID = 'ai';
 const { id } = Astro.params;
@@ -11,20 +11,26 @@ let member: any = await client.query("committee:getById", { id });
 
 if (!member) return Astro.redirect('/admin/committee');
 
+const userId = Astro.locals.user?._id || '';
+const csrfToken = generateCsrfToken(userId);
 let errors: Record<string, string> = {};
 
 if (Astro.request.method === 'POST') {
   const formData = await Astro.request.formData();
-  const input = {
-    name: formData.get('name')?.toString() || '',
-    role: formData.get('role')?.toString() || '',
-    bio: formData.get('bio')?.toString() || '',
-    image: formData.get('image')?.toString() || '',
-    email: formData.get('email')?.toString() || '',
-    linkedIn: formData.get('linkedIn')?.toString() || '',
-    displayOrder: formData.get('displayOrder')?.toString() ? parseInt(formData.get('displayOrder')!.toString()) : undefined,
-    isActive: formData.get('isActive') !== 'false',
-  };
+
+  if (!verifyCsrfToken(formData.get('_csrf')?.toString(), userId)) {
+    errors._csrf = 'Invalid or expired form submission. Please try again.';
+  } else {
+    const input = {
+      name: formData.get('name')?.toString() || '',
+      role: formData.get('role')?.toString() || '',
+      bio: formData.get('bio')?.toString() || '',
+      image: formData.get('image')?.toString() || '',
+      email: formData.get('email')?.toString() || '',
+      linkedIn: formData.get('linkedIn')?.toString() || '',
+      displayOrder: formData.get('displayOrder')?.toString() ? parseInt(formData.get('displayOrder')!.toString()) : undefined,
+      isActive: formData.get('isActive') !== 'false',
+    };
 
   const validation = validateCommitteeInput(input, true);
   if (validation.valid) {
@@ -35,8 +41,9 @@ if (Astro.request.method === 'POST') {
     });
     return Astro.redirect('/admin/committee?success=1');
   }
-  errors = validation.errors;
-  member = { ...member, ...input };
+    errors = validation.errors;
+    member = { ...member, ...input };
+  }
 }
 ---
 <AdminLayout title="Edit Committee Member" societyId={SOCIETY_ID} currentPath="/admin/committee">
@@ -48,6 +55,7 @@ if (Astro.request.method === 'POST') {
 
   <div class="form-card">
     <form method="POST">
+      <input type="hidden" name="_csrf" value={csrfToken} />
       <div class="form-group">
         <label for="name" class="form-label">Name *</label>
         <input type="text" id="name" name="name" class="form-input" value={member.name} required />
