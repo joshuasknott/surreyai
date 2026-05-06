@@ -1,5 +1,6 @@
 import { query } from "./_generated/server";
 import { v } from "convex/values";
+import { requireExistingAdmin } from "./permissions";
 
 export const listBySociety = query({
   args: { societySlug: v.string() },
@@ -10,24 +11,11 @@ export const listBySociety = query({
       .first();
     if (!society) return [];
 
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return [];
-
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
-      .first();
-    if (!user) return [];
-
-    const membership = await ctx.db
-      .query("memberships")
-      .withIndex("by_user_society", (q) =>
-        q.eq("userId", user._id).eq("societyId", society._id)
-      )
-      .first();
-    if (!membership || membership.status !== "active") return [];
-    if (membership.role !== "protectedAdmin" && membership.role !== "admin")
+    try {
+      await requireExistingAdmin(ctx, society._id);
+    } catch {
       return [];
+    }
 
     const logs = await ctx.db
       .query("auditLogs")

@@ -49,7 +49,7 @@ export function requireAdmin(context: AdminActionContext): AdminGuardResult {
 export function requireAdminRole(context: AdminActionContext): AdminGuardResult {
   const result = requireAdmin(context);
 
-  if (result.user.role !== 'protectedAdmin' && result.user.role !== 'admin') {
+  if (result.user.role !== 'owner' && result.user.role !== 'protectedAdmin' && result.user.role !== 'admin') {
     throw { code: 'FORBIDDEN', message: 'Admin role required' };
   }
 

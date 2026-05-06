@@ -1,6 +1,7 @@
 ---
 export const prerender = false;
 import { getSocietyById } from '@surreysocieties/admin';
+import { SignIn } from '@clerk/astro/components';
 import '../../styles/admin.css';
 
 const SOCIETY_ID = 'ai';
@@ -23,30 +24,17 @@ if (userId) return Astro.redirect('/admin');
   </head>
   <body class="admin-body">
     <div class="login-container">
-      <div class="login-card">
-        <div class="login-logo">
+      <div style="display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 400px; gap: 1rem;">
+        <div class="login-logo" style="margin-bottom: 0;">
           <img src={society?.logo || '/favicon.svg'} alt="" />
           <h1>{society?.shortName || 'Admin'}</h1>
           <p>Admin Dashboard</p>
         </div>
-        <div id="clerk-sign-in"></div>
+        <SignIn fallbackRedirectUrl="/admin" />
         <p style="margin-top: 1rem; text-align: center;">
-          <a href="/" style="color: var(--color-admin-primary);">← Back to public site</a>
+          <a href="/" style="color: var(--color-admin-primary); text-decoration: none; font-size: 0.875rem;">← Back to public site</a>
         </p>
       </div>
     </div>
   </body>
-  <script is:inline>
-    (function() {
-      var interval = setInterval(function() {
-        if (window.Clerk && window.Clerk.isReady && window.Clerk.isReady()) {
-          clearInterval(interval);
-          window.Clerk.openSignIn({
-            element: '#clerk-sign-in',
-            redirectUrl: '/admin'
-          });
-        }
-      }, 100);
-    })();
-  </script>
 </html>

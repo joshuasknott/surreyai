@@ -28,6 +28,7 @@ export default defineSchema({
     userId: v.id("users"),
     societyId: v.id("societies"),
     role: v.union(
+      v.literal("owner"),
       v.literal("protectedAdmin"),
       v.literal("admin"),
       v.literal("member")
@@ -119,6 +120,5 @@ export default defineSchema({
     targetType: v.optional(v.string()),
     details: v.optional(v.string()),
   })
-    .index("by_society", ["societyId"])
-    .index("by_society_time", ["societyId", "_creationTime"]),
+    .index("by_society", ["societyId"]),
 });

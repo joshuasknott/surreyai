@@ -6,7 +6,7 @@ import { validateInviteInput, generateCsrfToken, verifyCsrfToken } from '@surrey
 const SOCIETY_ID = 'ai';
 const user = Astro.locals.user!;
 
-if (user.role !== 'protectedAdmin' && user.role !== 'admin') return Astro.redirect('/admin/admins');
+if (user.role !== 'owner' && user.role !== 'protectedAdmin' && user.role !== 'admin') return Astro.redirect('/admin/admins');
 
 const csrfToken = generateCsrfToken(user._id);
 let errors: Record<string, string> = {};

@@ -1,6 +1,6 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
-import { requireContentEditor, requireMembership, logAction } from "./permissions";
+import { requireContentEditor, requireExistingMembership, logAction } from "./permissions";
 
 export const list = query({
   args: { societySlug: v.string() },
@@ -11,7 +11,7 @@ export const list = query({
       .first();
     if (!society) return [];
 
-    await requireMembership(ctx, society._id);
+    await requireExistingMembership(ctx, society._id);
 
     return await ctx.db
       .query("events")
@@ -65,7 +65,7 @@ export const getById = query({
     const event = await ctx.db.get(id);
     if (!event) return null;
 
-    await requireMembership(ctx, event.societyId);
+    await requireExistingMembership(ctx, event.societyId);
     return event;
   },
 });

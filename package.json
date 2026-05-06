@@ -17,7 +17,8 @@
     "build:ai": "npm run build -w apps/ai",
     "build:business": "npm run build -w apps/business",
     "build:neurotech": "npm run build -w apps/neurotech",
-    "build:all": "npm run build -w apps/ai && npm run build -w apps/business && npm run build -w apps/neurotech"
+    "build:all": "npm run build -w apps/ai && npm run build -w apps/business && npm run build -w apps/neurotech",
+    "provision:admins": "node scripts/provision-admins.mjs"
   },
   "overrides": {
     "vite": "^7.3.2"

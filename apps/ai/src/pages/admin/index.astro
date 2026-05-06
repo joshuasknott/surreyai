@@ -44,7 +44,7 @@ const activeMembers = committee.filter(m => m.isActive);
   <div class="quick-actions">
     <a href="/admin/events/new" class="btn btn-primary">+ Add Event</a>
     <a href="/admin/committee/new" class="btn btn-primary">+ Add Committee Member</a>
-    {(user.role === 'protectedAdmin' || user.role === 'admin') && (
+    {(user.role === 'owner' || user.role === 'protectedAdmin' || user.role === 'admin') && (
       <a href="/admin/admins/invite" class="btn btn-outline">Invite Admin</a>
     )}
   </div>

@@ -6,7 +6,8 @@ import {
   canManageRole,
   isProtectedEmail,
   logAction,
-  resolveUser,
+  ensureUser,
+  getUserByIdentity,
 } from "./permissions";
 import type { Role } from "./permissions";
 
@@ -48,20 +49,7 @@ export const getMyMembership = query({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return null;
 
-    let user = await ctx.db
-      .query("users")
-      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
-      .first();
-
-    if (!user && identity.email) {
-      user = await ctx.db
-        .query("users")
-        .withIndex("by_email", (q) =>
-          q.eq("email", identity.email!.toLowerCase())
-        )
-        .first();
-    }
-
+    const user = await getUserByIdentity(ctx, identity);
     if (!user) return null;
 
     const society = await ctx.db
@@ -148,10 +136,7 @@ export const listInvitations = query({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return [];
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
-      .first();
+    const user = await getUserByIdentity(ctx, identity);
     if (!user) return [];
 
     const membership = await ctx.db
@@ -224,7 +209,7 @@ export const acceptInvitation = mutation({
       );
     }
 
-    const user = await resolveUser(ctx, identity);
+    const user = await ensureUser(ctx, identity);
 
     const existingMembership = await ctx.db
       .query("memberships")
@@ -286,22 +271,17 @@ export const changeRole = mutation({
       .first();
 
     if (!targetMembership) throw new Error("Target user is not a member");
-    if (targetMembership.role === "protectedAdmin") {
-      throw new Error("Cannot change the role of a protected admin");
-    }
-    const targetUser = await ctx.db.get(targetUserId);
-    if (targetUser && isProtectedEmail(targetUser.email)) {
-      throw new Error("Cannot change the role of a protected admin");
-    }
-    if (
-      !canManageRole(
-        membership.role as Role,
-        targetMembership.role as Role
-      )
-    ) {
+    if (!canManageRole(membership.role as Role, targetMembership.role as Role)) {
       throw new Error(
         "Insufficient permissions to change this user's role"
       );
+    }
+    if (targetMembership.role === "owner") {
+      throw new Error("Cannot change the role of the owner");
+    }
+    const targetUser = await ctx.db.get(targetUserId);
+    if (targetUser && isProtectedEmail(targetUser.email) && membership.role !== "owner") {
+      throw new Error("Cannot change the role of a protected admin");
     }
 
     await ctx.db.patch(targetMembership._id, { role: newRole });
@@ -343,20 +323,15 @@ export const removeMember = mutation({
       .first();
 
     if (!targetMembership) throw new Error("Target user is not a member");
-    if (targetMembership.role === "protectedAdmin") {
-      throw new Error("Cannot remove a protected admin");
+    if (!canManageRole(membership.role as Role, targetMembership.role as Role)) {
+      throw new Error("Insufficient permissions to remove this user");
+    }
+    if (targetMembership.role === "owner") {
+      throw new Error("Cannot remove the owner");
     }
     const targetUser = await ctx.db.get(targetUserId);
-    if (targetUser && isProtectedEmail(targetUser.email)) {
+    if (targetUser && isProtectedEmail(targetUser.email) && membership.role !== "owner") {
       throw new Error("Cannot remove a protected admin");
-    }
-    if (
-      !canManageRole(
-        membership.role as Role,
-        targetMembership.role as Role
-      )
-    ) {
-      throw new Error("Insufficient permissions to remove this user");
     }
 
     await ctx.db.patch(targetMembership._id, { status: "disabled" });

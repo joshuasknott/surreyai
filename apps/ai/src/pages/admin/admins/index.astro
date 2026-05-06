@@ -10,7 +10,7 @@ const client = Astro.locals.convexClient;
 const members: any[] = await client.query("memberships:listBySociety", { societySlug: SOCIETY_ID });
 const invitations: any[] = await client.query("memberships:listInvitations", { societySlug: SOCIETY_ID });
 const pendingInvitations = invitations.filter(i => i.status === 'pending');
-const isManager = user.role === 'protectedAdmin' || user.role === 'admin';
+const isManager = user.role === 'owner' || user.role === 'protectedAdmin' || user.role === 'admin';
 
 const success = Astro.url.searchParams.get('success');
 const invited = Astro.url.searchParams.get('invited');
@@ -47,7 +47,7 @@ const actionSuccess = (removeResult && !removeResult.error) || (revokeResult && 
             <td><span class={`pill pill-${member.role}`}>{member.role}</span></td>
             {isManager && (
               <td>
-                {member.role !== 'protectedAdmin' && member.user?._id !== user._id && (
+                {member.role !== 'owner' && (user.role === 'owner' || member.role !== 'protectedAdmin') && member.user?._id !== user._id && (
                   <form method="POST" action={actions.admin.removeAdmin} style="display:inline;" onsubmit="return confirm('Remove admin access for this user?')">
                     <input type="hidden" name="userId" value={member.user?._id} />
                     <button type="submit" class="btn btn-ghost btn-sm" style="color: var(--color-admin-danger);">Remove</button>

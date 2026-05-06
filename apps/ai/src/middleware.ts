@@ -33,7 +33,10 @@ export const onRequest = clerkMiddleware(async (auth, context) => {
     return context.redirect('/admin/login');
   }
 
-  const token = await auth().getToken();
+  const token = await auth().getToken({ template: 'convex' });
+  if (!token) {
+    return new Response('Authentication configuration error: missing Convex Clerk token.', { status: 500 });
+  }
   const client = createConvexClient(token || undefined);
 
   const membership = await client.query("memberships:getMyMembership", {

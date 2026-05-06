@@ -1,5 +1,6 @@
 import { mutation } from "./_generated/server";
-import { PROTECTED_ADMIN_EMAILS } from "./permissions";
+import { v } from "convex/values";
+import { OWNER_EMAIL, PROTECTED_ADMIN_EMAILS } from "./permissions";
 
 export const seedSocieties = mutation({
   args: {},
@@ -77,5 +78,63 @@ export const seedSocieties = mutation({
     }
 
     return "Societies seeded successfully";
+  },
+});
+
+export const seedOwnerMemberships = mutation({
+  args: {
+    email: v.optional(v.string()),
+    name: v.optional(v.string()),
+  },
+  handler: async (ctx, { email, name }) => {
+    const ownerEmail = (email || OWNER_EMAIL).toLowerCase().trim();
+
+    let owner = await ctx.db
+      .query("users")
+      .withIndex("by_email", (q) => q.eq("email", ownerEmail))
+      .first();
+
+    if (!owner) {
+      const ownerId = await ctx.db.insert("users", {
+        email: ownerEmail,
+        name: name || "Josh Knott",
+      });
+      owner = await ctx.db.get(ownerId);
+    }
+
+    const societies = await ctx.db.query("societies").collect();
+    let changed = 0;
+
+    for (const society of societies) {
+      const existingMembership = await ctx.db
+        .query("memberships")
+        .withIndex("by_user_society", (q) =>
+          q.eq("userId", owner!._id).eq("societyId", society._id)
+        )
+        .first();
+
+      if (existingMembership) {
+        if (
+          existingMembership.role !== "owner" ||
+          existingMembership.status !== "active"
+        ) {
+          await ctx.db.patch(existingMembership._id, {
+            role: "owner",
+            status: "active",
+          });
+          changed++;
+        }
+      } else {
+        await ctx.db.insert("memberships", {
+          userId: owner!._id,
+          societyId: society._id,
+          role: "owner",
+          status: "active",
+        });
+        changed++;
+      }
+    }
+
+    return `Owner seeded across ${societies.length} societies (${changed} memberships changed)`;
   },
 });
