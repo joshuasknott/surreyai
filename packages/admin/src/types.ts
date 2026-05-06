@@ -1,5 +1,3 @@
-// ─── Data Models ─────────────────────────────────────────────────────────────
-
 export interface Society {
   id: string;
   name: string;
@@ -25,73 +23,12 @@ export interface SocietySocials {
   email?: string;
 }
 
-export interface Event {
-  id: string;
-  societyId: string;
-  title: string;
-  description: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  location: string;
-  category: string;
-  image: string;
-  registrationUrl: string;
-  status: 'draft' | 'published';
-  isFeatured: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface CommitteeMember {
-  id: string;
-  societyId: string;
+export interface AuthenticatedUser {
+  _id: string;
   name: string;
+  email: string;
   role: string;
-  bio: string;
-  image: string;
-  email: string;
-  linkedIn: string;
-  displayOrder: number;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
 }
-
-export type AdminRole = 'owner' | 'societyAdmin' | 'editor';
-export type AdminStatus = 'invited' | 'active' | 'disabled';
-
-export interface AdminUser {
-  id: string;
-  name: string;
-  email: string;
-  passwordHash: string;
-  role: AdminRole;
-  societyId: string;
-  status: AdminStatus;
-  createdAt: string;
-  updatedAt: string;
-}
-
-/** AdminUser without passwordHash, safe for client-side use */
-export type SafeAdminUser = Omit<AdminUser, 'passwordHash'>;
-
-export type InvitationStatus = 'pending' | 'accepted' | 'expired' | 'revoked';
-
-export interface Invitation {
-  id: string;
-  email: string;
-  role: AdminRole;
-  societyId: string;
-  invitedBy: string;
-  token: string;
-  expiresAt: string;
-  status: InvitationStatus;
-  createdAt: string;
-  updatedAt: string;
-}
-
-// ─── Input Types ─────────────────────────────────────────────────────────────
 
 export interface CreateEventInput {
   title: string;
@@ -124,17 +61,13 @@ export interface UpdateCommitteeMemberInput extends Partial<CreateCommitteeMembe
 
 export interface InviteAdminInput {
   email: string;
-  role: AdminRole;
+  role: 'admin' | 'member';
 }
-
-// ─── Validation Result ───────────────────────────────────────────────────────
 
 export interface ValidationResult {
   valid: boolean;
   errors: Record<string, string>;
 }
-
-// ─── Event Categories ────────────────────────────────────────────────────────
 
 export const EVENT_CATEGORIES = [
   'Workshop',

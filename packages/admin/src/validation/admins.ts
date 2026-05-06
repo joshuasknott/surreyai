@@ -9,8 +9,8 @@ export function validateInviteInput(input: InviteAdminInput): ValidationResult {
     errors.email = 'A valid email is required';
   }
 
-  if (!input.role || !['societyAdmin', 'editor'].includes(input.role)) {
-    errors.role = 'Role must be societyAdmin or editor';
+  if (!input.role || !['admin', 'member'].includes(input.role)) {
+    errors.role = 'Role must be admin or member';
   }
 
   return { valid: Object.keys(errors).length === 0, errors };
