@@ -1,0 +1,101 @@
+---
+import type { AITrack } from "../../../data/aiTracks";
+
+interface Props {
+  tracks: AITrack[];
+  activeId: string;
+}
+
+const { tracks, activeId } = Astro.props;
+---
+
+<div class="track-selectors" role="tablist" aria-label="AI Tracks" data-track-selectors>
+  {tracks.map((track, index) => (
+    <button
+      type="button"
+      role="tab"
+      id={`track-tab-${track.id}`}
+      aria-selected={track.id === activeId ? "true" : "false"}
+      aria-controls={`track-panel-${track.id}`}
+      class={`track-selectors__tab${track.id === activeId ? " is-active" : ""}`}
+      data-track-tab={track.id}
+      data-accent={track.accentColor}
+      data-accent-rgb={track.accentRgb}
+      tabindex={track.id === activeId ? 0 : -1}
+    >
+      <span class="track-selectors__tab-icon">{track.icon}</span>
+      <span class="track-selectors__tab-label">{track.title}</span>
+    </button>
+  ))}
+</div>
+
+<style>
+  .track-selectors {
+    display: flex;
+    gap: 2px;
+    padding: 12px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(148, 163, 184, 0.2) transparent;
+  }
+
+  .track-selectors::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .track-selectors::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .track-selectors::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.2);
+    border-radius: 2px;
+  }
+
+  .track-selectors__tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    color: #94A3B8;
+    background: transparent;
+    font-size: 0.8rem;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color 180ms ease, background 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+    font-family: var(--font-sans);
+  }
+
+  .track-selectors__tab:hover {
+    color: #CBD5E1;
+    background: rgba(148, 163, 184, 0.06);
+  }
+
+  .track-selectors__tab:focus-visible {
+    outline: 2px solid var(--accent, #06B6D4);
+    outline-offset: 2px;
+  }
+
+  .track-selectors__tab.is-active {
+    color: #F8FAFC;
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.12), rgba(139, 92, 246, 0.08));
+    border-color: rgba(6, 182, 212, 0.3);
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.1);
+  }
+
+  .track-selectors__tab-icon {
+    font-size: 0.9rem;
+    line-height: 1;
+  }
+
+  @media (max-width: 768px) {
+    .track-selectors__tab {
+      padding: 8px 12px;
+      font-size: 0.72rem;
+    }
+  }
+</style>

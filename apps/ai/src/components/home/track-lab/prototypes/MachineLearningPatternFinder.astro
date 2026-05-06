@@ -1,0 +1,717 @@
+---
+const chipData = [
+  { id: "creative", label: "Creative", color: "#F472B6" },
+  { id: "maths", label: "Maths", color: "#06B6D4" },
+  { id: "coding", label: "Coding", color: "#34D399" },
+  { id: "research", label: "Research", color: "#60A5FA" },
+  { id: "social", label: "Social Impact", color: "#FB923C" },
+  { id: "startups", label: "Startups", color: "#A78BFA" },
+  { id: "games", label: "Games", color: "#FBBF24" },
+  { id: "design", label: "Design", color: "#E879F9" },
+];
+
+const nodeData = [
+  { label: "AI Art", x: 90, y: 72, chips: ["creative", "design"], desc: "Generative visual art" },
+  { label: "Music Gen", x: 160, y: 45, chips: ["creative"], desc: "Audio synthesis & composition" },
+  { label: "Story AI", x: 72, y: 148, chips: ["creative", "research"], desc: "Narrative generation" },
+  { label: "Statistics", x: 280, y: 58, chips: ["maths", "research"], desc: "Probabilistic modeling" },
+  { label: "Optimization", x: 350, y: 105, chips: ["maths", "coding"], desc: "Gradient-based learning" },
+  { label: "Deep Math", x: 262, y: 128, chips: ["maths"], desc: "Neural network theory" },
+  { label: "ML Libs", x: 458, y: 72, chips: ["coding"], desc: "TensorFlow & PyTorch" },
+  { label: "AutoML", x: 498, y: 145, chips: ["coding", "research"], desc: "Automated model selection" },
+  { label: "MLOps", x: 432, y: 190, chips: ["coding", "startups"], desc: "Production ML pipelines" },
+  { label: "Papers", x: 188, y: 155, chips: ["research"], desc: "Academic research" },
+  { label: "Datasets", x: 218, y: 215, chips: ["research", "maths"], desc: "Data curation & labeling" },
+  { label: "Healthcare", x: 98, y: 262, chips: ["social", "research"], desc: "Medical diagnosis AI" },
+  { label: "Climate ML", x: 162, y: 298, chips: ["social", "maths"], desc: "Environmental modeling" },
+  { label: "EdTech", x: 70, y: 322, chips: ["social", "games"], desc: "Adaptive learning systems" },
+  { label: "Product ML", x: 332, y: 268, chips: ["startups", "coding"], desc: "ML-powered products" },
+  { label: "Recommenders", x: 395, y: 308, chips: ["startups", "maths"], desc: "Recommendation engines" },
+  { label: "Analytics", x: 278, y: 310, chips: ["startups"], desc: "Data-driven decisions" },
+  { label: "Game AI", x: 478, y: 268, chips: ["games", "coding"], desc: "Intelligent game agents" },
+  { label: "Proc Gen", x: 542, y: 305, chips: ["games", "creative"], desc: "Procedural content generation" },
+  { label: "Gen Design", x: 555, y: 128, chips: ["design", "creative"], desc: "Design automation tools" },
+  { label: "UI/UX AI", x: 535, y: 208, chips: ["design", "startups"], desc: "AI-powered interfaces" },
+];
+
+const edgePairs: [number, number][] = [
+  [0, 1], [0, 2], [1, 2],
+  [3, 4], [3, 5], [4, 5],
+  [6, 7], [6, 8], [7, 8],
+  [9, 10],
+  [11, 12], [11, 13], [12, 13],
+  [14, 15], [14, 16], [15, 16],
+  [17, 18],
+  [19, 20],
+  [2, 9], [3, 10], [4, 6], [5, 10],
+  [8, 14], [8, 20], [12, 15],
+  [17, 6], [18, 19],
+];
+
+const edges = edgePairs.map(([a, b]) => {
+  const shared = nodeData[a].chips.filter((c) => nodeData[b].chips.includes(c));
+  const color = shared.length > 0
+    ? chipData.find((c) => c.id === shared[0])!.color
+    : "#475569";
+  return {
+    x1: nodeData[a].x,
+    y1: nodeData[a].y,
+    x2: nodeData[b].x,
+    y2: nodeData[b].y,
+    a,
+    b,
+    sharedChips: shared,
+    color,
+  };
+});
+
+const stars = Array.from({ length: 55 }, (_, i) => ({
+  cx: ((i * 127 + 43) % 580) + 10,
+  cy: ((i * 89 + 17) % 340) + 10,
+  r: 0.3 + (i % 4) * 0.15,
+  opacity: 0.08 + (i % 3) * 0.06,
+  twinkle: i % 5 === 0,
+}));
+---
+
+<div data-track-prototype="ml" class="mlpf">
+  <div class="mlpf__top">
+    <span class="mlpf__badge">Pattern Finder</span>
+    <div class="mlpf__chips" role="group" aria-label="Interest areas">
+      {chipData.map((chip) => (
+        <button
+          class="mlpf__chip"
+          type="button"
+          data-mlpf-chip={chip.id}
+          aria-pressed="false"
+          style={`--chip-color: ${chip.color}`}
+        >
+          <span class="mlpf__chip-dot" />
+          {chip.label}
+        </button>
+      ))}
+    </div>
+  </div>
+
+  <div class="mlpf__canvas">
+    <svg
+      class="mlpf__svg"
+      viewBox="0 0 600 360"
+      preserveAspectRatio="xMidYMid meet"
+      role="img"
+      aria-label="AI path constellation map"
+    >
+      <defs>
+        <filter id="mlpf-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="4" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
+      <g class="mlpf__stars">
+        {stars.map((star) => (
+          <circle
+            class:list={[{ "mlpf__star--twinkle": star.twinkle }]}
+            cx={star.cx}
+            cy={star.cy}
+            r={star.r}
+            fill="#94A3B8"
+            style={`--base-opacity: ${star.opacity}`}
+            opacity={star.opacity}
+          />
+        ))}
+      </g>
+
+      <g class="mlpf__edges">
+        {edges.map((edge) => (
+          <line
+            class="mlpf__edge"
+            data-mlpf-edge={edge.sharedChips.join(",")}
+            data-mlpf-edge-nodes={`${edge.a}-${edge.b}`}
+            x1={edge.x1}
+            y1={edge.y1}
+            x2={edge.x2}
+            y2={edge.y2}
+            stroke={edge.color}
+            stroke-width="1"
+            opacity="0"
+          />
+        ))}
+      </g>
+
+      <g class="mlpf__nodes">
+        {nodeData.map((node, i) => {
+          const primaryChip = chipData.find((c) => c.id === node.chips[0]);
+          return (
+            <g
+              class="mlpf__node"
+              data-mlpf-node={i}
+              data-mlpf-node-chips={node.chips.join(",")}
+              data-mlpf-node-label={node.label}
+              data-mlpf-node-desc={node.desc}
+              tabindex="0"
+              role="button"
+              aria-label={`${node.label}: ${node.desc}`}
+            >
+              <circle
+                class="mlpf__node-ring"
+                cx={node.x}
+                cy={node.y}
+                r="14"
+                fill="transparent"
+              />
+              <circle
+                class="mlpf__node-dot"
+                cx={node.x}
+                cy={node.y}
+                r="4"
+                fill={primaryChip?.color ?? "#06B6D4"}
+                opacity="0.3"
+              />
+              <text
+                class="mlpf__node-label"
+                x={node.x}
+                y={node.y - 10}
+                text-anchor="middle"
+                fill="#94A3B8"
+                font-size="8"
+                font-weight="600"
+                font-family="system-ui, sans-serif"
+                opacity="0.35"
+                pointer-events="none"
+              >
+                {node.label}
+              </text>
+            </g>
+          );
+        })}
+      </g>
+    </svg>
+
+    <div class="mlpf__tooltip" data-mlpf-tooltip hidden>
+      <span class="mlpf__tooltip-label" />
+      <span class="mlpf__tooltip-desc" />
+      <span class="mlpf__tooltip-chips" />
+    </div>
+  </div>
+
+  <div class="mlpf__footer" aria-live="polite">
+    <span class="mlpf__status" data-mlpf-status>
+      Select interests to discover AI paths
+    </span>
+    <span class="mlpf__count" data-mlpf-count />
+  </div>
+</div>
+
+<style>
+  .mlpf {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 8px;
+    padding: 12px;
+    position: relative;
+  }
+
+  .mlpf__top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+  }
+
+  .mlpf__badge {
+    font-size: 0.6rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #06B6D4;
+    padding: 3px 8px;
+    border: 1px solid rgba(6, 182, 212, 0.3);
+    border-radius: 4px;
+    white-space: nowrap;
+    line-height: 1;
+  }
+
+  .mlpf__chips {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    flex: 1;
+  }
+
+  .mlpf__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border: 1px solid rgba(148, 163, 184, 0.15);
+    border-radius: 20px;
+    background: rgba(148, 163, 184, 0.05);
+    color: #94A3B8;
+    font-size: 0.62rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 180ms ease, border-color 180ms ease, color 180ms ease;
+    white-space: nowrap;
+    font-family: system-ui, sans-serif;
+    line-height: 1;
+  }
+
+  .mlpf__chip:hover {
+    background: rgba(148, 163, 184, 0.1);
+    color: #CBD5E1;
+  }
+
+  .mlpf__chip:focus-visible {
+    outline: 2px solid var(--chip-color, #06B6D4);
+    outline-offset: 1px;
+  }
+
+  .mlpf__chip[aria-pressed="true"] {
+    background: color-mix(in srgb, var(--chip-color) 15%, transparent);
+    border-color: color-mix(in srgb, var(--chip-color) 40%, transparent);
+    color: var(--chip-color);
+  }
+
+  .mlpf__chip-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--chip-color);
+    opacity: 0.4;
+    transition: opacity 180ms ease;
+    flex-shrink: 0;
+  }
+
+  .mlpf__chip[aria-pressed="true"] .mlpf__chip-dot {
+    opacity: 1;
+  }
+
+  .mlpf__canvas {
+    flex: 1;
+    min-height: 0;
+    position: relative;
+  }
+
+  .mlpf__svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .mlpf__edge {
+    transition: opacity 320ms ease;
+  }
+
+  .mlpf__star--twinkle {
+    animation: mlpf-twinkle 4s ease-in-out infinite;
+  }
+
+  @keyframes mlpf-twinkle {
+    0%, 100% {
+      opacity: var(--base-opacity, 0.1);
+    }
+    50% {
+      opacity: calc(var(--base-opacity, 0.1) + 0.12);
+    }
+  }
+
+  .mlpf__node {
+    cursor: pointer;
+  }
+
+  .mlpf__node-dot {
+    transition: opacity 280ms ease;
+  }
+
+  .mlpf__node.is-active .mlpf__node-dot {
+    filter: url(#mlpf-glow);
+    animation: mlpf-pulse 2.8s ease-in-out infinite;
+  }
+
+  @keyframes mlpf-pulse {
+    0%, 100% {
+      opacity: 0.7;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  .mlpf__node-label {
+    transition: opacity 280ms ease;
+  }
+
+  .mlpf__node-ring {
+    transition: fill 180ms ease;
+  }
+
+  .mlpf__node:hover .mlpf__node-ring,
+  .mlpf__node:focus .mlpf__node-ring {
+    fill: rgba(148, 163, 184, 0.08);
+  }
+
+  .mlpf__tooltip {
+    position: absolute;
+    pointer-events: none;
+    padding: 7px 11px;
+    background: rgba(5, 8, 16, 0.94);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    z-index: 10;
+    transform: translate(-50%, -100%) translateY(-14px);
+    white-space: nowrap;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  }
+
+  .mlpf__tooltip-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #F8FAFC;
+    line-height: 1.2;
+  }
+
+  .mlpf__tooltip-desc {
+    font-size: 0.62rem;
+    color: #94A3B8;
+    line-height: 1.3;
+  }
+
+  .mlpf__tooltip-chips {
+    font-size: 0.56rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    line-height: 1.3;
+  }
+
+  .mlpf__footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    padding-top: 6px;
+    border-top: 1px solid rgba(148, 163, 184, 0.08);
+  }
+
+  .mlpf__status {
+    font-size: 0.68rem;
+    color: #64748B;
+    font-style: italic;
+    flex: 1;
+    line-height: 1;
+  }
+
+  .mlpf__count {
+    font-size: 0.62rem;
+    font-weight: 700;
+    color: #06B6D4;
+    font-family: ui-monospace, monospace;
+    white-space: nowrap;
+    line-height: 1;
+  }
+
+  @media (max-width: 768px) {
+    .mlpf {
+      padding: 8px;
+      gap: 6px;
+    }
+
+    .mlpf__chip {
+      padding: 2px 6px;
+      font-size: 0.55rem;
+    }
+
+    .mlpf__badge {
+      font-size: 0.52rem;
+      padding: 2px 6px;
+    }
+
+    .mlpf__status {
+      font-size: 0.6rem;
+    }
+
+    .mlpf__count {
+      font-size: 0.55rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mlpf *,
+    .mlpf *::before,
+    .mlpf *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
+
+<script>
+  (() => {
+    const root = document.querySelector("[data-track-prototype=\"ml\"]");
+    if (root instanceof HTMLElement) {
+      const chips = Array.from(
+        root.querySelectorAll<HTMLButtonElement>("[data-mlpf-chip]")
+      );
+      const nodeEls = Array.from(
+        root.querySelectorAll<SVGGElement>("[data-mlpf-node]")
+      );
+      const edgeEls = Array.from(
+        root.querySelectorAll<SVGLineElement>("[data-mlpf-edge]")
+      );
+      const statusEl = root.querySelector("[data-mlpf-status]");
+      const countEl = root.querySelector("[data-mlpf-count]");
+      const tooltipEl = root.querySelector("[data-mlpf-tooltip]");
+      const tooltipLabel = tooltipEl?.querySelector(".mlpf__tooltip-label");
+      const tooltipDesc = tooltipEl?.querySelector(".mlpf__tooltip-desc");
+      const tooltipChips = tooltipEl?.querySelector(".mlpf__tooltip-chips");
+      const canvasEl = root.querySelector(".mlpf__canvas");
+      const svgEl = root.querySelector(".mlpf__svg");
+
+      if (
+        !statusEl || !countEl || !tooltipEl || !tooltipLabel ||
+        !tooltipDesc || !tooltipChips || !canvasEl || !svgEl
+      ) {
+        return;
+      }
+
+      const selected = new Set<string>();
+
+      const chipMeta: Record<string, { color: string; label: string }> = {
+        creative: { color: "#F472B6", label: "Creative" },
+        maths: { color: "#06B6D4", label: "Maths" },
+        coding: { color: "#34D399", label: "Coding" },
+        research: { color: "#60A5FA", label: "Research" },
+        social: { color: "#FB923C", label: "Social Impact" },
+        startups: { color: "#A78BFA", label: "Startups" },
+        games: { color: "#FBBF24", label: "Games" },
+        design: { color: "#E879F9", label: "Design" },
+      };
+
+      const insights: Record<string, string> = {
+        "coding+creative": "Creative coding turns ideas into interactive experiences",
+        "creative+design": "Generative tools reshape the design process",
+        "creative+games": "Imagination powers procedural worlds",
+        "creative+maths": "Generative algorithms blend art with mathematics",
+        "creative+research": "Research fuels novel creative applications",
+        "creative+social": "AI creativity applied to social good",
+        "creative+startups": "Creative AI drives new product categories",
+        "coding+design": "Programmatic design systems at scale",
+        "coding+games": "Engine development and AI integration",
+        "coding+maths": "Theory becomes practice through implementation",
+        "coding+research": "Reproducible experiments through code",
+        "coding+social": "Open-source tools for humanitarian AI",
+        "coding+startups": "From notebook to production pipeline",
+        "design+games": "Game design principles in AI interfaces",
+        "design+maths": "Mathematical beauty in generative design",
+        "design+research": "User research meets AI-powered design",
+        "design+social": "Inclusive and accessible design patterns",
+        "design+startups": "Design-led product development",
+        "games+maths": "Algorithms power game mechanics and strategy",
+        "games+research": "Cutting-edge techniques in game AI",
+        "games+social": "Educational games for social change",
+        "games+startups": "Indie studios and gaming platforms",
+        "maths+research": "Statistical rigor drives scientific discovery",
+        "maths+social": "Quantitative models for social impact",
+        "maths+startups": "Data-driven decisions at startup scale",
+        "research+social": "Evidence-based approaches to societal challenges",
+        "research+startups": "Research spinoffs and deep tech ventures",
+        "social+startups": "Impact-driven startups and social enterprises",
+      };
+
+      function update() {
+        const hasSelection = selected.size > 0;
+        let activeCount = 0;
+
+        nodeEls.forEach((node) => {
+          const nodeChips = node.dataset.mlpfNodeChips!.split(",");
+          const isActive = !hasSelection || nodeChips.some((c) => selected.has(c));
+          const dot = node.querySelector(".mlpf__node-dot") as SVGCircleElement | null;
+          const label = node.querySelector(".mlpf__node-label") as SVGTextElement | null;
+          if (!dot || !label) return;
+
+          if (hasSelection && isActive) {
+            activeCount++;
+            const matchChip = nodeChips.find((c) => selected.has(c)) ?? nodeChips[0];
+            dot.setAttribute("fill", chipMeta[matchChip]?.color ?? "#06B6D4");
+            dot.setAttribute("opacity", "0.9");
+            dot.setAttribute("r", "5.5");
+            label.setAttribute("opacity", "0.8");
+            label.setAttribute("fill", "#F8FAFC");
+            node.classList.add("is-active");
+          } else if (hasSelection && !isActive) {
+            dot.setAttribute("opacity", "0.06");
+            dot.setAttribute("r", "2.5");
+            label.setAttribute("opacity", "0.1");
+            label.setAttribute("fill", "#475569");
+            node.classList.remove("is-active");
+          } else {
+            const primary = nodeChips[0];
+            dot.setAttribute("fill", chipMeta[primary]?.color ?? "#06B6D4");
+            dot.setAttribute("opacity", "0.3");
+            dot.setAttribute("r", "4");
+            label.setAttribute("opacity", "0.35");
+            label.setAttribute("fill", "#94A3B8");
+            node.classList.remove("is-active");
+          }
+        });
+
+        edgeEls.forEach((edge) => {
+          if (!hasSelection) {
+            edge.setAttribute("opacity", "0");
+            return;
+          }
+
+          const [aStr, bStr] = edge.dataset.mlpfEdgeNodes!.split("-");
+          const aIdx = parseInt(aStr, 10);
+          const bIdx = parseInt(bStr, 10);
+          const aChips = nodeEls[aIdx].dataset.mlpfNodeChips!.split(",");
+          const bChips = nodeEls[bIdx].dataset.mlpfNodeChips!.split(",");
+          const aMatch = aChips.some((c) => selected.has(c));
+          const bMatch = bChips.some((c) => selected.has(c));
+
+          if (aMatch && bMatch) {
+            const sharedChip = edge.dataset.mlpfEdge!
+              .split(",")
+              .find((c) => selected.has(c));
+            edge.setAttribute(
+              "stroke",
+              sharedChip ? (chipMeta[sharedChip]?.color ?? "#475569") : "#475569"
+            );
+            edge.setAttribute("opacity", "0.35");
+          } else {
+            edge.setAttribute("opacity", "0");
+          }
+        });
+
+        if (!hasSelection) {
+          statusEl.textContent = "Select interests to discover AI paths";
+          countEl.textContent = "";
+        } else {
+          const names = Array.from(selected).map((c) => chipMeta[c]?.label ?? c);
+          let text: string;
+          if (selected.size === 1) {
+            text = `Scanning ${names[0]} territory`;
+          } else if (selected.size === 2) {
+            const key = Array.from(selected).sort().join("+");
+            text = insights[key] ?? `Patterns across ${names.join(" & ")}`;
+          } else {
+            text = `Deep scan: ${names.slice(0, 3).join(", ")}${names.length > 3 ? "\u2026" : ""}`;
+          }
+          statusEl.textContent = text;
+          countEl.textContent = `${activeCount} path${activeCount !== 1 ? "s" : ""} found`;
+        }
+      }
+
+      chips.forEach((chip) => {
+        chip.addEventListener("click", () => {
+          const id = chip.dataset.mlpfChip!;
+          if (selected.has(id)) {
+            selected.delete(id);
+            chip.setAttribute("aria-pressed", "false");
+          } else {
+            selected.add(id);
+            chip.setAttribute("aria-pressed", "true");
+          }
+          update();
+        });
+      });
+
+      let activeTooltipNode: SVGGElement | null = null;
+
+      function positionTooltip(node: SVGGElement) {
+        const dot = node.querySelector(".mlpf__node-dot") as SVGCircleElement | null;
+        if (!dot) return;
+        const cx = parseFloat(dot.getAttribute("cx") ?? "0");
+        const cy = parseFloat(dot.getAttribute("cy") ?? "0");
+
+        const pt = (svgEl as SVGSVGElement).createSVGPoint();
+        pt.x = cx;
+        pt.y = cy;
+        const ctm = (svgEl as SVGSVGElement).getScreenCTM();
+        if (!ctm) return;
+        const screenPt = pt.matrixTransform(ctm);
+        const canvasRect = canvasEl.getBoundingClientRect();
+
+        tooltipEl.style.left = `${screenPt.x - canvasRect.left}px`;
+        tooltipEl.style.top = `${screenPt.y - canvasRect.top}px`;
+      }
+
+      function showNodeTooltip(node: SVGGElement) {
+        if (activeTooltipNode === node) return;
+        activeTooltipNode = node;
+
+        tooltipLabel!.textContent = node.dataset.mlpfNodeLabel ?? "";
+        tooltipDesc!.textContent = node.dataset.mlpfNodeDesc ?? "";
+        const nodeChips = node.dataset.mlpfNodeChips!.split(",");
+        tooltipChips!.textContent = nodeChips
+          .map((c) => chipMeta[c]?.label ?? c)
+          .join(" \u00B7 ");
+        tooltipChips!.style.color = chipMeta[nodeChips[0]]?.color ?? "#06B6D4";
+
+        positionTooltip(node);
+        tooltipEl.removeAttribute("hidden");
+      }
+
+      function hideTooltip() {
+        activeTooltipNode = null;
+        tooltipEl.setAttribute("hidden", "");
+      }
+
+      nodeEls.forEach((node) => {
+        node.addEventListener("mouseenter", () => showNodeTooltip(node));
+        node.addEventListener("mouseleave", hideTooltip);
+        node.addEventListener("focus", () => showNodeTooltip(node));
+        node.addEventListener("blur", hideTooltip);
+        node.addEventListener("touchstart", (e) => {
+          e.preventDefault();
+          if (activeTooltipNode === node) {
+            hideTooltip();
+          } else {
+            showNodeTooltip(node);
+          }
+        });
+      });
+
+      document.addEventListener("click", (e) => {
+        if (!root.contains(e.target as Node)) {
+          hideTooltip();
+        }
+      });
+
+      const chipContainer = root.querySelector(".mlpf__chips");
+      if (chipContainer) {
+        chipContainer.addEventListener("keydown", (e) => {
+          const ke = e as KeyboardEvent;
+          const current = document.activeElement as HTMLButtonElement;
+          const currentIndex = chips.indexOf(current);
+          if (currentIndex === -1) return;
+          let next = -1;
+          if (ke.key === "ArrowRight" || ke.key === "ArrowDown") {
+            next = (currentIndex + 1) % chips.length;
+          } else if (ke.key === "ArrowLeft" || ke.key === "ArrowUp") {
+            next = (currentIndex - 1 + chips.length) % chips.length;
+          }
+          if (next >= 0) {
+            ke.preventDefault();
+            chips[next].focus();
+          }
+        });
+      }
+
+      window.addEventListener("resize", () => {
+        if (activeTooltipNode) positionTooltip(activeTooltipNode);
+      });
+    }
+  })();
+</script>

@@ -1,0 +1,65 @@
+---
+interface Props {
+  committee: {
+    _id: string;
+    name?: string;
+    role: string;
+    displayOrder?: number;
+  }[];
+}
+
+const { committee } = Astro.props;
+
+const getInitials = (name?: string, role?: string) => {
+  const source = (name || role || "?").trim();
+  const words = source.split(/\s+/).filter(Boolean);
+  if (words.length === 0) return "?";
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+  return words
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase();
+};
+---
+
+<section class="py-20 sm:py-24 px-6 relative overflow-hidden">
+  <div class="mx-auto max-w-6xl">
+    <div class="mb-12">
+      <div class="inline-flex items-center gap-3 mb-4 border border-border-subtle px-3 py-1.5">
+        <span class="text-accent-blue text-xs font-bold uppercase tracking-widest">Our Team</span>
+      </div>
+      <h2 class="text-3xl sm:text-4xl font-black tracking-tight">
+        Meet the Committee
+      </h2>
+      <p class="mt-3 text-text-secondary">
+        The students behind Surrey Artificial Intelligence Society.
+      </p>
+    </div>
+
+    {committee.length === 0 ? (
+      <div class="border border-border-subtle bg-surface-card/50 p-8 sm:p-12 text-center">
+        <h3 class="font-semibold text-lg mb-2">Committee details coming soon</h3>
+        <p class="text-text-secondary text-sm leading-relaxed">
+          Check back soon to meet the Surrey Artificial Intelligence Society committee.
+        </p>
+      </div>
+    ) : (
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {committee.map((member) => (
+          <div class="border border-border-subtle bg-surface-card/50 p-5 flex items-start gap-4 hover:border-accent-blue/30 transition-all duration-300">
+            <div class="w-12 h-12 rounded-full bg-accent-purple/20 border-2 border-accent-purple/40 flex items-center justify-center text-accent-purple text-sm font-bold font-mono shrink-0">
+              {getInitials(member.name, member.role)}
+            </div>
+            <div>
+              <h3 class="font-semibold text-base">{member.role}</h3>
+              {member.name && (
+                <p class="text-text-muted text-sm mt-0.5">{member.name}</p>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+</section>

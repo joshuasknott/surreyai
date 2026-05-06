@@ -12,3 +12,14 @@ declare namespace App {
     societySlug?: string;
   }
 }
+
+declare namespace NodeJS {
+  interface ProcessEnv {
+    GEMINI_API_KEY?: string;
+    AI_PROVIDER?: string;
+    AI_MODEL?: string;
+    AI_FEATURES_ENABLED?: string;
+    AI_MAX_OUTPUT_TOKENS?: string;
+    AI_TIMEOUT_MS?: string;
+  }
+}

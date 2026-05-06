@@ -1,0 +1,793 @@
+---
+---
+
+<div class="bs-root" data-build-sprint-root hidden>
+  <div class="bs-intro" data-bs-intro>
+    <span class="bs-intro__label">★ Build Sprint</span>
+    <span class="bs-intro__hint">Pick a theme and guide a project from idea to showcase</span>
+    <div class="bs-pills">
+      <button type="button" class="bs-pill" data-bs-theme="campus">Campus Assistant</button>
+      <button type="button" class="bs-pill" data-bs-theme="study">Study Tool</button>
+      <button type="button" class="bs-pill" data-bs-theme="creative">Creative AI</button>
+      <button type="button" class="bs-pill" data-bs-theme="vision">Vision Demo</button>
+      <button type="button" class="bs-pill" data-bs-theme="automation">Automation Helper</button>
+      <button type="button" class="bs-pill" data-bs-theme="ethics">Ethics Debate Tool</button>
+    </div>
+  </div>
+
+  <div class="bs-board" data-bs-board hidden>
+    <div class="bs-board__head">
+      <span class="bs-board__name" data-project-name></span>
+      <span class="bs-board__stage" data-stage-badge></span>
+    </div>
+
+    <div class="bs-pipeline">
+      <div class="bs-pipe" data-pipe-stage="0">
+        <div class="bs-pipe__node"></div>
+        <span class="bs-pipe__label">Idea</span>
+      </div>
+      <div class="bs-pipe__line" data-pipe-line="0"></div>
+      <div class="bs-pipe" data-pipe-stage="1">
+        <div class="bs-pipe__node"></div>
+        <span class="bs-pipe__label">Team</span>
+      </div>
+      <div class="bs-pipe__line" data-pipe-line="1"></div>
+      <div class="bs-pipe" data-pipe-stage="2">
+        <div class="bs-pipe__node"></div>
+        <span class="bs-pipe__label">Prototype</span>
+      </div>
+      <div class="bs-pipe__line" data-pipe-line="2"></div>
+      <div class="bs-pipe" data-pipe-stage="3">
+        <div class="bs-pipe__node"></div>
+        <span class="bs-pipe__label">Demo</span>
+      </div>
+      <div class="bs-pipe__line" data-pipe-line="3"></div>
+      <div class="bs-pipe" data-pipe-stage="4">
+        <div class="bs-pipe__node"></div>
+        <span class="bs-pipe__label">Showcase</span>
+      </div>
+    </div>
+
+    <div class="bs-card" data-bs-card>
+      <p class="bs-card__text" data-stage-desc></p>
+      <span class="bs-card__ai-tag" data-ai-tag hidden>AI-enhanced</span>
+    </div>
+
+    <div class="bs-actions">
+      <button type="button" class="bs-advance" data-advance-btn hidden>Advance →</button>
+      <button type="button" class="bs-ai-btn" data-ai-btn hidden>AI Assist</button>
+    </div>
+  </div>
+
+  <div class="bs-done" data-bs-done hidden>
+    <span class="bs-done__star">★</span>
+    <span class="bs-done__title">Showcased!</span>
+    <span class="bs-done__sub">From raw idea to live demo — that is how societies build.</span>
+    <button type="button" class="bs-again" data-reset-btn>New Sprint</button>
+  </div>
+</div>
+
+<style>
+  .bs-root {
+    --bs-accent: var(--stage-accent, #8B5CF6);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 24px;
+    gap: 14px;
+    color: #F8FAFC;
+    position: relative;
+    z-index: 1;
+    box-sizing: border-box;
+  }
+
+  /* ---------- Intro ---------- */
+
+  .bs-intro {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-align: center;
+    animation: bs-fade-up 400ms ease;
+  }
+
+  .bs-intro__label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--bs-accent);
+  }
+
+  .bs-intro__hint {
+    font-size: 0.72rem;
+    color: #94A3B8;
+    max-width: 260px;
+    line-height: 1.55;
+  }
+
+  .bs-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    max-width: 380px;
+    margin-top: 4px;
+  }
+
+  .bs-pill {
+    padding: 5px 12px;
+    font-size: 0.62rem;
+    font-weight: 700;
+    color: #CBD5E1;
+    background: rgba(148, 163, 184, 0.07);
+    border: 1px solid rgba(148, 163, 184, 0.14);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 180ms ease;
+    font-family: var(--font-sans);
+    white-space: nowrap;
+  }
+
+  .bs-pill:hover {
+    background: color-mix(in srgb, var(--bs-accent) 14%, transparent);
+    border-color: color-mix(in srgb, var(--bs-accent) 40%, transparent);
+    color: #F8FAFC;
+  }
+
+  .bs-pill:focus-visible {
+    outline: 2px solid var(--bs-accent);
+    outline-offset: 2px;
+  }
+
+  .bs-pill.is-selected {
+    background: var(--bs-accent);
+    border-color: var(--bs-accent);
+    color: #fff;
+    box-shadow: 0 0 18px color-mix(in srgb, var(--bs-accent) 40%, transparent);
+  }
+
+  /* ---------- Board ---------- */
+
+  .bs-board {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    animation: bs-fade-up 350ms ease;
+  }
+
+  .bs-board__head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .bs-board__name {
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: #F8FAFC;
+    letter-spacing: -0.01em;
+  }
+
+  .bs-board__stage {
+    font-size: 0.58rem;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--bs-accent);
+    padding: 2px 8px;
+    border: 1px solid color-mix(in srgb, var(--bs-accent) 30%, transparent);
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--bs-accent) 10%, transparent);
+  }
+
+  /* ---------- Pipeline ---------- */
+
+  .bs-pipeline {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 6px 0;
+  }
+
+  .bs-pipe {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+  }
+
+  .bs-pipe__node {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 2px solid rgba(148, 163, 184, 0.18);
+    background: rgba(5, 8, 16, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 300ms ease;
+    position: relative;
+  }
+
+  .bs-pipe__label {
+    font-size: 0.52rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #475569;
+    transition: color 300ms ease;
+    font-family: var(--font-mono);
+  }
+
+  .bs-pipe__line {
+    width: 24px;
+    height: 2px;
+    background: rgba(148, 163, 184, 0.1);
+    margin-top: 12px;
+    border-radius: 1px;
+    transition: background 400ms ease;
+  }
+
+  .bs-pipe.is-done .bs-pipe__node {
+    background: var(--bs-accent);
+    border-color: var(--bs-accent);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--bs-accent) 35%, transparent);
+  }
+
+  .bs-pipe.is-done .bs-pipe__node::after {
+    content: "✓";
+    color: #fff;
+    font-size: 0.6rem;
+    font-weight: 900;
+  }
+
+  .bs-pipe.is-done .bs-pipe__label {
+    color: #CBD5E1;
+  }
+
+  .bs-pipe.is-active .bs-pipe__node {
+    border-color: var(--bs-accent);
+    animation: bs-pulse 2s ease-in-out infinite;
+  }
+
+  .bs-pipe.is-active .bs-pipe__label {
+    color: var(--bs-accent);
+  }
+
+  .bs-pipe__line.is-filled {
+    background: var(--bs-accent);
+  }
+
+  /* ---------- Card ---------- */
+
+  .bs-card {
+    padding: 12px 16px;
+    border-radius: 8px;
+    background: rgba(21, 32, 58, 0.35);
+    border: 1px solid rgba(148, 163, 184, 0.07);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    min-height: 56px;
+  }
+
+  .bs-card__text {
+    font-size: 0.7rem;
+    line-height: 1.6;
+    color: #CBD5E1;
+    margin: 0;
+    transition: opacity 180ms ease;
+  }
+
+  .bs-card__ai-tag {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    font-size: 0.5rem;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--bs-accent);
+    opacity: 0.7;
+  }
+
+  /* ---------- Actions ---------- */
+
+  .bs-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .bs-advance {
+    padding: 6px 18px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    color: #fff;
+    background: var(--bs-accent);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 180ms ease;
+    font-family: var(--font-sans);
+  }
+
+  .bs-advance:hover {
+    box-shadow: 0 0 20px color-mix(in srgb, var(--bs-accent) 45%, transparent);
+    transform: translateY(-1px);
+  }
+
+  .bs-advance:focus-visible {
+    outline: 2px solid var(--bs-accent);
+    outline-offset: 2px;
+  }
+
+  .bs-ai-btn {
+    padding: 6px 14px;
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: #CBD5E1;
+    background: rgba(148, 163, 184, 0.07);
+    border: 1px solid rgba(148, 163, 184, 0.14);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 180ms ease;
+    font-family: var(--font-sans);
+  }
+
+  .bs-ai-btn:hover {
+    background: color-mix(in srgb, var(--bs-accent) 12%, transparent);
+    border-color: color-mix(in srgb, var(--bs-accent) 30%, transparent);
+    color: #F8FAFC;
+  }
+
+  .bs-ai-btn.is-loading {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .bs-ai-btn:focus-visible {
+    outline: 2px solid var(--bs-accent);
+    outline-offset: 2px;
+  }
+
+  /* ---------- Done ---------- */
+
+  .bs-done {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-align: center;
+    animation: bs-fade-up 400ms ease;
+  }
+
+  .bs-done__star {
+    font-size: 2.2rem;
+    color: var(--bs-accent);
+    animation: bs-star-pop 600ms ease forwards;
+    text-shadow: 0 0 30px color-mix(in srgb, var(--bs-accent) 50%, transparent);
+    line-height: 1;
+  }
+
+  .bs-done__title {
+    font-size: 1.05rem;
+    font-weight: 900;
+    color: #F8FAFC;
+    letter-spacing: -0.01em;
+  }
+
+  .bs-done__sub {
+    font-size: 0.7rem;
+    color: #94A3B8;
+    max-width: 240px;
+    line-height: 1.55;
+  }
+
+  .bs-again {
+    margin-top: 2px;
+    padding: 5px 14px;
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: #94A3B8;
+    background: transparent;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 180ms ease;
+    font-family: var(--font-sans);
+  }
+
+  .bs-again:hover {
+    color: #F8FAFC;
+    border-color: rgba(148, 163, 184, 0.35);
+  }
+
+  .bs-again:focus-visible {
+    outline: 2px solid var(--bs-accent);
+    outline-offset: 2px;
+  }
+
+  /* ---------- Keyframes ---------- */
+
+  @keyframes bs-fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes bs-pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 6px color-mix(in srgb, var(--bs-accent) 25%, transparent);
+    }
+    50% {
+      box-shadow: 0 0 16px color-mix(in srgb, var(--bs-accent) 55%, transparent);
+    }
+  }
+
+  @keyframes bs-star-pop {
+    0% {
+      transform: scale(0) rotate(-15deg);
+      opacity: 0;
+    }
+    60% {
+      transform: scale(1.2) rotate(4deg);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1) rotate(0deg);
+      opacity: 1;
+    }
+  }
+
+  /* ---------- Responsive ---------- */
+
+  @media (max-width: 768px) {
+    .bs-root {
+      padding: 14px 16px;
+      gap: 10px;
+    }
+
+    .bs-pills {
+      gap: 4px;
+      max-width: 300px;
+    }
+
+    .bs-pill {
+      padding: 4px 9px;
+      font-size: 0.56rem;
+    }
+
+    .bs-pipe__node {
+      width: 22px;
+      height: 22px;
+    }
+
+    .bs-pipe__line {
+      width: 14px;
+      margin-top: 10px;
+    }
+
+    .bs-pipe__label {
+      font-size: 0.47rem;
+    }
+
+    .bs-card__text {
+      font-size: 0.64rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bs-pipe.is-active .bs-pipe__node,
+    .bs-done__star,
+    .bs-board,
+    .bs-done,
+    .bs-intro {
+      animation: none;
+    }
+
+    .bs-pipe.is-active .bs-pipe__node {
+      box-shadow: 0 0 10px color-mix(in srgb, var(--bs-accent) 40%, transparent);
+    }
+  }
+</style>
+
+<script>
+  const THEMES: Record<string, { label: string; stages: string[] }> = {
+    campus: {
+      label: "Campus Assistant",
+      stages: [
+        "An AI-powered helper that answers student questions about campus services and facilities",
+        "Assembled a 3-person squad \u2014 designer, backend developer, and content strategist",
+        "Working chat interface connected to a campus knowledge base with natural language queries",
+        "Presented live to 30 students at the society meetup \u2014 answered real questions in real time",
+        "Published to the society website, now helping students navigate campus every day",
+      ],
+    },
+    study: {
+      label: "Study Tool",
+      stages: [
+        "Smart flashcard generator that transforms lecture notes into interactive study decks",
+        "Formed a 4-person crew \u2014 ML engineer, full-stack dev, UX designer, and QA tester",
+        "Web app that parses PDFs, extracts key concepts, and generates spaced-repetition flashcards",
+        "Presented to faculty and students \u2014 processed a real Machine Learning lecture live",
+        "Open-sourced the project \u2014 adopted by students across multiple modules",
+      ],
+    },
+    creative: {
+      label: "Creative AI",
+      stages: [
+        "A collaborative art tool where students and AI co-create original visual compositions",
+        "Gathered a 3-person collective \u2014 creative coder, digital artist, and interaction designer",
+        "Canvas-based app with style transfer, generative patterns, and real-time collaboration",
+        "Interactive gallery at the end-of-semester exhibition \u2014 200 visitors tried it",
+        "Featured in the university\u2019s digital arts showcase alongside professional work",
+      ],
+    },
+    vision: {
+      label: "Vision Demo",
+      stages: [
+        "A real-time object recognition app to improve accessibility and navigation on campus",
+        "Recruited a 4-person team \u2014 CV specialist, mobile dev, accessibility lead, and tester",
+        "Camera-based app that identifies and describes objects and text in the surroundings",
+        "Live demo with student volunteers testing real-world recognition accuracy on campus",
+        "Submitted to the university\u2019s accessibility innovation challenge and won recognition",
+      ],
+    },
+    automation: {
+      label: "Automation Helper",
+      stages: [
+        "An automated system to handle the entire lifecycle of society events from planning to feedback",
+        "Built a 3-person ops team \u2014 automation dev, event planner, and integrations specialist",
+        "Automated pipeline: RSVP collection, reminder scheduling, attendance tracking, and feedback forms",
+        "Ran a real society event end-to-end through the system \u2014 80 attendees, zero manual overhead",
+        "Adopted by three other societies for their own event management workflows",
+      ],
+    },
+    ethics: {
+      label: "Ethics Debate Tool",
+      stages: [
+        "A platform that presents AI ethics dilemmas with structured frameworks for debate and analysis",
+        "Convened a 4-person panel \u2014 ethicist, full-stack dev, UX researcher, and content lead",
+        "Web app with timed debate rounds, argument mapping, stakeholder analysis, and scoring rubrics",
+        "Hosted a live debate night with 40 participants tackling real AI ethics case studies",
+        "Integrated into the society\u2019s regular ethics workshop series as a permanent tool",
+      ],
+    },
+  };
+
+  const STAGE_LABELS = ["Idea", "Team", "Prototype", "Demo", "Showcase"];
+
+  function initBuildSprint() {
+    const root = document.querySelector("[data-build-sprint-root]") as HTMLDivElement | null;
+    if (!root) return;
+
+    const slot = document.querySelector('[data-proto-slot="projects"]');
+    if (slot && !slot.contains(root)) {
+      while (slot.firstChild) slot.removeChild(slot.firstChild);
+      slot.appendChild(root);
+    } else if (slot) {
+      const siblings = Array.from(slot.children);
+      for (const child of siblings) {
+        if (child !== root) slot.removeChild(child);
+      }
+    }
+
+    root.removeAttribute("hidden");
+
+    const intro = root.querySelector("[data-bs-intro]") as HTMLDivElement;
+    const board = root.querySelector("[data-bs-board]") as HTMLDivElement;
+    const done = root.querySelector("[data-bs-done]") as HTMLDivElement;
+    const pills = root.querySelectorAll("[data-bs-theme]") as NodeListOf<HTMLButtonElement>;
+    const projectName = root.querySelector("[data-project-name]") as HTMLSpanElement;
+    const stageBadge = root.querySelector("[data-stage-badge]") as HTMLSpanElement;
+    const stageDesc = root.querySelector("[data-stage-desc]") as HTMLParagraphElement;
+    const advanceBtn = root.querySelector("[data-advance-btn]") as HTMLButtonElement;
+    const aiBtn = root.querySelector("[data-ai-btn]") as HTMLButtonElement;
+    const aiTag = root.querySelector("[data-ai-tag]") as HTMLSpanElement;
+    const resetBtn = root.querySelector("[data-reset-btn]") as HTMLButtonElement;
+    const pipeStages = root.querySelectorAll("[data-pipe-stage]") as NodeListOf<HTMLDivElement>;
+    const pipeLines = root.querySelectorAll("[data-pipe-line]") as NodeListOf<HTMLDivElement>;
+
+    const lab = document.querySelector("[data-track-lab]");
+    const aiEnabled = lab != null && lab.hasAttribute("data-ai-enabled");
+
+    let currentTheme = "";
+    let currentStage = 0;
+    let aiDescriptions: string[] | null = null;
+
+    function show(el: HTMLElement) {
+      el.removeAttribute("hidden");
+    }
+
+    function hide(el: HTMLElement) {
+      el.setAttribute("hidden", "");
+    }
+
+    function resetPipeline() {
+      pipeStages.forEach((p) => {
+        p.classList.remove("is-done", "is-active");
+      });
+      pipeLines.forEach((l) => {
+        l.classList.remove("is-filled");
+      });
+    }
+
+    function renderPipeline() {
+      pipeStages.forEach((p, i) => {
+        p.classList.remove("is-done", "is-active");
+        if (i < currentStage) p.classList.add("is-done");
+        else if (i === currentStage) p.classList.add("is-active");
+      });
+      pipeLines.forEach((l, i) => {
+        l.classList.toggle("is-filled", i < currentStage);
+      });
+    }
+
+    function getDescription(stage: number): string {
+      if (aiDescriptions && aiDescriptions[stage]) return aiDescriptions[stage];
+      const theme = THEMES[currentTheme];
+      if (!theme) return "";
+      return theme.stages[stage] || "";
+    }
+
+    function updateDescription(text?: string) {
+      const content = text || getDescription(currentStage);
+      stageDesc.style.opacity = "0";
+      setTimeout(() => {
+        stageDesc.textContent = content;
+        stageDesc.style.opacity = "1";
+      }, 180);
+    }
+
+    function selectTheme(themeId: string) {
+      const theme = THEMES[themeId];
+      if (!theme) return;
+
+      currentTheme = themeId;
+      currentStage = 0;
+      aiDescriptions = null;
+      aiTag.setAttribute("hidden", "");
+
+      pills.forEach((pill) =>
+        pill.classList.toggle("is-selected", pill.dataset.bsTheme === themeId)
+      );
+
+      projectName.textContent = theme.label;
+      stageBadge.textContent = STAGE_LABELS[0];
+      resetPipeline();
+      renderPipeline();
+      updateDescription(theme.stages[0]);
+
+      hide(intro);
+      hide(done);
+      show(board);
+      show(advanceBtn);
+
+      if (aiEnabled) show(aiBtn);
+      else hide(aiBtn);
+    }
+
+    function advanceStage() {
+      if (currentStage < 0 || currentStage > 4) return;
+
+      const prevStage = currentStage;
+      currentStage++;
+
+      if (currentStage > 4) {
+        pipeStages.forEach((p) => {
+          p.classList.remove("is-active");
+          p.classList.add("is-done");
+        });
+        pipeLines.forEach((l) => l.classList.add("is-filled"));
+
+        hide(board);
+        show(done);
+        return;
+      }
+
+      renderPipeline();
+      stageBadge.textContent = STAGE_LABELS[currentStage];
+      updateDescription();
+    }
+
+    async function callAI() {
+      if (!aiEnabled || !currentTheme) return;
+
+      aiBtn.classList.add("is-loading");
+      aiBtn.textContent = "Loading\u2026";
+
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 5000);
+
+        const res = await fetch("/api/ai/track-lab", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            feature: "build-sprint",
+            theme: currentTheme,
+            currentStage,
+          }),
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeout);
+
+        if (!res.ok) throw new Error("not ok");
+        const data = await res.json();
+
+        if (data.stages && Array.isArray(data.stages)) {
+          aiDescriptions = data.stages;
+        } else if (typeof data.description === "string") {
+          if (!aiDescriptions) {
+            const fallback = THEMES[currentTheme].stages.slice();
+            aiDescriptions = fallback;
+          }
+          aiDescriptions[currentStage] = data.description;
+        }
+
+        updateDescription();
+        show(aiTag);
+      } catch {
+        updateDescription();
+      } finally {
+        aiBtn.classList.remove("is-loading");
+        aiBtn.textContent = "AI Assist";
+      }
+    }
+
+    function resetSprint() {
+      currentTheme = "";
+      currentStage = 0;
+      aiDescriptions = null;
+
+      pills.forEach((pill) => pill.classList.remove("is-selected"));
+      resetPipeline();
+      hide(aiTag);
+
+      hide(done);
+      hide(board);
+      show(intro);
+    }
+
+    pills.forEach((pill) => {
+      pill.addEventListener("click", () => selectTheme(pill.dataset.bsTheme!));
+    });
+
+    advanceBtn.addEventListener("click", advanceStage);
+
+    pipeStages.forEach((pipe) => {
+      pipe.addEventListener("click", () => {
+        const idx = parseInt(pipe.dataset.pipeStage!, 10);
+        if (idx === currentStage) advanceStage();
+      });
+    });
+
+    if (aiBtn) aiBtn.addEventListener("click", callAI);
+    resetBtn.addEventListener("click", resetSprint);
+  }
+
+  initBuildSprint();
+</script>

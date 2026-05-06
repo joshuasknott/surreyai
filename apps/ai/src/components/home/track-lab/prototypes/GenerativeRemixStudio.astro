@@ -1,0 +1,1104 @@
+---
+import type { AITrack } from "../../../../data/aiTracks";
+
+interface Props {
+  track: AITrack;
+}
+
+const { track } = Astro.props;
+
+const seedIdeas = [
+  "An app that tracks your mood",
+  "A tool for study groups",
+  "AI recipe suggester",
+  "Campus event finder",
+  "Music playlist maker",
+];
+
+const modes = [
+  { id: "sharpen", label: "Sharpen", icon: "◇", tip: "Refine & clarify" },
+  { id: "visual", label: "Visual", icon: "◈", tip: "Design direction" },
+  { id: "project", label: "Project", icon: "◆", tip: "Action plan" },
+  { id: "beginner", label: "Beginner", icon: "○", tip: "Simplify & explain" },
+];
+---
+
+<div
+  class="remix-studio"
+  data-remix-studio
+  style={`--remix-accent: ${track.accentColor}; --remix-accent-rgb: ${track.accentRgb};`}
+>
+  <div class="remix-studio__panel remix-studio__panel--input">
+    <label class="remix-studio__label" for="remix-idea-input">Your Idea</label>
+    <input
+      id="remix-idea-input"
+      type="text"
+      class="remix-studio__field"
+      placeholder="Type a rough idea or pick one below..."
+      data-remix-input
+      autocomplete="off"
+    />
+
+    <div class="remix-studio__seeds" role="group" aria-label="Seed ideas">
+      {seedIdeas.map((idea) => (
+        <button type="button" class="remix-studio__seed" data-remix-seed>
+          {idea}
+        </button>
+      ))}
+    </div>
+
+    <span class="remix-studio__label">Transform</span>
+    <div class="remix-studio__modes" role="radiogroup" aria-label="Transform mode">
+      {modes.map((mode) => (
+        <button
+          type="button"
+          class={`remix-studio__mode${mode.id === "sharpen" ? " is-active" : ""}`}
+          data-remix-mode={mode.id}
+          role="radio"
+          aria-checked={mode.id === "sharpen" ? "true" : "false"}
+          title={mode.tip}
+        >
+          <span class="remix-studio__mode-icon">{mode.icon}</span>
+          <span>{mode.label}</span>
+        </button>
+      ))}
+    </div>
+
+    <button type="button" class="remix-studio__action" data-remix-action aria-label="Remix your idea">
+      <span class="remix-studio__action-spark">&#x2726;</span>
+      <span class="remix-studio__action-text">Remix</span>
+    </button>
+  </div>
+
+  <div class="remix-studio__divider" aria-hidden="true"></div>
+
+  <div class="remix-studio__panel remix-studio__panel--output" aria-live="polite">
+    <div class="remix-studio__idle" data-remix-idle>
+      <span class="remix-studio__idle-icon">&#x2727;</span>
+      <span class="remix-studio__idle-text">Your remixed concept appears here</span>
+    </div>
+
+    <div class="remix-studio__processing" data-remix-processing hidden>
+      <div class="remix-studio__shimmer"></div>
+      <div class="remix-studio__shimmer remix-studio__shimmer--short"></div>
+      <div class="remix-studio__shimmer remix-studio__shimmer--mid"></div>
+      <span class="remix-studio__processing-label">Remixing&hellip;</span>
+    </div>
+
+    <div class="remix-studio__card" data-remix-card hidden></div>
+  </div>
+</div>
+
+<style>
+  .remix-studio {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: 14px;
+    padding: 16px 18px;
+    font-family: var(--font-sans);
+    color: var(--color-text-secondary);
+    overflow: hidden;
+  }
+
+  .remix-studio__panel {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .remix-studio__panel--output {
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .remix-studio__label {
+    font-size: 0.58rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #64748B;
+  }
+
+  .remix-studio__field {
+    width: 100%;
+    padding: 7px 11px;
+    border: 1px solid rgba(148, 163, 184, 0.15);
+    border-radius: 7px;
+    background: rgba(5, 8, 16, 0.5);
+    color: #F8FAFC;
+    font-size: 0.8rem;
+    font-family: var(--font-sans);
+    outline: none;
+    transition: border-color 200ms ease, box-shadow 200ms ease;
+  }
+
+  .remix-studio__field::placeholder {
+    color: #475569;
+    font-size: 0.75rem;
+  }
+
+  .remix-studio__field:focus {
+    border-color: rgba(var(--remix-accent-rgb), 0.45);
+    box-shadow: 0 0 0 3px rgba(var(--remix-accent-rgb), 0.08);
+  }
+
+  .remix-studio__seeds {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .remix-studio__seed {
+    padding: 3px 8px;
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    border-radius: 20px;
+    background: transparent;
+    color: #94A3B8;
+    font-size: 0.6rem;
+    font-weight: 600;
+    font-family: var(--font-sans);
+    cursor: pointer;
+    transition: all 180ms ease;
+    white-space: nowrap;
+  }
+
+  .remix-studio__seed:hover {
+    color: #F8FAFC;
+    border-color: rgba(var(--remix-accent-rgb), 0.3);
+    background: rgba(var(--remix-accent-rgb), 0.08);
+  }
+
+  .remix-studio__modes {
+    display: flex;
+    gap: 4px;
+  }
+
+  .remix-studio__mode {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    padding: 4px 9px;
+    border: 1px solid rgba(148, 163, 184, 0.1);
+    border-radius: 6px;
+    background: transparent;
+    color: #94A3B8;
+    font-size: 0.65rem;
+    font-weight: 700;
+    font-family: var(--font-sans);
+    cursor: pointer;
+    transition: all 180ms ease;
+    white-space: nowrap;
+  }
+
+  .remix-studio__mode:hover {
+    color: #CBD5E1;
+    border-color: rgba(148, 163, 184, 0.2);
+  }
+
+  .remix-studio__mode.is-active {
+    color: var(--remix-accent);
+    border-color: rgba(var(--remix-accent-rgb), 0.35);
+    background: rgba(var(--remix-accent-rgb), 0.1);
+    box-shadow: 0 0 12px rgba(var(--remix-accent-rgb), 0.08);
+  }
+
+  .remix-studio__mode-icon {
+    font-size: 0.7rem;
+    line-height: 1;
+  }
+
+  .remix-studio__action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 7px 14px;
+    border: none;
+    border-radius: 7px;
+    background: linear-gradient(135deg, var(--remix-accent), rgba(var(--remix-accent-rgb), 0.7));
+    color: #0B1120;
+    font-size: 0.78rem;
+    font-weight: 800;
+    font-family: var(--font-sans);
+    cursor: pointer;
+    transition: transform 150ms ease, box-shadow 200ms ease, opacity 200ms ease;
+    letter-spacing: 0.02em;
+    margin-top: 2px;
+  }
+
+  .remix-studio__action:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(var(--remix-accent-rgb), 0.3);
+  }
+
+  .remix-studio__action:active {
+    transform: translateY(0);
+  }
+
+  .remix-studio__action:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .remix-studio__action-spark {
+    font-size: 0.82rem;
+    line-height: 1;
+    transition: transform 300ms ease;
+  }
+
+  .remix-studio__action:hover .remix-studio__action-spark {
+    transform: rotate(90deg);
+  }
+
+  .remix-studio__divider {
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, rgba(148, 163, 184, 0.15), transparent);
+    align-self: stretch;
+  }
+
+  .remix-studio__idle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-align: center;
+    padding: 24px;
+  }
+
+  .remix-studio__idle-icon {
+    font-size: 1.5rem;
+    color: rgba(var(--remix-accent-rgb), 0.2);
+    animation: remix-idle-pulse 3s ease-in-out infinite;
+  }
+
+  .remix-studio__idle-text {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #475569;
+  }
+
+  .remix-studio__processing {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 18px 16px;
+  }
+
+  .remix-studio__shimmer {
+    height: 11px;
+    border-radius: 6px;
+    background: linear-gradient(
+      90deg,
+      rgba(148, 163, 184, 0.04),
+      rgba(var(--remix-accent-rgb), 0.1),
+      rgba(148, 163, 184, 0.04)
+    );
+    background-size: 200% 100%;
+    animation: remix-shimmer 1.5s ease-in-out infinite;
+  }
+
+  .remix-studio__shimmer--short {
+    width: 55%;
+  }
+
+  .remix-studio__shimmer--mid {
+    width: 75%;
+  }
+
+  .remix-studio__processing-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: rgba(var(--remix-accent-rgb), 0.55);
+    text-align: center;
+    margin-top: 4px;
+    font-family: var(--font-mono);
+    letter-spacing: 0.06em;
+  }
+
+  .remix-studio__card {
+    position: relative;
+    border-radius: 10px;
+    background: rgba(21, 32, 58, 0.7);
+    border: 1px solid rgba(var(--remix-accent-rgb), 0.14);
+    padding: 13px 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    overflow-y: auto;
+    max-height: 100%;
+    backdrop-filter: blur(8px);
+    transition: border-color 200ms ease, box-shadow 200ms ease;
+    animation: remix-card-enter 450ms ease both;
+  }
+
+  .remix-studio__card:hover {
+    border-color: rgba(var(--remix-accent-rgb), 0.25);
+    box-shadow: 0 4px 24px rgba(var(--remix-accent-rgb), 0.08);
+  }
+
+  .remix-studio__card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--remix-accent), transparent);
+    border-radius: 10px 10px 0 0;
+    opacity: 0.6;
+  }
+
+  .remix-studio__card-badge {
+    display: inline-block;
+    font-size: 0.56rem;
+    font-weight: 800;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--remix-accent);
+    padding: 2px 8px;
+    border: 1px solid rgba(var(--remix-accent-rgb), 0.25);
+    border-radius: 4px;
+    background: rgba(var(--remix-accent-rgb), 0.06);
+    width: fit-content;
+  }
+
+  .remix-studio__card-title {
+    font-size: 0.95rem;
+    font-weight: 900;
+    color: #F8FAFC;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  .remix-studio__card-tagline {
+    font-size: 0.75rem;
+    font-style: italic;
+    color: #94A3B8;
+    line-height: 1.45;
+  }
+
+  .remix-studio__card-section {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    animation: remix-section-in 350ms ease both;
+  }
+
+  .remix-studio__card-section-label {
+    font-size: 0.56rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #64748B;
+  }
+
+  .remix-studio__card-section ul,
+  .remix-studio__card-section ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .remix-studio__card-section li {
+    font-size: 0.72rem;
+    color: #CBD5E1;
+    line-height: 1.45;
+    padding-left: 10px;
+    position: relative;
+  }
+
+  .remix-studio__card-section li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 7px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: rgba(var(--remix-accent-rgb), 0.5);
+  }
+
+  .remix-studio__card-section li strong {
+    color: #F8FAFC;
+    font-weight: 700;
+  }
+
+  .remix-studio__card-section p,
+  .remix-studio__card-section > span {
+    font-size: 0.72rem;
+    line-height: 1.5;
+    color: #CBD5E1;
+  }
+
+  .remix-studio__card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 2px;
+  }
+
+  .remix-studio__card-tag {
+    font-size: 0.55rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 4px;
+    background: rgba(var(--remix-accent-rgb), 0.08);
+    color: rgba(var(--remix-accent-rgb), 0.8);
+    border: 1px solid rgba(var(--remix-accent-rgb), 0.12);
+  }
+
+  .remix-studio__swatches {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .remix-studio__swatch-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .remix-studio__swatch-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    flex-shrink: 0;
+  }
+
+  .remix-studio__swatch-name {
+    font-size: 0.6rem;
+    color: #94A3B8;
+    font-weight: 600;
+  }
+
+  .remix-studio__level-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .remix-studio__level-pip {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  .remix-studio__level-pip--on {
+    background: var(--remix-accent);
+  }
+
+  .remix-studio__level-pip--off {
+    background: rgba(148, 163, 184, 0.15);
+  }
+
+  .remix-studio__level-label {
+    font-size: 0.6rem;
+    color: #94A3B8;
+    margin-left: 2px;
+  }
+
+  @keyframes remix-idle-pulse {
+    0%,
+    100% {
+      opacity: 0.2;
+      transform: scale(0.95);
+    }
+    50% {
+      opacity: 0.4;
+      transform: scale(1.05);
+    }
+  }
+
+  @keyframes remix-shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  @keyframes remix-card-enter {
+    from {
+      opacity: 0;
+      transform: translateY(8px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes remix-section-in {
+    from {
+      opacity: 0;
+      transform: translateY(5px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .remix-studio {
+      grid-template-columns: 1fr;
+      gap: 10px;
+      padding: 12px 14px;
+    }
+
+    .remix-studio__divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(
+        to right,
+        transparent,
+        rgba(148, 163, 184, 0.15),
+        transparent
+      );
+    }
+
+    .remix-studio__panel--output {
+      order: -1;
+      min-height: 140px;
+    }
+
+    .remix-studio__modes {
+      flex-wrap: wrap;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .remix-studio *,
+    .remix-studio *::before,
+    .remix-studio *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
+
+<script define:vars={{ accentColor: track.accentColor, accentRgb: track.accentRgb }}>
+  (() => {
+    const studio = document.querySelector("[data-remix-studio]");
+    if (!studio) return;
+
+    const inputEl = studio.querySelector("[data-remix-input]");
+    const seedEls = studio.querySelectorAll("[data-remix-seed]");
+    const modeEls = studio.querySelectorAll("[data-remix-mode]");
+    const actionEl = studio.querySelector("[data-remix-action]");
+    const idleEl = studio.querySelector("[data-remix-idle]");
+    const processingEl = studio.querySelector("[data-remix-processing]");
+    const cardEl = studio.querySelector("[data-remix-card]");
+
+    let currentMode = "sharpen";
+    let remixing = false;
+
+    seedEls.forEach((seed) => {
+      seed.addEventListener("click", () => {
+        inputEl.value = seed.textContent;
+        inputEl.focus();
+      });
+    });
+
+    modeEls.forEach((mode) => {
+      mode.addEventListener("click", () => {
+        modeEls.forEach((m) => {
+          m.classList.remove("is-active");
+          m.setAttribute("aria-checked", "false");
+        });
+        mode.classList.add("is-active");
+        mode.setAttribute("aria-checked", "true");
+        currentMode = mode.dataset.remixMode;
+      });
+    });
+
+    inputEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") actionEl.click();
+    });
+
+    actionEl.addEventListener("click", () => {
+      const value = inputEl.value.trim();
+      if (!value || remixing) return;
+      runRemix(value, currentMode);
+    });
+
+    async function runRemix(input, mode) {
+      remixing = true;
+      actionEl.disabled = true;
+
+      idleEl.hidden = true;
+      cardEl.hidden = true;
+      processingEl.hidden = false;
+
+      const result = (await tryAI(input, mode)) || localTransform(input, mode);
+
+      processingEl.hidden = true;
+      cardEl.innerHTML = "";
+      cardEl.appendChild(buildCard(result, mode));
+      cardEl.hidden = false;
+
+      remixing = false;
+      actionEl.disabled = false;
+    }
+
+    async function tryAI(input, mode) {
+      const lab = studio.closest("[data-track-lab]");
+      if (!lab || lab.dataset.aiEnabled !== "true") return null;
+      try {
+        const ctrl = new AbortController();
+        const tid = setTimeout(() => ctrl.abort(), 5000);
+        const res = await fetch("/api/ai/track-lab", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ feature: "remix-studio", input, mode }),
+          signal: ctrl.signal,
+        });
+        clearTimeout(tid);
+        if (!res.ok) return null;
+        const data = await res.json();
+        return data && data.output ? data.output : null;
+      } catch {
+        return null;
+      }
+    }
+
+    function hash(str) {
+      let h = 5381;
+      for (let i = 0; i < str.length; i++) {
+        h = ((h << 5) + h + str.charCodeAt(i)) & 0x7fffffff;
+      }
+      return h;
+    }
+
+    function pick(arr, h, off) {
+      return arr[((h >>> 0) + (off || 0)) % arr.length];
+    }
+
+    function cap(s) {
+      return s.charAt(0).toUpperCase() + s.slice(1);
+    }
+
+    const STOP = new Set([
+      "a","an","the","that","this","is","are","was","were","it","its","for","to","of",
+      "in","on","at","by","with","from","and","or","but","not","your","my","our","their",
+      "what","which","who","how","can","will","do","does","did","has","have","had","be",
+      "been","am","i","you","he","she","we","they","me","him","her","us","them","up",
+      "down","out","into","about","some","any","all","each","every","both","few","more",
+      "most","other","than","too","very","just","also","then","so","if","when","while",
+      "where","here","there","like","help","make","need","want","use","get","new","own",
+    ]);
+
+    function keywords(input) {
+      return input
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, "")
+        .split(/\s+/)
+        .filter((w) => w.length > 2 && !STOP.has(w));
+    }
+
+    const SUFFIXES = [
+      "Flow","Pulse","Hub","Scout","Sync","Lens","Forge","Spark","Wave","Kit",
+      "Base","Loop","Mind","Craft","Sense","Dash","Stack","Nest","Graph","Arc",
+    ];
+
+    const ADJS = [
+      "Smart","Adaptive","Intelligent","Seamless","Intuitive","Dynamic",
+      "Personalized","Predictive","Elegant","Context-aware","Proactive",
+      "Responsive","Effortless","Precise","Collaborative",
+    ];
+
+    const VERBS = [
+      "analyzes","suggests","adapts to","discovers","predicts","optimizes",
+      "personalizes","curates","matches","maps","tracks","generates",
+      "connects","learns","surfaces","orchestrates",
+    ];
+
+    const NOUNS = [
+      "patterns","insights","preferences","trends","habits","goals",
+      "routines","connections","progress","behaviors","needs","workflow",
+      "context","environment","signals","choices",
+    ];
+
+    const BENEFITS = [
+      "save time","stay focused","make better decisions","build consistency",
+      "reduce friction","gain clarity","stay organized","discover opportunities",
+      "build momentum","improve outcomes","work smarter","learn faster",
+    ];
+
+    const AUDIENCES = [
+      "Students balancing busy schedules",
+      "Professionals optimizing productivity",
+      "Creators seeking inspiration",
+      "Teams collaborating on projects",
+      "Researchers exploring new territory",
+      "Beginners learning new skills",
+      "Hobbyists pursuing their passions",
+      "Entrepreneurs building products",
+    ];
+
+    const TECH_TAGS = [
+      "ML","UX","Data","Mobile","API","Cloud","Real-time","Personal",
+      "Analytics","IoT","Responsive","Adaptive","NLP","Automation",
+    ];
+
+    const MOODS = [
+      "Calm & Minimalist","Bold & Energetic","Clean & Professional",
+      "Warm & Friendly","Dark & Sophisticated","Playful & Colorful",
+      "Elegant & Refined","Modern & Geometric",
+    ];
+
+    const COLORS = [
+      { name: "Slate Blue", hex: "#64748B" },
+      { name: "Soft Lavender", hex: "#C4B5FD" },
+      { name: "Mint Cream", hex: "#D1FAE5" },
+      { name: "Deep Teal", hex: "#0D9488" },
+      { name: "Warm Amber", hex: "#F59E0B" },
+      { name: "Off-White", hex: "#F1F5F9" },
+      { name: "Midnight", hex: "#1E1B4B" },
+      { name: "Electric Cyan", hex: "#22D3EE" },
+      { name: "Charcoal", hex: "#374151" },
+      { name: "Forest Green", hex: "#166534" },
+      { name: "Peach", hex: "#FB923C" },
+      { name: "Warm Gray", hex: "#9CA3AF" },
+      { name: "Indigo", hex: "#4F46E5" },
+      { name: "Rose Quartz", hex: "#FDA4AF" },
+      { name: "Pale Gold", hex: "#EAB308" },
+      { name: "Burnt Orange", hex: "#EA580C" },
+      { name: "Cream", hex: "#FEF3C7" },
+      { name: "Steel Blue", hex: "#3B82F6" },
+      { name: "Coral", hex: "#FB7185" },
+      { name: "Plum", hex: "#9333EA" },
+      { name: "Sage", hex: "#86EFAC" },
+      { name: "Ivory", hex: "#FFFBEB" },
+    ];
+
+    const TYPOGRAPHY = [
+      "Clean Sans-serif","Modern Geometric Sans","Friendly Rounded Sans",
+      "Elegant Serif","Technical Monospace","Bold Display",
+    ];
+
+    const UI_ELEMENTS = [
+      "Card-based dashboard","Timeline view","Interactive map",
+      "Split-panel workspace","Feed-style list","Canvas workspace",
+      "Tabbed interface","Command palette",
+    ];
+
+    const METAPHORS = [
+      "a personal compass","a smart assistant","a thoughtful curator",
+      "a reliable co-pilot","a creative partner","a fitness tracker for your goals",
+      "a recipe for success","a well-organized desk",
+    ];
+
+    const PHASE_SETS = [
+      ["Understand users","Sketch core flows","Build working prototype","Ship & iterate"],
+      ["Research landscape","Define key features","Develop MVP","Gather feedback"],
+      ["Explore ideas freely","Design the system","Implement core logic","Test & refine"],
+      ["Map the problem space","Architect a solution","Code & integrate","Launch & learn"],
+    ];
+
+    const STACKS = [
+      ["React","Node.js","SQLite"],
+      ["Next.js","Python","PostgreSQL"],
+      ["Vue","Firebase","Tailwind"],
+      ["Svelte","Supabase","Vercel"],
+    ];
+
+    const TIMELINES = ["2\u20133 weeks","3\u20134 weeks","4\u20136 weeks","1\u20132 weeks","6\u20138 weeks"];
+
+    const ANALOGIES = [
+      "a helpful librarian who knows exactly what you need",
+      "a fitness tracker, but for your goals and ideas",
+      "a GPS that navigates complex decisions",
+      "a personal chef that preps your workflow",
+      "a study group that never sleeps",
+      "a smart notebook that organizes itself",
+      "a trusted advisor who\u2019s always available",
+      "a playlist that adapts to your mood",
+    ];
+
+    const STEP_SETS = [
+      ["Start with one simple feature","Test it with a real person","Iterate based on what you learn"],
+      ["Write down your core idea in one sentence","Sketch the main screen","Build just that one thing"],
+      ["Pick your smallest assumption","Create a quick experiment","Learn and adjust"],
+      ["Define the problem clearly","Find one existing solution","Improve one specific thing about it"],
+      ["List what you already know","Identify your biggest gap","Fill that gap first"],
+    ];
+
+    const LEARNINGS = [
+      "How to break complex problems into manageable pieces",
+      "The basics of user-centered design thinking",
+      "How to iterate quickly and learn from feedback",
+      "Core concepts of data-driven decision making",
+      "How to communicate ideas clearly and effectively",
+      "Practical skills in prototyping and testing",
+    ];
+
+    const BEGINNER_TAGS = [
+      "No-Code","Templates","Guided","Step-by-step","Visual","Interactive",
+      "Community","Resources","Hands-on","Beginner-friendly",
+    ];
+
+    const PHASE_LABELS = ["Research","Design","Build","Launch"];
+
+    function localTransform(input, mode) {
+      const h = hash(input + mode);
+      const kw = keywords(input);
+      const main = kw[0] || "idea";
+
+      switch (mode) {
+        case "sharpen":
+          return transformSharpen(main, kw, h);
+        case "visual":
+          return transformVisual(main, h);
+        case "project":
+          return transformProject(main, h);
+        case "beginner":
+          return transformBeginner(main, h);
+        default:
+          return transformSharpen(main, kw, h);
+      }
+    }
+
+    function transformSharpen(main, kw, h) {
+      const title = cap(main) + pick(SUFFIXES, h, 0);
+      const adj = pick(ADJS, h, 1);
+      const verb = pick(VERBS, h, 2);
+      const noun = pick(NOUNS, h, 3);
+      const tagline = `${adj} system that ${verb} your ${noun}`;
+
+      const features = [
+        `${pick(VERBS, h, 4)} ${pick(NOUNS, h, 5)} to ${pick(BENEFITS, h, 6)}`,
+        `${cap(pick(VERBS, h, 7).replace(/s$/, ""))}s ${pick(NOUNS, h, 8)} with minimal user input`,
+        `${pick(ADJS, h, 9)} ${pick(NOUNS, h, 10)} that evolves over time`,
+      ];
+
+      const audience = pick(AUDIENCES, h, 11);
+      const tags = [
+        pick(TECH_TAGS, h, 12),
+        pick(TECH_TAGS, h, 13),
+        pick(TECH_TAGS, h, 14),
+      ];
+
+      return {
+        badge: "Refined Concept",
+        title,
+        tagline,
+        sections: [
+          { label: "Key Features", items: features },
+          { label: "Target", text: audience },
+        ],
+        tags,
+      };
+    }
+
+    function transformVisual(main, h) {
+      const title = cap(main) + " \u2014 Visual Direction";
+      const mood = pick(MOODS, h, 0);
+
+      const ci = (h + 1) % (COLORS.length - 2);
+      const palette = [COLORS[ci], COLORS[ci + 1], COLORS[ci + 2]];
+
+      const typo = pick(TYPOGRAPHY, h, 3);
+      const elems = [pick(UI_ELEMENTS, h, 4), pick(UI_ELEMENTS, h, 5)];
+      const metaphor = pick(METAPHORS, h, 6);
+
+      return {
+        badge: "Visual Concept",
+        title,
+        sections: [
+          { label: "Mood", text: mood },
+          { label: "Palette", swatches: palette },
+          { label: "Typography", text: typo },
+          { label: "Key Elements", items: elems },
+          { label: "Visual Metaphor", text: `Like ${metaphor}` },
+        ],
+      };
+    }
+
+    function transformProject(main, h) {
+      const projectName = cap(main) + pick(SUFFIXES, h, 0);
+      const title = projectName + " \u2014 Project Brief";
+      const phases = pick(PHASE_SETS, h, 1);
+      const stack = pick(STACKS, h, 2);
+      const timeline = pick(TIMELINES, h, 3);
+      const milestone = PHASE_LABELS[0] + " complete with documented findings";
+
+      const phaseItems = phases.map((p, i) => `${PHASE_LABELS[i]} \u2014 ${p}`);
+
+      return {
+        badge: "Project Brief",
+        title,
+        tagline: `Estimated timeline: ${timeline}`,
+        sections: [
+          { label: "Phases", items: phaseItems },
+          { label: "Stack", stackTags: stack },
+          { label: "First Milestone", text: milestone },
+        ],
+      };
+    }
+
+    function transformBeginner(main, h) {
+      const title = cap(main) + " \u2014 Simplified";
+      const simple = `${cap(main)} made simple and approachable for anyone starting out.`;
+      const analogy = `Think of it like ${pick(ANALOGIES, h, 0)}.`;
+      const steps = pick(STEP_SETS, h, 1);
+      const learning = pick(LEARNINGS, h, 2);
+      const diff = (h % 3) + 1;
+      const tags = [
+        pick(BEGINNER_TAGS, h, 3),
+        pick(BEGINNER_TAGS, h, 4),
+        pick(BEGINNER_TAGS, h, 5),
+      ];
+
+      const levelLabels = ["Beginner","Intermediate","Advanced"];
+      const stepItems = steps.map((s, i) => `${i + 1}. ${s}`);
+
+      return {
+        badge: "Simplified",
+        title,
+        sections: [
+          { label: "In Simple Terms", text: simple },
+          { label: "Think of it like\u2026", text: analogy },
+          { label: "Getting Started", items: stepItems },
+          { label: "You\u2019ll Learn", text: learning },
+          {
+            label: "Level",
+            level: { filled: diff, total: 3, label: levelLabels[diff - 1] },
+          },
+        ],
+        tags,
+      };
+    }
+
+    function buildCard(result, mode) {
+      const frag = document.createDocumentFragment();
+      const wrapper = document.createElement("div");
+      wrapper.className = "remix-studio__card-inner";
+
+      let delay = 0;
+
+      const badge = el("span", "remix-studio__card-badge", result.badge);
+      badge.style.animationDelay = `${delay}ms`;
+      wrapper.appendChild(badge);
+
+      delay += 60;
+      const title = el("span", "remix-studio__card-title", result.title);
+      title.style.animationDelay = `${delay}ms`;
+      title.classList.add("remix-studio__card-section");
+      wrapper.appendChild(title);
+
+      if (result.tagline) {
+        delay += 60;
+        const tagline = el("span", "remix-studio__card-tagline", result.tagline);
+        tagline.style.animationDelay = `${delay}ms`;
+        tagline.classList.add("remix-studio__card-section");
+        wrapper.appendChild(tagline);
+      }
+
+      if (result.sections) {
+        result.sections.forEach((sec) => {
+          delay += 80;
+          const section = document.createElement("div");
+          section.className = "remix-studio__card-section";
+          section.style.animationDelay = `${delay}ms`;
+
+          section.appendChild(el("span", "remix-studio__card-section-label", sec.label));
+
+          if (sec.items) {
+            const ul = document.createElement("ul");
+            sec.items.forEach((item) => {
+              ul.appendChild(el("li", "", item));
+            });
+            section.appendChild(ul);
+          }
+
+          if (sec.text) {
+            section.appendChild(el("span", "", sec.text));
+          }
+
+          if (sec.swatches) {
+            const row = document.createElement("div");
+            row.className = "remix-studio__swatches";
+            sec.swatches.forEach((sw) => {
+              const g = document.createElement("div");
+              g.className = "remix-studio__swatch-group";
+              const dot = document.createElement("span");
+              dot.className = "remix-studio__swatch-dot";
+              dot.style.background = sw.hex;
+              g.appendChild(dot);
+              g.appendChild(el("span", "remix-studio__swatch-name", sw.name));
+              row.appendChild(g);
+            });
+            section.appendChild(row);
+          }
+
+          if (sec.stackTags) {
+            const row = document.createElement("div");
+            row.className = "remix-studio__card-tags";
+            sec.stackTags.forEach((t) => {
+              row.appendChild(el("span", "remix-studio__card-tag", t));
+            });
+            section.appendChild(row);
+          }
+
+          if (sec.level) {
+            const row = document.createElement("div");
+            row.className = "remix-studio__level-row";
+            for (let i = 0; i < sec.level.total; i++) {
+              const pip = document.createElement("span");
+              pip.className =
+                "remix-studio__level-pip " +
+                (i < sec.level.filled
+                  ? "remix-studio__level-pip--on"
+                  : "remix-studio__level-pip--off");
+              row.appendChild(pip);
+            }
+            row.appendChild(
+              el("span", "remix-studio__level-label", sec.level.label)
+            );
+            section.appendChild(row);
+          }
+
+          wrapper.appendChild(section);
+        });
+      }
+
+      if (result.tags) {
+        delay += 60;
+        const tagRow = document.createElement("div");
+        tagRow.className = "remix-studio__card-tags remix-studio__card-section";
+        tagRow.style.animationDelay = `${delay}ms`;
+        result.tags.forEach((t) => {
+          tagRow.appendChild(el("span", "remix-studio__card-tag", t));
+        });
+        wrapper.appendChild(tagRow);
+      }
+
+      frag.appendChild(wrapper);
+      return frag;
+    }
+
+    function el(tag, cls, text) {
+      const e = document.createElement(tag);
+      if (cls) e.className = cls;
+      if (text !== undefined) e.textContent = text;
+      return e;
+    }
+  })();
+</script>

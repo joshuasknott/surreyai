@@ -1,0 +1,92 @@
+---
+interface Props {
+  events: {
+    _id: string;
+    title: string;
+    description?: string;
+    date?: string;
+    startTime?: string;
+    endTime?: string;
+    location?: string;
+    category?: string;
+    status: string;
+  }[];
+}
+
+const { events } = Astro.props;
+
+const formatEventDate = (date?: string) => {
+  if (!date) return "Date TBC";
+  const parsed = new Date(`${date}T00:00:00`);
+  if (Number.isNaN(parsed.getTime())) return date;
+  return parsed.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+};
+---
+
+<section id="events" class="bg-navy text-text-on-dark py-20 sm:py-24 px-6 relative overflow-hidden">
+  <div class="absolute inset-0 bg-[linear-gradient(rgba(91,142,219,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(91,142,219,0.04)_1px,transparent_1px)] bg-[size:48px_48px] pointer-events-none"></div>
+
+  <div class="mx-auto max-w-6xl relative z-10">
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-12 gap-4">
+      <div>
+        <div class="inline-flex items-center gap-4 mb-4">
+          <span class="w-12 h-px bg-border-subtle"></span>
+          <span class="text-accent-blue text-xs font-bold uppercase tracking-widest">Events</span>
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-black tracking-tight">
+          What's Coming Up
+        </h2>
+      </div>
+      <a href="/events" class="text-accent-blue hover:text-accent-blue-dark text-sm font-semibold transition-colors">
+        View all events &rarr;
+      </a>
+    </div>
+
+    {events.length === 0 ? (
+      <div class="border border-border-subtle bg-surface-card/50 p-8 sm:p-12 text-center">
+        <h3 class="font-semibold text-lg mb-2">Events being announced soon</h3>
+        <p class="text-text-on-dark-secondary text-sm leading-relaxed max-w-md mx-auto">
+          We're planning workshops, build nights, discussions, and more for the year ahead.
+          Check back soon or follow our socials for updates.
+        </p>
+      </div>
+    ) : (
+      <div class="flex flex-col gap-2 font-mono-tech">
+        {events.slice(0, 4).map((event) => (
+          <div class="group relative bg-surface-card border border-border-subtle p-4 sm:p-6 hover:bg-surface-alt transition-colors flex flex-col sm:flex-row gap-4 sm:gap-8 sm:items-center">
+            <div class="absolute left-0 top-0 bottom-0 w-1 bg-accent-blue opacity-0 group-hover:opacity-100 group-hover:shadow-[0_0_12px_rgba(6,182,212,0.8)] transition-all duration-300"></div>
+
+            <div class="flex-shrink-0 w-32 text-xs sm:text-sm text-text-muted group-hover:text-accent-blue transition-colors">
+              <div>[{formatEventDate(event.date)}]</div>
+              {event.startTime && <div>[{event.startTime}]</div>}
+            </div>
+
+            <div class="flex-grow">
+              <div class="flex items-center gap-3 mb-2">
+                {event.category && (
+                  <span class="text-[10px] font-bold text-accent-purple uppercase tracking-wider">
+                    &gt;&gt; {event.category}
+                  </span>
+                )}
+              </div>
+              <h3 class="font-bold text-base sm:text-lg uppercase tracking-tight text-text-primary mb-1 font-sans group-hover:text-accent-blue transition-colors">
+                {event.title}
+              </h3>
+              {event.description && (
+                <p class="text-text-secondary text-xs sm:text-sm font-sans">{event.description}</p>
+              )}
+            </div>
+
+            <div class="hidden sm:block flex-shrink-0 text-text-muted group-hover:text-accent-blue transition-colors">
+              <span class="text-xl">&rarr;</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+</section>

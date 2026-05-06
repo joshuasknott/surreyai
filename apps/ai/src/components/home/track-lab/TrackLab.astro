@@ -1,0 +1,152 @@
+---
+import { aiTracks } from "../../../data/aiTracks";
+import { isAIEnabled } from "../../../lib/server/ai/gemini";
+import TrackSelectors from "./TrackSelectors.astro";
+import TrackInfoPanel from "./TrackInfoPanel.astro";
+import TrackStage from "./TrackStage.astro";
+
+const activeId = aiTracks[0].id;
+const aiEnabled = isAIEnabled();
+---
+
+<div class="track-lab" data-track-lab data-ai-enabled={aiEnabled ? "true" : undefined}>
+  <TrackSelectors tracks={aiTracks} activeId={activeId} />
+
+  <div class="track-lab__body">
+    <div class="track-lab__info">
+      <TrackInfoPanel tracks={aiTracks} activeId={activeId} />
+    </div>
+    <div class="track-lab__stage">
+      <TrackStage tracks={aiTracks} activeId={activeId} />
+    </div>
+  </div>
+</div>
+
+<style>
+  .track-lab {
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 20px;
+    background: linear-gradient(160deg, rgba(5, 8, 16, 0.96), rgba(21, 32, 58, 0.72));
+    box-shadow: 0 20px 70px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(248, 250, 252, 0.04);
+    overflow: hidden;
+  }
+
+  .track-lab__body {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: 32px;
+    padding: 28px;
+    min-height: 460px;
+    align-items: start;
+  }
+
+  .track-lab__info {
+    position: relative;
+  }
+
+  .track-lab__stage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @media (max-width: 768px) {
+    .track-lab__body {
+      grid-template-columns: 1fr;
+      padding: 20px;
+      min-height: 0;
+      gap: 20px;
+    }
+
+    .track-lab__stage {
+      order: -1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .track-lab *,
+    .track-lab *::before,
+    .track-lab *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
+
+<script>
+  const lab = document.querySelector("[data-track-lab]");
+  if (lab) {
+    const tabs = Array.from(
+      lab.querySelectorAll<HTMLButtonElement>("[data-track-tab]")
+    );
+    const infoPanels = Array.from(
+      lab.querySelectorAll<HTMLElement>("[data-track-info]")
+    );
+    const stagePanels = Array.from(
+      lab.querySelectorAll<HTMLElement>("[data-track-stage]")
+    );
+
+    const activateTrack = (trackId: string) => {
+      tabs.forEach((tab) => {
+        const isActive = tab.dataset.trackTab === trackId;
+        tab.classList.toggle("is-active", isActive);
+        tab.setAttribute("aria-selected", String(isActive));
+        tab.tabIndex = isActive ? 0 : -1;
+      });
+
+      infoPanels.forEach((panel) => {
+        const isActive = panel.dataset.trackInfo === trackId;
+        panel.classList.toggle("is-active", isActive);
+        panel.setAttribute("aria-hidden", String(!isActive));
+        if (isActive) {
+          panel.removeAttribute("hidden");
+        } else {
+          panel.setAttribute("hidden", "");
+        }
+      });
+
+      stagePanels.forEach((panel) => {
+        const isActive = panel.dataset.trackStage === trackId;
+        panel.classList.toggle("is-active", isActive);
+        panel.setAttribute("aria-hidden", String(!isActive));
+        if (isActive) {
+          panel.removeAttribute("hidden");
+        } else {
+          panel.setAttribute("hidden", "");
+        }
+      });
+    };
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        activateTrack(tab.dataset.trackTab!);
+      });
+    });
+
+    lab.addEventListener("keydown", (e: Event) => {
+      const ke = e as KeyboardEvent;
+      const currentTab = tabs.find((t) => t.getAttribute("aria-selected") === "true");
+      if (!currentTab) return;
+
+      const currentIndex = tabs.indexOf(currentTab);
+      let nextIndex = -1;
+
+      if (ke.key === "ArrowRight" || ke.key === "ArrowDown") {
+        nextIndex = (currentIndex + 1) % tabs.length;
+      } else if (ke.key === "ArrowLeft" || ke.key === "ArrowUp") {
+        nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+      } else if (ke.key === "Home") {
+        nextIndex = 0;
+      } else if (ke.key === "End") {
+        nextIndex = tabs.length - 1;
+      }
+
+      if (nextIndex >= 0) {
+        ke.preventDefault();
+        tabs[nextIndex].focus();
+        activateTrack(tabs[nextIndex].dataset.trackTab!);
+      }
+    });
+  }
+</script>

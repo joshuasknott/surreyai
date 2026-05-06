@@ -1,0 +1,85 @@
+---
+import type { AITrack } from "../../../data/aiTracks";
+import MachineLearningPatternFinder from "./prototypes/MachineLearningPatternFinder.astro";
+import GenerativeRemixStudio from "./prototypes/GenerativeRemixStudio.astro";
+import ComputerVisionLens from "./prototypes/ComputerVisionLens.astro";
+import EthicsImpactCompass from "./prototypes/EthicsImpactCompass.astro";
+import AgentsTaskRelay from "./prototypes/AgentsTaskRelay.astro";
+import ProjectsBuildSprint from "./prototypes/ProjectsBuildSprint.astro";
+
+interface Props {
+  tracks: AITrack[];
+  activeId: string;
+}
+
+const { tracks, activeId } = Astro.props;
+---
+
+<div class="track-stage-panels" data-track-stage-panels>
+  {tracks.map((track) => (
+    <div
+      class={`track-stage${track.id === activeId ? " is-active" : ""}`}
+      data-track-stage={track.id}
+      hidden={track.id !== activeId}
+      aria-hidden={track.id !== activeId ? "true" : "false"}
+    >
+      <div class="track-stage__frame" style={`--stage-accent: ${track.accentColor};`}>
+        {track.id === "ml" && <MachineLearningPatternFinder />}
+        {track.id === "genai" && <GenerativeRemixStudio track={track} />}
+        {track.id === "cv" && <ComputerVisionLens />}
+        {track.id === "ethics" && <EthicsImpactCompass />}
+        {track.id === "agents" && <AgentsTaskRelay />}
+        {track.id === "projects" && <ProjectsBuildSprint />}
+      </div>
+    </div>
+  ))}
+</div>
+
+<style>
+  .track-stage-panels {
+    position: relative;
+  }
+
+  .track-stage {
+    display: none;
+    opacity: 0;
+    transform: scale(0.97);
+    transition: opacity 320ms ease, transform 320ms ease;
+  }
+
+  .track-stage.is-active {
+    display: flex;
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .track-stage__frame {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    min-height: 320px;
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    border-radius: 14px;
+    background:
+      radial-gradient(circle at center, color-mix(in srgb, var(--stage-accent, #06B6D4) 4%, transparent), transparent 60%),
+      rgba(5, 8, 16, 0.6);
+    display: flex;
+    align-items: stretch;
+    justify-content: stretch;
+    position: relative;
+    overflow: hidden;
+    transition: background 400ms ease, border-color 400ms ease;
+  }
+
+  @media (max-width: 768px) {
+    .track-stage__frame {
+      min-height: 240px;
+      aspect-ratio: 4 / 3;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .track-stage {
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>

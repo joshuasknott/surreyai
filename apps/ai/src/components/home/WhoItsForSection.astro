@@ -1,0 +1,74 @@
+---
+const audiences = [
+  {
+    title: "Beginners",
+    description:
+      "Never touched AI? Most of our events are designed as starting points with no prerequisites.",
+    icon: "\u25B7",
+  },
+  {
+    title: "Builders",
+    description:
+      "Already code and want to apply your skills? Our build nights and project groups are for you.",
+    icon: "\u2692",
+  },
+  {
+    title: "Creatives",
+    description:
+      "Explore generative art, AI-powered music, creative writing tools, and design experiments.",
+    icon: "\u2604",
+  },
+  {
+    title: "Social Science & Policy",
+    description:
+      "Interested in ethics, regulation, or societal implications? We host discussions and panels on these topics.",
+    icon: "\u2696",
+  },
+  {
+    title: "Researchers",
+    description:
+      "Deepen your understanding, connect with like-minded students, and explore cutting-edge AI methods.",
+    icon: "\u2316",
+  },
+  {
+    title: "Entrepreneurs",
+    description:
+      "Discover how AI can power new ventures, automate workflows, and create competitive products.",
+    icon: "\u2605",
+  },
+];
+---
+
+<section class="py-20 sm:py-24 px-6 bg-surface relative overflow-hidden border-t border-border-subtle">
+  <div class="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(139,92,246,0.08),transparent_30%)] pointer-events-none"></div>
+
+  <div class="mx-auto max-w-6xl relative z-10">
+    <div class="max-w-3xl mb-12">
+      <div class="inline-flex items-center gap-3 mb-5 border border-border-subtle px-3 py-1.5 bg-surface-card/40">
+        <span class="w-2 h-2 bg-accent-purple shadow-[0_0_12px_rgba(139,92,246,0.8)]"></span>
+        <span class="text-accent-purple text-xs font-bold font-mono-tech tracking-widest uppercase">
+          Community
+        </span>
+      </div>
+      <h2 class="text-3xl sm:text-4xl font-black tracking-tight mb-5">
+        Who It's For
+      </h2>
+      <p class="text-text-secondary text-base sm:text-lg leading-relaxed max-w-2xl">
+        Whether you're studying computer science, business, psychology, law, or anything
+        else &mdash; if you're curious about AI, you're welcome here.
+      </p>
+    </div>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      {audiences.map((audience) => (
+        <div class="group border border-border-subtle bg-surface-card/40 p-6 hover:border-accent-blue/30 transition-all duration-300">
+          <div class="flex items-center gap-3 mb-3">
+            <span class="text-accent-blue text-lg font-mono leading-none">{audience.icon}</span>
+            <h3 class="font-bold text-sm uppercase tracking-wide text-text-primary">{audience.title}</h3>
+          </div>
+          <p class="text-text-secondary text-sm leading-relaxed">{audience.description}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
