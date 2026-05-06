@@ -1,13 +1,14 @@
 ---
 export const prerender = false;
 import AdminLayout from '../../../layouts/AdminLayout.astro';
-import { createEvent, validateEventInput, EVENT_CATEGORIES } from '@surreysocieties/admin';
+import { validateEventInput, EVENT_CATEGORIES } from '@surreysocieties/admin';
 
 const SOCIETY_ID = 'ai';
 let errors: Record<string, string> = {};
 let values: Record<string, string> = {};
 
 if (Astro.request.method === 'POST') {
+  const client = Astro.locals.convexClient;
   const formData = await Astro.request.formData();
   const input = {
     title: formData.get('title')?.toString() || '',
@@ -27,7 +28,10 @@ if (Astro.request.method === 'POST') {
 
   const validation = validateEventInput(input);
   if (validation.valid) {
-    createEvent(SOCIETY_ID, input);
+    await client.mutation("events:create", {
+      societySlug: SOCIETY_ID,
+      ...input,
+    });
     return Astro.redirect('/admin/events?success=1');
   }
   errors = validation.errors;

@@ -2,7 +2,13 @@
 
 declare namespace App {
   interface Locals {
-    user?: import('@surreysocieties/admin').SafeAdminUser;
-    societyId?: string;
+    convexClient?: any;
+    user?: {
+      _id: string;
+      name: string;
+      email: string;
+      role: string;
+    };
+    societySlug?: string;
   }
 }

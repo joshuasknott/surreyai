@@ -39,7 +39,6 @@ function isActive(href: string): boolean {
   </head>
   <body class="admin-body">
     <div class="admin-layout">
-      <!-- Sidebar -->
       <aside class="admin-sidebar" id="admin-sidebar">
         <div class="admin-sidebar-logo">
           <img src={society?.logo || '/favicon.svg'} alt="" />
@@ -63,15 +62,12 @@ function isActive(href: string): boolean {
         </div>
       </aside>
 
-      <!-- Main -->
       <div class="admin-main">
         <header class="admin-topbar">
           <div class="admin-topbar-user">
             <span>{user?.name || 'Admin'}</span>
             <span style="color: var(--color-admin-text-muted);">({user?.role})</span>
-            <form method="POST" action="/api/admin/auth/logout" style="display:inline;">
-              <button type="submit" class="btn btn-ghost btn-sm">Logout</button>
-            </form>
+            <button id="sign-out-btn" class="btn btn-ghost btn-sm">Logout</button>
           </div>
         </header>
         <div class="admin-content">
@@ -79,5 +75,12 @@ function isActive(href: string): boolean {
         </div>
       </div>
     </div>
+    <script is:inline>
+      document.getElementById('sign-out-btn')?.addEventListener('click', async function() {
+        if (window.Clerk) {
+          await window.Clerk.signOut({ redirectUrl: '/admin/login' });
+        }
+      });
+    </script>
   </body>
 </html>

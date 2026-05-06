@@ -17,17 +17,17 @@ const committee = [
 ];
 ---
 
-<Layout title="Committee" description="Meet the student committee running Surrey AI Society — the team behind our workshops, events, and community.">
+<Layout title="Committee" description="Meet the student committee running Surrey Artificial Intelligence Society — the team behind our workshops, events, and community.">
 
   <!-- Header -->
   <section class="bg-navy text-text-on-dark py-16 sm:py-20 px-6">
     <div class="mx-auto max-w-6xl">
       <div class="inline-flex items-center gap-2 mb-4">
-        <span class="w-8 h-px bg-gold"></span>
-        <span class="text-gold text-sm font-semibold uppercase tracking-wider">Our Team</span>
+        <span class="w-8 h-px bg-accent-blue"></span>
+        <span class="text-accent-blue text-sm font-semibold uppercase tracking-wider">Our Team</span>
       </div>
       <h1 class="text-4xl sm:text-5xl font-black tracking-tight">Committee</h1>
-      <p class="mt-4 text-text-on-dark-secondary text-lg max-w-2xl">The student volunteers who make Surrey AI Society happen.</p>
+      <p class="mt-4 text-text-on-dark-secondary text-lg max-w-2xl">The student volunteers who make Surrey Artificial Intelligence Society happen.</p>
     </div>
   </section>
 
@@ -36,8 +36,8 @@ const committee = [
     <div class="mx-auto max-w-6xl">
       <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {committee.map(member => (
-          <div class="bg-surface-card rounded-xl p-6 border border-navy/5 hover:border-gold/20 transition-colors shadow-sm flex items-start gap-4">
-            <div class="w-14 h-14 rounded-full bg-navy/5 border-2 border-gold/20 flex items-center justify-center text-gold font-bold text-sm shrink-0">
+          <div class="bg-surface-card rounded-xl p-6 border border-navy/5 hover:border-accent-blue/20 transition-colors shadow-sm flex items-start gap-4">
+            <div class="w-14 h-14 rounded-full bg-navy/5 border-2 border-accent-blue/20 flex items-center justify-center text-accent-blue font-bold text-sm shrink-0">
               {member.initials}
             </div>
             <div>
@@ -51,7 +51,7 @@ const committee = [
       <div class="mt-12 bg-surface-alt rounded-xl p-8 border border-navy/5 text-center">
         <h3 class="font-semibold text-lg mb-2">Interested in joining the committee?</h3>
         <p class="text-text-secondary text-sm mb-4">Committee elections happen through Surrey Students' Union. Keep an eye on our announcements for when positions open.</p>
-        <a href="/join" class="text-gold hover:text-gold-dark text-sm font-semibold transition-colors">
+        <a href="/join" class="text-accent-blue hover:text-accent-blue-dark text-sm font-semibold transition-colors">
           Join the society first →
         </a>
       </div>

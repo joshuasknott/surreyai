@@ -1,35 +1,41 @@
 @import "tailwindcss";
 
-/* Surrey AI Society — Navy + Blue palette */
+/* Surrey Artificial Intelligence Society — Navy + Blue + Purple palette */
 @theme {
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
   /* Logo-derived colours */
-  --color-navy: #071E41;
-  --color-navy-deep: #05142b;
-  --color-navy-light: #0d2a5a;
-  --color-accent-blue: #5B8EDB;
-  --color-accent-blue-light: #6EA1F2;
-  --color-accent-blue-dark: #416fb0;
-  --color-accent-blue-muted: #5B8EDB1a;
+  --color-navy: #0B1120;
+  --color-navy-deep: #050810;
+  --color-navy-light: #15203A;
+  --color-accent-blue: #06B6D4;
+  --color-accent-blue-light: #22D3EE;
+  --color-accent-blue-dark: #0891B2;
+  --color-accent-blue-muted: #06B6D41a;
+  
+  --color-accent-purple: #8B5CF6;
+  --color-accent-purple-light: #A78BFA;
+  --color-accent-purple-dark: #7C3AED;
+  --color-accent-purple-muted: #8B5CF61a;
 
   /* Semantic surfaces */
-  --color-surface: #F8FAFC;
-  --color-surface-alt: #FBFCFE;
-  --color-surface-dark: #071E41;
-  --color-surface-card: #ffffff;
-  --color-surface-card-dark: #0d2a5a;
+  --color-surface: #0B1120;
+  --color-surface-alt: #050810;
+  --color-surface-dark: #0B1120;
+  --color-surface-card: #15203A;
+  --color-surface-card-dark: #1E293B;
 
   /* Text */
-  --color-text-primary: #1F2937;
-  --color-text-secondary: #64748B;
-  --color-text-muted: #94a3b8;
+  --color-text-primary: #F8FAFC;
+  --color-text-secondary: #CBD5E1;
+  --color-text-muted: #94A3B8;
   --color-text-on-dark: #F8FAFC;
-  --color-text-on-dark-secondary: #cbd5e1;
+  --color-text-on-dark-secondary: #CBD5E1;
 
   /* Borders */
-  --color-border-subtle: #D8DEE9;
-  --color-border-strong: #94a3b8;
+  --color-border-subtle: #1E293B;
+  --color-border-strong: #334155;
 }
 
 /* Base styles */
@@ -41,6 +47,30 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Tech-Brutalism Utilities */
+.font-mono-tech {
+  font-family: var(--font-mono);
+}
+
+.duotone-tint {
+  position: relative;
+}
+
+.duotone-tint::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--color-navy-deep), var(--color-accent-purple));
+  mix-blend-mode: color;
+  opacity: 0.8;
+  pointer-events: none;
+  z-index: 10;
+}
+
+img.duotone-tint {
+  filter: grayscale(100%) sepia(100%) hue-rotate(240deg) saturate(200%) brightness(0.8) contrast(1.2);
 }
 
 /* Node decoration — square for tech-brutalism aesthetic */

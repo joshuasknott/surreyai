@@ -1,289 +1,660 @@
 ---
 export const prerender = true;
-import Layout from '../layouts/Layout.astro';
-import '../styles/global.css';
+import Layout from "../layouts/Layout.astro";
+import BackgroundVideo from "@surreysocieties/ui/components/BackgroundVideo";
+import ResponsiveImageFrame from "@surreysocieties/ui/components/ResponsiveImageFrame";
+import "../styles/global.css";
 ---
 
-<Layout title="Home" description="Surrey AI Society — A student-led community for learning, building, and discussing artificial intelligence at the University of Surrey.">
-
+<Layout
+  title="Home"
+  description="Surrey Artificial Intelligence Society — A student-led community for learning, building, and discussing artificial intelligence at the University of Surrey."
+>
   <!-- Hero -->
-  <section class="snap-start bg-navy text-text-on-dark relative overflow-hidden flex items-center min-h-[85vh] border-b-2 border-accent-blue/30">
-    <!-- Grid noise overlay -->
-    <div class="absolute inset-0 bg-[linear-gradient(rgba(91,142,219,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(91,142,219,0.04)_1px,transparent_1px)] bg-[size:48px_48px] pointer-events-none"></div>
+  <section class="bg-navy-deep text-text-on-dark relative overflow-hidden flex items-center min-h-[85vh] border-b border-border-subtle">
     <!-- Interactive Canvas Background -->
     <canvas id="hero-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-0"></canvas>
-    <!-- Accent corner block -->
-    <div class="absolute top-0 right-0 w-40 h-40 border-l-2 border-b-2 border-accent-blue/20 pointer-events-none"></div>
-    <div class="absolute bottom-0 left-0 w-24 h-24 border-r-2 border-t-2 border-accent-blue/20 pointer-events-none"></div>
-    <!-- Nodes -->
-    <div class="absolute top-[20%] left-[25%] node-dot"></div>
-    <div class="absolute top-[60%] right-[20%] node-dot"></div>
-    <div class="absolute bottom-[25%] left-[30%] node-dot"></div>
+    
     <div class="mx-auto max-w-6xl px-6 py-24 sm:py-32 relative z-10 w-full">
+      <div class="grid lg:grid-cols-[minmax(0,1fr)_minmax(340px,0.72fr)] gap-12 items-center">
       <div class="flex flex-col items-start max-w-3xl">
-        <div class="inline-flex items-center gap-3 mb-6 border border-accent-blue/30 px-3 py-1.5 bg-accent-blue/10">
-          <div class="w-2 h-2 bg-accent-blue"></div>
-          <span class="text-accent-blue text-xs font-bold uppercase tracking-widest">University of Surrey</span>
-        </div>
-        <h1 id="typewriter" class="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tight leading-[1.05]">
-          Surrey <span class="text-accent-blue">AI</span> Society
+        <span class="font-mono-tech text-accent-blue text-sm mb-4 block tracking-widest uppercase">
+          [System Status: Online]
+        </span>
+        <h1 class="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tight leading-[1.05] mb-6 drop-shadow-lg">
+          We Build <br/>
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-accent-blue to-accent-purple">Intelligence</span>
         </h1>
-        <p class="mt-6 text-lg sm:text-xl text-text-on-dark-secondary leading-relaxed max-w-2xl font-medium border-l-2 border-accent-blue/40 pl-4">
-          A student-led community for learning, building, and exploring artificial intelligence at Surrey.
+        <p class="font-mono-tech text-text-secondary text-sm sm:text-base leading-relaxed max-w-2xl border-l-2 border-accent-purple/50 pl-4">
+          A student-led community for learning, building, and exploring
+          artificial intelligence at the University of Surrey.
         </p>
-        <div class="mt-10 flex flex-col sm:flex-row gap-4">
-          <a href="/join" class="px-8 py-3.5 bg-accent-blue hover:bg-accent-blue-dark text-white font-bold uppercase tracking-wide text-sm transition-all duration-200 border border-accent-blue hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[4px_4px_0px_0px_var(--color-accent-blue-light)]">
-            Join the Society
+        <div class="mt-10 flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+          <a
+            href="/join"
+            class="px-8 py-3.5 bg-accent-blue hover:bg-accent-blue-light text-navy-deep font-bold uppercase tracking-wide text-sm transition-all duration-200 border border-accent-blue hover:shadow-[0_0_15px_rgba(6,182,212,0.5)] text-center"
+          >
+            Join Network
           </a>
-          <a href="/events" class="px-8 py-3.5 bg-transparent hover:bg-white/5 text-text-on-dark font-bold uppercase tracking-wide text-sm border border-white/20 transition-all duration-200 hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)]">
+          <a
+            href="/events"
+            class="px-8 py-3.5 bg-transparent hover:bg-surface-card text-text-on-dark font-bold uppercase tracking-wide text-sm border border-border-strong transition-all duration-200 hover:shadow-[0_0_15px_rgba(139,92,246,0.3)] text-center"
+          >
             View Events
           </a>
         </div>
       </div>
+      <div class="relative hidden lg:block min-h-[420px] border border-accent-blue/25 bg-surface-card/40 p-2 shadow-[0_0_40px_rgba(6,182,212,0.12)]">
+        <div class="relative h-full min-h-[400px] overflow-hidden border border-border-subtle bg-navy-deep">
+          <BackgroundVideo
+            src="/videos/optimized/ai-hero.optimized.mp4"
+            webmSrc="/videos/optimized/ai-hero.optimized.webm"
+            poster="/videos/posters/ai-hero.poster.jpg"
+            objectPosition="center 40%"
+            overlayClass="bg-navy-deep/45"
+          />
+          <ResponsiveImageFrame
+            src="/images/optimized/ai-students-1920.webp"
+            fallbackSrc="/images/optimized/ai-students-1920.jpg"
+            alt="AI Society students collaborating during a campus session"
+            objectPosition="center 40%"
+            loading="eager"
+            className="absolute inset-x-8 bottom-8 h-40 border border-accent-blue/30 shadow-[0_0_24px_rgba(6,182,212,0.18)]"
+            sizes="420px"
+          />
+          <div class="absolute left-6 top-6 font-mono-tech text-[10px] uppercase tracking-widest text-accent-blue bg-navy-deep/80 border border-accent-blue/30 px-3 py-1.5">
+            Student-led AI Lab
+          </div>
+        </div>
+      </div>
+      </div>
     </div>
+    
+    <!-- Subtle gradient overlay at bottom to blend into next section -->
+    <div class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-surface to-transparent pointer-events-none z-0"></div>
   </section>
 
-  <!-- What We Do — Bento Grid -->
-  <section class="snap-start py-20 sm:py-24 px-6 bg-surface">
-    <div class="mx-auto max-w-6xl">
-      <div class="mb-12">
-        <div class="inline-flex items-center gap-3 mb-4 border border-border-subtle px-3 py-1.5">
-          <span class="text-accent-blue text-xs font-bold uppercase tracking-widest">What We Do</span>
+  <!-- What We Do — Interactive Visualizer -->
+  <section class="py-24 px-6 bg-surface relative border-b border-border-subtle">
+    <div class="mx-auto max-w-6xl grid lg:grid-cols-2 gap-16 items-center">
+      <!-- Left Side: Text -->
+      <div>
+        <div class="inline-flex items-center gap-3 mb-6 border border-border-subtle px-3 py-1.5">
+          <span class="text-accent-blue text-xs font-bold font-mono-tech tracking-widest uppercase">
+            Core Pillars
+          </span>
         </div>
-        <h2 class="text-3xl sm:text-4xl font-black tracking-tight">Explore AI Together</h2>
+        <h2 class="text-4xl sm:text-5xl font-black tracking-tight mb-8">
+          Explore AI <span class="text-transparent bg-clip-text bg-gradient-to-r from-accent-blue to-accent-purple">Together</span>
+        </h2>
+        
+        <div class="flex flex-col gap-8">
+          <div class="border-l-2 border-accent-blue pl-6 relative">
+            <div class="absolute -left-[5px] top-1 w-2 h-2 bg-accent-blue"></div>
+            <h3 class="font-bold text-xl mb-2 uppercase tracking-tight">Machine Learning</h3>
+            <p class="text-text-secondary text-sm leading-relaxed">
+              Understand the algorithms that allow systems to learn from data. From linear regression to random forests, we break down the math into code.
+            </p>
+          </div>
+          <div class="border-l-2 border-accent-purple pl-6 relative">
+            <div class="absolute -left-[5px] top-1 w-2 h-2 bg-accent-purple"></div>
+            <h3 class="font-bold text-xl mb-2 uppercase tracking-tight">Neural Networks</h3>
+            <p class="text-text-secondary text-sm leading-relaxed">
+              Dive deep into deep learning. We build perceptrons, CNNs, and explore the architectures powering modern computer vision and generative models.
+            </p>
+          </div>
+          <div class="border-l-2 border-accent-blue pl-6 relative">
+            <div class="absolute -left-[5px] top-1 w-2 h-2 bg-accent-blue"></div>
+            <h3 class="font-bold text-xl mb-2 uppercase tracking-tight">NLP & LLMs</h3>
+            <p class="text-text-secondary text-sm leading-relaxed">
+              Explore how machines understand human language. From basic sentiment analysis to fine-tuning large language models on custom data.
+            </p>
+          </div>
+          <div class="border-l-2 border-accent-purple pl-6 relative">
+            <div class="absolute -left-[5px] top-1 w-2 h-2 bg-accent-purple"></div>
+            <h3 class="font-bold text-xl mb-2 uppercase tracking-tight">AI Ethics & Policy</h3>
+            <p class="text-text-secondary text-sm leading-relaxed">
+              Debate the societal impact of artificial intelligence. We focus on algorithmic bias, alignment, safety, and the future of work.
+            </p>
+          </div>
+        </div>
       </div>
 
-      <!-- Bento grid -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-px bg-border-subtle border border-border-subtle">
-        <div class="bg-surface-card p-8 hover:bg-surface-alt transition-all duration-200 group relative overflow-hidden col-span-2 lg:col-span-1 hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[4px_4px_0px_0px_var(--color-border-strong)]">
-          <div class="absolute top-0 left-0 w-full h-1 bg-accent-blue transform -translate-y-full group-hover:translate-y-0 transition-transform"></div>
-          <div class="w-10 h-10 border-2 border-accent-blue flex items-center justify-center text-accent-blue mb-6 text-xs font-bold font-mono">01</div>
-          <h3 class="font-black text-xl mb-3 uppercase tracking-tight">Learn</h3>
-          <p class="text-text-secondary text-sm leading-relaxed">Workshops covering machine learning, neural networks, NLP, and more — beginner to advanced.</p>
+      <!-- Right Side: Visualization -->
+      <div class="bg-surface-card border border-border-subtle p-2 relative group flex flex-col h-full min-h-[450px]">
+        <div class="flex items-center justify-between px-4 py-3 border-b border-border-subtle mb-2">
+          <span class="font-mono-tech text-xs text-text-secondary uppercase">K-Means Clustering</span>
+          <button id="run-kmeans-btn" class="text-xs bg-accent-blue/10 text-accent-blue hover:bg-accent-blue hover:text-navy-deep font-bold px-3 py-1.5 transition-colors uppercase tracking-wide border border-accent-blue/30 cursor-pointer">
+            Run Simulation
+          </button>
         </div>
-        <div class="bg-surface-card p-8 hover:bg-surface-alt transition-all duration-200 group relative overflow-hidden col-span-2 lg:col-span-1 hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[4px_4px_0px_0px_var(--color-border-strong)]">
-          <div class="absolute top-0 left-0 w-full h-1 bg-accent-blue transform -translate-y-full group-hover:translate-y-0 transition-transform"></div>
-          <div class="w-10 h-10 border-2 border-accent-blue flex items-center justify-center text-accent-blue mb-6 text-xs font-bold font-mono">02</div>
-          <h3 class="font-black text-xl mb-3 uppercase tracking-tight">Build</h3>
-          <p class="text-text-secondary text-sm leading-relaxed">Collaborative projects, build nights, and hackathons where you create real things with AI.</p>
-        </div>
-        <div class="bg-surface-card p-8 hover:bg-surface-alt transition-all duration-200 group relative overflow-hidden hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[4px_4px_0px_0px_var(--color-border-strong)]">
-          <div class="absolute top-0 left-0 w-full h-1 bg-accent-blue transform -translate-y-full group-hover:translate-y-0 transition-transform"></div>
-          <div class="w-10 h-10 border-2 border-accent-blue flex items-center justify-center text-accent-blue mb-6 text-xs font-bold font-mono">03</div>
-          <h3 class="font-black text-xl mb-3 uppercase tracking-tight">Discuss</h3>
-          <p class="text-text-secondary text-sm leading-relaxed">Open conversations about AI ethics, policy, and careers.</p>
-        </div>
-        <div class="bg-surface-card p-8 hover:bg-surface-alt transition-all duration-200 group relative overflow-hidden hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[4px_4px_0px_0px_var(--color-border-strong)]">
-          <div class="absolute top-0 left-0 w-full h-1 bg-accent-blue transform -translate-y-full group-hover:translate-y-0 transition-transform"></div>
-          <div class="w-10 h-10 border-2 border-accent-blue flex items-center justify-center text-accent-blue mb-6 text-xs font-bold font-mono">04</div>
-          <h3 class="font-black text-xl mb-3 uppercase tracking-tight">Connect</h3>
-          <p class="text-text-secondary text-sm leading-relaxed">Meet students from every discipline curious about AI.</p>
+        <div class="relative w-full flex-1 bg-navy-deep overflow-hidden border border-border-subtle/50">
+           <canvas id="kmeans-canvas" class="absolute inset-0 w-full h-full"></canvas>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Events Preview -->
-  <section class="snap-start bg-navy text-text-on-dark py-20 sm:py-24 px-6 relative overflow-hidden">
-    <div class="absolute inset-0 bg-[linear-gradient(rgba(91,142,219,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(91,142,219,0.04)_1px,transparent_1px)] bg-[size:48px_48px] pointer-events-none"></div>
+  <section
+    class="bg-navy text-text-on-dark py-20 sm:py-24 px-6 relative overflow-hidden"
+  >
+    <div
+      class="absolute inset-0 bg-[linear-gradient(rgba(91,142,219,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(91,142,219,0.04)_1px,transparent_1px)] bg-[size:48px_48px] pointer-events-none"
+    >
+    </div>
     <div class="mx-auto max-w-6xl relative z-10">
-      <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-12 gap-4">
+      <div
+        class="flex flex-col sm:flex-row sm:items-end justify-between mb-12 gap-4"
+      >
         <div>
           <div class="inline-flex items-center gap-4 mb-4">
             <span class="w-12 h-px bg-border-subtle"></span>
-            <span class="text-accent-blue text-xs font-bold uppercase tracking-widest">Events</span>
+            <span
+              class="text-accent-blue text-xs font-bold uppercase tracking-widest"
+              >Events</span
+            >
           </div>
-          <h2 class="text-3xl sm:text-4xl font-black tracking-tight">What's Coming Up</h2>
+          <h2 class="text-3xl sm:text-4xl font-black tracking-tight">
+            What's Coming Up
+          </h2>
         </div>
-        <a href="/events" class="text-accent-blue hover:text-accent-blue-dark text-sm font-semibold transition-colors">
+        <a
+          href="/events"
+          class="text-accent-blue hover:text-accent-blue-dark text-sm font-semibold transition-colors"
+        >
           View all events →
         </a>
       </div>
 
-      <div class="grid sm:grid-cols-2 gap-px bg-white/10 border border-white/10">
-        <div class="bg-surface-card p-8 hover:bg-surface-alt transition-colors group relative overflow-hidden">
-          <div class="absolute top-0 left-0 w-full h-1 bg-accent-blue transform -translate-y-full group-hover:translate-y-0 transition-transform"></div>
-          <span class="inline-block text-[10px] font-bold text-accent-blue border border-accent-blue/40 px-3 py-1 mb-4 uppercase tracking-wider">Coming Soon</span>
-          <h3 class="font-bold text-lg mb-2 uppercase tracking-tight">Intro to AI at Surrey</h3>
-          <p class="text-text-secondary text-sm">Our opening event — what AI is, why it matters, and what we'll be doing this year. Open to all students.</p>
-        </div>
-        <div class="bg-surface-card p-8 hover:bg-surface-alt transition-colors group relative overflow-hidden">
-          <div class="absolute top-0 left-0 w-full h-1 bg-accent-blue transform -translate-y-full group-hover:translate-y-0 transition-transform"></div>
-          <span class="inline-block text-[10px] font-bold text-accent-blue border border-accent-blue/40 px-3 py-1 mb-4 uppercase tracking-wider">Planned Format</span>
-          <h3 class="font-bold text-lg mb-2 uppercase tracking-tight">Practical AI Build Night</h3>
-          <p class="text-text-secondary text-sm">Hands-on session where you build something with AI tools — no prior experience required.</p>
-        </div>
+      <div class="flex flex-col gap-2 font-mono-tech">
+        {
+          [
+            { title: "Intro to AI at Surrey", type: "Coming Soon", desc: "Our opening event — what AI is, why it matters, and what we'll be doing this year. Open to all students.", date: "2024-09-25", time: "18:00" },
+            { title: "Practical AI Build Night", type: "Planned Format", desc: "Hands-on session where you build something with AI tools — no prior experience required.", date: "2024-10-02", time: "18:00" }
+          ].map((event) => (
+            <div class="group relative bg-surface-card border border-border-subtle p-4 sm:p-6 hover:bg-surface-alt transition-colors flex flex-col sm:flex-row gap-4 sm:gap-8 sm:items-center">
+              <div class="absolute left-0 top-0 bottom-0 w-1 bg-accent-blue opacity-0 group-hover:opacity-100 group-hover:shadow-[0_0_12px_rgba(6,182,212,0.8)] transition-all duration-300"></div>
+              
+              <div class="flex-shrink-0 w-32 text-xs sm:text-sm text-text-muted group-hover:text-accent-blue transition-colors">
+                <div>[{event.date}]</div>
+                <div>[{event.time}]</div>
+              </div>
+              
+              <div class="flex-grow">
+                <div class="flex items-center gap-3 mb-2">
+                  <span class="text-[10px] font-bold text-accent-purple uppercase tracking-wider">>> {event.type}</span>
+                </div>
+                <h3 class="font-bold text-base sm:text-lg uppercase tracking-tight text-text-primary mb-1 font-sans group-hover:text-accent-blue transition-colors">{event.title}</h3>
+                <p class="text-text-secondary text-xs sm:text-sm font-sans">{event.desc}</p>
+              </div>
+              
+              <div class="hidden sm:block flex-shrink-0 text-text-muted group-hover:text-accent-blue transition-colors">
+                <span class="text-xl">→</span>
+              </div>
+            </div>
+          ))
+        }
       </div>
     </div>
   </section>
 
   <!-- Committee -->
-  <section class="snap-start py-20 sm:py-24 px-6">
+  <section class="py-20 sm:py-24 px-6">
     <div class="mx-auto max-w-6xl">
       <div class="mb-12">
-        <div class="inline-flex items-center gap-3 mb-4 border border-border-subtle px-3 py-1.5">
-          <span class="text-accent-blue text-xs font-bold uppercase tracking-widest">Our Team</span>
+        <div
+          class="inline-flex items-center gap-3 mb-4 border border-border-subtle px-3 py-1.5"
+        >
+          <span
+            class="text-accent-blue text-xs font-bold uppercase tracking-widest"
+            >Our Team</span
+          >
         </div>
-        <h2 class="text-3xl sm:text-4xl font-black tracking-tight">Meet the Committee</h2>
-        <p class="mt-3 text-text-secondary">The students behind Surrey AI Society.</p>
+        <h2 class="text-3xl sm:text-4xl font-black tracking-tight">
+          Meet the Committee
+        </h2>
+        <p class="mt-3 text-text-secondary">
+          The students behind Surrey Artificial Intelligence Society.
+        </p>
       </div>
 
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-px bg-border-subtle border border-border-subtle">
-        {['President', 'Vice President', 'Treasurer', 'Events Lead', 'Technical Workshops Lead', 'Marketing Lead', 'Partnerships Lead', 'AI Ethics Lead', 'Projects Lead', 'First Year Rep'].map(role => (
-          <div class="bg-surface-card p-6 text-center hover:bg-surface-alt transition-all duration-200 group relative overflow-hidden hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[4px_4px_0px_0px_var(--color-border-strong)]">
-            <div class="absolute top-0 left-0 w-full h-0.5 bg-accent-blue transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
-            <div class="w-12 h-12 border-2 border-accent-blue/30 group-hover:border-accent-blue flex items-center justify-center text-accent-blue text-xs font-bold font-mono mx-auto mb-4 transition-colors">
-              {role.split(' ').map(w => w[0]).join('')}
+      <div
+        class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8 lg:gap-12"
+      >
+        {
+          [
+            "President",
+            "Vice President",
+            "Treasurer",
+            "Events Lead",
+            "Technical Workshops Lead",
+            "Marketing Lead",
+            "Partnerships Lead",
+            "AI Ethics Lead",
+            "Projects Lead",
+            "First Year Rep",
+          ].map((role) => (
+            <div class="text-center group flex flex-col items-center">
+              <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-accent-purple/20 border-2 border-accent-purple/40 flex items-center justify-center text-accent-purple text-2xl font-bold font-mono mx-auto mb-4 group-hover:border-accent-blue group-hover:text-accent-blue group-hover:shadow-[0_0_20px_rgba(6,182,212,0.3)] transition-all duration-300">
+                {role
+                  .split(" ")
+                  .map((w) => w[0])
+                  .join("")}
+              </div>
+              <p class="text-sm font-bold text-text-primary tracking-tight mb-1">Name TBC</p>
+              <p class="text-[10px] sm:text-xs font-mono-tech text-text-secondary uppercase tracking-wider">{role}</p>
             </div>
-            <p class="text-sm font-bold uppercase tracking-tight">{role}</p>
-            <p class="text-xs text-text-muted mt-1">Name TBC</p>
-          </div>
-        ))}
+          ))
+        }
       </div>
     </div>
   </section>
 
   <!-- Join CTA -->
-  <section class="snap-start bg-navy text-text-on-dark py-20 sm:py-28 px-6 relative overflow-hidden border-t-2 border-accent-blue/30">
-    <div class="absolute inset-0 bg-[linear-gradient(rgba(91,142,219,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(91,142,219,0.04)_1px,transparent_1px)] bg-[size:48px_48px] pointer-events-none"></div>
+  <section
+    class="bg-navy text-text-on-dark py-20 sm:py-28 px-6 relative overflow-hidden border-t-2 border-accent-blue/30"
+  >
+    <div
+      class="absolute inset-0 bg-[linear-gradient(rgba(91,142,219,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(91,142,219,0.04)_1px,transparent_1px)] bg-[size:48px_48px] pointer-events-none"
+    >
+    </div>
     <div class="mx-auto max-w-3xl text-center relative z-10">
-      <div class="inline-flex items-center gap-3 mb-6 border border-accent-blue/30 px-3 py-1.5 bg-accent-blue/10">
+      <div
+        class="inline-flex items-center gap-3 mb-6 border border-accent-blue/30 px-3 py-1.5 bg-accent-blue/10"
+      >
         <div class="w-2 h-2 bg-accent-blue"></div>
-        <span class="text-accent-blue text-xs font-bold uppercase tracking-widest">Get Involved</span>
+        <span
+          class="text-accent-blue text-xs font-bold uppercase tracking-widest"
+          >Get Involved</span
+        >
       </div>
-      <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight mb-6">Ready to get involved?</h2>
-      <p class="text-text-on-dark-secondary text-lg mb-10 max-w-xl mx-auto leading-relaxed border-l-2 border-accent-blue/40 pl-4 text-left">
-        Whether you're studying computer science, business, psychology, or anything else — if you're curious about AI, you're welcome here.
+      <h2
+        class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight mb-6"
+      >
+        Ready to get involved?
+      </h2>
+      <p
+        class="text-text-on-dark-secondary text-lg mb-10 max-w-xl mx-auto leading-relaxed border-l-2 border-accent-blue/40 pl-4 text-left"
+      >
+        Whether you're studying computer science, business, psychology, or
+        anything else — if you're curious about AI, you're welcome here.
       </p>
-      <a href="/join" class="inline-block px-10 py-4 bg-accent-blue hover:bg-accent-blue-dark text-white font-bold uppercase tracking-wide text-sm transition-all duration-200 border border-accent-blue hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[4px_4px_0px_0px_var(--color-accent-blue-light)]">
-        Join Surrey AI Society
+      <a
+        href="/join"
+        class="inline-block px-10 py-4 bg-accent-blue hover:bg-accent-blue-dark text-white font-bold uppercase tracking-wide text-sm transition-all duration-200 border border-accent-blue hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[4px_4px_0px_0px_var(--color-accent-blue-light)]"
+      >
+        Join Surrey Artificial Intelligence Society
       </a>
     </div>
   </section>
-
 </Layout>
 
 <script>
-  // Terminal Typing Effect
-  const titleElement = document.getElementById('typewriter');
-  if (titleElement) {
-    const originalHTML = titleElement.innerHTML;
-    const textToType = "Surrey AI Society";
-    titleElement.innerHTML = '<span class="text-accent-blue font-mono">_</span>';
-    
-    let i = 0;
-    const speed = 70; // typing speed
-    
-    function typeWriter() {
-      if (i < textToType.length) {
-        const char = textToType.charAt(i);
-        let currentText = textToType.substring(0, i + 1);
-        // Style 'AI' correctly as it's typed
-        currentText = currentText.replace('AI', '<span class="text-accent-blue">AI</span>');
-        titleElement.innerHTML = currentText + '<span class="text-accent-blue font-mono animate-pulse">_</span>';
-        i++;
-        setTimeout(typeWriter, speed);
-      } else {
-        // Once done, set back to original HTML perfectly
-        titleElement.innerHTML = originalHTML;
-      }
-    }
-    
-    setTimeout(typeWriter, 500);
-  }
-
-  // Interactive Canvas Background
-  const canvas = document.getElementById('hero-canvas');
+  // Neural Network Data Flow Canvas
+  const canvas = document.getElementById("hero-canvas");
   if (canvas) {
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (ctx) {
-      let width = canvas.width = window.innerWidth;
-      let height = canvas.height = window.innerHeight;
-      
-      window.addEventListener('resize', () => {
+      let width = (canvas.width = window.innerWidth);
+      let height = (canvas.height = window.innerHeight);
+
+      window.addEventListener("resize", () => {
         width = canvas.width = window.innerWidth;
         height = canvas.height = window.innerHeight;
       });
 
-      const particles = [];
-      const numParticles = Math.min(80, Math.floor(window.innerWidth / 15));
+      // Colors from our palette
+      const colorCyan = "#06B6D4";
+      const colorPurple = "#8B5CF6";
       
-      for (let i = 0; i < numParticles; i++) {
-        particles.push({
+      const nodes = [];
+      const numNodes = Math.min(60, Math.floor(window.innerWidth / 20));
+
+      for (let i = 0; i < numNodes; i++) {
+        nodes.push({
+          id: i,
           x: Math.random() * width,
           y: Math.random() * height,
-          vx: (Math.random() - 0.5) * 0.8,
-          vy: (Math.random() - 0.5) * 0.8,
-          size: Math.random() * 2 + 1.5
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: (Math.random() - 0.5) * 0.5,
+          size: Math.random() * 2 + 1,
+          connections: []
         });
       }
 
-      let mouse = { x: -1000, y: -1000 };
+      // Establish connections (nearest neighbors)
+      nodes.forEach(node => {
+        nodes.forEach(otherNode => {
+          if (node.id !== otherNode.id) {
+            const dx = node.x - otherNode.x;
+            const dy = node.y - otherNode.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            // Connect if close enough
+            if (dist < 150 && node.connections.length < 4) {
+              if (!node.connections.includes(otherNode.id)) {
+                node.connections.push(otherNode.id);
+                otherNode.connections.push(node.id);
+              }
+            }
+          }
+        });
+      });
+
+      // Data packets traveling along connections
+      const packets = [];
+      const numPackets = numNodes / 1.5;
       
-      // Update mouse position on move
-      window.addEventListener('mousemove', (e) => {
+      const spawnPacket = (packetToReuse = null) => {
+        // Find a node with connections
+        let startNode = null;
+        let attempts = 0;
+        while (!startNode && attempts < 10) {
+           const candidate = nodes[Math.floor(Math.random() * nodes.length)];
+           if (candidate.connections.length > 0) startNode = candidate;
+           attempts++;
+        }
+        
+        if (!startNode) return;
+        
+        const targetId = startNode.connections[Math.floor(Math.random() * startNode.connections.length)];
+        const targetNode = nodes.find(n => n.id === targetId);
+        
+        if (!targetNode) return;
+
+        const p = packetToReuse || {};
+        p.startNode = startNode;
+        p.targetNode = targetNode;
+        p.progress = 0;
+        p.speed = Math.random() * 0.01 + 0.005;
+        p.color = Math.random() > 0.5 ? colorCyan : colorPurple;
+        
+        if (!packetToReuse) packets.push(p);
+      };
+
+      for(let i = 0; i < numPackets; i++) {
+         spawnPacket();
+      }
+
+      let mouse = { x: -1000, y: -1000 };
+
+      window.addEventListener("mousemove", (e) => {
         const rect = canvas.getBoundingClientRect();
         mouse.x = e.clientX - rect.left;
         mouse.y = e.clientY - rect.top;
       });
 
-      // Reset mouse position when leaving the hero area
-      window.addEventListener('mouseout', () => {
+      window.addEventListener("mouseout", () => {
         mouse.x = -1000;
         mouse.y = -1000;
       });
 
       function animate() {
         ctx.clearRect(0, 0, width, height);
-        
-        ctx.fillStyle = 'rgba(91, 142, 219, 0.7)';
-        particles.forEach(p => {
-          p.x += p.vx;
-          p.y += p.vy;
-          
-          if (p.x < 0 || p.x > width) p.vx *= -1;
-          if (p.y < 0 || p.y > height) p.vy *= -1;
-          
-          // Draw brutalist square nodes instead of circles
-          ctx.fillRect(p.x - p.size/2, p.y - p.size/2, p.size, p.size);
-        });
-        
-        ctx.lineWidth = 1;
-        
-        for (let i = 0; i < numParticles; i++) {
-          // Connect particles to each other
-          for (let j = i + 1; j < numParticles; j++) {
-            const dx = particles[i].x - particles[j].x;
-            const dy = particles[i].y - particles[j].y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            
-            if (dist < 120) {
-              ctx.strokeStyle = `rgba(91, 142, 219, ${0.15 - dist/800})`;
-              ctx.beginPath();
-              ctx.moveTo(particles[i].x, particles[i].y);
-              ctx.lineTo(particles[j].x, particles[j].y);
-              ctx.stroke();
-            }
-          }
-          
-          // Connect particles to mouse
-          const dxMouse = particles[i].x - mouse.x;
-          const dyMouse = particles[i].y - mouse.y;
+
+        // Update nodes
+        nodes.forEach((node) => {
+          node.x += node.vx;
+          node.y += node.vy;
+
+          if (node.x < 0 || node.x > width) node.vx *= -1;
+          if (node.y < 0 || node.y > height) node.vy *= -1;
+
+          // Mouse interaction - drift towards cursor
+          const dxMouse = mouse.x - node.x;
+          const dyMouse = mouse.y - node.y;
           const distMouse = Math.sqrt(dxMouse * dxMouse + dyMouse * dyMouse);
           
-          if (distMouse < 180) {
-            ctx.strokeStyle = `rgba(91, 142, 219, ${0.4 - distMouse/450})`;
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(mouse.x, mouse.y);
-            ctx.stroke();
+          if (distMouse < 250) {
+            const force = (250 - distMouse) / 250;
+            node.x += dxMouse * force * 0.02;
+            node.y += dyMouse * force * 0.02;
           }
-        }
-        
+
+          // Draw node
+          ctx.fillStyle = "rgba(100, 116, 139, 0.5)";
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, node.size, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        // Draw connections
+        ctx.lineWidth = 0.5;
+        nodes.forEach(node => {
+          node.connections.forEach(targetId => {
+            if (node.id < targetId) { // Draw once per pair
+              const targetNode = nodes.find(n => n.id === targetId);
+              if (targetNode) {
+                const dx = node.x - targetNode.x;
+                const dy = node.y - targetNode.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 200) {
+                  ctx.strokeStyle = `rgba(100, 116, 139, ${0.3 * (1 - dist/200)})`;
+                  ctx.beginPath();
+                  ctx.moveTo(node.x, node.y);
+                  ctx.lineTo(targetNode.x, targetNode.y);
+                  ctx.stroke();
+                }
+              }
+            }
+          });
+        });
+
+        // Update and draw packets
+        packets.forEach(p => {
+          if (!p.startNode || !p.targetNode) return;
+          p.progress += p.speed;
+          if (p.progress >= 1) {
+            spawnPacket(p);
+            return;
+          }
+
+          // Interpolate position
+          const x = p.startNode.x + (p.targetNode.x - p.startNode.x) * p.progress;
+          const y = p.startNode.y + (p.targetNode.y - p.startNode.y) * p.progress;
+
+          ctx.fillStyle = p.color;
+          ctx.shadowBlur = 8;
+          ctx.shadowColor = p.color;
+          ctx.beginPath();
+          ctx.arc(x, y, 2, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.shadowBlur = 0; // reset
+        });
+
         requestAnimationFrame(animate);
       }
-      
+
       animate();
     }
+  }
+</script>
+
+<script>
+  // K-Means Clustering Visualizer
+  const kmeansBtn = document.getElementById('run-kmeans-btn');
+  const kmeansCanvas = document.getElementById('kmeans-canvas');
+  
+  if (kmeansCanvas && kmeansBtn) {
+    const ctx = kmeansCanvas.getContext('2d');
+    let width = kmeansCanvas.width = kmeansCanvas.clientWidth;
+    let height = kmeansCanvas.height = kmeansCanvas.clientHeight;
+    
+    // Resize handler
+    window.addEventListener('resize', () => {
+      width = kmeansCanvas.width = kmeansCanvas.clientWidth;
+      height = kmeansCanvas.height = kmeansCanvas.clientHeight;
+      draw();
+    });
+
+    // Color tokens
+    const colors = ['#06B6D4', '#8B5CF6', '#F8FAFC']; // Cyan, Purple, White
+    const numClusters = 3;
+    const numPoints = 150;
+    
+    let points = [];
+    let centroids = [];
+
+    // Initialize random points
+    function initPoints() {
+      points = [];
+      for (let i = 0; i < numPoints; i++) {
+        points.push({
+          x: Math.random() * (width - 40) + 20,
+          y: Math.random() * (height - 40) + 20,
+          cluster: -1,
+          radius: 3
+        });
+      }
+    }
+
+    // Initialize random centroids
+    function initCentroids() {
+      centroids = [];
+      for (let i = 0; i < numClusters; i++) {
+        centroids.push({
+          x: Math.random() * (width - 60) + 30,
+          y: Math.random() * (height - 60) + 30,
+          color: colors[i],
+          id: i,
+          targetX: 0,
+          targetY: 0
+        });
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, width, height);
+
+      // Draw points
+      points.forEach(p => {
+        ctx.fillStyle = p.cluster === -1 ? '#334155' : colors[p.cluster];
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Draw centroids
+      centroids.forEach(c => {
+        ctx.strokeStyle = '#0B1120';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        
+        ctx.moveTo(c.x - 8, c.y);
+        ctx.lineTo(c.x + 8, c.y);
+        ctx.moveTo(c.x, c.y - 8);
+        ctx.lineTo(c.x, c.y + 8);
+        ctx.stroke();
+        
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = c.color;
+        ctx.beginPath();
+        ctx.moveTo(c.x - 6, c.y);
+        ctx.lineTo(c.x + 6, c.y);
+        ctx.moveTo(c.x, c.y - 6);
+        ctx.lineTo(c.x, c.y + 6);
+        ctx.stroke();
+      });
+    }
+
+    // Assign points to nearest centroid
+    function assignClusters() {
+      let changed = false;
+      points.forEach(p => {
+        let minDist = Infinity;
+        let closest = -1;
+        centroids.forEach(c => {
+          const dist = Math.hypot(p.x - c.x, p.y - c.y);
+          if (dist < minDist) {
+            minDist = dist;
+            closest = c.id;
+          }
+        });
+        if (p.cluster !== closest) {
+          p.cluster = closest;
+          changed = true;
+        }
+      });
+      return changed;
+    }
+
+    // Move centroids to the center of their assigned points
+    function updateCentroids() {
+      centroids.forEach(c => {
+        const clusterPoints = points.filter(p => p.cluster === c.id);
+        if (clusterPoints.length > 0) {
+          const sumX = clusterPoints.reduce((acc, p) => acc + p.x, 0);
+          const sumY = clusterPoints.reduce((acc, p) => acc + p.y, 0);
+          c.targetX = sumX / clusterPoints.length;
+          c.targetY = sumY / clusterPoints.length;
+        } else {
+           c.targetX = c.x;
+           c.targetY = c.y;
+        }
+      });
+    }
+
+    // Animate centroid movement
+    function animateCentroids(callback) {
+      let progress = 0;
+      const startPos = centroids.map(c => ({ x: c.x, y: c.y }));
+      
+      function step() {
+        progress += 0.05;
+        if (progress > 1) progress = 1;
+        
+        const ease = progress * (2 - progress);
+        
+        centroids.forEach((c, i) => {
+          c.x = startPos[i].x + (c.targetX - startPos[i].x) * ease;
+          c.y = startPos[i].y + (c.targetY - startPos[i].y) * ease;
+        });
+        
+        draw();
+        
+        if (progress < 1) {
+          requestAnimationFrame(step);
+        } else {
+          setTimeout(callback, 200);
+        }
+      }
+      step();
+    }
+
+    function runStep() {
+      const changed = assignClusters();
+      draw();
+      
+      if (changed) {
+        updateCentroids();
+        setTimeout(() => {
+          animateCentroids(runStep);
+        }, 300);
+      } else {
+        kmeansBtn.textContent = "Restart Simulation";
+        kmeansBtn.disabled = false;
+        kmeansBtn.classList.remove("opacity-50", "cursor-not-allowed");
+      }
+    }
+
+    kmeansBtn.addEventListener('click', () => {
+      kmeansBtn.disabled = true;
+      kmeansBtn.textContent = "Running...";
+      kmeansBtn.classList.add("opacity-50", "cursor-not-allowed");
+      
+      initPoints();
+      initCentroids();
+      draw();
+      
+      setTimeout(runStep, 400);
+    });
+
+    // Initial setup to handle zero width issue if rendering immediately
+    setTimeout(() => {
+        width = kmeansCanvas.width = kmeansCanvas.clientWidth;
+        height = kmeansCanvas.height = kmeansCanvas.clientHeight;
+        initPoints();
+        draw();
+    }, 100);
   }
 </script>

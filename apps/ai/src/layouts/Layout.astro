@@ -17,7 +17,7 @@ const navLinks = [
 ---
 
 <!doctype html>
-<html lang="en" class="snap-y snap-mandatory scroll-smooth">
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -26,16 +26,17 @@ const navLinks = [
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <title>{title} — Surrey AI Society</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <title>{title} — Surrey Artificial Intelligence Society</title>
   </head>
   <body class="bg-surface text-text-primary font-sans min-h-screen flex flex-col">
     <!-- Navigation -->
     <nav class="sticky top-0 z-50 bg-navy border-b border-border-subtle/20">
       <div class="mx-auto max-w-6xl px-6 h-16 flex items-center justify-between">
         <a href="/" class="flex items-center gap-3">
-          <img src="/logos/ai-logo.png" alt="Surrey AI Society" class="h-9 w-9 rounded-full ring-2 ring-navy ring-offset-1 ring-offset-accent-blue/30" />
+          <img src="/logos/optimized/ai-logo.optimized.png" alt="Surrey Artificial Intelligence Society" class="h-9 w-9 rounded-full ring-2 ring-navy ring-offset-1 ring-offset-accent-blue/30" />
           <span class="text-text-on-dark font-bold text-lg tracking-tight hidden sm:block">
-            Surrey <span class="text-accent-blue">AI</span> Society
+            Surrey <span class="text-accent-blue">Artificial Intelligence</span> Society
           </span>
         </a>
 
@@ -45,7 +46,7 @@ const navLinks = [
             <a
               href={link.href}
               class:list={[
-                'px-4 py-2 text-sm font-medium rounded-lg transition-colors border border-transparent',
+                'px-4 py-2 text-sm font-medium rounded-lg transition-colors border border-transparent font-mono-tech',
                 currentPath === link.href || (link.href !== '/' && currentPath.startsWith(link.href))
                   ? 'text-accent-blue bg-accent-blue/10 border-accent-blue/20'
                   : 'text-text-on-dark-secondary hover:text-text-on-dark hover:bg-white/5',
@@ -75,7 +76,7 @@ const navLinks = [
             <a
               href={link.href}
               class:list={[
-                'px-4 py-2.5 text-sm font-medium rounded-lg transition-colors border border-transparent',
+                'px-4 py-2.5 text-sm font-medium rounded-lg transition-colors border border-transparent font-mono-tech',
                 currentPath === link.href || (link.href !== '/' && currentPath.startsWith(link.href))
                   ? 'text-accent-blue bg-accent-blue/10 border-accent-blue/20'
                   : 'text-text-on-dark-secondary hover:text-text-on-dark hover:bg-white/5',
@@ -99,8 +100,8 @@ const navLinks = [
         <div class="grid sm:grid-cols-3 gap-8 mb-8">
           <div>
             <div class="flex items-center gap-3 mb-4">
-              <img src="/logos/ai-logo.png" alt="" class="h-8 w-8 rounded-full ring-2 ring-navy ring-offset-1 ring-offset-accent-blue/30" />
-              <span class="text-text-on-dark font-bold tracking-tight">Surrey AI Society</span>
+              <img src="/logos/optimized/ai-logo.optimized.png" alt="" class="h-8 w-8 rounded-full ring-2 ring-navy ring-offset-1 ring-offset-accent-blue/30" />
+              <span class="text-text-on-dark font-bold tracking-tight">Surrey Artificial Intelligence Society</span>
             </div>
             <p class="text-sm leading-relaxed">
               A student-led society under Surrey Students' Union at the University of Surrey. Exploring AI through learning, building, and open discussion.
@@ -124,7 +125,7 @@ const navLinks = [
           </div>
         </div>
         <div class="border-t border-border-subtle/20 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
-          <p>&copy; 2025 Surrey AI Society. A student society at the University of Surrey.</p>
+          <p>&copy; 2025 Surrey Artificial Intelligence Society. A student society at the University of Surrey.</p>
           <p class="text-accent-blue/80 font-medium tracking-wide">surreyaisociety.org</p>
         </div>
       </div>

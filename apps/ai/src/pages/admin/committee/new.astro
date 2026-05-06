@@ -1,13 +1,14 @@
 ---
 export const prerender = false;
 import AdminLayout from '../../../layouts/AdminLayout.astro';
-import { createCommitteeMember, validateCommitteeInput } from '@surreysocieties/admin';
+import { validateCommitteeInput } from '@surreysocieties/admin';
 
 const SOCIETY_ID = 'ai';
 let errors: Record<string, string> = {};
 let values: Record<string, string> = {};
 
 if (Astro.request.method === 'POST') {
+  const client = Astro.locals.convexClient;
   const formData = await Astro.request.formData();
   const input = {
     name: formData.get('name')?.toString() || '',
@@ -16,14 +17,18 @@ if (Astro.request.method === 'POST') {
     image: formData.get('image')?.toString() || '',
     email: formData.get('email')?.toString() || '',
     linkedIn: formData.get('linkedIn')?.toString() || '',
-    displayOrder: parseInt(formData.get('displayOrder')?.toString() || '0') || 0,
-    isActive: formData.get('isActive') !== 'off',
+    displayOrder: formData.get('displayOrder')?.toString() ? parseInt(formData.get('displayOrder')!.toString()) : undefined,
+    isActive: formData.get('isActive') !== 'false',
   };
+
   values = input as unknown as Record<string, string>;
 
   const validation = validateCommitteeInput(input);
   if (validation.valid) {
-    createCommitteeMember(SOCIETY_ID, input);
+    await client.mutation("committee:create", {
+      societySlug: SOCIETY_ID,
+      ...input,
+    });
     return Astro.redirect('/admin/committee?success=1');
   }
   errors = validation.errors;
@@ -38,17 +43,16 @@ if (Astro.request.method === 'POST') {
 
   <div class="form-card">
     <form method="POST">
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-        <div class="form-group">
-          <label for="name" class="form-label">Name *</label>
-          <input type="text" id="name" name="name" class="form-input" value={values.name || ''} required />
-          {errors.name && <div class="form-error">{errors.name}</div>}
-        </div>
-        <div class="form-group">
-          <label for="role" class="form-label">Role *</label>
-          <input type="text" id="role" name="role" class="form-input" value={values.role || ''} required placeholder="e.g. President" />
-          {errors.role && <div class="form-error">{errors.role}</div>}
-        </div>
+      <div class="form-group">
+        <label for="name" class="form-label">Name *</label>
+        <input type="text" id="name" name="name" class="form-input" value={values.name || ''} required />
+        {errors.name && <div class="form-error">{errors.name}</div>}
+      </div>
+
+      <div class="form-group">
+        <label for="role" class="form-label">Role *</label>
+        <input type="text" id="role" name="role" class="form-input" value={values.role || ''} required />
+        {errors.role && <div class="form-error">{errors.role}</div>}
       </div>
 
       <div class="form-group">
@@ -56,39 +60,30 @@ if (Astro.request.method === 'POST') {
         <textarea id="bio" name="bio" class="form-textarea">{values.bio || ''}</textarea>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-        <div class="form-group">
-          <label for="email" class="form-label">Email</label>
-          <input type="email" id="email" name="email" class="form-input" value={values.email || ''} />
-          {errors.email && <div class="form-error">{errors.email}</div>}
-        </div>
-        <div class="form-group">
-          <label for="linkedIn" class="form-label">LinkedIn URL</label>
-          <input type="url" id="linkedIn" name="linkedIn" class="form-input" value={values.linkedIn || ''} />
-          {errors.linkedIn && <div class="form-error">{errors.linkedIn}</div>}
-        </div>
-      </div>
-
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-        <div class="form-group">
-          <label for="image" class="form-label">Photo URL</label>
-          <input type="text" id="image" name="image" class="form-input" value={values.image || ''} />
-        </div>
-        <div class="form-group">
-          <label for="displayOrder" class="form-label">Display Order</label>
-          <input type="number" id="displayOrder" name="displayOrder" class="form-input" value={values.displayOrder || '0'} min="0" />
-        </div>
+      <div class="form-group">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" id="email" name="email" class="form-input" value={values.email || ''} />
+        {errors.email && <div class="form-error">{errors.email}</div>}
       </div>
 
       <div class="form-group">
-        <label class="form-checkbox-row">
-          <input type="checkbox" name="isActive" checked />
-          <span class="form-label" style="margin-bottom: 0;">Active member</span>
-        </label>
+        <label for="linkedIn" class="form-label">LinkedIn</label>
+        <input type="url" id="linkedIn" name="linkedIn" class="form-input" value={values.linkedIn || ''} />
+        {errors.linkedIn && <div class="form-error">{errors.linkedIn}</div>}
+      </div>
+
+      <div class="form-group">
+        <label for="image" class="form-label">Image URL</label>
+        <input type="text" id="image" name="image" class="form-input" value={values.image || ''} />
+      </div>
+
+      <div class="form-group">
+        <label for="displayOrder" class="form-label">Display Order</label>
+        <input type="number" id="displayOrder" name="displayOrder" class="form-input" value={values.displayOrder || ''} />
       </div>
 
       <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
-        <button type="submit" class="btn btn-primary">Add Member</button>
+        <button type="submit" class="btn btn-primary">Create Member</button>
         <a href="/admin/committee" class="btn btn-outline">Cancel</a>
       </div>
     </form>

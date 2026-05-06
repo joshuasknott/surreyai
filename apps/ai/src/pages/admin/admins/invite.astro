@@ -1,27 +1,32 @@
 ---
 export const prerender = false;
 import AdminLayout from '../../../layouts/AdminLayout.astro';
-import { canManageAdmins, inviteAdmin, validateInviteInput } from '@surreysocieties/admin';
+import { validateInviteInput } from '@surreysocieties/admin';
 
 const SOCIETY_ID = 'ai';
 const user = Astro.locals.user!;
 
-if (!canManageAdmins(user)) return Astro.redirect('/admin/admins');
+if (user.role !== 'protectedAdmin' && user.role !== 'admin') return Astro.redirect('/admin/admins');
 
 let errors: Record<string, string> = {};
 let values: Record<string, string> = {};
 
 if (Astro.request.method === 'POST') {
+  const client = Astro.locals.convexClient;
   const formData = await Astro.request.formData();
   const input = {
     email: formData.get('email')?.toString() || '',
-    role: formData.get('role')?.toString() as any || 'editor',
+    role: formData.get('role')?.toString() as any || 'member',
   };
   values = input;
 
-  const validation = validateInviteInput(input);
+  const validation = validateInviteInput(input as any);
   if (validation.valid) {
-    inviteAdmin(SOCIETY_ID, input, user.id);
+    await client.mutation("memberships:inviteUser", {
+      societySlug: SOCIETY_ID,
+      email: input.email,
+      role: input.role,
+    });
     return Astro.redirect('/admin/admins?invited=1');
   }
   errors = validation.errors;
@@ -51,8 +56,8 @@ if (Astro.request.method === 'POST') {
       <div class="form-group">
         <label for="role" class="form-label">Role *</label>
         <select id="role" name="role" class="form-select">
-          <option value="editor" selected={values.role !== 'societyAdmin'}>Editor — Can manage events and committee</option>
-          <option value="societyAdmin" selected={values.role === 'societyAdmin'}>Society Admin — Can also manage admin users</option>
+          <option value="member" selected={values.role !== 'admin'}>Member — Can manage events and committee</option>
+          <option value="admin" selected={values.role === 'admin'}>Admin — Can also manage admin users</option>
         </select>
         {errors.role && <div class="form-error">{errors.role}</div>}
       </div>

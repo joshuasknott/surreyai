@@ -11,10 +11,12 @@
   },
   "dependencies": {
     "@astrojs/node": "^10.0.6",
+    "@clerk/astro": "^3.1.0",
     "@surreysocieties/admin": "*",
     "@surreysocieties/ui": "*",
     "@tailwindcss/vite": "^4.2.4",
     "astro": "^6.1.10",
+    "convex": "^1.37.0",
     "tailwindcss": "^4.2.4"
   }
 }

@@ -1,15 +1,21 @@
 export const prerender = false;
 import type { APIRoute } from 'astro';
-import { deleteCommitteeMember } from '@surreysocieties/admin';
+import { createConvexClient } from '@surreysocieties/admin';
 
 const SOCIETY_ID = 'ai';
 
-export const POST: APIRoute = async ({ request, redirect }) => {
+export const POST: APIRoute = async ({ request, redirect, locals }) => {
+  const client = locals.convexClient;
+  if (!client) return redirect('/admin/login');
+
   const formData = await request.formData();
   const id = formData.get('id')?.toString();
 
   if (id) {
-    deleteCommitteeMember(SOCIETY_ID, id);
+    await client.mutation("committee:remove", {
+      societySlug: SOCIETY_ID,
+      memberId: id as any,
+    });
   }
 
   return redirect('/admin/committee?deleted=1');

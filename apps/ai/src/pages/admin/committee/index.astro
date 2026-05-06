@@ -1,10 +1,10 @@
 ---
 export const prerender = false;
 import AdminLayout from '../../../layouts/AdminLayout.astro';
-import { getCommittee } from '@surreysocieties/admin';
 
 const SOCIETY_ID = 'ai';
-const members = getCommittee(SOCIETY_ID);
+const client = Astro.locals.convexClient;
+const members: any[] = await client.query("committee:list", { societySlug: SOCIETY_ID });
 const success = Astro.url.searchParams.get('success');
 const deleted = Astro.url.searchParams.get('deleted');
 ---
@@ -48,9 +48,9 @@ const deleted = Astro.url.searchParams.get('deleted');
               <td>{member.displayOrder}</td>
               <td>
                 <div class="table-actions">
-                  <a href={`/admin/committee/${member.id}/edit`} class="btn btn-outline btn-sm">Edit</a>
+                  <a href={`/admin/committee/${member._id}/edit`} class="btn btn-outline btn-sm">Edit</a>
                   <form method="POST" action="/api/admin/committee/delete" style="display:inline;" onsubmit="return confirm('Remove this committee member?')">
-                    <input type="hidden" name="id" value={member.id} />
+                    <input type="hidden" name="id" value={member._id} />
                     <button type="submit" class="btn btn-ghost btn-sm" style="color: var(--color-admin-danger);">Remove</button>
                   </form>
                 </div>
