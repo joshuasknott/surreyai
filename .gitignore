@@ -27,3 +27,6 @@ pnpm-debug.log*
 *.db
 *.db-wal
 *.db-shm
+
+# Convex
+.convex/

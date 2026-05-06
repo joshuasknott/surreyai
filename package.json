@@ -17,10 +17,12 @@
     "build:ai": "npm run build -w apps/ai",
     "build:business": "npm run build -w apps/business",
     "build:neurotech": "npm run build -w apps/neurotech",
-    "build:all": "npm run build -w apps/ai && npm run build -w apps/business && npm run build -w apps/neurotech",
-    "db:seed": "node --loader ts-node/esm packages/admin/src/db/run-seed.ts"
+    "build:all": "npm run build -w apps/ai && npm run build -w apps/business && npm run build -w apps/neurotech"
   },
   "overrides": {
     "vite": "^7.3.2"
+  },
+  "dependencies": {
+    "convex": "^1.37.0"
   }
 }
