@@ -1,7 +1,7 @@
 // Shared UI exports
 // Add shared utilities, types, and component helpers here
 export const SOCIETY_NAMES = {
-  ai: 'Surrey AI Society',
+  ai: 'Surrey Artificial Intelligence Society',
   business: 'Surrey Business Society',
   neurotech: 'Surrey Neurotech Society',
 } as const;
