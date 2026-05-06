@@ -1,0 +1,29 @@
+---
+export const prerender = false;
+import AdminLayout from '../../layouts/AdminLayout.astro';
+
+const SOCIETY_ID = 'ai';
+const user = Astro.locals.user!;
+---
+<AdminLayout title="Settings" societyId={SOCIETY_ID} currentPath="/admin/settings">
+  <div class="admin-page-header">
+    <div>
+      <h1 class="admin-page-title">Settings</h1>
+      <p style="color: var(--color-admin-text-muted); margin-top: 0.5rem;">Manage your admin account and password.</p>
+    </div>
+  </div>
+
+  <div class="admin-card" style="max-width: 680px;">
+    <h2 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem;">Account</h2>
+    <p style="color: var(--color-admin-text-muted); margin-bottom: 1rem;">Signed in as {user.email}. Use Clerk account settings to change your password or recover access details.</p>
+    <button id="manage-account-btn" class="btn btn-primary">Manage Account</button>
+  </div>
+
+  <script is:inline>
+    document.getElementById('manage-account-btn')?.addEventListener('click', async function() {
+      if (window.Clerk) {
+        await window.Clerk.openUserProfile();
+      }
+    });
+  </script>
+</AdminLayout>
