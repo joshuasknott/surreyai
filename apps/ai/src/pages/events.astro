@@ -35,62 +35,84 @@ const getEventDetails = (event: any) => {
 <Layout title="Events" description="Upcoming and planned events from Surrey Artificial Intelligence Society — workshops, build nights, discussions, and careers events.">
 
   <!-- Header -->
-  <section class="bg-navy text-text-on-dark py-16 sm:py-20 px-6 relative overflow-hidden">
-    <div class="absolute inset-0 z-0 opacity-20 pointer-events-none">
-      <Picture
-        src={studentHackathon}
-        alt="Students participating in a hackathon"
-        widths={[768, 1280, 1920]}
-        sizes="100vw"
-        class="w-full h-full object-cover"
-        style={{ objectPosition: 'center 40%' }}
-        pictureAttributes={{ class: 'w-full h-full block overflow-hidden' }}
-      />
-      <div class="absolute inset-0 bg-gradient-to-r from-navy via-navy/90 to-navy/40"></div>
-    </div>
-    <div class="mx-auto max-w-6xl relative z-10">
-      <div class="inline-flex items-center gap-2 mb-4">
-        <span class="w-8 h-px bg-accent-blue"></span>
-        <span class="text-accent-blue text-sm font-semibold uppercase tracking-wider">Events</span>
+  <header class="bg-ai-surface text-ai-fg py-16 sm:py-24 px-6 relative border-b border-ai-border">
+    <div class="mx-auto max-w-5xl relative z-10 flex flex-col md:flex-row gap-8 items-start md:items-end justify-between">
+      <div class="max-w-2xl">
+        <div class="inline-flex items-center gap-2 mb-6">
+          <span class="w-8 h-px bg-ai-cyan"></span>
+          <span class="font-mono-tech text-ai-cyan text-sm font-semibold uppercase tracking-wider">Programme</span>
+        </div>
+        <h1 class="text-4xl sm:text-6xl font-black tracking-tight mb-4">Events & Workshops</h1>
+        <p class="text-ai-fg-muted text-lg leading-relaxed">
+          Our schedule of technical deep-dives, hands-on build nights, and industry speakers. 
+          Expect a mix of foundational concepts and cutting-edge developments.
+        </p>
       </div>
-      <h1 class="text-4xl sm:text-5xl font-black tracking-tight">Events</h1>
-      <p class="mt-4 text-text-on-dark-secondary text-lg max-w-2xl">What we're planning for the year ahead. Dates will be announced on our socials.</p>
+      <div class="w-full md:w-64 h-32 md:h-40 border border-ai-border relative overflow-hidden shrink-0 hidden md:block">
+        <Picture
+          src={studentHackathon}
+          alt="Students at a hackathon"
+          widths={[400]}
+          sizes="250px"
+          class="w-full h-full object-cover"
+        />
+      </div>
     </div>
-  </section>
+  </header>
 
   <!-- Events List -->
-  <section class="py-16 sm:py-20 px-6">
-    <div class="mx-auto max-w-6xl">
+  <section class="py-16 sm:py-24 px-6 bg-ai-bg text-ai-fg min-h-[50vh]">
+    <div class="mx-auto max-w-5xl">
       {events.length === 0 ? (
-        <div class="bg-surface-card rounded-xl p-8 border border-navy/5 shadow-sm text-center">
-          <h3 class="font-semibold text-lg mb-2">No published events yet</h3>
-          <p class="text-text-secondary text-sm leading-relaxed">Check back soon for upcoming Surrey Artificial Intelligence Society events.</p>
+        <div class="border-l-2 border-ai-purple pl-6 py-2">
+          <h2 class="text-2xl font-bold mb-4 font-mono-tech">Events Coming Soon</h2>
+          <p class="text-ai-fg-muted text-lg leading-relaxed max-w-2xl mb-8">
+            We are currently finalizing our termly programme. This will include beginner-friendly introductions to PyTorch, neural network architecture breakdowns, and our signature hackathons.
+          </p>
+          <div class="grid sm:grid-cols-2 gap-4 max-w-3xl">
+            <div class="border border-ai-border bg-ai-surface p-4">
+              <span class="text-xs font-mono-tech text-ai-fg-muted uppercase tracking-wider block mb-2">Upcoming Focus</span>
+              <span class="font-semibold block">Applied Machine Learning</span>
+            </div>
+            <div class="border border-ai-border bg-ai-surface p-4">
+              <span class="text-xs font-mono-tech text-ai-fg-muted uppercase tracking-wider block mb-2">Upcoming Focus</span>
+              <span class="font-semibold block">AI Policy & Ethics Panels</span>
+            </div>
+          </div>
         </div>
       ) : (
-        <div class="grid sm:grid-cols-2 gap-6">
+        <div class="grid gap-6">
           {events.map(event => (
-            <div class="bg-surface-card rounded-xl p-6 border border-navy/5 hover:border-accent-blue/20 transition-colors shadow-sm">
-              <div class="flex items-center gap-3 mb-4">
-                <span class="inline-block text-xs font-medium text-accent-blue bg-accent-blue/10 px-3 py-1 rounded-full">{event.category || 'Event'}</span>
-                <span class="text-xs text-text-muted">{formatEventDate(event.date)}</span>
+            <article class="group bg-ai-bg border border-ai-border p-6 sm:p-8 hover:border-ai-cyan transition-colors flex flex-col md:flex-row gap-6 md:gap-12 md:items-start">
+              <div class="w-full md:w-48 shrink-0">
+                <time datetime={event.date || ''} class="font-mono-tech text-ai-cyan text-sm block mb-1">
+                  {formatEventDate(event.date)}
+                </time>
+                <span class="inline-block text-xs font-medium text-ai-fg bg-ai-surface border border-ai-border px-2 py-0.5 uppercase tracking-wider">
+                  {event.category || 'Event'}
+                </span>
               </div>
-              <h3 class="font-semibold text-lg mb-2">{event.title}</h3>
-              <p class="text-text-secondary text-sm leading-relaxed mb-4">{event.description || 'Details coming soon.'}</p>
-              <div class="text-xs text-text-muted">
-                {getEventDetails(event)}
+              <div class="flex-grow">
+                <h2 class="font-bold text-xl sm:text-2xl mb-3 group-hover:text-ai-cyan transition-colors">{event.title}</h2>
+                <p class="text-ai-fg-muted leading-relaxed mb-4">{event.description || 'Details to be announced.'}</p>
+                <div class="font-mono-tech text-xs text-ai-fg-muted flex gap-4">
+                  <span>{getEventDetails(event)}</span>
+                </div>
               </div>
-            </div>
+            </article>
           ))}
         </div>
       )}
 
-      <div class="mt-12 bg-surface-alt rounded-xl p-8 border border-navy/5 text-center">
-        <h3 class="font-semibold text-lg mb-2">Want to suggest an event?</h3>
-        <p class="text-text-secondary text-sm mb-4">We're always open to ideas. If there's a topic you'd like us to cover, let us know.</p>
-        <a href="/join" class="text-accent-blue hover:text-accent-blue-dark text-sm font-semibold transition-colors">
-          Get in touch →
+      <section class="mt-20 border-t border-ai-border pt-12">
+        <h3 class="font-bold text-xl mb-4 font-mono-tech">Suggest a Topic</h3>
+        <p class="text-ai-fg-muted mb-6 max-w-2xl">
+          Is there a specific model, architecture, or tool you want us to cover? We tailor our workshops to what members want to learn.
+        </p>
+        <a href="/join" class="inline-flex items-center gap-2 text-ai-cyan hover:text-ai-cyan/80 font-mono-tech text-sm uppercase tracking-wider transition-colors">
+          Get in touch &rarr;
         </a>
-      </div>
+      </section>
     </div>
   </section>
 

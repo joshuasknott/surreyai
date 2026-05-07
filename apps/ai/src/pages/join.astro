@@ -6,110 +6,112 @@ import '../styles/global.css';
 
 <Layout title="Join" description="Join Surrey Artificial Intelligence Society — find out how to become a member, what you'll get, and how to stay connected.">
 
-  <!-- Header -->
-  <section class="bg-navy text-text-on-dark py-16 sm:py-20 px-6">
-    <div class="mx-auto max-w-6xl">
-      <div class="inline-flex items-center gap-2 mb-4">
-        <span class="w-8 h-px bg-accent-blue"></span>
-        <span class="text-accent-blue text-sm font-semibold uppercase tracking-wider">Get Involved</span>
+  <header class="bg-ai-surface text-ai-fg py-16 sm:py-24 px-6 relative border-b border-ai-border">
+    <div class="mx-auto max-w-5xl">
+      <div class="inline-flex items-center gap-2 mb-6">
+        <span class="w-8 h-px bg-ai-cyan"></span>
+        <span class="font-mono-tech text-ai-cyan text-sm font-semibold uppercase tracking-wider">Membership</span>
       </div>
-      <h1 class="text-4xl sm:text-5xl font-black tracking-tight">Join Us</h1>
-      <p class="mt-4 text-text-on-dark-secondary text-lg max-w-2xl">Becoming a member takes less than a minute through Surrey Students' Union.</p>
+      <h1 class="text-4xl sm:text-6xl font-black tracking-tight mb-4">Join the Society</h1>
+      <p class="text-ai-fg-muted text-lg max-w-2xl leading-relaxed">
+        Connect with developers, researchers, and AI enthusiasts. Open to all students at the University of Surrey regardless of course.
+      </p>
     </div>
-  </section>
+  </header>
 
-  <!-- Why Join -->
-  <section class="py-16 sm:py-20 px-6">
-    <div class="mx-auto max-w-6xl">
-      <div class="grid lg:grid-cols-2 gap-12">
-        <div>
-          <h2 class="text-2xl sm:text-3xl font-bold mb-6">Why Join?</h2>
-          <div class="space-y-4">
-            <div class="flex gap-3">
-              <div class="w-6 h-6 rounded bg-accent-blue/10 flex items-center justify-center text-accent-blue shrink-0 mt-0.5">✓</div>
-              <p class="text-text-secondary leading-relaxed">Access to all workshops, build nights, and events throughout the year</p>
+  <section class="py-16 sm:py-24 px-6 bg-ai-bg text-ai-fg">
+    <div class="mx-auto max-w-5xl">
+      <div class="grid lg:grid-cols-5 gap-12 lg:gap-8 items-start">
+        
+        <div class="lg:col-span-3">
+          <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-8 font-mono-tech">Why Join?</h2>
+            <div class="space-y-6">
+              {[
+                "Access to all technical workshops, build nights, and hackathons.",
+                "Join collaborative open-source AI projects.",
+                "Be part of a multidisciplinary network of AI-curious students.",
+                "Early access to careers events and industry panels.",
+                "Shape the society's direction and propose event topics."
+              ].map((text) => (
+                <div class="flex gap-4">
+                  <span class="font-mono-tech text-ai-cyan mt-1">&rarr;</span>
+                  <p class="text-ai-fg-muted leading-relaxed">{text}</p>
+                </div>
+              ))}
             </div>
-            <div class="flex gap-3">
-              <div class="w-6 h-6 rounded bg-accent-blue/10 flex items-center justify-center text-accent-blue shrink-0 mt-0.5">✓</div>
-              <p class="text-text-secondary leading-relaxed">Join collaborative AI projects with other students</p>
+          </section>
+
+          <section>
+            <h2 class="text-2xl font-bold mb-6 font-mono-tech">Who Can Join?</h2>
+            <div class="bg-ai-surface border border-ai-border p-6 sm:p-8">
+              <p class="text-ai-fg mb-4">
+                <strong>No prior experience required.</strong>
+              </p>
+              <p class="text-ai-fg-muted leading-relaxed">
+                You do not need to be studying computer science to join. AI impacts every field — we actively welcome members from law, business, arts, and biosciences. Many of our events assume zero prior coding knowledge.
+              </p>
             </div>
-            <div class="flex gap-3">
-              <div class="w-6 h-6 rounded bg-accent-blue/10 flex items-center justify-center text-accent-blue shrink-0 mt-0.5">✓</div>
-              <p class="text-text-secondary leading-relaxed">Be part of a growing community of AI-curious students from every discipline</p>
+          </section>
+        </div>
+
+        <aside class="lg:col-span-2">
+          <div class="border border-ai-border bg-ai-bg p-8 sticky top-24">
+            <h2 class="text-xl font-bold mb-4 font-mono-tech text-ai-cyan">Join the Society</h2>
+            <p class="text-ai-fg-muted mb-8 text-sm leading-relaxed">
+              Official membership is processed securely through the Surrey Students' Union platform.
+            </p>
+            
+            <div class="w-full block py-4 px-6 bg-ai-surface/50 border border-ai-border-strong text-ai-fg-muted font-bold uppercase tracking-widest text-sm text-center">
+              <span class="font-mono-tech">Membership Opening Soon</span>
             </div>
-            <div class="flex gap-3">
-              <div class="w-6 h-6 rounded bg-accent-blue/10 flex items-center justify-center text-accent-blue shrink-0 mt-0.5">✓</div>
-              <p class="text-text-secondary leading-relaxed">Get early access to careers events and networking opportunities</p>
-            </div>
-            <div class="flex gap-3">
-              <div class="w-6 h-6 rounded bg-accent-blue/10 flex items-center justify-center text-accent-blue shrink-0 mt-0.5">✓</div>
-              <p class="text-text-secondary leading-relaxed">Shape the society — we're student-run and always open to ideas</p>
-            </div>
+            <p class="font-mono-tech text-xs text-ai-fg-muted mt-4 text-center">
+              Check back soon or follow our social channels for activation.
+            </p>
           </div>
-        </div>
+        </aside>
 
-        <div>
-          <h2 class="text-2xl sm:text-3xl font-bold mb-6">Who Can Join?</h2>
-          <p class="text-text-secondary leading-relaxed mb-6">
-            Any student at the University of Surrey can join. You don't need to be studying computer science or have any prior experience with AI. We welcome students from all years and all courses.
-          </p>
-          <p class="text-text-secondary leading-relaxed">
-            Membership is managed through Surrey Students' Union. You can sign up on their website — the link will be available once our membership page is live.
-          </p>
-        </div>
       </div>
     </div>
   </section>
 
-  <!-- CTA -->
-  <section class="bg-surface-alt py-16 sm:py-20 px-6">
-    <div class="mx-auto max-w-6xl">
-      <div class="bg-surface-card rounded-xl p-8 sm:p-12 border border-navy/5 shadow-sm text-center">
-        <h2 class="text-2xl sm:text-3xl font-bold mb-4">Become a Member</h2>
-        <p class="text-text-secondary mb-8 max-w-lg mx-auto">Membership is handled through Surrey Students' Union. Click below when the link is available.</p>
-        <a href="#" class="inline-block px-8 py-3.5 bg-accent-blue hover:bg-accent-blue-dark text-white font-semibold rounded-lg transition-all hover:shadow-lg hover:shadow-accent-blue/20">
-          Surrey Union Link — Coming Soon
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Contact & FAQ -->
-  <section class="py-16 sm:py-20 px-6">
-    <div class="mx-auto max-w-6xl">
-      <div class="grid lg:grid-cols-2 gap-12">
+  <section class="py-16 sm:py-24 px-6 bg-ai-surface border-t border-ai-border text-ai-fg">
+    <div class="mx-auto max-w-5xl">
+      <div class="grid md:grid-cols-2 gap-12">
         <div>
-          <h2 class="text-2xl font-bold mb-6">Stay Connected</h2>
-          <div class="space-y-4">
-            <div class="bg-surface-card rounded-xl p-5 border border-navy/5 shadow-sm">
-              <h3 class="font-semibold mb-1">Instagram</h3>
-              <p class="text-text-muted text-sm">Coming soon — follow us for event announcements and updates.</p>
+          <h2 class="text-2xl font-bold mb-8 font-mono-tech">FAQ</h2>
+          <dl class="space-y-6">
+            <div>
+              <dt class="font-bold mb-2">Do I need to know how to code?</dt>
+              <dd class="text-ai-fg-muted text-sm leading-relaxed">No. We run dedicated non-technical tracks covering AI ethics, implications, and tooling for non-programmers.</dd>
             </div>
-            <div class="bg-surface-card rounded-xl p-5 border border-navy/5 shadow-sm">
-              <h3 class="font-semibold mb-1">Email</h3>
-              <p class="text-text-muted text-sm">Contact details coming soon.</p>
+            <div>
+              <dt class="font-bold mb-2">Is there a membership fee?</dt>
+              <dd class="text-ai-fg-muted text-sm leading-relaxed">Fees are standardized and set via the Students' Union. Exact figures will be displayed on the SU portal.</dd>
             </div>
-          </div>
+            <div>
+              <dt class="font-bold mb-2">I'm a first-year. Is this for me?</dt>
+              <dd class="text-ai-fg-muted text-sm leading-relaxed">Absolutely. We start from first principles. It's the perfect time to get involved.</dd>
+            </div>
+          </dl>
         </div>
-
+        
         <div>
-          <h2 class="text-2xl font-bold mb-6">FAQ</h2>
-          <div class="space-y-4">
-            <div>
-              <h3 class="font-semibold mb-1">Do I need to know how to code?</h3>
-              <p class="text-text-secondary text-sm leading-relaxed">No. Many of our events are accessible to non-coders. We cover concepts, ethics, and careers as well as technical topics.</p>
+          <h2 class="text-2xl font-bold mb-8 font-mono-tech">Contact</h2>
+          <div class="grid gap-4">
+            <div class="border border-ai-border bg-ai-bg p-5 flex items-center justify-between">
+              <div>
+                <h3 class="font-bold">Instagram</h3>
+                <p class="text-ai-fg-muted text-sm">@surreyai (Pending)</p>
+              </div>
+              <span class="font-mono-tech text-xs text-ai-cyan px-2 py-1 bg-ai-surface">COMING SOON</span>
             </div>
-            <div>
-              <h3 class="font-semibold mb-1">Is there a membership fee?</h3>
-              <p class="text-text-secondary text-sm leading-relaxed">Membership fees are set through Surrey Students' Union. Details will be confirmed on our membership page.</p>
-            </div>
-            <div>
-              <h3 class="font-semibold mb-1">Can I attend events without being a member?</h3>
-              <p class="text-text-secondary text-sm leading-relaxed">Some events may be open to all, but membership gives you access to our full programme and community channels.</p>
-            </div>
-            <div>
-              <h3 class="font-semibold mb-1">I'm a first-year. Is this for me?</h3>
-              <p class="text-text-secondary text-sm leading-relaxed">Absolutely. We have a dedicated First Year Representative on our committee, and most events are designed to be beginner-friendly.</p>
+            <div class="border border-ai-border bg-ai-bg p-5 flex items-center justify-between">
+              <div>
+                <h3 class="font-bold">Email</h3>
+                <p class="text-ai-fg-muted text-sm">su.ai@surrey.ac.uk</p>
+              </div>
+              <a href="mailto:su.ai@surrey.ac.uk" class="font-mono-tech text-xs text-ai-purple px-2 py-1 bg-ai-surface hover:bg-ai-border transition-colors">EMAIL US</a>
             </div>
           </div>
         </div>

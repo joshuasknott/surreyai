@@ -39,34 +39,27 @@ const audiences = [
 ];
 ---
 
-<section class="py-20 sm:py-24 px-6 bg-surface relative overflow-hidden border-t border-border-subtle">
-  <div class="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(139,92,246,0.08),transparent_30%)] pointer-events-none"></div>
-
-  <div class="mx-auto max-w-6xl relative z-10">
-    <div class="max-w-3xl mb-12">
-      <div class="inline-flex items-center gap-3 mb-5 border border-border-subtle px-3 py-1.5 bg-surface-card/40">
-        <span class="w-2 h-2 bg-accent-purple shadow-[0_0_12px_rgba(139,92,246,0.8)]"></span>
-        <span class="text-accent-purple text-xs font-bold font-mono-tech tracking-widest uppercase">
-          Community
-        </span>
-      </div>
-      <h2 class="text-3xl sm:text-4xl font-black tracking-tight mb-5">
+<section class="py-20 sm:py-24 px-6 bg-ai-surface relative overflow-hidden border-t border-ai-border">
+  <div class="mx-auto max-w-7xl relative z-10">
+    <div class="max-w-3xl mb-16">
+      <h2 class="text-3xl sm:text-4xl font-bold tracking-tight mb-5 text-ai-fg">
         Who It's For
       </h2>
-      <p class="text-text-secondary text-base sm:text-lg leading-relaxed max-w-2xl">
-        Whether you're studying computer science, business, psychology, law, or anything
-        else &mdash; if you're curious about AI, you're welcome here.
+      <p class="text-ai-fg-muted text-lg sm:text-xl leading-relaxed max-w-2xl">
+        Whether you're studying computer science, business, psychology, law, or anything else &mdash; if you're curious about AI, you're welcome here.
       </p>
     </div>
 
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {audiences.map((audience) => (
-        <div class="group border border-border-subtle bg-surface-card/40 p-6 hover:border-accent-blue/30 transition-all duration-300">
-          <div class="flex items-center gap-3 mb-3">
-            <span class="text-accent-blue text-lg font-mono leading-none">{audience.icon}</span>
-            <h3 class="font-bold text-sm uppercase tracking-wide text-text-primary">{audience.title}</h3>
+        <div class="bg-ai-bg border border-ai-border rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-lg bg-ai-purple/10 flex items-center justify-center text-ai-purple text-xl" aria-hidden="true">
+              {audience.icon}
+            </div>
+            <h3 class="font-semibold text-lg text-ai-fg">{audience.title}</h3>
           </div>
-          <p class="text-text-secondary text-sm leading-relaxed">{audience.description}</p>
+          <p class="text-ai-fg-muted text-base leading-relaxed">{audience.description}</p>
         </div>
       ))}
     </div>

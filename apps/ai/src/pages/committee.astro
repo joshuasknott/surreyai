@@ -26,48 +26,58 @@ const getInitials = (name?: string, role?: string) => {
 <Layout title="Committee" description="Meet the student committee running Surrey Artificial Intelligence Society — the team behind our workshops, events, and community.">
 
   <!-- Header -->
-  <section class="bg-navy text-text-on-dark py-16 sm:py-20 px-6">
-    <div class="mx-auto max-w-6xl">
-      <div class="inline-flex items-center gap-2 mb-4">
-        <span class="w-8 h-px bg-accent-blue"></span>
-        <span class="text-accent-blue text-sm font-semibold uppercase tracking-wider">Our Team</span>
+  <header class="bg-ai-surface text-ai-fg py-16 sm:py-24 px-6 relative border-b border-ai-border">
+    <div class="mx-auto max-w-5xl">
+      <div class="inline-flex items-center gap-2 mb-6">
+        <span class="w-8 h-px bg-ai-purple"></span>
+        <span class="font-mono-tech text-ai-purple text-sm font-semibold uppercase tracking-wider">Leadership</span>
       </div>
-      <h1 class="text-4xl sm:text-5xl font-black tracking-tight">Committee</h1>
-      <p class="mt-4 text-text-on-dark-secondary text-lg max-w-2xl">The student volunteers who make Surrey Artificial Intelligence Society happen.</p>
+      <h1 class="text-4xl sm:text-6xl font-black tracking-tight mb-4">The Committee</h1>
+      <p class="text-ai-fg-muted text-lg max-w-2xl leading-relaxed">
+        The student volunteers directing the society. We are researchers, developers, and enthusiasts committed to making AI accessible.
+      </p>
     </div>
-  </section>
+  </header>
 
   <!-- Committee Grid -->
-  <section class="py-16 sm:py-20 px-6">
-    <div class="mx-auto max-w-6xl">
+  <section class="py-16 sm:py-24 px-6 bg-ai-bg text-ai-fg min-h-[50vh]">
+    <div class="mx-auto max-w-5xl">
       {committee.length === 0 ? (
-        <div class="bg-surface-card rounded-xl p-8 border border-navy/5 shadow-sm text-center">
-          <h3 class="font-semibold text-lg mb-2">Committee details coming soon</h3>
-          <p class="text-text-secondary text-sm leading-relaxed">Check back soon to meet the Surrey Artificial Intelligence Society committee.</p>
+        <div class="max-w-3xl">
+          <div class="border-l-2 border-ai-purple pl-6 py-2">
+            <h2 class="text-2xl font-bold mb-4 font-mono-tech">Committee Elections Upcoming</h2>
+            <p class="text-ai-fg-muted text-lg leading-relaxed mb-6">
+              Our committee roster is currently updating for the new academic year. The team responsible for workshops, events, and society operations will be listed here shortly.
+            </p>
+            <div class="h-px w-full bg-gradient-to-r from-ai-border to-transparent mb-6"></div>
+            <p class="font-mono-tech text-sm text-ai-fg-muted">
+              Elections are held annually via the Surrey Students' Union platform.
+            </p>
+          </div>
         </div>
       ) : (
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {committee.map(member => (
-            <div class="bg-surface-card rounded-xl p-6 border border-navy/5 hover:border-accent-blue/20 transition-colors shadow-sm flex items-start gap-4">
-              <div class="w-14 h-14 rounded-full bg-navy/5 border-2 border-accent-blue/20 flex items-center justify-center text-accent-blue font-bold text-sm shrink-0">
+            <article class="bg-ai-bg border border-ai-border p-6 flex flex-col hover:border-ai-purple transition-colors">
+              <div class="w-14 h-14 rounded-none bg-ai-surface border border-ai-border-strong flex items-center justify-center font-mono-tech text-ai-purple font-bold text-sm mb-6">
                 {getInitials(member.name, member.role)}
               </div>
-              <div>
-                <h3 class="font-semibold text-lg">{member.role}</h3>
-                <p class="text-text-muted text-sm mt-1">{member.name}</p>
-              </div>
-            </div>
+              <h2 class="font-bold text-lg mb-1">{member.role}</h2>
+              <p class="text-ai-fg-muted text-sm">{member.name}</p>
+            </article>
           ))}
         </div>
       )}
 
-      <div class="mt-12 bg-surface-alt rounded-xl p-8 border border-navy/5 text-center">
-        <h3 class="font-semibold text-lg mb-2">Interested in joining the committee?</h3>
-        <p class="text-text-secondary text-sm mb-4">Committee elections happen through Surrey Students' Union. Keep an eye on our announcements for when positions open.</p>
-        <a href="/join" class="text-accent-blue hover:text-accent-blue-dark text-sm font-semibold transition-colors">
-          Join the society first →
+      <section class="mt-24 border-t border-ai-border pt-12">
+        <h3 class="font-bold text-xl mb-4 font-mono-tech">Join the Core Team</h3>
+        <p class="text-ai-fg-muted mb-6 max-w-2xl">
+          Passionate about AI and want to help shape the society? Keep an eye out for open committee positions or become a volunteer for our larger events.
+        </p>
+        <a href="/join" class="inline-flex items-center gap-2 text-ai-purple hover:text-ai-purple/80 font-mono-tech text-sm uppercase tracking-wider transition-colors">
+          See Membership Details &rarr;
         </a>
-      </div>
+      </section>
     </div>
   </section>
 

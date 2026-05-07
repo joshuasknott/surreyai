@@ -1,261 +1,45 @@
 ---
 import BackgroundVideo from "@surreysocieties/ui/components/BackgroundVideo";
-import { Picture } from "astro:assets";
-import aiGptHero from "../../assets/images/ai-gpt-hero.png";
 ---
 
-<section class="bg-navy-deep text-text-on-dark relative overflow-hidden flex items-center min-h-[85vh] border-b border-border-subtle">
-  <canvas id="hero-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-0" aria-hidden="true"></canvas>
-
-  <div class="mx-auto max-w-6xl px-6 py-24 sm:py-32 relative z-10 w-full">
-    <div class="grid lg:grid-cols-[minmax(0,1fr)_minmax(340px,0.72fr)] gap-12 items-center">
-      <div class="flex flex-col items-start max-w-3xl">
-        <span class="font-mono-tech text-accent-blue text-sm mb-4 block tracking-widest uppercase">
-          [System Status: Online]
+<section class="bg-ai-bg text-ai-fg relative overflow-hidden flex items-center min-h-[85vh] border-b border-ai-border">
+  <div class="mx-auto max-w-7xl px-6 py-24 sm:py-32 relative z-10 w-full">
+    <div class="grid lg:grid-cols-[minmax(0,1fr)_minmax(400px,1fr)] gap-12 lg:gap-16 items-center">
+      <div class="flex flex-col items-start max-w-2xl">
+        <span class="text-ai-cyan font-semibold text-sm sm:text-base mb-4 block" aria-hidden="true">
+          University of Surrey
         </span>
-        <h1 class="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tight leading-[1.05] mb-6 drop-shadow-lg">
-          We Build <br/>
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-accent-blue to-accent-purple">Intelligence</span>
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.1] mb-6">
+          Empowering Students in <span class="text-ai-cyan">Artificial Intelligence</span>
         </h1>
-        <p class="font-mono-tech text-text-secondary text-sm sm:text-base leading-relaxed max-w-2xl border-l-2 border-accent-purple/50 pl-4">
-          Surrey Artificial Intelligence Society is a student-led community at the
-          University of Surrey. We learn, build, discuss, and apply artificial
-          intelligence together &mdash; open to every discipline and experience level.
+        <p class="text-ai-fg-muted text-lg leading-relaxed max-w-xl mb-10">
+          We are a student-led community dedicated to learning, building, and discussing artificial intelligence. Open to every discipline and experience level.
         </p>
-        <div class="mt-10 flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+        <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
           <a
             href="/join"
-            class="px-8 py-3.5 bg-accent-blue hover:bg-accent-blue-light text-navy-deep font-bold uppercase tracking-wide text-sm transition-all duration-200 border border-accent-blue hover:shadow-[0_0_15px_rgba(6,182,212,0.5)] text-center"
+            class="px-8 py-3.5 bg-ai-cyan hover:opacity-90 text-white font-semibold rounded-lg transition-colors text-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ai-cyan"
           >
-            Join Society
+            Join the Society
           </a>
           <a
             href="#events"
-            class="px-8 py-3.5 bg-transparent hover:bg-surface-card text-text-on-dark font-bold uppercase tracking-wide text-sm border border-border-strong transition-all duration-200 hover:shadow-[0_0_15px_rgba(139,92,246,0.3)] text-center"
+            class="px-8 py-3.5 bg-ai-surface hover:bg-ai-border text-ai-fg font-medium rounded-lg border border-ai-border transition-colors text-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ai-cyan"
           >
             View Events
           </a>
-          <a
-            href="#tracks"
-            class="px-8 py-3.5 bg-transparent hover:bg-surface-card text-text-on-dark font-bold uppercase tracking-wide text-sm border border-border-strong transition-all duration-200 hover:shadow-[0_0_15px_rgba(139,92,246,0.3)] text-center"
-          >
-            Explore Tracks
-          </a>
         </div>
       </div>
-      <div class="relative hidden lg:block min-h-[420px] border border-accent-blue/25 bg-surface-card/40 p-2 shadow-[0_0_40px_rgba(6,182,212,0.12)]">
-        <div class="relative h-full min-h-[400px] overflow-hidden border border-border-subtle bg-navy-deep">
-          <BackgroundVideo
-            src="/videos/optimized/ai-hero.optimized.mp4"
-            webmSrc="/videos/optimized/ai-hero.optimized.webm"
-            poster="/videos/posters/ai-hero.poster.jpg"
-            objectPosition="center 40%"
-            overlayClass="bg-navy-deep/45"
-          />
-          <Picture
-            src={aiGptHero}
-            alt="AI Society conceptual representation of artificial intelligence and community"
-            widths={[768, 1280, 1920]}
-            sizes="420px"
-            loading="eager"
-            class="w-full h-full object-cover"
-            style={{ objectPosition: 'center 40%' }}
-            pictureAttributes={{ class: 'absolute inset-x-8 bottom-8 h-40 border border-accent-blue/30 shadow-[0_0_24px_rgba(6,182,212,0.18)] block overflow-hidden' }}
-          />
-          <div class="absolute left-6 top-6 font-mono-tech text-[10px] uppercase tracking-widest text-accent-blue bg-navy-deep/80 border border-accent-blue/30 px-3 py-1.5">
-            Student-led AI Lab
-          </div>
-        </div>
+      
+      <div class="relative w-full aspect-video lg:aspect-[4/3] rounded-2xl overflow-hidden shadow-xl ring-1 ring-ai-border">
+        <BackgroundVideo
+          src="/videos/optimized/ai-hero.optimized.mp4"
+          webmSrc="/videos/optimized/ai-hero.optimized.webm"
+          poster="/videos/posters/ai-hero.poster.jpg"
+          objectPosition="center center"
+        />
       </div>
     </div>
   </div>
-
-  <div class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-surface to-transparent pointer-events-none z-0"></div>
 </section>
 
-<script>
-  const canvas = document.getElementById("hero-canvas") as HTMLCanvasElement | null;
-  if (canvas) {
-    const ctx = canvas.getContext("2d");
-    if (ctx) {
-      let width = (canvas.width = window.innerWidth);
-      let height = (canvas.height = window.innerHeight);
-
-      window.addEventListener("resize", () => {
-        width = canvas.width = window.innerWidth;
-        height = canvas.height = window.innerHeight;
-      });
-
-      const colorCyan = "#06B6D4";
-      const colorPurple = "#8B5CF6";
-
-      const nodes: {
-        id: number;
-        x: number;
-        y: number;
-        vx: number;
-        vy: number;
-        size: number;
-        connections: number[];
-      }[] = [];
-      const numNodes = Math.min(60, Math.floor(window.innerWidth / 20));
-
-      for (let i = 0; i < numNodes; i++) {
-        nodes.push({
-          id: i,
-          x: Math.random() * width,
-          y: Math.random() * height,
-          vx: (Math.random() - 0.5) * 0.5,
-          vy: (Math.random() - 0.5) * 0.5,
-          size: Math.random() * 2 + 1,
-          connections: [],
-        });
-      }
-
-      nodes.forEach((node) => {
-        nodes.forEach((other) => {
-          if (node.id !== other.id) {
-            const dx = node.x - other.x;
-            const dy = node.y - other.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < 150 && node.connections.length < 4) {
-              if (!node.connections.includes(other.id)) {
-                node.connections.push(other.id);
-                other.connections.push(node.id);
-              }
-            }
-          }
-        });
-      });
-
-      const packets: {
-        startNode: typeof nodes[0];
-        targetNode: typeof nodes[0];
-        progress: number;
-        speed: number;
-        color: string;
-      }[] = [];
-      const numPackets = numNodes / 1.5;
-
-      const spawnPacket = (reuse?: typeof packets[0]) => {
-        let startNode: typeof nodes[0] | null = null;
-        let attempts = 0;
-        while (!startNode && attempts < 10) {
-          const candidate = nodes[Math.floor(Math.random() * nodes.length)];
-          if (candidate.connections.length > 0) startNode = candidate;
-          attempts++;
-        }
-        if (!startNode) return;
-
-        const targetId =
-          startNode.connections[
-            Math.floor(Math.random() * startNode.connections.length)
-          ];
-        const targetNode = nodes.find((n) => n.id === targetId);
-        if (!targetNode) return;
-
-        const p = reuse || ({} as typeof packets[0]);
-        p.startNode = startNode;
-        p.targetNode = targetNode;
-        p.progress = 0;
-        p.speed = Math.random() * 0.01 + 0.005;
-        p.color = Math.random() > 0.5 ? colorCyan : colorPurple;
-        if (!reuse) packets.push(p);
-      };
-
-      for (let i = 0; i < numPackets; i++) spawnPacket();
-
-      let mouseX = -1000;
-      let mouseY = -1000;
-
-      canvas.addEventListener("mousemove", (e) => {
-        const rect = canvas.getBoundingClientRect();
-        mouseX = e.clientX - rect.left;
-        mouseY = e.clientY - rect.top;
-      });
-
-      canvas.addEventListener("mouseleave", () => {
-        mouseX = -1000;
-        mouseY = -1000;
-      });
-
-      const prefersReducedMotion = window.matchMedia(
-        "(prefers-reduced-motion: reduce)"
-      ).matches;
-
-      function animate() {
-        ctx.clearRect(0, 0, width, height);
-
-        nodes.forEach((node) => {
-          if (!prefersReducedMotion) {
-            node.x += node.vx;
-            node.y += node.vy;
-            if (node.x < 0 || node.x > width) node.vx *= -1;
-            if (node.y < 0 || node.y > height) node.vy *= -1;
-
-            const dxM = mouseX - node.x;
-            const dyM = mouseY - node.y;
-            const distM = Math.sqrt(dxM * dxM + dyM * dyM);
-            if (distM < 250) {
-              const force = (250 - distM) / 250;
-              node.x += dxM * force * 0.02;
-              node.y += dyM * force * 0.02;
-            }
-          }
-
-          ctx.fillStyle = "rgba(100, 116, 139, 0.5)";
-          ctx.beginPath();
-          ctx.arc(node.x, node.y, node.size, 0, Math.PI * 2);
-          ctx.fill();
-        });
-
-        ctx.lineWidth = 0.5;
-        nodes.forEach((node) => {
-          node.connections.forEach((targetId) => {
-            if (node.id < targetId) {
-              const target = nodes.find((n) => n.id === targetId);
-              if (target) {
-                const dx = node.x - target.x;
-                const dy = node.y - target.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < 200) {
-                  ctx.strokeStyle = `rgba(100, 116, 139, ${0.3 * (1 - dist / 200)})`;
-                  ctx.beginPath();
-                  ctx.moveTo(node.x, node.y);
-                  ctx.lineTo(target.x, target.y);
-                  ctx.stroke();
-                }
-              }
-            }
-          });
-        });
-
-        packets.forEach((p) => {
-          if (!p.startNode || !p.targetNode) return;
-          p.progress += p.speed;
-          if (p.progress >= 1) {
-            spawnPacket(p);
-            return;
-          }
-          const x =
-            p.startNode.x +
-            (p.targetNode.x - p.startNode.x) * p.progress;
-          const y =
-            p.startNode.y +
-            (p.targetNode.y - p.startNode.y) * p.progress;
-          ctx.fillStyle = p.color;
-          ctx.shadowBlur = 8;
-          ctx.shadowColor = p.color;
-          ctx.beginPath();
-          ctx.arc(x, y, 2, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.shadowBlur = 0;
-        });
-
-        requestAnimationFrame(animate);
-      }
-
-      animate();
-    }
-  }
-</script>
