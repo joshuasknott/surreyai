@@ -32,84 +32,129 @@ const navLinks = [
   description={description}
   ogImage={ogImage}
   canonicalUrl={canonicalUrl}
-  htmlClass="scroll-smooth"
-  bodyClass="bg-surface text-text-primary font-sans min-h-screen flex flex-col"
+  htmlClass="motion-safe:scroll-smooth"
+  bodyClass="bg-ai-bg text-ai-fg font-sans min-h-screen flex flex-col transition-colors duration-200"
   extraFontHrefs={[
-    'https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&display=swap',
+    'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
   ]}
 >
+  <!-- Theme Init Script — runs before paint to prevent FOUC -->
+  <script is:inline>
+    const getTheme = () => {
+      if (typeof localStorage !== 'undefined' && localStorage.getItem('surrey-ai-theme')) {
+        return localStorage.getItem('surrey-ai-theme');
+      }
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    };
+    const theme = getTheme();
+    document.documentElement.setAttribute('data-theme', theme);
+  </script>
+
+  <!-- Skip link -->
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-ai-surface focus:text-ai-fg focus:font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan shadow-lg rounded-lg">
+    Skip to content
+  </a>
+
   <!-- Navigation -->
-  <nav class="sticky top-0 z-50 bg-navy border-b border-border-subtle/20">
+  <header class="sticky top-0 z-50 bg-ai-bg/90 backdrop-blur-md border-b border-ai-border">
     <div class="mx-auto max-w-6xl px-6 h-16 flex items-center justify-between">
-      <a href="/" class="flex items-center gap-3">
+      <a href="/" class="flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan rounded-lg">
         <img
           src="/logos/optimized/ai-logo.optimized.png"
-          alt="Surrey Artificial Intelligence Society"
+          alt="Surrey Artificial Intelligence Society logo"
           width="36"
           height="36"
-          class="h-9 w-9 rounded-full ring-2 ring-navy ring-offset-1 ring-offset-accent-blue/30"
+          class="h-9 w-9 rounded-full"
         />
-        <span class="text-text-on-dark font-bold text-lg tracking-tight hidden sm:block">
-          Surrey <span class="text-accent-blue">Artificial Intelligence</span> Society
+        <span class="text-ai-fg font-semibold text-lg tracking-tight hidden sm:block">
+          Surrey <span class="text-ai-cyan">AI</span> Society
         </span>
       </a>
 
-      <!-- Desktop nav -->
-      <div class="hidden md:flex items-center gap-1">
-        {navLinks.map(link => (
-          <a
-            href={link.href}
-            class:list={[
-              'px-4 py-2 text-sm font-medium rounded-lg transition-colors border border-transparent font-mono-tech',
-              currentPath === link.href || (link.href !== '/' && currentPath.startsWith(link.href))
-                ? 'text-accent-blue bg-accent-blue/10 border-accent-blue/20'
-                : 'text-text-on-dark-secondary hover:text-text-on-dark hover:bg-white/5',
-            ]}
-          >
-            {link.label}
-          </a>
-        ))}
-      </div>
+      <div class="flex items-center gap-4">
+        <!-- Desktop nav -->
+        <nav aria-label="Primary navigation" class="hidden md:flex items-center gap-1">
+          {navLinks.map(link => {
+            const isActive = currentPath === link.href || (link.href !== '/' && currentPath.startsWith(link.href));
+            return (
+              <a
+                href={link.href}
+                aria-current={isActive ? 'page' : undefined}
+                class:list={[
+                  'px-3.5 py-2 text-sm font-medium rounded-lg border border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan transition-colors',
+                  isActive
+                    ? 'text-ai-cyan bg-ai-cyan/8 border-ai-cyan/15'
+                    : 'text-ai-fg-muted hover:text-ai-fg hover:bg-ai-surface',
+                ]}
+              >
+                {link.label}
+              </a>
+            );
+          })}
+        </nav>
 
-      <!-- Mobile menu button -->
-      <button
-        id="mobile-menu-btn"
-        class="md:hidden text-text-on-dark p-2 hover:bg-white/10 rounded-lg transition-colors"
-        aria-label="Toggle navigation menu"
-      >
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path id="menu-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-      </button>
+        <!-- Theme Toggle -->
+        <button
+          type="button"
+          id="theme-toggle"
+          aria-label="Switch to dark mode"
+          class="text-ai-fg-muted hover:text-ai-fg hover:bg-ai-surface p-2 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan"
+        >
+          <svg id="theme-icon-dark" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+          <svg id="theme-icon-light" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+        </button>
+
+        <!-- Mobile menu button -->
+        <button
+          type="button"
+          id="ai-mobile-menu-btn"
+          aria-label="Open navigation menu"
+          aria-expanded="false"
+          aria-controls="ai-mobile-menu"
+          class="md:hidden text-ai-fg p-2 hover:bg-ai-surface rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path id="ai-menu-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
     </div>
 
     <!-- Mobile nav -->
-    <div id="mobile-menu" class="hidden md:hidden border-t border-border-subtle/20 bg-navy-deep">
-      <div class="px-6 py-3 flex flex-col gap-1">
-        {navLinks.map(link => (
-          <a
-            href={link.href}
-            class:list={[
-              'px-4 py-2.5 text-sm font-medium rounded-lg transition-colors border border-transparent font-mono-tech',
-              currentPath === link.href || (link.href !== '/' && currentPath.startsWith(link.href))
-                ? 'text-accent-blue bg-accent-blue/10 border-accent-blue/20'
-                : 'text-text-on-dark-secondary hover:text-text-on-dark hover:bg-white/5',
-            ]}
-          >
-            {link.label}
-          </a>
-        ))}
-      </div>
+    <div id="ai-mobile-menu" class="hidden md:hidden border-t border-ai-border bg-ai-surface" role="region" aria-label="Mobile navigation">
+      <nav aria-label="Primary mobile navigation" class="px-6 py-3 flex flex-col gap-1">
+        {navLinks.map(link => {
+          const isActive = currentPath === link.href || (link.href !== '/' && currentPath.startsWith(link.href));
+          return (
+            <a
+              href={link.href}
+              aria-current={isActive ? 'page' : undefined}
+              class:list={[
+                'px-4 py-2.5 text-sm font-medium rounded-lg border border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan transition-colors',
+                isActive
+                  ? 'text-ai-cyan bg-ai-cyan/8 border-ai-cyan/15'
+                  : 'text-ai-fg-muted hover:text-ai-fg hover:bg-ai-bg',
+              ]}
+            >
+              {link.label}
+            </a>
+          );
+        })}
+      </nav>
     </div>
-  </nav>
+  </header>
 
   <!-- Main content -->
-  <main class="flex-1">
+  <main id="main-content" class="flex-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan" tabindex="-1">
     <slot />
   </main>
 
   <!-- Footer -->
-  <footer class="bg-navy text-text-on-dark-secondary">
+  <footer class="bg-ai-surface text-ai-fg-muted border-t border-ai-border mt-auto">
     <div class="mx-auto max-w-6xl px-6 py-12">
       <div class="grid sm:grid-cols-3 gap-8 mb-8">
         <div>
@@ -119,35 +164,94 @@ const navLinks = [
               alt=""
               width="32"
               height="32"
-              class="h-8 w-8 rounded-full ring-2 ring-navy ring-offset-1 ring-offset-accent-blue/30"
+              class="h-8 w-8 rounded-full"
             />
-            <span class="text-text-on-dark font-bold tracking-tight">Surrey Artificial Intelligence Society</span>
+            <span class="text-ai-fg font-semibold tracking-tight">Surrey AI Society</span>
           </div>
-          <p class="text-sm leading-relaxed">
-            A student-led society under Surrey Students' Union at the University of Surrey. Exploring AI through learning, building, and open discussion.
+          <p class="text-sm leading-relaxed max-w-xs">
+            A student-led society under Surrey Students' Union. Exploring AI through learning, building, and open discussion.
           </p>
         </div>
         <div>
-          <h4 class="text-text-on-dark font-semibold mb-3 text-sm uppercase tracking-widest text-accent-blue">Pages</h4>
-          <div class="flex flex-col gap-2">
+          <h4 class="text-ai-fg font-semibold mb-3 text-sm">Pages</h4>
+          <nav aria-label="Footer navigation" class="flex flex-col gap-2">
             {navLinks.map(link => (
-              <a href={link.href} class="text-sm hover:text-accent-blue transition-colors">{link.label}</a>
+              <a href={link.href} class="text-sm hover:text-ai-cyan transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan w-max rounded">{link.label}</a>
             ))}
-          </div>
+          </nav>
         </div>
         <div>
-          <h4 class="text-text-on-dark font-semibold mb-3 text-sm uppercase tracking-widest text-accent-blue">Connect</h4>
+          <h4 class="text-ai-fg font-semibold mb-3 text-sm">Connect</h4>
           <div class="flex flex-col gap-2 text-sm">
-            <span>Instagram — coming soon</span>
-            <span>Email — coming soon</span>
-            <span>Surrey Students' Union</span>
+            <span class="text-ai-fg-muted/50 cursor-not-allowed select-none" aria-disabled="true">Instagram — coming soon</span>
+            <span class="text-ai-fg-muted/50 cursor-not-allowed select-none" aria-disabled="true">Email — coming soon</span>
+            <a href="https://surreyunion.org/" target="_blank" rel="noopener noreferrer" class="hover:text-ai-cyan transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan w-max rounded">Surrey Students' Union</a>
           </div>
         </div>
       </div>
-      <div class="border-t border-border-subtle/20 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
-        <p>&copy; 2025 Surrey Artificial Intelligence Society. A student society at the University of Surrey.</p>
-        <p class="text-accent-blue/80 font-medium tracking-wide">surreyaisociety.org</p>
+      <div class="border-t border-ai-border pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+        <p>&copy; {new Date().getFullYear()} Surrey Artificial Intelligence Society.</p>
+        <p class="text-ai-fg-muted">surreyaisociety.org</p>
       </div>
     </div>
   </footer>
+
+  <script>
+    // ── Theme toggle ──
+    const themeBtn = document.getElementById('theme-toggle');
+    const iconDark = document.getElementById('theme-icon-dark');
+    const iconLight = document.getElementById('theme-icon-light');
+
+    function updateThemeUI(theme: string) {
+      const isDark = theme === 'dark';
+
+      document.documentElement.setAttribute('data-theme', theme);
+
+      // Show the icon for the *opposite* mode (the icon represents what
+      // clicking will switch to)
+      iconDark?.classList.toggle('hidden', !isDark);
+      iconLight?.classList.toggle('hidden', isDark);
+
+      // Announce the available action, not the current state
+      themeBtn?.setAttribute(
+        'aria-label',
+        isDark ? 'Switch to light mode' : 'Switch to dark mode'
+      );
+    }
+
+    // Initial load — read from the data-attribute set by the inline script
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    updateThemeUI(currentTheme);
+
+    themeBtn?.addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const newTheme = isDark ? 'light' : 'dark';
+      localStorage.setItem('surrey-ai-theme', newTheme);
+      updateThemeUI(newTheme);
+    });
+
+    // ── Mobile menu toggle ──
+    const btn = document.getElementById('ai-mobile-menu-btn');
+    const menu = document.getElementById('ai-mobile-menu');
+    const icon = document.getElementById('ai-menu-icon');
+
+    btn?.addEventListener('click', () => {
+      const isExpanded = btn.getAttribute('aria-expanded') === 'true';
+      btn?.setAttribute('aria-expanded', (!isExpanded).toString());
+
+      // Update the aria-label to reflect available action
+      btn?.setAttribute(
+        'aria-label',
+        isExpanded ? 'Open navigation menu' : 'Close navigation menu'
+      );
+
+      if (isExpanded) {
+        menu?.classList.add('hidden');
+        if (icon) icon.setAttribute('d', 'M4 6h16M4 12h16M4 18h16');
+      } else {
+        menu?.classList.remove('hidden');
+        if (icon) icon.setAttribute('d', 'M6 18L18 6M6 6l12 12');
+      }
+    });
+  </script>
 </BaseLayout>
