@@ -3,93 +3,125 @@
 
 <div class="ethics-compass" data-track-prototype="ethics" role="region" aria-label="AI Ethics Impact Compass">
   <div class="ec__body">
-    <svg class="ec__svg" viewBox="0 0 380 250" aria-hidden="true">
-      <circle class="ec__ring ec__ring--outer" cx="190" cy="125" r="118" />
-      <circle class="ec__ring ec__ring--main" cx="190" cy="125" r="88" />
-      <circle class="ec__ring ec__ring--inner" cx="190" cy="125" r="48" />
-      <circle class="ec__center-glow" cx="190" cy="125" r="34" />
+    <svg class="ec__svg" viewBox="0 0 500 440" aria-hidden="true">
+      <circle class="ec__ring ec__ring--outer" cx="250" cy="200" r="175" />
+      <circle class="ec__ring ec__ring--main" cx="250" cy="200" r="140" />
+      <circle class="ec__ring ec__ring--inner" cx="250" cy="200" r="70" />
+      
       <g class="ec__ticks"></g>
+      
       <g class="ec__spokes">
-        <line class="ec__spoke" data-dim="fairness" x1="190" y1="125" x2="190" y2="37" />
-        <line class="ec__spoke" data-dim="privacy" x1="190" y1="125" x2="266" y2="81" />
-        <line class="ec__spoke" data-dim="accountability" x1="190" y1="125" x2="266" y2="169" />
-        <line class="ec__spoke" data-dim="safety" x1="190" y1="125" x2="190" y2="213" />
-        <line class="ec__spoke" data-dim="bias" x1="190" y1="125" x2="114" y2="169" />
-        <line class="ec__spoke" data-dim="usefulness" x1="190" y1="125" x2="114" y2="81" />
+        <line class="ec__spoke" data-dim="fairness" x1="250" y1="200" x2="250" y2="60" />
+        <line class="ec__spoke" data-dim="privacy" x1="250" y1="200" x2="371" y2="130" />
+        <line class="ec__spoke" data-dim="accountability" x1="250" y1="200" x2="371" y2="270" />
+        <line class="ec__spoke" data-dim="safety" x1="250" y1="200" x2="250" y2="340" />
+        <line class="ec__spoke" data-dim="bias" x1="250" y1="200" x2="129" y2="270" />
+        <line class="ec__spoke" data-dim="usefulness" x1="250" y1="200" x2="129" y2="130" />
       </g>
+      
       <polygon class="ec__polygon" points="" />
-      <g class="ec__dim" data-dim="fairness" tabindex="0" role="button" aria-label="Fairness: click to adjust weight">
-        <circle class="ec__dim-glow" cx="190" cy="37" r="20" />
-        <circle class="ec__dim-ring" cx="190" cy="37" r="11" />
-        <circle class="ec__dim-dot" cx="190" cy="37" r="4.5" />
-        <text class="ec__dim-text" x="190" y="16" text-anchor="middle">Fairness</text>
+      
+      <g class="ec__dim" data-dim="fairness" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0" aria-valuetext="not weighted" aria-label="Fairness weight">
+        <circle class="ec__dim-glow" cx="250" cy="60" r="32" />
+        <circle class="ec__dim-ring" cx="250" cy="60" r="16" />
+        <circle class="ec__dim-dot" cx="250" cy="60" r="6" />
+        <text class="ec__dim-text" x="250" y="30" text-anchor="middle">Fairness</text>
+        <text class="ec__dim-val" x="250" y="86" text-anchor="middle"></text>
       </g>
-      <g class="ec__dim" data-dim="privacy" tabindex="0" role="button" aria-label="Privacy: click to adjust weight">
-        <circle class="ec__dim-glow" cx="266" cy="81" r="20" />
-        <circle class="ec__dim-ring" cx="266" cy="81" r="11" />
-        <circle class="ec__dim-dot" cx="266" cy="81" r="4.5" />
-        <text class="ec__dim-text" x="288" y="85" text-anchor="start">Privacy</text>
+      <g class="ec__dim" data-dim="privacy" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0" aria-valuetext="not weighted" aria-label="Privacy weight">
+        <circle class="ec__dim-glow" cx="371" cy="130" r="32" />
+        <circle class="ec__dim-ring" cx="371" cy="130" r="16" />
+        <circle class="ec__dim-dot" cx="371" cy="130" r="6" />
+        <text class="ec__dim-text" x="395" y="134" text-anchor="start">Privacy</text>
+        <text class="ec__dim-val" x="395" y="152" text-anchor="start"></text>
       </g>
-      <g class="ec__dim" data-dim="accountability" tabindex="0" role="button" aria-label="Accountability: click to adjust weight">
-        <circle class="ec__dim-glow" cx="266" cy="169" r="20" />
-        <circle class="ec__dim-ring" cx="266" cy="169" r="11" />
-        <circle class="ec__dim-dot" cx="266" cy="169" r="4.5" />
-        <text class="ec__dim-text" x="288" y="173" text-anchor="start">Accountability</text>
+      <g class="ec__dim" data-dim="accountability" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0" aria-valuetext="not weighted" aria-label="Accountability weight">
+        <circle class="ec__dim-glow" cx="371" cy="270" r="32" />
+        <circle class="ec__dim-ring" cx="371" cy="270" r="16" />
+        <circle class="ec__dim-dot" cx="371" cy="270" r="6" />
+        <text class="ec__dim-text" x="395" y="274" text-anchor="start">Accountability</text>
+        <text class="ec__dim-val" x="395" y="292" text-anchor="start"></text>
       </g>
-      <g class="ec__dim" data-dim="safety" tabindex="0" role="button" aria-label="Safety: click to adjust weight">
-        <circle class="ec__dim-glow" cx="190" cy="213" r="20" />
-        <circle class="ec__dim-ring" cx="190" cy="213" r="11" />
-        <circle class="ec__dim-dot" cx="190" cy="213" r="4.5" />
-        <text class="ec__dim-text" x="190" y="239" text-anchor="middle">Safety</text>
+      <g class="ec__dim" data-dim="safety" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0" aria-valuetext="not weighted" aria-label="Safety weight">
+        <circle class="ec__dim-glow" cx="250" cy="340" r="32" />
+        <circle class="ec__dim-ring" cx="250" cy="340" r="16" />
+        <circle class="ec__dim-dot" cx="250" cy="340" r="6" />
+        <text class="ec__dim-text" x="250" y="378" text-anchor="middle">Safety</text>
+        <text class="ec__dim-val" x="250" y="396" text-anchor="middle"></text>
       </g>
-      <g class="ec__dim" data-dim="bias" tabindex="0" role="button" aria-label="Bias: click to adjust weight">
-        <circle class="ec__dim-glow" cx="114" cy="169" r="20" />
-        <circle class="ec__dim-ring" cx="114" cy="169" r="11" />
-        <circle class="ec__dim-dot" cx="114" cy="169" r="4.5" />
-        <text class="ec__dim-text" x="92" y="173" text-anchor="end">Bias</text>
+      <g class="ec__dim" data-dim="bias" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0" aria-valuetext="not weighted" aria-label="Bias weight">
+        <circle class="ec__dim-glow" cx="129" cy="270" r="32" />
+        <circle class="ec__dim-ring" cx="129" cy="270" r="16" />
+        <circle class="ec__dim-dot" cx="129" cy="270" r="6" />
+        <text class="ec__dim-text" x="105" y="274" text-anchor="end">Bias</text>
+        <text class="ec__dim-val" x="105" y="292" text-anchor="end"></text>
       </g>
-      <g class="ec__dim" data-dim="usefulness" tabindex="0" role="button" aria-label="Usefulness: click to adjust weight">
-        <circle class="ec__dim-glow" cx="114" cy="81" r="20" />
-        <circle class="ec__dim-ring" cx="114" cy="81" r="11" />
-        <circle class="ec__dim-dot" cx="114" cy="81" r="4.5" />
-        <text class="ec__dim-text" x="92" y="85" text-anchor="end">Usefulness</text>
+      <g class="ec__dim" data-dim="usefulness" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0" aria-valuetext="not weighted" aria-label="Usefulness weight">
+        <circle class="ec__dim-glow" cx="129" cy="130" r="32" />
+        <circle class="ec__dim-ring" cx="129" cy="130" r="16" />
+        <circle class="ec__dim-dot" cx="129" cy="130" r="6" />
+        <text class="ec__dim-text" x="105" y="134" text-anchor="end">Usefulness</text>
+        <text class="ec__dim-val" x="105" y="152" text-anchor="end"></text>
       </g>
     </svg>
-    <div class="ec__center">
+    <div class="ec__center" aria-hidden="true">
       <span class="ec__center-title">Impact Compass</span>
-      <span class="ec__center-sub">Choose a scenario to explore</span>
+      <span class="ec__center-sub">Select a scenario to analyze</span>
     </div>
   </div>
+  
   <div class="ec__controls">
-    <div class="ec__scenarios" role="group" aria-label="AI application scenarios">
-      <button class="ec__btn" type="button" data-scenario="education">Education</button>
-      <button class="ec__btn" type="button" data-scenario="hiring">Hiring</button>
-      <button class="ec__btn" type="button" data-scenario="healthcare">Healthcare</button>
-      <button class="ec__btn" type="button" data-scenario="policing">Policing</button>
-      <button class="ec__btn" type="button" data-scenario="creative">Creative Work</button>
+    <div class="ec__scenarios" role="group" aria-label="Workshop scenarios">
+      <button class="ec__btn" type="button" data-scenario="marking" aria-pressed="false">AI Marking</button>
+      <button class="ec__btn" type="button" data-scenario="transcription" aria-pressed="false">Lecture Transcription</button>
+      <button class="ec__btn" type="button" data-scenario="internships" aria-pressed="false">Hiring Internships</button>
+      <button class="ec__btn" type="button" data-scenario="triage" aria-pressed="false">Healthcare Triage</button>
+      <button class="ec__btn" type="button" data-scenario="coursework" aria-pressed="false">Creative Coursework</button>
+      <button class="ec__btn" type="button" data-scenario="safety" aria-pressed="false">Campus Safety</button>
     </div>
-    <p class="ec__insight" aria-live="polite">AI affects people, power, society, and trust.</p>
+    
+    <div class="ec__insight-box">
+      <p class="ec__insight" role="status" aria-live="polite">AI systems do not just process data; they affect students, power, society, and trust. Choose an exercise above.</p>
+    </div>
   </div>
 </div>
 
 <style>
   .ethics-compass {
+    --ec-text-main: var(--ai-text-main, #0F172A);
+    --ec-text-muted: var(--ai-text-muted, #475569);
+    --ec-text-faint: var(--ai-text-faint, #94A3B8);
+    --ec-accent: var(--ai-primary, #3B82F6);
+    --ec-bg-hover: var(--ai-bg-hover, rgba(59, 130, 246, 0.08));
+    --ec-bg-active: var(--ai-bg-active, rgba(59, 130, 246, 0.15));
+    --ec-border: var(--ai-border, rgba(148, 163, 184, 0.2));
+    
     width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 12px;
-    padding: 12px 16px;
-    font-family: var(--font-sans, sans-serif);
+    gap: 32px;
+    padding: 32px;
+    font-family: var(--font-sans, system-ui, sans-serif);
     box-sizing: border-box;
+  }
+
+  :global([data-theme="dark"]) .ethics-compass {
+    --ec-text-main: var(--ai-text-main, #F8FAFC);
+    --ec-text-muted: var(--ai-text-muted, #94A3B8);
+    --ec-text-faint: var(--ai-text-faint, #475569);
+    --ec-accent: var(--ai-primary, #60A5FA);
+    --ec-bg-hover: var(--ai-bg-hover, rgba(96, 165, 250, 0.12));
+    --ec-bg-active: var(--ai-bg-active, rgba(96, 165, 250, 0.2));
+    --ec-border: var(--ai-border, rgba(148, 163, 184, 0.2));
   }
 
   .ec__body {
     position: relative;
     width: 100%;
-    max-width: 380px;
+    max-width: 500px;
     flex-shrink: 1;
     min-height: 0;
   }
@@ -98,70 +130,64 @@
     display: block;
     width: 100%;
     height: 100%;
+    overflow: visible;
+  }
+
+  .ec__ring {
+    fill: none;
+    stroke: var(--ec-accent);
   }
 
   .ec__ring--outer {
-    fill: none;
-    stroke: var(--stage-accent, #60A5FA);
-    stroke-opacity: 0.05;
-    stroke-width: 0.75;
-    stroke-dasharray: 3 9;
-    animation: ec-spin 90s linear infinite;
-    transform-origin: 190px 125px;
+    stroke-opacity: 0.08;
+    stroke-width: 1;
+    stroke-dasharray: 4 12;
+    transform-origin: 250px 200px;
   }
 
   .ec__ring--main {
-    fill: none;
-    stroke: var(--stage-accent, #60A5FA);
-    stroke-opacity: 0.18;
+    stroke-opacity: 0.2;
     stroke-width: 1.5;
   }
 
   .ec__ring--inner {
-    fill: none;
-    stroke: var(--stage-accent, #60A5FA);
-    stroke-opacity: 0.06;
-    stroke-width: 0.5;
-  }
-
-  .ec__center-glow {
-    fill: var(--stage-accent, #60A5FA);
-    fill-opacity: 0.025;
+    stroke-opacity: 0.1;
+    stroke-width: 0.75;
   }
 
   .ec__tick {
-    stroke: var(--stage-accent, #60A5FA);
-    stroke-width: 0.75;
-  }
-
-  .ec__tick--major {
+    stroke: var(--ec-accent);
     stroke-width: 1;
   }
 
+  .ec__tick--major {
+    stroke-width: 1.5;
+  }
+
   .ec__spoke {
-    stroke: var(--stage-accent, #60A5FA);
+    stroke: var(--ec-accent);
     stroke-opacity: 0;
-    stroke-width: 0.75;
-    transition: stroke-opacity 500ms ease;
+    stroke-width: 1.5;
+    transition: stroke-opacity 400ms ease;
   }
 
   .ec__spoke.is-active {
-    stroke-opacity: 0.12;
+    stroke-opacity: 0.15;
   }
 
   .ec__polygon {
-    fill: var(--stage-accent, #60A5FA);
+    fill: var(--ec-accent);
     fill-opacity: 0;
-    stroke: var(--stage-accent, #60A5FA);
+    stroke: var(--ec-accent);
     stroke-opacity: 0;
-    stroke-width: 1.5;
+    stroke-width: 2;
     stroke-linejoin: round;
-    transition: fill-opacity 500ms ease, stroke-opacity 500ms ease;
+    transition: fill-opacity 600ms ease, stroke-opacity 600ms ease;
   }
 
   .ec__polygon.is-active {
-    fill-opacity: 0.06;
-    stroke-opacity: 0.25;
+    fill-opacity: 0.12;
+    stroke-opacity: 0.4;
   }
 
   .ec__dim {
@@ -170,62 +196,78 @@
   }
 
   .ec__dim-glow {
-    fill: var(--stage-accent, #60A5FA);
+    fill: var(--ec-accent);
     fill-opacity: 0;
-    transition: fill-opacity 500ms ease;
+    transition: fill-opacity 300ms ease;
   }
 
   .ec__dim-ring {
     fill: none;
-    stroke: var(--stage-accent, #60A5FA);
+    stroke: var(--ec-accent);
     stroke-opacity: 0;
-    stroke-width: 1;
-    transition: stroke-opacity 500ms ease;
+    stroke-width: 1.5;
+    transition: stroke-opacity 300ms ease, r 300ms ease;
   }
 
   .ec__dim-dot {
-    fill: var(--stage-accent, #60A5FA);
-    fill-opacity: 0.2;
-    transition: fill-opacity 500ms ease;
+    fill: var(--ec-accent);
+    fill-opacity: 0.25;
+    transition: fill-opacity 300ms ease, r 300ms ease;
   }
 
   .ec__dim-text {
-    fill: #475569;
-    font-size: 10px;
+    fill: var(--ec-text-faint);
+    font-size: 14px;
     font-weight: 600;
-    letter-spacing: 0.03em;
-    transition: fill 500ms ease;
+    letter-spacing: 0.02em;
+    transition: fill 300ms ease, font-size 300ms ease;
+    pointer-events: none;
+    user-select: none;
+  }
+  
+  .ec__dim-val {
+    fill: var(--ec-text-faint);
+    fill-opacity: 0;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: fill-opacity 300ms ease, fill 300ms ease;
     pointer-events: none;
     user-select: none;
   }
 
   .ec__dim:hover .ec__dim-dot {
-    fill-opacity: 0.45;
+    fill-opacity: 0.5;
+    r: 8;
   }
 
   .ec__dim:focus-visible .ec__dim-ring {
-    stroke-opacity: 0.6;
-    stroke-width: 1.5;
+    stroke-opacity: 0.8;
+    stroke-width: 2;
+  }
+  
+  .ec__dim:focus-visible .ec__dim-text {
+    fill: var(--ec-text-main);
   }
 
-  .ec__dim[data-level="1"] .ec__dim-dot { fill-opacity: 0.4; }
+  .ec__dim[data-level="1"] .ec__dim-dot { fill-opacity: 0.5; r: 7; }
   .ec__dim[data-level="1"] .ec__dim-glow { fill-opacity: 0.04; }
-  .ec__dim[data-level="1"] .ec__dim-ring { stroke-opacity: 0.2; }
-  .ec__dim[data-level="1"] .ec__dim-text { fill: #94A3B8; }
+  .ec__dim[data-level="1"] .ec__dim-ring { stroke-opacity: 0.25; r: 18; }
+  .ec__dim[data-level="1"] .ec__dim-text { fill: var(--ec-text-muted); font-size: 14px; }
+  .ec__dim[data-level="1"] .ec__dim-val { fill: var(--ec-text-muted); fill-opacity: 0.6; }
 
-  .ec__dim[data-level="2"] .ec__dim-dot { fill-opacity: 0.6; }
+  .ec__dim[data-level="2"] .ec__dim-dot { fill-opacity: 0.75; r: 9; }
   .ec__dim[data-level="2"] .ec__dim-glow { fill-opacity: 0.08; }
-  .ec__dim[data-level="2"] .ec__dim-ring { stroke-opacity: 0.35; }
-  .ec__dim[data-level="2"] .ec__dim-text { fill: #CBD5E1; }
+  .ec__dim[data-level="2"] .ec__dim-ring { stroke-opacity: 0.4; r: 21; }
+  .ec__dim[data-level="2"] .ec__dim-text { fill: var(--ec-text-main); font-size: 15px; }
+  .ec__dim[data-level="2"] .ec__dim-val { fill: var(--ec-text-main); fill-opacity: 0.8; }
 
-  .ec__dim[data-level="3"] .ec__dim-dot { fill-opacity: 0.85; }
-  .ec__dim[data-level="3"] .ec__dim-glow { fill-opacity: 0.14; }
-  .ec__dim[data-level="3"] .ec__dim-ring { stroke-opacity: 0.5; }
-  .ec__dim[data-level="3"] .ec__dim-text { fill: #F8FAFC; }
-
-  .ec__dim[data-level="3"] .ec__dim-glow {
-    animation: ec-pulse 2.5s ease-in-out infinite;
-  }
+  .ec__dim[data-level="3"] .ec__dim-dot { fill-opacity: 1; r: 12; }
+  .ec__dim[data-level="3"] .ec__dim-glow { fill-opacity: 0.12; }
+  .ec__dim[data-level="3"] .ec__dim-ring { stroke-opacity: 0.6; r: 26; }
+  .ec__dim[data-level="3"] .ec__dim-text { fill: var(--ec-text-main); font-size: 16px; font-weight: 700; }
+  .ec__dim[data-level="3"] .ec__dim-val { fill: var(--ec-text-main); fill-opacity: 1; }
 
   .ec__center {
     position: absolute;
@@ -234,108 +276,127 @@
     transform: translate(-50%, -50%);
     text-align: center;
     pointer-events: none;
-    width: 110px;
+    width: 140px;
+    margin-top: -20px;
   }
 
   .ec__center-title {
     display: block;
-    font-size: 0.82rem;
+    font-size: 1rem;
     font-weight: 800;
-    color: #F8FAFC;
+    color: var(--ec-text-main);
     letter-spacing: 0.02em;
-    line-height: 1.3;
+    line-height: 1.2;
+    transition: color 300ms ease;
   }
 
   .ec__center-sub {
     display: block;
-    font-size: 0.6rem;
-    color: #64748B;
-    margin-top: 3px;
-    line-height: 1.35;
+    font-size: 0.75rem;
+    color: var(--ec-text-muted);
+    margin-top: 4px;
+    line-height: 1.4;
+    transition: color 300ms ease;
   }
 
   .ec__controls {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 24px;
     flex-shrink: 0;
+    width: 100%;
+    max-width: 700px;
   }
 
   .ec__scenarios {
     display: flex;
     flex-wrap: wrap;
-    gap: 5px;
+    gap: 12px;
     justify-content: center;
   }
 
   .ec__btn {
-    padding: 5px 13px;
-    border: 1px solid rgba(96, 165, 250, 0.14);
-    border-radius: 20px;
+    padding: 10px 18px;
+    border: 1px solid var(--ec-border, rgba(148, 163, 184, 0.2));
+    border-radius: 24px;
     background: transparent;
-    color: #64748B;
-    font-family: var(--font-sans, sans-serif);
-    font-size: 0.68rem;
+    color: var(--ec-text-muted);
+    font-family: inherit;
+    font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;
-    transition: color 200ms ease, background 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+    transition: all 200ms ease;
     line-height: 1.4;
   }
 
   .ec__btn:hover {
-    color: #94A3B8;
-    border-color: rgba(96, 165, 250, 0.28);
-    background: rgba(96, 165, 250, 0.05);
+    color: var(--ec-text-main);
+    border-color: var(--ec-accent);
+    background: var(--ec-bg-hover);
   }
 
   .ec__btn:focus-visible {
-    outline: 2px solid var(--stage-accent, #60A5FA);
+    outline: 2px solid var(--ec-accent);
     outline-offset: 2px;
   }
 
   .ec__btn.is-active {
-    color: #F8FAFC;
-    background: rgba(96, 165, 250, 0.14);
-    border-color: rgba(96, 165, 250, 0.4);
-    box-shadow: 0 0 14px rgba(96, 165, 250, 0.12);
+    color: var(--ec-text-main);
+    background: var(--ec-bg-active);
+    border-color: var(--ec-accent);
+    box-shadow: 0 0 16px var(--ec-bg-hover);
+  }
+
+  .ec__insight-box {
+    background: var(--ec-bg-hover);
+    border-left: 4px solid var(--ec-accent);
+    padding: 16px 24px;
+    border-radius: 6px;
+    width: 100%;
+    max-width: 500px;
   }
 
   .ec__insight {
-    font-size: 0.65rem;
-    color: #475569;
-    text-align: center;
-    max-width: 300px;
-    min-height: 1.5em;
-    line-height: 1.5;
-    transition: color 400ms ease;
+    font-size: 0.95rem;
+    color: var(--ec-text-main);
+    text-align: left;
     margin: 0;
+    line-height: 1.6;
+    font-weight: 500;
   }
 
-  @keyframes ec-spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
 
-  @keyframes ec-pulse {
-    0%, 100% { fill-opacity: 0.1; }
-    50% { fill-opacity: 0.2; }
-  }
 
   @media (max-width: 768px) {
     .ethics-compass {
-      padding: 8px 12px;
-      gap: 8px;
+      padding: 16px 12px;
+      gap: 16px;
     }
+    
+    .ec__dim-text {
+      font-size: 12px;
+    }
+    .ec__dim[data-level="1"] .ec__dim-text { font-size: 12px; }
+    .ec__dim[data-level="2"] .ec__dim-text { font-size: 13px; }
+    .ec__dim[data-level="3"] .ec__dim-text { font-size: 14px; }
 
     .ec__btn {
-      font-size: 0.62rem;
-      padding: 4px 10px;
+      font-size: 0.75rem;
+      padding: 6px 12px;
     }
 
+    .ec__center-title {
+      font-size: 0.9rem;
+    }
+    .ec__center-sub {
+      font-size: 0.65rem;
+    }
+    .ec__insight-box {
+      padding: 10px 16px;
+    }
     .ec__insight {
-      font-size: 0.6rem;
-      max-width: 260px;
+      font-size: 0.8rem;
     }
   }
 
@@ -353,18 +414,19 @@
 <script>
   const root = document.querySelector("[data-track-prototype=\"ethics\"]");
   if (root) {
-    const CX = 190;
-    const CY = 125;
-    const R = 88;
+    const CX = 250;
+    const CY = 200;
     const DIMS = ["fairness", "privacy", "accountability", "safety", "bias", "usefulness"];
+    
     const NODE_POS: Record<string, { x: number; y: number }> = {
-      fairness: { x: 190, y: 37 },
-      privacy: { x: 266, y: 81 },
-      accountability: { x: 266, y: 169 },
-      safety: { x: 190, y: 213 },
-      bias: { x: 114, y: 169 },
-      usefulness: { x: 114, y: 81 },
+      fairness: { x: 250, y: 60 },
+      privacy: { x: 371, y: 130 },
+      accountability: { x: 371, y: 270 },
+      safety: { x: 250, y: 340 },
+      bias: { x: 129, y: 270 },
+      usefulness: { x: 129, y: 130 },
     };
+    
     const LEVEL_LABELS = ["not weighted", "low", "medium", "high"];
 
     const SCENARIOS: Record<string, {
@@ -373,35 +435,41 @@
       impacts: Record<string, number>;
       insight: string;
     }> = {
-      education: {
-        label: "Education",
-        desc: "AI grades essays, recommends courses, adapts learning",
-        impacts: { fairness: 3, privacy: 2, accountability: 2, safety: 1, bias: 3, usefulness: 3 },
-        insight: "When AI grades your work, whose standards are being applied?",
+      marking: {
+        label: "AI Marking",
+        desc: "AI grades essays and recommends course modules",
+        impacts: { fairness: 3, privacy: 2, accountability: 3, safety: 1, bias: 3, usefulness: 3 },
+        insight: "When an AI evaluates your work, whose standards apply? It is efficient but poses large fairness and accountability questions.",
       },
-      hiring: {
-        label: "Hiring",
-        desc: "AI screens CVs, ranks candidates, predicts fit",
+      transcription: {
+        label: "Lecture Transcription",
+        desc: "Automated real-time captions for lectures",
+        impacts: { fairness: 1, privacy: 1, accountability: 1, safety: 1, bias: 2, usefulness: 3 },
+        insight: "Highly useful for accessibility, but inconsistent accuracy across accents can subtly disadvantage certain students.",
+      },
+      internships: {
+        label: "Hiring Internships",
+        desc: "AI filtering student CVs for placements",
         impacts: { fairness: 3, privacy: 3, accountability: 2, safety: 1, bias: 3, usefulness: 2 },
-        insight: "Automated decisions can carry forward old prejudices at scale.",
+        insight: "Automated CV screening can perpetuate historical biases. Students' privacy and fairness are major tradeoffs here.",
       },
-      healthcare: {
-        label: "Healthcare",
-        desc: "AI diagnoses conditions, triages patients, suggests treatments",
+      triage: {
+        label: "Healthcare Triage",
+        desc: "AI sorting student patients at the university clinic",
         impacts: { fairness: 2, privacy: 3, accountability: 3, safety: 3, bias: 2, usefulness: 3 },
-        insight: "A wrong prediction in medicine is not just an error \u2014 it\u2019s a harm.",
+        insight: "A wrong prediction here is an active harm. High safety, accountability, and privacy are absolutely critical.",
       },
-      policing: {
-        label: "Policing",
-        desc: "AI predicts crime, flags suspects, directs patrols",
-        impacts: { fairness: 3, privacy: 3, accountability: 3, safety: 2, bias: 3, usefulness: 1 },
-        insight: "Predictive systems raise questions about who is watched and who is protected.",
+      coursework: {
+        label: "Creative Coursework",
+        desc: "Using generative AI for essays or art assignments",
+        impacts: { fairness: 2, privacy: 1, accountability: 2, safety: 1, bias: 2, usefulness: 3 },
+        insight: "Sparks debates on originality and academic integrity. Accountability is key: where does the student's work end?",
       },
-      creative: {
-        label: "Creative Work",
-        desc: "AI generates art, writes copy, composes music",
-        impacts: { fairness: 1, privacy: 1, accountability: 2, safety: 1, bias: 2, usefulness: 3 },
-        insight: "If a machine can make it, what does ownership mean?",
+      safety: {
+        label: "Campus Safety",
+        desc: "Predictive AI monitoring security cameras across campus",
+        impacts: { fairness: 3, privacy: 3, accountability: 3, safety: 3, bias: 3, usefulness: 2 },
+        insight: "Heavy surveillance affects student privacy. Bias in monitoring algorithms can disproportionately profile specific groups.",
       },
     };
 
@@ -424,15 +492,15 @@
       for (let i = 0; i < 24; i++) {
         const deg = (i * 15 - 90) * (Math.PI / 180);
         const isMajor = i % 6 === 0;
-        const r1 = isMajor ? 97 : 99;
-        const r2 = isMajor ? 108 : 104;
+        const r1 = isMajor ? 150 : 154;
+        const r2 = isMajor ? 168 : 162;
         const line = document.createElementNS(svgNS, "line");
         line.setAttribute("x1", String(CX + r1 * Math.cos(deg)));
         line.setAttribute("y1", String(CY + r1 * Math.sin(deg)));
         line.setAttribute("x2", String(CX + r2 * Math.cos(deg)));
         line.setAttribute("y2", String(CY + r2 * Math.sin(deg)));
         line.setAttribute("class", isMajor ? "ec__tick ec__tick--major" : "ec__tick");
-        line.setAttribute("stroke-opacity", isMajor ? "0.2" : "0.1");
+        line.setAttribute("stroke-opacity", isMajor ? "0.3" : "0.15");
         ticksGroup.appendChild(line);
       }
     }
@@ -441,10 +509,17 @@
       const activeDims = DIMS.filter((d) => weights[d] > 0);
 
       if (polygon) {
-        if (activeDims.length >= 2) {
-          const pts = activeDims
-            .map((d) => `${NODE_POS[d].x},${NODE_POS[d].y}`)
-            .join(" ");
+        if (activeDims.length > 0) {
+          const pts = DIMS.map((d) => {
+            const weight = weights[d];
+            if (weight === 0) return `${CX},${CY}`;
+            const targetPos = NODE_POS[d];
+            const t = weight / 3;
+            const x = CX + (targetPos.x - CX) * t;
+            const y = CY + (targetPos.y - CY) * t;
+            return `${x},${y}`;
+          }).join(" ");
+          
           polygon.setAttribute("points", pts);
           polygon.classList.add("is-active");
         } else {
@@ -456,10 +531,13 @@
         const dim = g.dataset.dim!;
         const level = weights[dim];
         g.dataset.level = String(level);
-        g.setAttribute(
-          "aria-label",
-          `${dim.charAt(0).toUpperCase() + dim.slice(1)}: ${LEVEL_LABELS[level]} weight`
-        );
+        g.setAttribute("aria-valuenow", String(level));
+        g.setAttribute("aria-valuetext", LEVEL_LABELS[level]);
+        
+        const valText = g.querySelector(".ec__dim-val");
+        if (valText) {
+          valText.textContent = level > 0 ? LEVEL_LABELS[level] : "";
+        }
       });
 
       spokes.forEach((spoke) => {
@@ -475,13 +553,13 @@
           insightEl.textContent = s.insight;
         } else {
           const hasAny = activeDims.length > 0;
-          centerTitle.textContent = hasAny ? "Custom" : "Impact Compass";
+          centerTitle.textContent = hasAny ? "Custom Workshop" : "Impact Compass";
           centerSub.textContent = hasAny
-            ? "Click nodes to adjust weights"
-            : "Choose a scenario to explore";
+            ? "Tradeoffs visualized"
+            : "Select a scenario to analyze";
           insightEl.textContent = hasAny
-            ? "Every dimension you weight shapes the ethical picture."
-            : "AI affects people, power, society, and trust.";
+            ? "Every dimension you weight shapes the ethical picture. Discuss the tradeoffs of this configuration with your group."
+            : "AI systems do not just process data; they affect students, power, society, and trust. Choose an exercise above.";
         }
       }
 
@@ -519,6 +597,18 @@
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
           cycleWeight();
+        } else if (e.key === "ArrowUp" || e.key === "ArrowRight") {
+          e.preventDefault();
+          const dim = g.dataset.dim!;
+          weights[dim] = Math.min(weights[dim] + 1, 3);
+          activeScenario = null;
+          update();
+        } else if (e.key === "ArrowDown" || e.key === "ArrowLeft") {
+          e.preventDefault();
+          const dim = g.dataset.dim!;
+          weights[dim] = Math.max(weights[dim] - 1, 0);
+          activeScenario = null;
+          update();
         }
       });
     });

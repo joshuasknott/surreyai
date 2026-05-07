@@ -24,38 +24,41 @@ const aiEnabled = isAIEnabled();
 
 <style>
   .track-lab {
-    border: 1px solid rgba(148, 163, 184, 0.18);
-    border-radius: 20px;
-    background: linear-gradient(160deg, rgba(5, 8, 16, 0.96), rgba(21, 32, 58, 0.72));
-    box-shadow: 0 20px 70px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(248, 250, 252, 0.04);
+    border: 1px solid var(--ai-border);
+    border-radius: 16px;
+    background: var(--ai-surface);
+    box-shadow: 0 4px 24px color-mix(in srgb, var(--ai-fg) 4%, transparent);
     overflow: hidden;
   }
 
   .track-lab__body {
     display: grid;
-    grid-template-columns: 1fr 1.3fr;
-    gap: 32px;
-    padding: 28px;
-    min-height: 460px;
-    align-items: start;
+    grid-template-columns: minmax(300px, 340px) 1fr;
+    gap: 40px;
+    padding: 32px;
+    min-height: 560px;
+    align-items: stretch;
   }
 
   .track-lab__info {
     position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 
   .track-lab__stage {
     display: flex;
-    align-items: center;
-    justify-content: center;
+    align-items: stretch;
+    justify-content: stretch;
   }
 
   @media (max-width: 768px) {
     .track-lab__body {
       grid-template-columns: 1fr;
-      padding: 20px;
-      min-height: 0;
-      gap: 20px;
+      padding: 24px;
+      min-height: auto;
+      gap: 32px;
     }
 
     .track-lab__stage {

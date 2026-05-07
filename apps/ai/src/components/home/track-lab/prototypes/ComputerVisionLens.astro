@@ -2,7 +2,13 @@
 ---
 
 <div class="cv-lens" data-track-prototype="cv">
-  <div class="cv-lens__viewport" data-cv-viewport>
+  <div class="cv-lens__instructions" id="cv-instructions">
+    Interactive scanner: Use pointer to scan, or <kbd>Tab</kbd> to explore objects.
+  </div>
+  
+  <div aria-live="polite" class="sr-only" data-cv-announcer></div>
+
+  <div class="cv-lens__viewport" data-cv-viewport aria-describedby="cv-instructions" role="group" aria-label="Object Detection Environment">
     <svg
       class="cv-lens__scene"
       viewBox="0 0 800 500"
@@ -11,195 +17,88 @@
     >
       <defs>
         <linearGradient id="cv-wall" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#141e30" />
-          <stop offset="100%" stop-color="#0f1724" />
+          <stop offset="0%" stop-color="var(--cv-wall-top)" />
+          <stop offset="100%" stop-color="var(--cv-wall-bot)" />
         </linearGradient>
         <linearGradient id="cv-floor" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#111825" />
-          <stop offset="100%" stop-color="#0c1018" />
+          <stop offset="0%" stop-color="var(--cv-floor-top)" />
+          <stop offset="100%" stop-color="var(--cv-floor-bot)" />
         </linearGradient>
         <radialGradient id="cv-glow" cx="50%" cy="35%" r="55%">
-          <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.025" />
+          <stop offset="0%" stop-color="var(--cv-accent)" stop-opacity="0.04" />
           <stop offset="100%" stop-color="transparent" />
         </radialGradient>
       </defs>
 
       <rect x="0" y="0" width="800" height="350" fill="url(#cv-wall)" />
       <rect x="0" y="350" width="800" height="150" fill="url(#cv-floor)" />
-      <line x1="0" y1="350" x2="800" y2="350" stroke="#1e293b" stroke-width="1.5" />
-      <line x1="0" y1="348" x2="800" y2="348" stroke="#38bdf8" stroke-width="0.4" opacity="0.2" />
+      <line x1="0" y1="350" x2="800" y2="350" stroke="var(--cv-grid)" stroke-width="1.5" />
+      <line x1="0" y1="348" x2="800" y2="348" stroke="var(--cv-accent)" stroke-width="0.5" opacity="0.2" />
       <rect x="0" y="0" width="800" height="500" fill="url(#cv-glow)" />
 
       <!-- WHITEBOARD -->
-      <rect x="280" y="40" width="240" height="140" rx="3" fill="#c1cdd9" stroke="#7e8ea0" stroke-width="1.5" />
-      <rect x="288" y="48" width="224" height="124" rx="2" fill="#dce4ec" />
-      <line x1="300" y1="76" x2="415" y2="76" stroke="#64748b" stroke-width="2.5" stroke-linecap="round" />
-      <line x1="300" y1="96" x2="488" y2="96" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" />
-      <line x1="300" y1="110" x2="468" y2="110" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" />
-      <line x1="300" y1="124" x2="438" y2="124" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" />
-      <line x1="300" y1="138" x2="408" y2="138" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" />
-      <rect x="280" y="180" width="240" height="5" rx="2" fill="#64748b" />
-      <rect x="338" y="183" width="5" height="14" rx="1" fill="#ef4444" />
-      <rect x="347" y="183" width="5" height="14" rx="1" fill="#3b82f6" />
-
-      <!-- CLOCK -->
-      <circle cx="160" cy="78" r="22" fill="#0c1220" stroke="#475569" stroke-width="1.5" />
-      <circle cx="160" cy="78" r="17" fill="#111825" />
-      <line x1="160" y1="78" x2="160" y2="65" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" />
-      <line x1="160" y1="78" x2="171" y2="82" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" />
-      <circle cx="160" cy="78" r="1.5" fill="#38bdf8" />
-
-      <!-- POSTER -->
-      <rect x="42" y="50" width="58" height="44" rx="2" fill="#161f30" stroke="#334155" stroke-width="0.8" />
-      <rect x="50" y="58" width="42" height="4" rx="1" fill="#38bdf8" opacity="0.2" />
-      <rect x="50" y="66" width="28" height="3" rx="1" fill="#475569" opacity="0.3" />
-      <rect x="50" y="73" width="36" height="3" rx="1" fill="#475569" opacity="0.25" />
-
-      <!-- BOOKSHELF -->
-      <rect x="652" y="38" width="108" height="132" rx="2" fill="#2d2218" stroke="#1c1509" stroke-width="1" />
-      <rect x="657" y="44" width="98" height="3" fill="#1c1509" />
-      <rect x="660" y="51" width="14" height="32" rx="1" fill="#ef4444" />
-      <rect x="676" y="55" width="11" height="28" rx="1" fill="#3b82f6" />
-      <rect x="689" y="49" width="13" height="34" rx="1" fill="#10b981" />
-      <rect x="704" y="53" width="10" height="30" rx="1" fill="#f59e0b" />
-      <rect x="716" y="50" width="13" height="33" rx="1" fill="#8b5cf6" />
-      <rect x="732" y="54" width="10" height="29" rx="1" fill="#ec4899" />
-      <rect x="657" y="87" width="98" height="3" fill="#1c1509" />
-      <rect x="660" y="94" width="12" height="30" rx="1" fill="#06b6d4" />
-      <rect x="674" y="97" width="15" height="27" rx="1" fill="#f97316" />
-      <rect x="691" y="92" width="11" height="32" rx="1" fill="#a855f7" />
-      <rect x="704" y="96" width="13" height="28" rx="1" fill="#14b8a6" />
-      <rect x="719" y="93" width="10" height="31" rx="1" fill="#e11d48" />
-      <rect x="657" y="129" width="98" height="3" fill="#1c1509" />
-      <rect x="662" y="135" width="16" height="26" rx="1" fill="#64748b" />
-      <rect x="680" y="138" width="11" height="23" rx="1" fill="#6366f1" />
-      <rect x="693" y="134" width="14" height="27" rx="1" fill="#84cc16" />
-
-      <!-- LEFT DESK -->
-      <rect x="40" y="285" width="210" height="10" rx="2" fill="#3d2f22" stroke="#2d2218" stroke-width="0.5" />
-      <rect x="55" y="295" width="6" height="55" rx="1" fill="#3d2f22" />
-      <rect x="235" y="295" width="6" height="55" rx="1" fill="#3d2f22" />
+      <rect x="300" y="50" width="200" height="120" rx="4" fill="var(--cv-stroke-item)" />
+      <rect x="304" y="54" width="192" height="112" rx="2" fill="var(--cv-whiteboard)" />
+      <line x1="320" y1="80" x2="450" y2="80" stroke="var(--cv-accent)" stroke-width="3" stroke-linecap="round" />
+      <line x1="320" y1="100" x2="480" y2="100" stroke="var(--cv-text-muted)" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+      <line x1="320" y1="120" x2="420" y2="120" stroke="var(--cv-text-muted)" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+      <circle cx="470" cy="145" r="4" fill="var(--cv-accent)" />
 
       <!-- LAPTOP -->
-      <rect x="88" y="225" width="122" height="60" rx="4" fill="#1e293b" stroke="#475569" stroke-width="1.5" />
-      <rect x="96" y="232" width="106" height="46" rx="2" fill="#0c1322" />
-      <rect x="104" y="241" width="42" height="3.5" rx="1" fill="#38bdf8" opacity="0.45" />
-      <rect x="104" y="250" width="68" height="2" rx="1" fill="#475569" opacity="0.4" />
-      <rect x="104" y="257" width="54" height="2" rx="1" fill="#475569" opacity="0.35" />
-      <rect x="104" y="264" width="38" height="2" rx="1" fill="#38bdf8" opacity="0.25" />
-      <path d="M 76 285 L 88 285 L 210 285 L 222 285 L 226 290 L 72 290 Z" fill="#475569" stroke="#3d4f63" stroke-width="0.5" />
-      <rect x="140" y="278" width="18" height="7" rx="1.5" fill="#334155" />
+      <rect x="60" y="270" width="160" height="8" rx="2" fill="var(--cv-stroke-item)" />
+      <rect x="90" y="210" width="100" height="60" rx="4" fill="var(--cv-bg-item)" stroke="var(--cv-stroke-item)" stroke-width="2" />
+      <rect x="96" y="216" width="88" height="48" rx="2" fill="var(--cv-wall-bot)" />
+      <rect x="104" y="226" width="50" height="3" fill="var(--cv-accent)" />
+      <rect x="104" y="236" width="70" height="2" fill="var(--cv-text-muted)" opacity="0.5" />
+      <rect x="104" y="246" width="40" height="2" fill="var(--cv-text-muted)" opacity="0.5" />
+      <path d="M 80 270 L 90 270 L 190 270 L 200 270 L 210 275 L 70 275 Z" fill="var(--cv-stroke-item)" />
+
+      <!-- POSTER -->
+      <rect x="640" y="100" width="100" height="180" rx="4" fill="var(--cv-bg-item)" stroke="var(--cv-stroke-item)" stroke-width="2" />
+      <rect x="650" y="115" width="80" height="20" rx="2" fill="var(--cv-wall-bot)" />
+      <rect x="650" y="145" width="80" height="20" rx="2" fill="var(--cv-wall-bot)" />
+      <rect x="650" y="175" width="80" height="20" rx="2" fill="var(--cv-wall-bot)" />
+      <rect x="650" y="205" width="80" height="20" rx="2" fill="var(--cv-wall-bot)" />
+      <rect x="650" y="235" width="80" height="20" rx="2" fill="var(--cv-wall-bot)" />
 
       <!-- NOTEBOOK -->
-      <rect x="48" y="260" width="30" height="25" rx="2" fill="#fef3c7" stroke="#d97706" stroke-width="0.8" />
-      <rect x="48" y="260" width="5" height="25" rx="1" fill="#fbbf24" opacity="0.25" />
-      <line x1="57" y1="268" x2="72" y2="268" stroke="#b45309" stroke-width="0.6" opacity="0.45" />
-      <line x1="57" y1="273" x2="70" y2="273" stroke="#b45309" stroke-width="0.6" opacity="0.4" />
-      <line x1="57" y1="278" x2="66" y2="278" stroke="#b45309" stroke-width="0.6" opacity="0.35" />
-
-      <!-- COFFEE MUG -->
-      <rect x="232" y="272" width="12" height="14" rx="2" fill="#475569" />
-      <path d="M 244 276 Q 251 276 251 280 Q 251 284 244 284" fill="none" stroke="#475569" stroke-width="1.2" />
-      <rect x="233" y="272" width="10" height="3" rx="1" fill="#6f4e37" opacity="0.6" />
-
-      <!-- DISCUSSION BUBBLES -->
-      <rect x="475" y="222" width="60" height="32" rx="11" fill="#131c2e" stroke="#475569" stroke-width="1" />
-      <path d="M 497 254 L 505 254 L 501 264" fill="#131c2e" stroke="#475569" stroke-width="1" />
-      <rect x="485" y="234" width="32" height="2.5" rx="1" fill="#94a3b8" opacity="0.35" />
-      <rect x="485" y="241" width="40" height="2.5" rx="1" fill="#94a3b8" opacity="0.25" />
-
-      <rect x="545" y="214" width="58" height="30" rx="11" fill="#131c2e" stroke="#475569" stroke-width="1" />
-      <path d="M 567 244 L 575 244 L 571 253" fill="#131c2e" stroke="#475569" stroke-width="1" />
-      <rect x="555" y="225" width="30" height="2.5" rx="1" fill="#94a3b8" opacity="0.35" />
-      <rect x="555" y="232" width="38" height="2.5" rx="1" fill="#94a3b8" opacity="0.25" />
-
-      <!-- STUDENT GROUP -->
-      <circle cx="490" cy="304" r="12" fill="#7c3aed" />
-      <rect x="478" y="316" width="24" height="34" rx="7" fill="#7c3aed" opacity="0.88" />
-
-      <circle cx="535" cy="307" r="11" fill="#06b6d4" />
-      <rect x="524" y="318" width="22" height="32" rx="6" fill="#06b6d4" opacity="0.88" />
-
-      <circle cx="578" cy="302" r="12" fill="#f59e0b" />
-      <rect x="566" y="314" width="24" height="34" rx="7" fill="#f59e0b" opacity="0.88" />
-
-      <!-- STUDENT TABLE -->
-      <rect x="450" y="352" width="180" height="8" rx="2" fill="#3d2f22" />
-      <rect x="462" y="360" width="5" height="38" rx="1" fill="#3d2f22" />
-      <rect x="615" y="360" width="5" height="38" rx="1" fill="#3d2f22" />
-
-      <!-- COLLABORATION SCREEN -->
-      <rect x="655" y="205" width="118" height="82" rx="3" fill="#1e293b" stroke="#475569" stroke-width="1.5" />
-      <rect x="662" y="212" width="104" height="68" rx="2" fill="#080d18" />
-      <rect x="670" y="222" width="38" height="2.5" rx="1" fill="#38bdf8" opacity="0.35" />
-      <rect x="670" y="229" width="58" height="2" rx="1" fill="#475569" opacity="0.28" />
-      <rect x="670" y="235" width="50" height="2" rx="1" fill="#475569" opacity="0.25" />
-      <rect x="670" y="241" width="62" height="2" rx="1" fill="#475569" opacity="0.28" />
-      <rect x="670" y="247" width="44" height="2" rx="1" fill="#475569" opacity="0.22" />
-      <polygon points="722,258 728,266 725,266 729,274 726,274 722,266 720,266" fill="#38bdf8" opacity="0.45" />
-      <polygon points="740,250 746,258 743,258 747,266 744,266 740,258 738,258" fill="#f59e0b" opacity="0.3" />
-      <rect x="707" y="287" width="12" height="14" fill="#475569" />
-      <rect x="694" y="301" width="38" height="3" rx="1.5" fill="#475569" />
-
-      <!-- PLANT -->
-      <rect x="20" y="312" width="14" height="20" rx="2" fill="#475569" />
-      <ellipse cx="27" cy="306" rx="16" ry="12" fill="#166534" opacity="0.55" />
-      <ellipse cx="22" cy="300" rx="10" ry="8" fill="#16a34a" opacity="0.45" />
-      <ellipse cx="33" cy="302" rx="8" ry="7" fill="#15803d" opacity="0.45" />
-
-      <!-- FLOOR REFLECTIONS -->
-      <rect x="40" y="352" width="210" height="38" fill="#38bdf8" opacity="0.015" />
-      <rect x="450" y="352" width="180" height="38" fill="#38bdf8" opacity="0.015" />
-      <rect x="655" y="352" width="118" height="38" fill="#38bdf8" opacity="0.015" />
+      <rect x="370" y="320" width="60" height="30" rx="2" fill="var(--cv-bg-item)" stroke="var(--cv-stroke-item)" stroke-width="2" />
+      <rect x="375" y="325" width="50" height="4" rx="1" fill="var(--cv-accent)" opacity="0.5" />
+      <rect x="375" y="335" width="40" height="2" rx="1" fill="var(--cv-text-muted)" opacity="0.5" />
+      <rect x="375" y="342" width="30" height="2" rx="1" fill="var(--cv-text-muted)" opacity="0.5" />
     </svg>
 
-    <div class="cv-lens__zone" data-zone="whiteboard" style="left:33%;top:5%;width:33%;height:32%;"></div>
-    <div class="cv-lens__zone" data-zone="laptop" style="left:8%;top:42%;width:22%;height:28%;"></div>
-    <div class="cv-lens__zone" data-zone="notebook" style="left:2%;top:48%;width:12%;height:14%;"></div>
-    <div class="cv-lens__zone" data-zone="discussion" style="left:57%;top:40%;width:17%;height:18%;"></div>
-    <div class="cv-lens__zone" data-zone="student-group" style="left:53%;top:58%;width:26%;height:22%;"></div>
-    <div class="cv-lens__zone" data-zone="collaboration" style="left:78%;top:38%;width:18%;height:32%;"></div>
+    <button class="cv-lens__zone" data-zone="whiteboard" aria-label="Scan Whiteboard" tabindex="0" style="left:36%;top:8%;width:27%;height:26%;"></button>
+    <button class="cv-lens__zone" data-zone="laptop" aria-label="Scan Laptop" tabindex="0" style="left:10%;top:40%;width:18%;height:20%;"></button>
+    <button class="cv-lens__zone" data-zone="poster" aria-label="Scan Poster" tabindex="0" style="left:78%;top:18%;width:15%;height:40%;"></button>
+    <button class="cv-lens__zone" data-zone="notebook" aria-label="Scan Notebook" tabindex="0" style="left:44%;top:60%;width:10%;height:10%;"></button>
 
-    <div class="cv-lens__label" data-label-for="whiteboard" style="--label-x:49%;--label-y:11%;">
+    <div class="cv-lens__label" data-label-for="whiteboard" style="--label-x:50%;--label-y:14%;">
       <span class="cv-lens__label-pill">
         <span class="cv-lens__label-dot"></span>
         <span class="cv-lens__label-text">Whiteboard</span>
-        <span class="cv-lens__label-conf">91%</span>
+        <span class="cv-lens__label-conf">98%</span>
       </span>
     </div>
-    <div class="cv-lens__label" data-label-for="laptop" style="--label-x:19%;--label-y:40%;">
+    <div class="cv-lens__label" data-label-for="laptop" style="--label-x:17%;--label-y:41%;">
       <span class="cv-lens__label-pill">
         <span class="cv-lens__label-dot"></span>
         <span class="cv-lens__label-text">Laptop</span>
-        <span class="cv-lens__label-conf">96%</span>
+        <span class="cv-lens__label-conf">94%</span>
       </span>
     </div>
-    <div class="cv-lens__label" data-label-for="notebook" style="--label-x:8%;--label-y:46%;">
+    <div class="cv-lens__label" data-label-for="poster" style="--label-x:85%;--label-y:20%;">
+      <span class="cv-lens__label-pill">
+        <span class="cv-lens__label-dot"></span>
+        <span class="cv-lens__label-text">Poster</span>
+        <span class="cv-lens__label-conf">99%</span>
+      </span>
+    </div>
+    <div class="cv-lens__label" data-label-for="notebook" style="--label-x:49%;--label-y:60%;">
       <span class="cv-lens__label-pill">
         <span class="cv-lens__label-dot"></span>
         <span class="cv-lens__label-text">Notebook</span>
         <span class="cv-lens__label-conf">87%</span>
-      </span>
-    </div>
-    <div class="cv-lens__label" data-label-for="discussion" style="--label-x:66%;--label-y:42%;">
-      <span class="cv-lens__label-pill">
-        <span class="cv-lens__label-dot"></span>
-        <span class="cv-lens__label-text">Discussion</span>
-        <span class="cv-lens__label-conf">94%</span>
-      </span>
-    </div>
-    <div class="cv-lens__label" data-label-for="student-group" style="--label-x:66%;--label-y:58%;">
-      <span class="cv-lens__label-pill">
-        <span class="cv-lens__label-dot"></span>
-        <span class="cv-lens__label-text">Student Group</span>
-        <span class="cv-lens__label-conf">89%</span>
-      </span>
-    </div>
-    <div class="cv-lens__label" data-label-for="collaboration" style="--label-x:87%;--label-y:40%;">
-      <span class="cv-lens__label-pill">
-        <span class="cv-lens__label-dot"></span>
-        <span class="cv-lens__label-text">Collaboration</span>
-        <span class="cv-lens__label-conf">92%</span>
       </span>
     </div>
 
@@ -211,34 +110,81 @@
 
     <div class="cv-lens__prompt" data-cv-prompt>
       <span class="cv-lens__prompt-icon">&#x25CE;</span>
-      <span class="cv-lens__prompt-text">Move the lens to scan</span>
+      <span class="cv-lens__prompt-text">Scan Area (Hover or Tab)</span>
     </div>
   </div>
 
   <div class="cv-lens__hud">
     <div class="cv-lens__hud-left">
       <span class="cv-lens__hud-dot" data-cv-dot></span>
-      <span class="cv-lens__hud-status">Scanning</span>
+      <span class="cv-lens__hud-status">Ready to scan</span>
     </div>
     <div class="cv-lens__hud-right">
       <span class="cv-lens__hud-count" data-cv-count>0</span>
-      <span class="cv-lens__hud-unit">objects detected</span>
+      <span class="cv-lens__hud-unit">objects found</span>
     </div>
   </div>
 </div>
 
 <style>
   .cv-lens {
+    --cv-wall-top: var(--ai-bg);
+    --cv-wall-bot: var(--ai-surface);
+    --cv-floor-top: var(--ai-surface);
+    --cv-floor-bot: var(--ai-bg);
+    --cv-grid: var(--ai-border);
+    --cv-accent: var(--ai-cyan);
+    --cv-accent-dim: color-mix(in srgb, var(--ai-cyan) 20%, transparent);
+    --cv-bg-item: var(--ai-surface);
+    --cv-stroke-item: var(--ai-border-strong);
+    --cv-whiteboard: var(--ai-bg);
+    --cv-text-main: var(--ai-fg);
+    --cv-text-muted: var(--ai-fg-muted);
+    --cv-hud-bg: color-mix(in srgb, var(--ai-bg) 90%, transparent);
+    --cv-pill-bg: color-mix(in srgb, var(--ai-bg) 95%, transparent);
+    
     width: 100%;
-    height: 100%;
+    min-height: 400px;
     display: flex;
     flex-direction: column;
+    border-radius: 8px;
+    background: var(--cv-wall-top);
+    overflow: hidden;
+  }
+
+  .cv-lens__instructions {
+    padding: 12px 16px;
+    background: var(--cv-wall-top);
+    border-bottom: 1px solid var(--cv-grid);
+    color: var(--cv-text-muted);
+    font-size: 0.875rem;
+    text-align: center;
+  }
+  .cv-lens__instructions kbd {
+    font-family: var(--font-mono, monospace);
+    background: var(--cv-bg-item);
+    border: 1px solid var(--cv-grid);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 0.8rem;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
   }
 
   .cv-lens__viewport {
     position: relative;
     flex: 1;
-    min-height: 0;
+    min-height: 450px;
     overflow: hidden;
     cursor: crosshair;
     user-select: none;
@@ -250,11 +196,16 @@
     cursor: none;
   }
 
+  .cv-lens__viewport:focus-visible {
+    outline: 2px solid var(--cv-accent);
+    outline-offset: -2px;
+  }
+
   .cv-lens__viewport::before {
     content: "";
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse at center, transparent 55%, rgba(5, 8, 16, 0.35) 100%);
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.25) 100%);
     pointer-events: none;
     z-index: 3;
   }
@@ -268,32 +219,22 @@
     background: linear-gradient(
       90deg,
       transparent 5%,
-      rgba(56, 189, 248, 0.12) 30%,
-      rgba(56, 189, 248, 0.2) 50%,
-      rgba(56, 189, 248, 0.12) 70%,
+      var(--cv-accent-dim) 30%,
+      var(--cv-accent) 50%,
+      var(--cv-accent-dim) 70%,
       transparent 95%
     );
     animation: cv-sweep 4.5s linear infinite;
     pointer-events: none;
     z-index: 4;
-    opacity: 0.7;
+    opacity: 0.4;
   }
 
   @keyframes cv-sweep {
-    0% {
-      top: -1px;
-      opacity: 0;
-    }
-    5% {
-      opacity: 0.7;
-    }
-    95% {
-      opacity: 0.7;
-    }
-    100% {
-      top: 100%;
-      opacity: 0;
-    }
+    0% { top: -1px; opacity: 0; }
+    5% { opacity: 0.6; }
+    95% { opacity: 0.6; }
+    100% { top: 100%; opacity: 0; }
   }
 
   .cv-lens__scene {
@@ -307,16 +248,45 @@
 
   .cv-lens__zone {
     position: absolute;
-    border: 1.5px dashed transparent;
+    border: 2px solid transparent;
     border-radius: 4px;
-    pointer-events: none;
-    transition: border-color 250ms ease, background 250ms ease, box-shadow 250ms ease;
+    background: transparent;
+    cursor: pointer;
+    transition: border-color 200ms ease, background 200ms ease;
+    z-index: 5;
+    padding: 0;
+  }
+  
+  .cv-lens__zone::before, .cv-lens__zone::after {
+    content: '';
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border: 2px solid transparent;
+    transition: border-color 200ms ease;
+  }
+  .cv-lens__zone::before {
+    top: -2px; left: -2px;
+    border-right: none; border-bottom: none;
+    border-top-left-radius: 4px;
+  }
+  .cv-lens__zone::after {
+    bottom: -2px; right: -2px;
+    border-left: none; border-top: none;
+    border-bottom-right-radius: 4px;
+  }
+
+  .cv-lens__zone:focus-visible {
+    outline: 2px solid var(--cv-accent);
+    outline-offset: 4px;
   }
 
   .cv-lens__zone.is-detected {
-    border-color: rgba(56, 189, 248, 0.45);
-    background: rgba(56, 189, 248, 0.04);
-    box-shadow: inset 0 0 24px rgba(56, 189, 248, 0.06);
+    background: var(--cv-accent-dim);
+  }
+  .cv-lens__zone.is-detected::before,
+  .cv-lens__zone.is-detected::after {
+    border-color: var(--cv-accent);
   }
 
   .cv-lens__label {
@@ -326,77 +296,77 @@
     transform: translate(-50%, -100%) translateY(-6px);
     pointer-events: none;
     opacity: 0;
-    transition: opacity 200ms ease, transform 200ms ease;
+    transition: opacity 250ms ease, transform 250ms ease;
     z-index: 12;
   }
 
   .cv-lens__label.is-visible {
     opacity: 1;
-    transform: translate(-50%, -100%) translateY(-10px);
+    transform: translate(-50%, -100%) translateY(-12px);
   }
 
   .cv-lens__label-pill {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 5px 10px;
-    background: rgba(5, 8, 16, 0.9);
-    border: 1px solid rgba(56, 189, 248, 0.4);
+    gap: 8px;
+    padding: 6px 12px;
+    background: var(--cv-pill-bg);
+    border: 1px solid var(--cv-accent);
     border-radius: 6px;
     backdrop-filter: blur(8px);
-    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.45), 0 0 8px rgba(56, 189, 248, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 0 12px var(--cv-accent-dim);
     white-space: nowrap;
     position: relative;
+    color: var(--cv-text-main);
   }
 
   .cv-lens__label-pill::after {
     content: "";
     position: absolute;
-    bottom: -5px;
+    bottom: -6px;
     left: 50%;
     transform: translateX(-50%);
     width: 0;
     height: 0;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-top: 5px solid rgba(5, 8, 16, 0.9);
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid var(--cv-accent);
   }
 
   .cv-lens__label-dot {
-    width: 5px;
-    height: 5px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
-    background: #38bdf8;
-    box-shadow: 0 0 6px rgba(56, 189, 248, 0.5);
+    background: var(--cv-accent);
+    box-shadow: 0 0 8px var(--cv-accent);
     flex-shrink: 0;
   }
 
   .cv-lens__label-text {
-    font-size: 0.72rem;
+    font-size: 1rem;
     font-weight: 600;
-    color: #e2e8f0;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.03em;
   }
 
   .cv-lens__label-conf {
-    font-size: 0.6rem;
+    font-size: 0.85rem;
     font-weight: 700;
-    font-family: var(--font-mono);
-    color: #38bdf8;
-    opacity: 0.85;
+    font-family: var(--font-mono, monospace);
+    color: var(--cv-accent);
+    opacity: 1;
   }
 
   .cv-lens__scanner {
     position: absolute;
-    width: 90px;
-    height: 90px;
+    width: 100px;
+    height: 100px;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
     pointer-events: none;
     z-index: 10;
     opacity: 0;
-    transition: opacity 320ms ease;
+    transition: opacity 300ms ease;
   }
 
   .cv-lens__scanner.is-active {
@@ -407,74 +377,63 @@
     position: absolute;
     inset: 0;
     border-radius: 50%;
-    border: 2px solid rgba(56, 189, 248, 0.55);
+    border: 1px solid color-mix(in srgb, var(--cv-accent) 20%, transparent);
     background: radial-gradient(
       circle,
-      rgba(56, 189, 248, 0.06) 0%,
-      rgba(56, 189, 248, 0.02) 40%,
+      color-mix(in srgb, var(--cv-accent) 10%, transparent) 0%,
       transparent 65%
     );
-    box-shadow: 0 0 28px rgba(56, 189, 248, 0.22), 0 0 8px rgba(56, 189, 248, 0.15),
-      inset 0 0 18px rgba(56, 189, 248, 0.06);
-    animation: cv-ring-breathe 3s ease-in-out infinite;
+    box-shadow: 0 0 10px var(--cv-accent-dim);
+    animation: cv-ring-breathe 2.5s ease-in-out infinite;
   }
 
   @keyframes cv-ring-breathe {
-    0%,
-    100% {
-      box-shadow: 0 0 28px rgba(56, 189, 248, 0.22), 0 0 8px rgba(56, 189, 248, 0.15),
-        inset 0 0 18px rgba(56, 189, 248, 0.06);
+    0%, 100% {
+      transform: scale(1);
+      opacity: 1;
     }
     50% {
-      box-shadow: 0 0 36px rgba(56, 189, 248, 0.3), 0 0 12px rgba(56, 189, 248, 0.2),
-        inset 0 0 22px rgba(56, 189, 248, 0.1);
+      transform: scale(1.05);
+      opacity: 0.8;
     }
   }
 
-  .cv-lens__scanner-crosshair {
+  .cv-lens__scanner-crosshair::before,
+  .cv-lens__scanner-crosshair::after {
+    content: "";
     position: absolute;
-    inset: 0;
+    background: var(--cv-accent);
+    opacity: 0.5;
   }
 
   .cv-lens__scanner-crosshair::before {
-    content: "";
-    position: absolute;
     top: 50%;
-    left: 18%;
-    right: 18%;
+    left: 15%;
+    right: 15%;
     height: 1px;
-    background: rgba(56, 189, 248, 0.28);
     transform: translateY(-50%);
   }
 
   .cv-lens__scanner-crosshair::after {
-    content: "";
-    position: absolute;
     left: 50%;
-    top: 18%;
-    bottom: 18%;
+    top: 15%;
+    bottom: 15%;
     width: 1px;
-    background: rgba(56, 189, 248, 0.28);
     transform: translateX(-50%);
   }
 
   .cv-lens__scanner-line {
     position: absolute;
-    left: 24%;
-    right: 24%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.4), transparent);
-    animation: cv-scan-line 2.4s ease-in-out infinite;
+    left: 20%;
+    right: 20%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cv-accent), transparent);
+    animation: cv-scan-line 2s ease-in-out infinite;
   }
 
   @keyframes cv-scan-line {
-    0%,
-    100% {
-      top: 22%;
-    }
-    50% {
-      top: 78%;
-    }
+    0%, 100% { top: 22%; }
+    50% { top: 78%; }
   }
 
   .cv-lens__prompt {
@@ -484,10 +443,10 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 12px;
     z-index: 15;
     pointer-events: none;
-    transition: opacity 500ms ease;
+    transition: opacity 400ms ease;
   }
 
   .cv-lens__prompt.is-hidden {
@@ -495,131 +454,113 @@
   }
 
   .cv-lens__prompt-icon {
-    font-size: 2.4rem;
-    color: rgba(56, 189, 248, 0.22);
+    font-size: 2.8rem;
+    color: var(--cv-accent);
+    opacity: 0.6;
     animation: cv-pulse 2.5s ease-in-out infinite;
     line-height: 1;
   }
 
   @keyframes cv-pulse {
-    0%,
-    100% {
-      opacity: 0.18;
-      transform: scale(0.95);
-    }
-    50% {
-      opacity: 0.4;
-      transform: scale(1.05);
-    }
+    0%, 100% { opacity: 0.3; transform: scale(0.95); }
+    50% { opacity: 0.7; transform: scale(1.05); }
   }
 
   .cv-lens__prompt-text {
-    font-size: 0.76rem;
+    font-size: 0.95rem;
     font-weight: 600;
-    color: rgba(148, 163, 184, 0.4);
-    letter-spacing: 0.04em;
+    color: var(--cv-text-main);
+    background: var(--cv-pill-bg);
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--cv-accent-dim);
+    letter-spacing: 0.02em;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   }
 
   .cv-lens__hud {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 7px 14px;
-    background: rgba(5, 8, 16, 0.88);
-    border-top: 1px solid rgba(56, 189, 248, 0.1);
+    padding: 10px 16px;
+    background: var(--cv-hud-bg);
+    border-top: 1px solid var(--cv-grid);
+    color: var(--cv-text-main);
   }
 
   .cv-lens__hud-left {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
   }
 
   .cv-lens__hud-dot {
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    background: #38bdf8;
-    box-shadow: 0 0 6px rgba(56, 189, 248, 0.4);
+    background: var(--cv-accent);
+    box-shadow: 0 0 8px var(--cv-accent);
     animation: cv-blink 2s ease-in-out infinite;
   }
 
   @keyframes cv-blink {
-    0%,
-    100% {
-      opacity: 0.25;
-    }
-    50% {
-      opacity: 1;
-    }
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
   }
 
   .cv-lens__hud-status {
-    font-size: 0.66rem;
+    font-size: 0.875rem;
     font-weight: 600;
-    color: #64748b;
-    letter-spacing: 0.04em;
+    color: var(--cv-text-muted);
+    letter-spacing: 0.02em;
   }
 
   .cv-lens__hud-right {
     display: flex;
     align-items: baseline;
-    gap: 4px;
+    gap: 6px;
   }
 
   .cv-lens__hud-count {
-    font-size: 0.74rem;
+    font-size: 1rem;
     font-weight: 700;
-    font-family: var(--font-mono);
-    color: #38bdf8;
+    font-family: var(--font-mono, monospace);
+    color: var(--cv-accent);
     min-width: 1ch;
     text-align: right;
   }
 
   .cv-lens__hud-unit {
-    font-size: 0.6rem;
+    font-size: 0.875rem;
     font-weight: 500;
-    color: #475569;
+    color: var(--cv-text-muted);
   }
 
   @media (max-width: 768px) {
     .cv-lens__scanner {
-      width: 68px;
-      height: 68px;
+      width: 70px;
+      height: 70px;
     }
-
     .cv-lens__label-pill {
-      padding: 4px 7px;
-      gap: 4px;
+      padding: 4px 8px;
+      gap: 6px;
     }
-
     .cv-lens__label-text {
-      font-size: 0.62rem;
+      font-size: 0.875rem;
     }
-
     .cv-lens__label-conf {
-      font-size: 0.52rem;
+      font-size: 0.75rem;
     }
-
-    .cv-lens__label-pill::after {
-      border-left-width: 4px;
-      border-right-width: 4px;
-      border-top-width: 4px;
-      bottom: -4px;
-    }
-
     .cv-lens__prompt-icon {
-      font-size: 2rem;
+      font-size: 2.2rem;
     }
-
     .cv-lens__prompt-text {
-      font-size: 0.68rem;
+      font-size: 0.8rem;
     }
-
     .cv-lens__viewport {
       cursor: default;
+      min-height: 350px;
     }
-
     .cv-lens__viewport.is-scanning {
       cursor: default;
     }
@@ -630,39 +571,22 @@
       animation: none;
       top: 50%;
     }
-
     .cv-lens__scanner-glow {
       animation: none;
     }
-
     .cv-lens__prompt-icon {
       animation: none;
-      opacity: 0.22;
+      opacity: 0.8;
     }
-
     .cv-lens__hud-dot {
       animation: none;
-      opacity: 0.6;
+      opacity: 0.8;
     }
-
     .cv-lens__viewport::after {
       animation: none;
       display: none;
     }
-
-    .cv-lens__label {
-      transition-duration: 0.01ms;
-    }
-
-    .cv-lens__zone {
-      transition-duration: 0.01ms;
-    }
-
-    .cv-lens__scanner {
-      transition-duration: 0.01ms;
-    }
-
-    .cv-lens__prompt {
+    .cv-lens__label, .cv-lens__zone, .cv-lens__scanner, .cv-lens__prompt {
       transition-duration: 0.01ms;
     }
   }
@@ -674,9 +598,10 @@
     const scanner = root.querySelector("[data-cv-scanner]");
     const prompt = root.querySelector("[data-cv-prompt]");
     const countEl = root.querySelector("[data-cv-count]");
+    const announcer = root.querySelector("[data-cv-announcer]");
+    const statusText = root.querySelector(".cv-lens__hud-status");
     const zones = Array.from(root.querySelectorAll("[data-zone]"));
     const labels = Array.from(root.querySelectorAll("[data-label-for]"));
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     let interacted = false;
 
@@ -684,23 +609,19 @@
       if (!interacted) {
         interacted = true;
         scanner.classList.add("is-active");
-        viewport.classList.add("is-scanning");
         prompt.classList.add("is-hidden");
+        statusText.textContent = "Scanning active";
       }
 
       const rect = viewport.getBoundingClientRect();
-      const x = ((clientX - rect.left) / rect.width) * 100;
-      const y = ((clientY - rect.top) / rect.height) * 100;
+      const x = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
+      const y = Math.max(0, Math.min(100, ((clientY - rect.top) / rect.height) * 100));
 
-      if (!reducedMotion) {
-        scanner.style.left = x + "%";
-        scanner.style.top = y + "%";
-      } else {
-        scanner.style.left = x + "%";
-        scanner.style.top = y + "%";
-      }
+      scanner.style.left = x + "%";
+      scanner.style.top = y + "%";
 
       let count = 0;
+      let newlyDetected = [];
 
       zones.forEach((zone) => {
         const zr = zone.getBoundingClientRect();
@@ -709,35 +630,50 @@
         const zWidth = (zr.width / rect.width) * 100;
         const zHeight = (zr.height / rect.height) * 100;
 
-        const detected =
-          x >= zLeft && x <= zLeft + zWidth && y >= zTop && y <= zTop + zHeight;
-
+        const detected = x >= zLeft && x <= zLeft + zWidth && y >= zTop && y <= zTop + zHeight;
+        const wasDetected = zone.classList.contains("is-detected");
+        
         zone.classList.toggle("is-detected", detected);
 
         const label = labels.find((l) => l.dataset.labelFor === zone.dataset.zone);
         if (label) label.classList.toggle("is-visible", detected);
 
-        if (detected) count++;
+        if (detected) {
+          count++;
+          if (!wasDetected && label) {
+             newlyDetected.push(label.querySelector('.cv-lens__label-text').textContent);
+          }
+        }
       });
 
       countEl.textContent = count;
+      
+      if (newlyDetected.length > 0) {
+        announcer.textContent = `Found: ${newlyDetected.join(", ")}`;
+      }
     }
 
     function resetDetection() {
       zones.forEach((zone) => zone.classList.remove("is-detected"));
       labels.forEach((label) => label.classList.remove("is-visible"));
       countEl.textContent = "0";
+      statusText.textContent = "Ready to scan";
     }
 
     viewport.addEventListener("pointermove", (e) => {
+      // ignore pointer events if keyboard focus is actively inside a zone
+      if (document.activeElement && document.activeElement.classList.contains("cv-lens__zone")) return;
+      viewport.classList.add("is-scanning");
       handlePointer(e.clientX, e.clientY);
     });
 
     viewport.addEventListener("pointerdown", (e) => {
+      if (document.activeElement && document.activeElement.classList.contains("cv-lens__zone")) return;
       handlePointer(e.clientX, e.clientY);
     });
 
     viewport.addEventListener("pointerleave", () => {
+      if (document.activeElement && document.activeElement.classList.contains("cv-lens__zone")) return;
       if (interacted) {
         scanner.classList.remove("is-active");
         viewport.classList.remove("is-scanning");
@@ -745,16 +681,7 @@
       }
     });
 
-    viewport.addEventListener("pointerenter", (e) => {
-      if (interacted) {
-        scanner.classList.add("is-active");
-        viewport.classList.add("is-scanning");
-        handlePointer(e.clientX, e.clientY);
-      }
-    });
-
     viewport.addEventListener("touchmove", (e) => {
-      e.preventDefault();
       if (e.touches.length > 0) {
         handlePointer(e.touches[0].clientX, e.touches[0].clientY);
       }
@@ -767,7 +694,61 @@
     });
 
     viewport.addEventListener("touchend", () => {
-      resetDetection();
+      if (!document.activeElement || !document.activeElement.classList.contains("cv-lens__zone")) {
+        resetDetection();
+        scanner.classList.remove("is-active");
+        viewport.classList.remove("is-scanning");
+      }
+    });
+
+    // Keyboard support
+    zones.forEach(zone => {
+      zone.addEventListener("focus", () => {
+        interacted = true;
+        prompt.classList.add("is-hidden");
+        viewport.classList.remove("is-scanning");
+        
+        resetDetection();
+        zone.classList.add("is-detected");
+        
+        const label = labels.find((l) => l.dataset.labelFor === zone.dataset.zone);
+        if (label) label.classList.add("is-visible");
+        
+        countEl.textContent = "1";
+        statusText.textContent = "Object selected";
+        
+        const zr = zone.getBoundingClientRect();
+        const rect = viewport.getBoundingClientRect();
+        const cx = ((zr.left + zr.width / 2 - rect.left) / rect.width) * 100;
+        const cy = ((zr.top + zr.height / 2 - rect.top) / rect.height) * 100;
+        
+        scanner.style.left = cx + "%";
+        scanner.style.top = cy + "%";
+        scanner.classList.add("is-active");
+        
+        if (label) {
+          const text = label.querySelector('.cv-lens__label-text').textContent;
+          const conf = label.querySelector('.cv-lens__label-conf').textContent;
+          announcer.textContent = `Selected: ${text}, confidence ${conf}.`;
+        }
+      });
+      
+      zone.addEventListener("blur", () => {
+        resetDetection();
+        scanner.classList.remove("is-active");
+      });
+      
+      zone.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          const label = labels.find((l) => l.dataset.labelFor === zone.dataset.zone);
+          if (label) {
+            const text = label.querySelector('.cv-lens__label-text').textContent;
+            announcer.textContent = `Scanning ${text} details...`;
+          }
+        }
+      });
     });
   });
 </script>
+

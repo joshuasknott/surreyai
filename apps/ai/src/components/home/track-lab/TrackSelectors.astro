@@ -16,14 +16,14 @@ const { tracks, activeId } = Astro.props;
       role="tab"
       id={`track-tab-${track.id}`}
       aria-selected={track.id === activeId ? "true" : "false"}
-      aria-controls={`track-panel-${track.id}`}
+      aria-controls={`track-panel-${track.id} track-stage-${track.id}`}
       class={`track-selectors__tab${track.id === activeId ? " is-active" : ""}`}
       data-track-tab={track.id}
       data-accent={track.accentColor}
       data-accent-rgb={track.accentRgb}
       tabindex={track.id === activeId ? 0 : -1}
     >
-      <span class="track-selectors__tab-icon">{track.icon}</span>
+      <span class="track-selectors__tab-icon" aria-hidden="true">{track.icon}</span>
       <span class="track-selectors__tab-label">{track.title}</span>
     </button>
   ))}
@@ -37,7 +37,7 @@ const { tracks, activeId } = Astro.props;
     border-bottom: 1px solid rgba(148, 163, 184, 0.12);
     overflow-x: auto;
     scrollbar-width: thin;
-    scrollbar-color: rgba(148, 163, 184, 0.2) transparent;
+    scrollbar-color: var(--ai-border) transparent;
   }
 
   .track-selectors::-webkit-scrollbar {
@@ -49,7 +49,7 @@ const { tracks, activeId } = Astro.props;
   }
 
   .track-selectors::-webkit-scrollbar-thumb {
-    background: rgba(148, 163, 184, 0.2);
+    background: var(--ai-border);
     border-radius: 2px;
   }
 
@@ -59,32 +59,33 @@ const { tracks, activeId } = Astro.props;
     gap: 8px;
     padding: 10px 16px;
     border: 1px solid transparent;
-    border-radius: 10px;
-    color: #94A3B8;
+    border-radius: 8px;
+    color: var(--ai-fg-muted);
     background: transparent;
-    font-size: 0.8rem;
-    font-weight: 700;
+    font-size: 0.95rem;
+    font-weight: 600;
     white-space: nowrap;
     cursor: pointer;
-    transition: color 180ms ease, background 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+    transition: all 200ms ease;
     font-family: var(--font-sans);
   }
 
   .track-selectors__tab:hover {
-    color: #CBD5E1;
-    background: rgba(148, 163, 184, 0.06);
+    color: var(--ai-fg);
+    background: var(--ai-bg);
   }
 
   .track-selectors__tab:focus-visible {
-    outline: 2px solid var(--accent, #06B6D4);
+    outline: 2px solid var(--ai-cyan);
     outline-offset: 2px;
+    border-radius: 8px;
   }
 
   .track-selectors__tab.is-active {
-    color: #F8FAFC;
-    background: linear-gradient(135deg, rgba(6, 182, 212, 0.12), rgba(139, 92, 246, 0.08));
-    border-color: rgba(6, 182, 212, 0.3);
-    box-shadow: 0 0 20px rgba(6, 182, 212, 0.1);
+    color: var(--ai-fg);
+    background: var(--ai-surface);
+    border-color: var(--ai-border);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--ai-fg) 4%, transparent);
   }
 
   .track-selectors__tab-icon {

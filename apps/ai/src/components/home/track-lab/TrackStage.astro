@@ -19,11 +19,14 @@ const { tracks, activeId } = Astro.props;
   {tracks.map((track) => (
     <div
       class={`track-stage${track.id === activeId ? " is-active" : ""}`}
+      id={`track-stage-${track.id}`}
+      role="tabpanel"
+      aria-labelledby={`track-tab-${track.id}`}
       data-track-stage={track.id}
       hidden={track.id !== activeId}
       aria-hidden={track.id !== activeId ? "true" : "false"}
     >
-      <div class="track-stage__frame" style={`--stage-accent: ${track.accentColor};`}>
+      <div class="track-stage__frame">
         {track.id === "ml" && <MachineLearningPatternFinder />}
         {track.id === "genai" && <GenerativeRemixStudio track={track} />}
         {track.id === "cv" && <ComputerVisionLens />}
@@ -38,41 +41,43 @@ const { tracks, activeId } = Astro.props;
 <style>
   .track-stage-panels {
     position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
   }
 
   .track-stage {
     display: none;
     opacity: 0;
-    transform: scale(0.97);
-    transition: opacity 320ms ease, transform 320ms ease;
+    width: 100%;
+    height: 100%;
+    transform: scale(0.98);
+    transition: opacity 300ms ease, transform 300ms ease;
   }
 
   .track-stage.is-active {
     display: flex;
     opacity: 1;
     transform: scale(1);
+    flex-grow: 1;
   }
 
   .track-stage__frame {
     width: 100%;
-    aspect-ratio: 16 / 10;
-    min-height: 320px;
-    border: 1px solid rgba(148, 163, 184, 0.12);
-    border-radius: 14px;
-    background:
-      radial-gradient(circle at center, color-mix(in srgb, var(--stage-accent, #06B6D4) 4%, transparent), transparent 60%),
-      rgba(5, 8, 16, 0.6);
+    min-height: 480px;
+    border: 1px solid var(--ai-border);
+    border-radius: 12px;
+    background: var(--ai-bg);
     display: flex;
     align-items: stretch;
     justify-content: stretch;
     position: relative;
     overflow: hidden;
-    transition: background 400ms ease, border-color 400ms ease;
   }
 
   @media (max-width: 768px) {
     .track-stage__frame {
-      min-height: 240px;
+      min-height: 320px;
       aspect-ratio: 4 / 3;
     }
   }

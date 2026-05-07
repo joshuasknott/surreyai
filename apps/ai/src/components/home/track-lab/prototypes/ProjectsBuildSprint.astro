@@ -3,140 +3,184 @@
 
 <div class="bs-root" data-build-sprint-root hidden>
   <div class="bs-intro" data-bs-intro>
-    <span class="bs-intro__label">★ Build Sprint</span>
-    <span class="bs-intro__hint">Pick a theme and guide a project from idea to showcase</span>
-    <div class="bs-pills">
-      <button type="button" class="bs-pill" data-bs-theme="campus">Campus Assistant</button>
-      <button type="button" class="bs-pill" data-bs-theme="study">Study Tool</button>
-      <button type="button" class="bs-pill" data-bs-theme="creative">Creative AI</button>
-      <button type="button" class="bs-pill" data-bs-theme="vision">Vision Demo</button>
-      <button type="button" class="bs-pill" data-bs-theme="automation">Automation Helper</button>
-      <button type="button" class="bs-pill" data-bs-theme="ethics">Ethics Debate Tool</button>
+    <span class="bs-intro__label">Project Lifecycle</span>
+    <h3 class="bs-intro__title">From Idea to Demo</h3>
+    <p class="bs-intro__hint">Select a project theme to see how we guide a concept through our development pipeline.</p>
+    <div class="bs-pills" role="group" aria-label="Project Themes">
+      <button type="button" class="bs-pill" aria-pressed="false" data-bs-theme="campus">Campus Assistant</button>
+      <button type="button" class="bs-pill" aria-pressed="false" data-bs-theme="study">Revision Tool</button>
+      <button type="button" class="bs-pill" aria-pressed="false" data-bs-theme="creative">Creative AI</button>
+      <button type="button" class="bs-pill" aria-pressed="false" data-bs-theme="vision">Vision Demo</button>
+      <button type="button" class="bs-pill" aria-pressed="false" data-bs-theme="automation">Automation Helper</button>
+      <button type="button" class="bs-pill" aria-pressed="false" data-bs-theme="ethics">Ethics Debate Tool</button>
     </div>
   </div>
 
   <div class="bs-board" data-bs-board hidden>
     <div class="bs-board__head">
-      <span class="bs-board__name" data-project-name></span>
-      <span class="bs-board__stage" data-stage-badge></span>
+      <div class="bs-board__title-group">
+        <h4 class="bs-board__name" data-project-name></h4>
+        <span class="bs-board__stage" data-stage-badge aria-live="polite"></span>
+      </div>
+      <button type="button" class="bs-ai-btn" data-ai-btn hidden aria-live="polite">
+        <span aria-hidden="true">✨</span>
+        <span class="bs-ai-btn__text">AI Assist</span>
+      </button>
     </div>
 
-    <div class="bs-pipeline">
-      <div class="bs-pipe" data-pipe-stage="0">
-        <div class="bs-pipe__node"></div>
-        <span class="bs-pipe__label">Idea</span>
+    <div class="bs-pipeline" role="list" aria-label="Project Pipeline">
+      <div class="bs-pipe" role="listitem" data-pipe-stage="0">
+        <div class="bs-pipe__node" aria-hidden="true"></div>
+        <span class="bs-pipe__label">Idea<span class="bs-sr-only" data-pipe-status></span></span>
       </div>
-      <div class="bs-pipe__line" data-pipe-line="0"></div>
-      <div class="bs-pipe" data-pipe-stage="1">
-        <div class="bs-pipe__node"></div>
-        <span class="bs-pipe__label">Team</span>
+      <div class="bs-pipe__line" role="presentation" data-pipe-line="0"></div>
+      <div class="bs-pipe" role="listitem" data-pipe-stage="1">
+        <div class="bs-pipe__node" aria-hidden="true"></div>
+        <span class="bs-pipe__label">Team<span class="bs-sr-only" data-pipe-status></span></span>
       </div>
-      <div class="bs-pipe__line" data-pipe-line="1"></div>
-      <div class="bs-pipe" data-pipe-stage="2">
-        <div class="bs-pipe__node"></div>
-        <span class="bs-pipe__label">Prototype</span>
+      <div class="bs-pipe__line" role="presentation" data-pipe-line="1"></div>
+      <div class="bs-pipe" role="listitem" data-pipe-stage="2">
+        <div class="bs-pipe__node" aria-hidden="true"></div>
+        <span class="bs-pipe__label">Prototype<span class="bs-sr-only" data-pipe-status></span></span>
       </div>
-      <div class="bs-pipe__line" data-pipe-line="2"></div>
-      <div class="bs-pipe" data-pipe-stage="3">
-        <div class="bs-pipe__node"></div>
-        <span class="bs-pipe__label">Demo</span>
+      <div class="bs-pipe__line" role="presentation" data-pipe-line="2"></div>
+      <div class="bs-pipe" role="listitem" data-pipe-stage="3">
+        <div class="bs-pipe__node" aria-hidden="true"></div>
+        <span class="bs-pipe__label">Demo<span class="bs-sr-only" data-pipe-status></span></span>
       </div>
-      <div class="bs-pipe__line" data-pipe-line="3"></div>
-      <div class="bs-pipe" data-pipe-stage="4">
-        <div class="bs-pipe__node"></div>
-        <span class="bs-pipe__label">Showcase</span>
+      <div class="bs-pipe__line" role="presentation" data-pipe-line="3"></div>
+      <div class="bs-pipe" role="listitem" data-pipe-stage="4">
+        <div class="bs-pipe__node" aria-hidden="true"></div>
+        <span class="bs-pipe__label">Showcase<span class="bs-sr-only" data-pipe-status></span></span>
       </div>
     </div>
 
-    <div class="bs-card" data-bs-card>
+    <div class="bs-card" data-bs-card aria-live="polite" aria-atomic="true">
       <p class="bs-card__text" data-stage-desc></p>
       <span class="bs-card__ai-tag" data-ai-tag hidden>AI-enhanced</span>
     </div>
 
     <div class="bs-actions">
-      <button type="button" class="bs-advance" data-advance-btn hidden>Advance →</button>
-      <button type="button" class="bs-ai-btn" data-ai-btn hidden>AI Assist</button>
+      <button type="button" class="bs-advance" data-advance-btn hidden>Next Stage →</button>
     </div>
   </div>
 
   <div class="bs-done" data-bs-done hidden>
-    <span class="bs-done__star">★</span>
-    <span class="bs-done__title">Showcased!</span>
-    <span class="bs-done__sub">From raw idea to live demo — that is how societies build.</span>
-    <button type="button" class="bs-again" data-reset-btn>New Sprint</button>
+    <div class="bs-done__icon" aria-hidden="true">✨</div>
+    <h3 class="bs-done__title">Project Complete</h3>
+    <p class="bs-done__sub">From raw idea to live demo — that is how we build impactful student projects.</p>
+    <button type="button" class="bs-again" data-reset-btn>Start New Project</button>
   </div>
 </div>
 
 <style>
   .bs-root {
-    --bs-accent: var(--stage-accent, #8B5CF6);
+    --bs-accent: var(--ai-accent, #4f46e5);
+    --bs-accent-text: var(--ai-accent-text, #ffffff);
+    --bs-text-main: var(--ai-text, #0f172a);
+    --bs-text-muted: var(--ai-text-muted, #64748b);
+    --bs-bg-surface: var(--ai-surface, #ffffff);
+    --bs-bg-subtle: var(--ai-surface-subtle, #f8fafc);
+    --bs-border: var(--ai-border, #e2e8f0);
+    --bs-bg-solid: var(--ai-bg, #ffffff);
+
     width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
-    padding: 20px 24px;
-    gap: 14px;
-    color: #F8FAFC;
+    padding: 32px;
+    gap: 20px;
+    color: var(--bs-text-main);
     position: relative;
     z-index: 1;
     box-sizing: border-box;
+    font-family: var(--font-sans);
+  }
+
+  :global([data-theme="dark"]) .bs-root {
+    --bs-accent: var(--ai-accent, #818cf8);
+    --bs-accent-text: var(--ai-accent-text, #0f172a);
+    --bs-text-main: var(--ai-text, #f8fafc);
+    --bs-text-muted: var(--ai-text-muted, #94a3b8);
+    --bs-bg-surface: var(--ai-surface, #1e293b);
+    --bs-bg-subtle: var(--ai-surface-subtle, #0f172a);
+    --bs-border: var(--ai-border, #334155);
+    --bs-bg-solid: var(--ai-bg, #0f172a);
+  }
+
+  .bs-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   /* ---------- Intro ---------- */
-
   .bs-intro {
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 12px;
     text-align: center;
     animation: bs-fade-up 400ms ease;
   }
 
   .bs-intro__label {
-    font-size: 0.7rem;
-    font-weight: 800;
-    letter-spacing: 0.12em;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--bs-accent);
+    font-family: var(--font-mono);
+  }
+
+  .bs-intro__title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.2;
   }
 
   .bs-intro__hint {
-    font-size: 0.72rem;
-    color: #94A3B8;
-    max-width: 260px;
-    line-height: 1.55;
+    font-size: 0.95rem;
+    color: var(--bs-text-muted);
+    max-width: 400px;
+    line-height: 1.6;
+    margin: 0 0 12px 0;
   }
 
   .bs-pills {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 10px;
     justify-content: center;
-    max-width: 380px;
-    margin-top: 4px;
+    max-width: 480px;
   }
 
   .bs-pill {
-    padding: 5px 12px;
-    font-size: 0.62rem;
-    font-weight: 700;
-    color: #CBD5E1;
-    background: rgba(148, 163, 184, 0.07);
-    border: 1px solid rgba(148, 163, 184, 0.14);
-    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--bs-text-main);
+    background: var(--bs-bg-subtle);
+    border: 1px solid var(--bs-border);
+    border-radius: 99px;
     cursor: pointer;
-    transition: all 180ms ease;
+    transition: all 200ms ease;
     font-family: var(--font-sans);
     white-space: nowrap;
   }
 
   .bs-pill:hover {
-    background: color-mix(in srgb, var(--bs-accent) 14%, transparent);
-    border-color: color-mix(in srgb, var(--bs-accent) 40%, transparent);
-    color: #F8FAFC;
+    background: var(--bs-bg-surface);
+    border-color: var(--bs-accent);
   }
 
   .bs-pill:focus-visible {
@@ -144,119 +188,136 @@
     outline-offset: 2px;
   }
 
-  .bs-pill.is-selected {
+  .bs-pill[aria-pressed="true"] {
     background: var(--bs-accent);
     border-color: var(--bs-accent);
-    color: #fff;
-    box-shadow: 0 0 18px color-mix(in srgb, var(--bs-accent) 40%, transparent);
+    color: var(--bs-accent-text);
   }
 
   /* ---------- Board ---------- */
-
   .bs-board {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 20px;
     animation: bs-fade-up 350ms ease;
   }
 
   .bs-board__head {
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .bs-board__title-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
     flex-wrap: wrap;
   }
 
   .bs-board__name {
-    font-size: 0.82rem;
-    font-weight: 800;
-    color: #F8FAFC;
-    letter-spacing: -0.01em;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0;
   }
 
   .bs-board__stage {
-    font-size: 0.58rem;
-    font-weight: 700;
+    font-size: 0.75rem;
+    font-weight: 600;
     font-family: var(--font-mono);
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.05em;
     color: var(--bs-accent);
-    padding: 2px 8px;
-    border: 1px solid color-mix(in srgb, var(--bs-accent) 30%, transparent);
-    border-radius: 4px;
-    background: color-mix(in srgb, var(--bs-accent) 10%, transparent);
+    padding: 4px 10px;
+    border: 1px solid var(--bs-border);
+    border-radius: 6px;
+    background: var(--bs-bg-subtle);
   }
 
   /* ---------- Pipeline ---------- */
-
   .bs-pipeline {
     display: flex;
     align-items: flex-start;
-    justify-content: center;
-    padding: 6px 0;
+    justify-content: space-between;
+    padding: 12px 0;
+    position: relative;
+    max-width: 600px;
+    margin: 0 auto;
+    width: 100%;
+    list-style: none;
   }
 
   .bs-pipe {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
-    cursor: pointer;
+    gap: 8px;
+    position: relative;
+    z-index: 2;
   }
 
   .bs-pipe__node {
-    width: 26px;
-    height: 26px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
-    border: 2px solid rgba(148, 163, 184, 0.18);
-    background: rgba(5, 8, 16, 0.7);
+    border: 2px solid var(--bs-border);
+    background: var(--bs-bg-solid);
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 300ms ease;
-    position: relative;
   }
 
   .bs-pipe__label {
-    font-size: 0.52rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    color: #475569;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--bs-text-muted);
     transition: color 300ms ease;
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
   }
 
   .bs-pipe__line {
-    width: 24px;
+    flex: 1;
     height: 2px;
-    background: rgba(148, 163, 184, 0.1);
-    margin-top: 12px;
-    border-radius: 1px;
-    transition: background 400ms ease;
+    background: var(--bs-border);
+    margin-top: 13px;
+    border-radius: 2px;
+    transition: background 300ms ease;
+    z-index: 1;
+    min-width: 12px;
   }
 
   .bs-pipe.is-done .bs-pipe__node {
     background: var(--bs-accent);
     border-color: var(--bs-accent);
-    box-shadow: 0 0 10px color-mix(in srgb, var(--bs-accent) 35%, transparent);
   }
 
   .bs-pipe.is-done .bs-pipe__node::after {
     content: "✓";
-    color: #fff;
-    font-size: 0.6rem;
-    font-weight: 900;
+    color: var(--bs-accent-text);
+    font-size: 0.9rem;
+    font-weight: 800;
   }
 
   .bs-pipe.is-done .bs-pipe__label {
-    color: #CBD5E1;
+    color: var(--bs-text-main);
   }
 
   .bs-pipe.is-active .bs-pipe__node {
     border-color: var(--bs-accent);
-    animation: bs-pulse 2s ease-in-out infinite;
+    border-width: 3px;
+    background: var(--bs-bg-solid);
+  }
+
+  .bs-pipe.is-active .bs-pipe__node::after {
+    content: "";
+    width: 10px;
+    height: 10px;
+    background: var(--bs-accent);
+    border-radius: 50%;
   }
 
   .bs-pipe.is-active .bs-pipe__label {
@@ -268,94 +329,96 @@
   }
 
   /* ---------- Card ---------- */
-
   .bs-card {
-    padding: 12px 16px;
-    border-radius: 8px;
-    background: rgba(21, 32, 58, 0.35);
-    border: 1px solid rgba(148, 163, 184, 0.07);
+    padding: 24px;
+    border-radius: 12px;
+    background: var(--bs-bg-surface);
+    border: 1px solid var(--bs-border);
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
     position: relative;
-    min-height: 56px;
+    min-height: 80px;
   }
 
   .bs-card__text {
-    font-size: 0.7rem;
+    font-size: 1rem;
     line-height: 1.6;
-    color: #CBD5E1;
+    color: var(--bs-text-main);
     margin: 0;
-    transition: opacity 180ms ease;
+    transition: opacity 200ms ease;
   }
 
   .bs-card__ai-tag {
     position: absolute;
-    top: 6px;
-    right: 8px;
-    font-size: 0.5rem;
+    top: -12px;
+    right: 20px;
+    font-size: 0.7rem;
     font-weight: 700;
     font-family: var(--font-mono);
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--bs-accent);
-    opacity: 0.7;
+    letter-spacing: 0.05em;
+    color: var(--bs-accent-text);
+    background: var(--bs-accent);
+    padding: 4px 10px;
+    border-radius: 12px;
   }
 
   /* ---------- Actions ---------- */
-
   .bs-actions {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    margin-top: auto;
   }
 
   .bs-advance {
-    padding: 6px 18px;
-    font-size: 0.68rem;
-    font-weight: 800;
-    color: #fff;
+    padding: 12px 28px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--bs-accent-text);
     background: var(--bs-accent);
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    transition: all 180ms ease;
+    transition: all 200ms ease;
     font-family: var(--font-sans);
   }
 
   .bs-advance:hover {
-    box-shadow: 0 0 20px color-mix(in srgb, var(--bs-accent) 45%, transparent);
+    opacity: 0.9;
     transform: translateY(-1px);
   }
 
   .bs-advance:focus-visible {
     outline: 2px solid var(--bs-accent);
-    outline-offset: 2px;
+    outline-offset: 4px;
   }
 
   .bs-ai-btn {
-    padding: 6px 14px;
-    font-size: 0.6rem;
-    font-weight: 700;
-    color: #CBD5E1;
-    background: rgba(148, 163, 184, 0.07);
-    border: 1px solid rgba(148, 163, 184, 0.14);
+    padding: 8px 14px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--bs-text-main);
+    background: var(--bs-bg-subtle);
+    border: 1px solid var(--bs-border);
     border-radius: 8px;
     cursor: pointer;
-    transition: all 180ms ease;
+    transition: all 200ms ease;
     font-family: var(--font-sans);
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
 
   .bs-ai-btn:hover {
-    background: color-mix(in srgb, var(--bs-accent) 12%, transparent);
-    border-color: color-mix(in srgb, var(--bs-accent) 30%, transparent);
-    color: #F8FAFC;
+    background: var(--bs-bg-surface);
+    border-color: var(--bs-accent);
   }
 
-  .bs-ai-btn.is-loading {
-    opacity: 0.5;
+  .bs-ai-btn[aria-busy="true"] {
+    opacity: 0.6;
     pointer-events: none;
   }
 
@@ -365,57 +428,57 @@
   }
 
   /* ---------- Done ---------- */
-
   .bs-done {
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 16px;
     text-align: center;
-    animation: bs-fade-up 400ms ease;
+    animation: bs-fade-up 500ms ease;
   }
 
-  .bs-done__star {
-    font-size: 2.2rem;
-    color: var(--bs-accent);
-    animation: bs-star-pop 600ms ease forwards;
-    text-shadow: 0 0 30px color-mix(in srgb, var(--bs-accent) 50%, transparent);
+  .bs-done__icon {
+    font-size: 3rem;
     line-height: 1;
+    color: var(--bs-accent);
+    margin-bottom: 8px;
+    animation: bs-fade-up 600ms ease;
   }
 
   .bs-done__title {
-    font-size: 1.05rem;
-    font-weight: 900;
-    color: #F8FAFC;
-    letter-spacing: -0.01em;
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin: 0;
+    color: var(--bs-text-main);
   }
 
   .bs-done__sub {
-    font-size: 0.7rem;
-    color: #94A3B8;
-    max-width: 240px;
-    line-height: 1.55;
+    font-size: 1rem;
+    color: var(--bs-text-muted);
+    max-width: 380px;
+    line-height: 1.6;
+    margin: 0 0 8px 0;
   }
 
   .bs-again {
-    margin-top: 2px;
-    padding: 5px 14px;
-    font-size: 0.6rem;
-    font-weight: 700;
-    color: #94A3B8;
-    background: transparent;
-    border: 1px solid rgba(148, 163, 184, 0.18);
-    border-radius: 6px;
+    padding: 10px 24px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--bs-text-main);
+    background: var(--bs-bg-subtle);
+    border: 1px solid var(--bs-border);
+    border-radius: 8px;
     cursor: pointer;
-    transition: all 180ms ease;
+    transition: all 200ms ease;
     font-family: var(--font-sans);
   }
 
   .bs-again:hover {
-    color: #F8FAFC;
-    border-color: rgba(148, 163, 184, 0.35);
+    background: var(--bs-bg-surface);
+    border-color: var(--bs-border);
+    transform: translateY(-1px);
   }
 
   .bs-again:focus-visible {
@@ -424,11 +487,10 @@
   }
 
   /* ---------- Keyframes ---------- */
-
   @keyframes bs-fade-up {
     from {
       opacity: 0;
-      transform: translateY(8px);
+      transform: translateY(12px);
     }
     to {
       opacity: 1;
@@ -436,79 +498,61 @@
     }
   }
 
-  @keyframes bs-pulse {
-    0%,
-    100% {
-      box-shadow: 0 0 6px color-mix(in srgb, var(--bs-accent) 25%, transparent);
-    }
-    50% {
-      box-shadow: 0 0 16px color-mix(in srgb, var(--bs-accent) 55%, transparent);
-    }
-  }
-
-  @keyframes bs-star-pop {
-    0% {
-      transform: scale(0) rotate(-15deg);
-      opacity: 0;
-    }
-    60% {
-      transform: scale(1.2) rotate(4deg);
-      opacity: 1;
-    }
-    100% {
-      transform: scale(1) rotate(0deg);
-      opacity: 1;
-    }
-  }
-
   /* ---------- Responsive ---------- */
-
   @media (max-width: 768px) {
     .bs-root {
-      padding: 14px 16px;
-      gap: 10px;
+      padding: 24px 20px;
+      gap: 16px;
     }
 
-    .bs-pills {
-      gap: 4px;
-      max-width: 300px;
+    .bs-intro__title {
+      font-size: 1.3rem;
     }
 
-    .bs-pill {
-      padding: 4px 9px;
-      font-size: 0.56rem;
+    .bs-board__name {
+      font-size: 1rem;
     }
 
-    .bs-pipe__node {
-      width: 22px;
-      height: 22px;
-    }
-
-    .bs-pipe__line {
-      width: 14px;
-      margin-top: 10px;
-    }
-
-    .bs-pipe__label {
-      font-size: 0.47rem;
+    .bs-card {
+      padding: 16px;
     }
 
     .bs-card__text {
-      font-size: 0.64rem;
+      font-size: 0.95rem;
+    }
+
+    .bs-pipe__node {
+      width: 24px;
+      height: 24px;
+    }
+
+    .bs-pipe.is-active .bs-pipe__node::after {
+      width: 6px;
+      height: 6px;
+    }
+
+    .bs-pipe__line {
+      margin-top: 11px;
+    }
+
+    .bs-pipe__label {
+      font-size: 0.65rem;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .bs-pipe.is-active .bs-pipe__node,
-    .bs-done__star,
+    .bs-intro,
     .bs-board,
     .bs-done,
-    .bs-intro {
+    .bs-done__icon {
       animation: none;
     }
 
-    .bs-pipe.is-active .bs-pipe__node {
-      box-shadow: 0 0 10px color-mix(in srgb, var(--bs-accent) 40%, transparent);
+    .bs-advance,
+    .bs-pill,
+    .bs-again {
+      transition: none;
+      transform: none !important;
     }
   }
 </style>
@@ -518,27 +562,27 @@
     campus: {
       label: "Campus Assistant",
       stages: [
-        "An AI-powered helper that answers student questions about campus services and facilities",
+        "A society chatbot that answers freshers' questions about campus facilities and events",
         "Assembled a 3-person squad \u2014 designer, backend developer, and content strategist",
-        "Working chat interface connected to a campus knowledge base with natural language queries",
+        "Working chat interface connected to a university knowledge base with natural language queries",
         "Presented live to 30 students at the society meetup \u2014 answered real questions in real time",
         "Published to the society website, now helping students navigate campus every day",
       ],
     },
     study: {
-      label: "Study Tool",
+      label: "Revision Tool",
       stages: [
-        "Smart flashcard generator that transforms lecture notes into interactive study decks",
-        "Formed a 4-person crew \u2014 ML engineer, full-stack dev, UX designer, and QA tester",
-        "Web app that parses PDFs, extracts key concepts, and generates spaced-repetition flashcards",
-        "Presented to faculty and students \u2014 processed a real Machine Learning lecture live",
-        "Open-sourced the project \u2014 adopted by students across multiple modules",
+        "Smart flashcard generator that transforms lecture notes into interactive revision decks",
+        "Formed a 4-person crew \u2014 ML engineer, full-stack dev, UX designer, and tester",
+        "Web app that parses lecture PDFs, extracts key concepts, and generates spaced-repetition cards",
+        "Demonstrated to computer science students \u2014 processed a real ML lecture live",
+        "Open-sourced on GitHub \u2014 adopted by students across multiple university modules",
       ],
     },
     creative: {
       label: "Creative AI",
       stages: [
-        "A collaborative art tool where students and AI co-create original visual compositions",
+        "An interactive collaborative art tool where students and AI co-create visual compositions",
         "Gathered a 3-person collective \u2014 creative coder, digital artist, and interaction designer",
         "Canvas-based app with style transfer, generative patterns, and real-time collaboration",
         "Interactive gallery at the end-of-semester exhibition \u2014 200 visitors tried it",
@@ -548,7 +592,7 @@
     vision: {
       label: "Vision Demo",
       stages: [
-        "A real-time object recognition app to improve accessibility and navigation on campus",
+        "A computer vision accessibility app to help visually impaired students navigate lecture halls",
         "Recruited a 4-person team \u2014 CV specialist, mobile dev, accessibility lead, and tester",
         "Camera-based app that identifies and describes objects and text in the surroundings",
         "Live demo with student volunteers testing real-world recognition accuracy on campus",
@@ -558,7 +602,7 @@
     automation: {
       label: "Automation Helper",
       stages: [
-        "An automated system to handle the entire lifecycle of society events from planning to feedback",
+        "A script to automate the entire lifecycle of society events from ticketing to feedback",
         "Built a 3-person ops team \u2014 automation dev, event planner, and integrations specialist",
         "Automated pipeline: RSVP collection, reminder scheduling, attendance tracking, and feedback forms",
         "Ran a real society event end-to-end through the system \u2014 80 attendees, zero manual overhead",
@@ -568,7 +612,7 @@
     ethics: {
       label: "Ethics Debate Tool",
       stages: [
-        "A platform that presents AI ethics dilemmas with structured frameworks for debate and analysis",
+        "A platform used in tutorials to explore ethical tradeoffs in AI hiring algorithms",
         "Convened a 4-person panel \u2014 ethicist, full-stack dev, UX researcher, and content lead",
         "Web app with timed debate rounds, argument mapping, stakeholder analysis, and scoring rubrics",
         "Hosted a live debate night with 40 participants tackling real AI ethics case studies",
@@ -600,11 +644,12 @@
     const board = root.querySelector("[data-bs-board]") as HTMLDivElement;
     const done = root.querySelector("[data-bs-done]") as HTMLDivElement;
     const pills = root.querySelectorAll("[data-bs-theme]") as NodeListOf<HTMLButtonElement>;
-    const projectName = root.querySelector("[data-project-name]") as HTMLSpanElement;
+    const projectName = root.querySelector("[data-project-name]") as HTMLHeadingElement;
     const stageBadge = root.querySelector("[data-stage-badge]") as HTMLSpanElement;
     const stageDesc = root.querySelector("[data-stage-desc]") as HTMLParagraphElement;
     const advanceBtn = root.querySelector("[data-advance-btn]") as HTMLButtonElement;
     const aiBtn = root.querySelector("[data-ai-btn]") as HTMLButtonElement;
+    const aiBtnText = aiBtn?.querySelector(".bs-ai-btn__text") as HTMLSpanElement;
     const aiTag = root.querySelector("[data-ai-tag]") as HTMLSpanElement;
     const resetBtn = root.querySelector("[data-reset-btn]") as HTMLButtonElement;
     const pipeStages = root.querySelectorAll("[data-pipe-stage]") as NodeListOf<HTMLDivElement>;
@@ -628,6 +673,9 @@
     function resetPipeline() {
       pipeStages.forEach((p) => {
         p.classList.remove("is-done", "is-active");
+        p.removeAttribute("aria-current");
+        const statusSpan = p.querySelector("[data-pipe-status]");
+        if (statusSpan) statusSpan.textContent = " (Pending)";
       });
       pipeLines.forEach((l) => {
         l.classList.remove("is-filled");
@@ -637,8 +685,20 @@
     function renderPipeline() {
       pipeStages.forEach((p, i) => {
         p.classList.remove("is-done", "is-active");
-        if (i < currentStage) p.classList.add("is-done");
-        else if (i === currentStage) p.classList.add("is-active");
+        p.removeAttribute("aria-current");
+        
+        const statusSpan = p.querySelector("[data-pipe-status]");
+        
+        if (i < currentStage) {
+          p.classList.add("is-done");
+          if (statusSpan) statusSpan.textContent = " (Completed)";
+        } else if (i === currentStage) {
+          p.classList.add("is-active");
+          p.setAttribute("aria-current", "step");
+          if (statusSpan) statusSpan.textContent = " (Current)";
+        } else {
+          if (statusSpan) statusSpan.textContent = " (Pending)";
+        }
       });
       pipeLines.forEach((l, i) => {
         l.classList.toggle("is-filled", i < currentStage);
@@ -658,7 +718,7 @@
       setTimeout(() => {
         stageDesc.textContent = content;
         stageDesc.style.opacity = "1";
-      }, 180);
+      }, 200);
     }
 
     function selectTheme(themeId: string) {
@@ -668,11 +728,12 @@
       currentTheme = themeId;
       currentStage = 0;
       aiDescriptions = null;
-      aiTag.setAttribute("hidden", "");
+      hide(aiTag);
 
-      pills.forEach((pill) =>
-        pill.classList.toggle("is-selected", pill.dataset.bsTheme === themeId)
-      );
+      pills.forEach((pill) => {
+        const isSelected = pill.dataset.bsTheme === themeId;
+        pill.setAttribute("aria-pressed", isSelected ? "true" : "false");
+      });
 
       projectName.textContent = theme.label;
       stageBadge.textContent = STAGE_LABELS[0];
@@ -684,6 +745,9 @@
       hide(done);
       show(board);
       show(advanceBtn);
+      
+      // Ensure advance button is focused to guide keyboard users
+      advanceBtn.focus();
 
       if (aiEnabled) show(aiBtn);
       else hide(aiBtn);
@@ -692,18 +756,21 @@
     function advanceStage() {
       if (currentStage < 0 || currentStage > 4) return;
 
-      const prevStage = currentStage;
       currentStage++;
 
       if (currentStage > 4) {
         pipeStages.forEach((p) => {
           p.classList.remove("is-active");
           p.classList.add("is-done");
+          p.removeAttribute("aria-current");
+          const statusSpan = p.querySelector("[data-pipe-status]");
+          if (statusSpan) statusSpan.textContent = " (Completed)";
         });
         pipeLines.forEach((l) => l.classList.add("is-filled"));
 
         hide(board);
         show(done);
+        resetBtn.focus();
         return;
       }
 
@@ -715,8 +782,8 @@
     async function callAI() {
       if (!aiEnabled || !currentTheme) return;
 
-      aiBtn.classList.add("is-loading");
-      aiBtn.textContent = "Loading\u2026";
+      aiBtn.setAttribute("aria-busy", "true");
+      if (aiBtnText) aiBtnText.textContent = "Loading\u2026";
 
       try {
         const controller = new AbortController();
@@ -753,8 +820,8 @@
       } catch {
         updateDescription();
       } finally {
-        aiBtn.classList.remove("is-loading");
-        aiBtn.textContent = "AI Assist";
+        aiBtn.setAttribute("aria-busy", "false");
+        if (aiBtnText) aiBtnText.textContent = "AI Assist";
       }
     }
 
@@ -763,13 +830,16 @@
       currentStage = 0;
       aiDescriptions = null;
 
-      pills.forEach((pill) => pill.classList.remove("is-selected"));
+      pills.forEach((pill) => pill.setAttribute("aria-pressed", "false"));
       resetPipeline();
       hide(aiTag);
 
       hide(done);
       hide(board);
       show(intro);
+      
+      // Focus first pill for keyboard users
+      pills[0]?.focus();
     }
 
     pills.forEach((pill) => {
@@ -778,16 +848,10 @@
 
     advanceBtn.addEventListener("click", advanceStage);
 
-    pipeStages.forEach((pipe) => {
-      pipe.addEventListener("click", () => {
-        const idx = parseInt(pipe.dataset.pipeStage!, 10);
-        if (idx === currentStage) advanceStage();
-      });
-    });
-
     if (aiBtn) aiBtn.addEventListener("click", callAI);
     resetBtn.addEventListener("click", resetSprint);
   }
 
   initBuildSprint();
 </script>
+

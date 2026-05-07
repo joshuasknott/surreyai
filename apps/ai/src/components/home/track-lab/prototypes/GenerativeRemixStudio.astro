@@ -8,11 +8,12 @@ interface Props {
 const { track } = Astro.props;
 
 const seedIdeas = [
-  "An app that tracks your mood",
-  "A tool for study groups",
-  "AI recipe suggester",
+  "Study group tool",
+  "Society poster",
+  "Dissertation helper",
   "Campus event finder",
-  "Music playlist maker",
+  "Revision plan",
+  "Accessibility helper",
 ];
 
 const modes = [
@@ -29,17 +30,26 @@ const modes = [
   style={`--remix-accent: ${track.accentColor}; --remix-accent-rgb: ${track.accentRgb};`}
 >
   <div class="remix-studio__panel remix-studio__panel--input">
-    <label class="remix-studio__label" for="remix-idea-input">Your Idea</label>
-    <input
-      id="remix-idea-input"
-      type="text"
-      class="remix-studio__field"
-      placeholder="Type a rough idea or pick one below..."
-      data-remix-input
-      autocomplete="off"
-    />
+    <div class="remix-studio__header">
+      <h3 class="remix-studio__title">Generative Remix Studio</h3>
+      <p class="remix-studio__desc">
+        Experience how Generative AI transforms rough ideas into actionable concepts, project briefs, and visual directions.
+      </p>
+    </div>
 
-    <div class="remix-studio__seeds" role="group" aria-label="Seed ideas">
+    <div class="remix-studio__input-group">
+      <label class="remix-studio__label" for="remix-idea-input">Your Idea</label>
+      <input
+        id="remix-idea-input"
+        type="text"
+        class="remix-studio__field"
+        placeholder="Type a rough idea or pick one below..."
+        data-remix-input
+        autocomplete="off"
+      />
+    </div>
+
+    <div class="remix-studio__seeds" aria-label="Seed ideas">
       {seedIdeas.map((idea) => (
         <button type="button" class="remix-studio__seed" data-remix-seed>
           {idea}
@@ -47,42 +57,47 @@ const modes = [
       ))}
     </div>
 
-    <span class="remix-studio__label">Transform</span>
-    <div class="remix-studio__modes" role="radiogroup" aria-label="Transform mode">
-      {modes.map((mode) => (
-        <button
-          type="button"
-          class={`remix-studio__mode${mode.id === "sharpen" ? " is-active" : ""}`}
-          data-remix-mode={mode.id}
-          role="radio"
-          aria-checked={mode.id === "sharpen" ? "true" : "false"}
-          title={mode.tip}
-        >
-          <span class="remix-studio__mode-icon">{mode.icon}</span>
-          <span>{mode.label}</span>
-        </button>
-      ))}
+    <div class="remix-studio__input-group">
+      <span class="remix-studio__label" id="transform-mode-label">Transform Mode</span>
+      <div class="remix-studio__modes" role="radiogroup" aria-labelledby="transform-mode-label">
+        {modes.map((mode) => (
+          <button
+            type="button"
+            role="radio"
+            class={`remix-studio__mode${mode.id === "sharpen" ? " is-active" : ""}`}
+            data-remix-mode={mode.id}
+            aria-checked={mode.id === "sharpen" ? "true" : "false"}
+            tabindex={mode.id === "sharpen" ? "0" : "-1"}
+            title={mode.tip}
+          >
+            <span class="remix-studio__mode-icon" aria-hidden="true">{mode.icon}</span>
+            <span>{mode.label}</span>
+          </button>
+        ))}
+      </div>
     </div>
 
     <button type="button" class="remix-studio__action" data-remix-action aria-label="Remix your idea">
-      <span class="remix-studio__action-spark">&#x2726;</span>
-      <span class="remix-studio__action-text">Remix</span>
+      <span class="remix-studio__action-spark" aria-hidden="true">&#x2726;</span>
+      <span class="remix-studio__action-text" data-remix-action-text>Remix Idea</span>
     </button>
   </div>
 
   <div class="remix-studio__divider" aria-hidden="true"></div>
 
-  <div class="remix-studio__panel remix-studio__panel--output" aria-live="polite">
+  <div class="remix-studio__panel remix-studio__panel--output">
+    <div class="sr-only" aria-live="polite" data-remix-status></div>
+
     <div class="remix-studio__idle" data-remix-idle>
-      <span class="remix-studio__idle-icon">&#x2727;</span>
-      <span class="remix-studio__idle-text">Your remixed concept appears here</span>
+      <span class="remix-studio__idle-icon" aria-hidden="true">&#x2727;</span>
+      <span class="remix-studio__idle-text">Your remixed concept will appear here</span>
     </div>
 
     <div class="remix-studio__processing" data-remix-processing hidden>
-      <div class="remix-studio__shimmer"></div>
-      <div class="remix-studio__shimmer remix-studio__shimmer--short"></div>
-      <div class="remix-studio__shimmer remix-studio__shimmer--mid"></div>
-      <span class="remix-studio__processing-label">Remixing&hellip;</span>
+      <div class="remix-studio__shimmer" aria-hidden="true"></div>
+      <div class="remix-studio__shimmer remix-studio__shimmer--short" aria-hidden="true"></div>
+      <div class="remix-studio__shimmer remix-studio__shimmer--mid" aria-hidden="true"></div>
+      <span class="remix-studio__processing-label">Remixing your idea&hellip;</span>
     </div>
 
     <div class="remix-studio__card" data-remix-card hidden></div>
@@ -90,123 +105,220 @@ const modes = [
 </div>
 
 <style>
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
   .remix-studio {
+    /* Theme variables mapped to global --ai-* tokens */
+    --rs-bg: var(--ai-core-bg, #0B1120);
+    --rs-panel-bg: var(--ai-surface, rgba(15, 23, 42, 0.4));
+    --rs-card-bg: var(--ai-surface-raised, rgba(30, 41, 59, 0.7));
+    --rs-border: var(--ai-border, rgba(148, 163, 184, 0.2));
+    --rs-border-strong: var(--ai-border-strong, rgba(148, 163, 184, 0.3));
+    --rs-text: var(--ai-text, #F8FAFC);
+    --rs-text-muted: var(--ai-text-muted, #94A3B8);
+    --rs-text-faint: var(--ai-text-faint, #64748B);
+    --rs-hover: var(--ai-surface-hover, rgba(255, 255, 255, 0.05));
+    --rs-focus-ring: rgba(var(--remix-accent-rgb), 0.4);
+
     width: 100%;
     height: 100%;
     display: grid;
-    grid-template-columns: 1fr 1.3fr;
-    gap: 14px;
-    padding: 16px 18px;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    padding: 32px;
     font-family: var(--font-sans);
-    color: var(--color-text-secondary);
+    color: var(--rs-text);
+    background: var(--rs-bg);
+    border-radius: 16px;
     overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  /* Support for light themes via data-theme */
+  :global([data-theme="light"]) .remix-studio {
+    --rs-bg: var(--ai-core-bg, #ffffff);
+    --rs-panel-bg: var(--ai-surface, #f8fafc);
+    --rs-card-bg: var(--ai-surface-raised, #ffffff);
+    --rs-border: var(--ai-border, #e2e8f0);
+    --rs-border-strong: var(--ai-border-strong, #cbd5e1);
+    --rs-text: var(--ai-text, #0f172a);
+    --rs-text-muted: var(--ai-text-muted, #475569);
+    --rs-text-faint: var(--ai-text-faint, #64748B);
+    --rs-hover: var(--ai-surface-hover, rgba(0, 0, 0, 0.05));
   }
 
   .remix-studio__panel {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 16px;
     min-width: 0;
   }
 
   .remix-studio__panel--output {
     justify-content: center;
-    overflow: hidden;
+    background: var(--rs-panel-bg);
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid var(--rs-border);
+  }
+
+  .remix-studio__header {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  .remix-studio__title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0;
+    color: var(--rs-text);
+    letter-spacing: -0.02em;
+  }
+
+  .remix-studio__desc {
+    font-size: 1rem;
+    color: var(--rs-text-muted);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .remix-studio__input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
   }
 
   .remix-studio__label {
-    font-size: 0.58rem;
-    font-weight: 800;
+    font-size: 0.875rem;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: #64748B;
+    letter-spacing: 0.08em;
+    color: var(--rs-text-faint);
   }
 
   .remix-studio__field {
     width: 100%;
-    padding: 7px 11px;
-    border: 1px solid rgba(148, 163, 184, 0.15);
-    border-radius: 7px;
-    background: rgba(5, 8, 16, 0.5);
-    color: #F8FAFC;
-    font-size: 0.8rem;
-    font-family: var(--font-sans);
+    padding: 14px 18px;
+    border: 1px solid var(--rs-border-strong);
+    border-radius: 8px;
+    background: var(--rs-bg);
+    color: var(--rs-text);
+    font-size: 1.125rem;
+    font-family: inherit;
     outline: none;
     transition: border-color 200ms ease, box-shadow 200ms ease;
   }
 
   .remix-studio__field::placeholder {
-    color: #475569;
-    font-size: 0.75rem;
+    color: var(--rs-text-faint);
   }
 
-  .remix-studio__field:focus {
-    border-color: rgba(var(--remix-accent-rgb), 0.45);
-    box-shadow: 0 0 0 3px rgba(var(--remix-accent-rgb), 0.08);
+  .remix-studio__field:focus-visible {
+    border-color: var(--rs-focus-ring);
+    box-shadow: 0 0 0 3px rgba(var(--remix-accent-rgb), 0.1);
+  }
+
+  .remix-studio__field:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 
   .remix-studio__seeds {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px;
+    gap: 8px;
   }
 
   .remix-studio__seed {
-    padding: 3px 8px;
-    border: 1px solid rgba(148, 163, 184, 0.12);
+    padding: 8px 16px;
+    border: 1px solid var(--rs-border);
     border-radius: 20px;
-    background: transparent;
-    color: #94A3B8;
-    font-size: 0.6rem;
-    font-weight: 600;
-    font-family: var(--font-sans);
+    background: var(--rs-panel-bg);
+    color: var(--rs-text-muted);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    font-family: inherit;
     cursor: pointer;
     transition: all 180ms ease;
     white-space: nowrap;
   }
 
-  .remix-studio__seed:hover {
-    color: #F8FAFC;
-    border-color: rgba(var(--remix-accent-rgb), 0.3);
-    background: rgba(var(--remix-accent-rgb), 0.08);
+  .remix-studio__seed:hover:not(:disabled) {
+    color: var(--rs-text);
+    border-color: rgba(var(--remix-accent-rgb), 0.4);
+    background: rgba(var(--remix-accent-rgb), 0.05);
+  }
+
+  .remix-studio__seed:focus-visible {
+    outline: 2px solid var(--rs-focus-ring);
+    outline-offset: 2px;
+  }
+
+  .remix-studio__seed:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
   .remix-studio__modes {
     display: flex;
-    gap: 4px;
+    flex-wrap: wrap;
+    gap: 8px;
   }
 
   .remix-studio__mode {
     display: flex;
     align-items: center;
-    gap: 3px;
-    padding: 4px 9px;
-    border: 1px solid rgba(148, 163, 184, 0.1);
-    border-radius: 6px;
-    background: transparent;
-    color: #94A3B8;
-    font-size: 0.65rem;
-    font-weight: 700;
-    font-family: var(--font-sans);
+    gap: 6px;
+    padding: 10px 16px;
+    border: 1px solid var(--rs-border);
+    border-radius: 8px;
+    background: var(--rs-panel-bg);
+    color: var(--rs-text-muted);
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: inherit;
     cursor: pointer;
     transition: all 180ms ease;
     white-space: nowrap;
   }
 
-  .remix-studio__mode:hover {
-    color: #CBD5E1;
-    border-color: rgba(148, 163, 184, 0.2);
+  .remix-studio__mode:hover:not(:disabled) {
+    color: var(--rs-text);
+    background: var(--rs-hover);
+    border-color: var(--rs-border-strong);
   }
 
-  .remix-studio__mode.is-active {
+  .remix-studio__mode[aria-checked="true"] {
     color: var(--remix-accent);
-    border-color: rgba(var(--remix-accent-rgb), 0.35);
+    border-color: rgba(var(--remix-accent-rgb), 0.4);
     background: rgba(var(--remix-accent-rgb), 0.1);
-    box-shadow: 0 0 12px rgba(var(--remix-accent-rgb), 0.08);
+    box-shadow: 0 0 12px rgba(var(--remix-accent-rgb), 0.05);
+  }
+
+  .remix-studio__mode:focus-visible {
+    outline: 2px solid var(--rs-focus-ring);
+    outline-offset: 2px;
+  }
+
+  .remix-studio__mode:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
   .remix-studio__mode-icon {
-    font-size: 0.7rem;
+    font-size: 1rem;
     line-height: 1;
   }
 
@@ -214,51 +326,61 @@ const modes = [
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 8px;
     width: 100%;
-    padding: 7px 14px;
+    padding: 16px 24px;
     border: none;
-    border-radius: 7px;
-    background: linear-gradient(135deg, var(--remix-accent), rgba(var(--remix-accent-rgb), 0.7));
-    color: #0B1120;
-    font-size: 0.78rem;
-    font-weight: 800;
-    font-family: var(--font-sans);
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--remix-accent), rgba(var(--remix-accent-rgb), 0.8));
+    color: #ffffff; /* Explicitly light for contrast against accent */
+    font-size: 1.125rem;
+    font-weight: 700;
+    font-family: inherit;
     cursor: pointer;
     transition: transform 150ms ease, box-shadow 200ms ease, opacity 200ms ease;
     letter-spacing: 0.02em;
-    margin-top: 2px;
+    margin-top: 8px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
   }
 
-  .remix-studio__action:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 20px rgba(var(--remix-accent-rgb), 0.3);
+  .remix-studio__action:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(var(--remix-accent-rgb), 0.3);
   }
 
-  .remix-studio__action:active {
+  .remix-studio__action:active:not(:disabled) {
     transform: translateY(0);
   }
 
+  .remix-studio__action:focus-visible {
+    outline: 2px solid var(--remix-accent);
+    outline-offset: 4px;
+  }
+
   .remix-studio__action:disabled {
-    opacity: 0.5;
+    opacity: 0.6;
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
   }
 
   .remix-studio__action-spark {
-    font-size: 0.82rem;
+    font-size: 1.1rem;
     line-height: 1;
     transition: transform 300ms ease;
   }
 
-  .remix-studio__action:hover .remix-studio__action-spark {
+  .remix-studio__action:hover:not(:disabled) .remix-studio__action-spark {
     transform: rotate(90deg);
+  }
+
+  .remix-studio__action.is-loading .remix-studio__action-spark {
+    animation: spin 1s linear infinite;
   }
 
   .remix-studio__divider {
     width: 1px;
-    background: linear-gradient(to bottom, transparent, rgba(148, 163, 184, 0.15), transparent);
+    background: linear-gradient(to bottom, transparent, var(--rs-border-strong), transparent);
     align-self: stretch;
   }
 
@@ -267,70 +389,72 @@ const modes = [
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 12px;
     text-align: center;
-    padding: 24px;
+    padding: 32px;
   }
 
   .remix-studio__idle-icon {
-    font-size: 1.5rem;
-    color: rgba(var(--remix-accent-rgb), 0.2);
+    font-size: 2.5rem;
+    color: rgba(var(--remix-accent-rgb), 0.4);
     animation: remix-idle-pulse 3s ease-in-out infinite;
   }
 
   .remix-studio__idle-text {
-    font-size: 0.72rem;
-    font-weight: 600;
-    color: #475569;
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: var(--rs-text-muted);
   }
 
   .remix-studio__processing {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    padding: 18px 16px;
+    gap: 12px;
+    padding: 24px;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .remix-studio__shimmer {
-    height: 11px;
-    border-radius: 6px;
+    height: 16px;
+    border-radius: 8px;
     background: linear-gradient(
       90deg,
-      rgba(148, 163, 184, 0.04),
-      rgba(var(--remix-accent-rgb), 0.1),
-      rgba(148, 163, 184, 0.04)
+      var(--rs-border),
+      rgba(var(--remix-accent-rgb), 0.08),
+      var(--rs-border)
     );
     background-size: 200% 100%;
-    animation: remix-shimmer 1.5s ease-in-out infinite;
+    animation: remix-shimmer 2s ease-in-out infinite;
   }
 
   .remix-studio__shimmer--short {
-    width: 55%;
+    width: 60%;
   }
 
   .remix-studio__shimmer--mid {
-    width: 75%;
+    width: 80%;
   }
 
   .remix-studio__processing-label {
-    font-size: 0.65rem;
-    font-weight: 700;
-    color: rgba(var(--remix-accent-rgb), 0.55);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--remix-accent);
     text-align: center;
-    margin-top: 4px;
-    font-family: var(--font-mono);
-    letter-spacing: 0.06em;
+    margin-top: 12px;
+    font-family: inherit;
+    letter-spacing: 0.04em;
   }
 
   .remix-studio__card {
     position: relative;
-    border-radius: 10px;
-    background: rgba(21, 32, 58, 0.7);
-    border: 1px solid rgba(var(--remix-accent-rgb), 0.14);
-    padding: 13px 15px;
+    border-radius: 12px;
+    background: var(--rs-card-bg);
+    border: 1px solid var(--rs-border-strong);
+    padding: 24px;
     display: flex;
     flex-direction: column;
-    gap: 9px;
+    gap: 16px;
     overflow-y: auto;
     max-height: 100%;
     backdrop-filter: blur(8px);
@@ -339,8 +463,8 @@ const modes = [
   }
 
   .remix-studio__card:hover {
-    border-color: rgba(var(--remix-accent-rgb), 0.25);
-    box-shadow: 0 4px 24px rgba(var(--remix-accent-rgb), 0.08);
+    border-color: rgba(var(--remix-accent-rgb), 0.2);
+    box-shadow: 0 4px 20px rgba(var(--remix-accent-rgb), 0.05);
   }
 
   .remix-studio__card::before {
@@ -349,176 +473,188 @@ const modes = [
     top: 0;
     left: 0;
     right: 0;
-    height: 2px;
+    height: 3px;
     background: linear-gradient(90deg, transparent, var(--remix-accent), transparent);
-    border-radius: 10px 10px 0 0;
-    opacity: 0.6;
+    border-radius: 12px 12px 0 0;
+    opacity: 0.8;
   }
 
-  .remix-studio__card-badge {
+  /* Classes used via JavaScript */
+  :global(.remix-studio__card-badge) {
     display: inline-block;
-    font-size: 0.56rem;
-    font-weight: 800;
-    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    font-family: inherit;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.08em;
     color: var(--remix-accent);
-    padding: 2px 8px;
-    border: 1px solid rgba(var(--remix-accent-rgb), 0.25);
-    border-radius: 4px;
-    background: rgba(var(--remix-accent-rgb), 0.06);
+    padding: 4px 10px;
+    border: 1px solid rgba(var(--remix-accent-rgb), 0.3);
+    border-radius: 6px;
+    background: rgba(var(--remix-accent-rgb), 0.1);
     width: fit-content;
   }
 
-  .remix-studio__card-title {
-    font-size: 0.95rem;
-    font-weight: 900;
-    color: #F8FAFC;
+  :global(.remix-studio__card-title) {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--rs-text);
     letter-spacing: -0.02em;
-    line-height: 1.2;
+    line-height: 1.25;
   }
 
-  .remix-studio__card-tagline {
-    font-size: 0.75rem;
+  :global(.remix-studio__card-tagline) {
+    font-size: 1.125rem;
     font-style: italic;
-    color: #94A3B8;
-    line-height: 1.45;
+    color: var(--rs-text-muted);
+    line-height: 1.5;
   }
 
-  .remix-studio__card-section {
+  :global(.remix-studio__card-section) {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 8px;
     animation: remix-section-in 350ms ease both;
   }
 
-  .remix-studio__card-section-label {
-    font-size: 0.56rem;
-    font-weight: 800;
+  :global(.remix-studio__card-section-label) {
+    font-size: 0.75rem;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: #64748B;
+    color: var(--rs-text-faint);
   }
 
-  .remix-studio__card-section ul,
-  .remix-studio__card-section ol {
+  :global(.remix-studio__card-section ul),
+  :global(.remix-studio__card-section ol) {
     list-style: none;
     padding: 0;
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 6px;
   }
 
-  .remix-studio__card-section li {
-    font-size: 0.72rem;
-    color: #CBD5E1;
-    line-height: 1.45;
-    padding-left: 10px;
+  :global(.remix-studio__card-section li) {
+    font-size: 1rem;
+    color: var(--rs-text-muted);
+    line-height: 1.5;
+    padding-left: 16px;
     position: relative;
   }
 
-  .remix-studio__card-section li::before {
+  :global(.remix-studio__card-section li::before) {
     content: "";
     position: absolute;
     left: 0;
-    top: 7px;
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background: rgba(var(--remix-accent-rgb), 0.5);
-  }
-
-  .remix-studio__card-section li strong {
-    color: #F8FAFC;
-    font-weight: 700;
-  }
-
-  .remix-studio__card-section p,
-  .remix-studio__card-section > span {
-    font-size: 0.72rem;
-    line-height: 1.5;
-    color: #CBD5E1;
-  }
-
-  .remix-studio__card-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    margin-top: 2px;
-  }
-
-  .remix-studio__card-tag {
-    font-size: 0.55rem;
-    font-weight: 700;
-    padding: 2px 7px;
-    border-radius: 4px;
-    background: rgba(var(--remix-accent-rgb), 0.08);
-    color: rgba(var(--remix-accent-rgb), 0.8);
-    border: 1px solid rgba(var(--remix-accent-rgb), 0.12);
-  }
-
-  .remix-studio__swatches {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    flex-wrap: wrap;
-  }
-
-  .remix-studio__swatch-group {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  .remix-studio__swatch-dot {
-    width: 16px;
-    height: 16px;
-    border-radius: 3px;
-    border: 1px solid rgba(148, 163, 184, 0.12);
-    flex-shrink: 0;
-  }
-
-  .remix-studio__swatch-name {
-    font-size: 0.6rem;
-    color: #94A3B8;
-    font-weight: 600;
-  }
-
-  .remix-studio__level-row {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  .remix-studio__level-pip {
+    top: 9px;
     width: 6px;
     height: 6px;
     border-radius: 50%;
+    background: rgba(var(--remix-accent-rgb), 0.6);
   }
 
-  .remix-studio__level-pip--on {
+  :global(.remix-studio__card-section li strong) {
+    color: var(--rs-text);
+    font-weight: 600;
+  }
+
+  :global(.remix-studio__card-section p),
+  :global(.remix-studio__card-section > span:not(.remix-studio__card-section-label)) {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--rs-text-muted);
+  }
+
+  :global(.remix-studio__card-tags) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  :global(.remix-studio__card-tag) {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: var(--rs-panel-bg);
+    color: var(--rs-text);
+    border: 1px solid var(--rs-border-strong);
+  }
+
+  :global(.remix-studio__swatches) {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+
+  :global(.remix-studio__swatch-group) {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--rs-panel-bg);
+    padding: 4px 8px 4px 4px;
+    border-radius: 20px;
+    border: 1px solid var(--rs-border);
+  }
+
+  :global(.remix-studio__swatch-dot) {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+  }
+
+  :global(.remix-studio__swatch-name) {
+    font-size: 0.75rem;
+    color: var(--rs-text);
+    font-weight: 500;
+  }
+
+  :global(.remix-studio__level-row) {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  :global(.remix-studio__level-pip) {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  :global(.remix-studio__level-pip--on) {
     background: var(--remix-accent);
   }
 
-  .remix-studio__level-pip--off {
-    background: rgba(148, 163, 184, 0.15);
+  :global(.remix-studio__level-pip--off) {
+    background: var(--rs-border-strong);
   }
 
-  .remix-studio__level-label {
-    font-size: 0.6rem;
-    color: #94A3B8;
-    margin-left: 2px;
+  :global(.remix-studio__level-label) {
+    font-size: 0.8125rem;
+    color: var(--rs-text);
+    font-weight: 500;
+    margin-left: 4px;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
   }
 
   @keyframes remix-idle-pulse {
     0%,
     100% {
-      opacity: 0.2;
+      opacity: 0.3;
       transform: scale(0.95);
     }
     50% {
-      opacity: 0.4;
+      opacity: 0.6;
       transform: scale(1.05);
     }
   }
@@ -535,7 +671,7 @@ const modes = [
   @keyframes remix-card-enter {
     from {
       opacity: 0;
-      transform: translateY(8px) scale(0.98);
+      transform: translateY(12px) scale(0.98);
     }
     to {
       opacity: 1;
@@ -546,7 +682,7 @@ const modes = [
   @keyframes remix-section-in {
     from {
       opacity: 0;
-      transform: translateY(5px);
+      transform: translateY(8px);
     }
     to {
       opacity: 1;
@@ -554,11 +690,11 @@ const modes = [
     }
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 860px) {
     .remix-studio {
       grid-template-columns: 1fr;
-      gap: 10px;
-      padding: 12px 14px;
+      gap: 24px;
+      padding: 24px;
     }
 
     .remix-studio__divider {
@@ -567,18 +703,14 @@ const modes = [
       background: linear-gradient(
         to right,
         transparent,
-        rgba(148, 163, 184, 0.15),
+        var(--rs-border-strong),
         transparent
       );
     }
 
     .remix-studio__panel--output {
       order: -1;
-      min-height: 140px;
-    }
-
-    .remix-studio__modes {
-      flex-wrap: wrap;
+      min-height: 200px;
     }
   }
 
@@ -586,9 +718,13 @@ const modes = [
     .remix-studio *,
     .remix-studio *::before,
     .remix-studio *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
+      animation: none !important;
+      transition: none !important;
+    }
+    
+    .remix-studio__action.is-loading .remix-studio__action-spark {
+      animation: none !important;
+      transform: rotate(45deg);
     }
   }
 </style>
@@ -602,9 +738,11 @@ const modes = [
     const seedEls = studio.querySelectorAll("[data-remix-seed]");
     const modeEls = studio.querySelectorAll("[data-remix-mode]");
     const actionEl = studio.querySelector("[data-remix-action]");
+    const actionTextEl = studio.querySelector("[data-remix-action-text]");
     const idleEl = studio.querySelector("[data-remix-idle]");
     const processingEl = studio.querySelector("[data-remix-processing]");
     const cardEl = studio.querySelector("[data-remix-card]");
+    const statusEl = studio.querySelector("[data-remix-status]");
 
     let currentMode = "sharpen";
     let remixing = false;
@@ -621,9 +759,11 @@ const modes = [
         modeEls.forEach((m) => {
           m.classList.remove("is-active");
           m.setAttribute("aria-checked", "false");
+          m.setAttribute("tabindex", "-1");
         });
         mode.classList.add("is-active");
         mode.setAttribute("aria-checked", "true");
+        mode.setAttribute("tabindex", "0");
         currentMode = mode.dataset.remixMode;
       });
     });
@@ -641,6 +781,14 @@ const modes = [
     async function runRemix(input, mode) {
       remixing = true;
       actionEl.disabled = true;
+      actionEl.classList.add("is-loading");
+      actionEl.setAttribute("aria-busy", "true");
+      actionTextEl.textContent = "Remixing...";
+      if (statusEl) statusEl.textContent = "Remixing your idea...";
+      
+      inputEl.disabled = true;
+      modeEls.forEach(m => m.disabled = true);
+      seedEls.forEach(s => s.disabled = true);
 
       idleEl.hidden = true;
       cardEl.hidden = true;
@@ -649,12 +797,26 @@ const modes = [
       const result = (await tryAI(input, mode)) || localTransform(input, mode);
 
       processingEl.hidden = true;
-      cardEl.innerHTML = "";
+      
+      // Use replaceChildren to avoid unsafe innerHTML while clearing
+      cardEl.replaceChildren();
       cardEl.appendChild(buildCard(result, mode));
       cardEl.hidden = false;
+      if (statusEl) statusEl.textContent = "Remix complete.";
 
       remixing = false;
       actionEl.disabled = false;
+      actionEl.classList.remove("is-loading");
+      actionEl.removeAttribute("aria-busy");
+      actionTextEl.textContent = "Remix Idea";
+      
+      inputEl.disabled = false;
+      modeEls.forEach(m => m.disabled = false);
+      seedEls.forEach(s => s.disabled = false);
+      
+      // Focus the new content for screen readers
+      cardEl.setAttribute("tabindex", "-1");
+      cardEl.focus();
     }
 
     async function tryAI(input, mode) {
@@ -998,7 +1160,7 @@ const modes = [
       wrapper.appendChild(badge);
 
       delay += 60;
-      const title = el("span", "remix-studio__card-title", result.title);
+      const title = el("h4", "remix-studio__card-title", result.title);
       title.style.animationDelay = `${delay}ms`;
       title.classList.add("remix-studio__card-section");
       wrapper.appendChild(title);
