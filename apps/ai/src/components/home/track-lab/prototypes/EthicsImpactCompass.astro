@@ -2,86 +2,104 @@
 ---
 
 <div class="ethics-compass" data-track-prototype="ethics" role="region" aria-label="AI Ethics Impact Compass">
-  <div class="ec__body">
-    <svg class="ec__svg" viewBox="0 0 500 440" aria-hidden="true">
-      <circle class="ec__ring ec__ring--outer" cx="250" cy="200" r="175" />
-      <circle class="ec__ring ec__ring--main" cx="250" cy="200" r="140" />
-      <circle class="ec__ring ec__ring--inner" cx="250" cy="200" r="70" />
-      
-      <g class="ec__ticks"></g>
-      
-      <g class="ec__spokes">
-        <line class="ec__spoke" data-dim="fairness" x1="250" y1="200" x2="250" y2="60" />
-        <line class="ec__spoke" data-dim="privacy" x1="250" y1="200" x2="371" y2="130" />
-        <line class="ec__spoke" data-dim="accountability" x1="250" y1="200" x2="371" y2="270" />
-        <line class="ec__spoke" data-dim="safety" x1="250" y1="200" x2="250" y2="340" />
-        <line class="ec__spoke" data-dim="bias" x1="250" y1="200" x2="129" y2="270" />
-        <line class="ec__spoke" data-dim="usefulness" x1="250" y1="200" x2="129" y2="130" />
-      </g>
-      
-      <polygon class="ec__polygon" points="" />
-      
-      <g class="ec__dim" data-dim="fairness" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0" aria-valuetext="not weighted" aria-label="Fairness weight">
-        <circle class="ec__dim-glow" cx="250" cy="60" r="32" />
-        <circle class="ec__dim-ring" cx="250" cy="60" r="16" />
-        <circle class="ec__dim-dot" cx="250" cy="60" r="6" />
-        <text class="ec__dim-text" x="250" y="30" text-anchor="middle">Fairness</text>
-        <text class="ec__dim-val" x="250" y="86" text-anchor="middle"></text>
-      </g>
-      <g class="ec__dim" data-dim="privacy" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0" aria-valuetext="not weighted" aria-label="Privacy weight">
-        <circle class="ec__dim-glow" cx="371" cy="130" r="32" />
-        <circle class="ec__dim-ring" cx="371" cy="130" r="16" />
-        <circle class="ec__dim-dot" cx="371" cy="130" r="6" />
-        <text class="ec__dim-text" x="395" y="134" text-anchor="start">Privacy</text>
-        <text class="ec__dim-val" x="395" y="152" text-anchor="start"></text>
-      </g>
-      <g class="ec__dim" data-dim="accountability" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0" aria-valuetext="not weighted" aria-label="Accountability weight">
-        <circle class="ec__dim-glow" cx="371" cy="270" r="32" />
-        <circle class="ec__dim-ring" cx="371" cy="270" r="16" />
-        <circle class="ec__dim-dot" cx="371" cy="270" r="6" />
-        <text class="ec__dim-text" x="395" y="274" text-anchor="start">Accountability</text>
-        <text class="ec__dim-val" x="395" y="292" text-anchor="start"></text>
-      </g>
-      <g class="ec__dim" data-dim="safety" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0" aria-valuetext="not weighted" aria-label="Safety weight">
-        <circle class="ec__dim-glow" cx="250" cy="340" r="32" />
-        <circle class="ec__dim-ring" cx="250" cy="340" r="16" />
-        <circle class="ec__dim-dot" cx="250" cy="340" r="6" />
-        <text class="ec__dim-text" x="250" y="378" text-anchor="middle">Safety</text>
-        <text class="ec__dim-val" x="250" y="396" text-anchor="middle"></text>
-      </g>
-      <g class="ec__dim" data-dim="bias" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0" aria-valuetext="not weighted" aria-label="Bias weight">
-        <circle class="ec__dim-glow" cx="129" cy="270" r="32" />
-        <circle class="ec__dim-ring" cx="129" cy="270" r="16" />
-        <circle class="ec__dim-dot" cx="129" cy="270" r="6" />
-        <text class="ec__dim-text" x="105" y="274" text-anchor="end">Bias</text>
-        <text class="ec__dim-val" x="105" y="292" text-anchor="end"></text>
-      </g>
-      <g class="ec__dim" data-dim="usefulness" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0" aria-valuetext="not weighted" aria-label="Usefulness weight">
-        <circle class="ec__dim-glow" cx="129" cy="130" r="32" />
-        <circle class="ec__dim-ring" cx="129" cy="130" r="16" />
-        <circle class="ec__dim-dot" cx="129" cy="130" r="6" />
-        <text class="ec__dim-text" x="105" y="134" text-anchor="end">Usefulness</text>
-        <text class="ec__dim-val" x="105" y="152" text-anchor="end"></text>
-      </g>
-    </svg>
-    <div class="ec__center" aria-hidden="true">
-      <span class="ec__center-title">Impact Compass</span>
-      <span class="ec__center-sub">Select a scenario to analyze</span>
-    </div>
-  </div>
-  
-  <div class="ec__controls">
-    <div class="ec__scenarios" role="group" aria-label="Workshop scenarios">
-      <button class="ec__btn" type="button" data-scenario="marking" aria-pressed="false">AI Marking</button>
-      <button class="ec__btn" type="button" data-scenario="transcription" aria-pressed="false">Lecture Transcription</button>
-      <button class="ec__btn" type="button" data-scenario="internships" aria-pressed="false">Hiring Internships</button>
-      <button class="ec__btn" type="button" data-scenario="triage" aria-pressed="false">Healthcare Triage</button>
-      <button class="ec__btn" type="button" data-scenario="coursework" aria-pressed="false">Creative Coursework</button>
-      <button class="ec__btn" type="button" data-scenario="safety" aria-pressed="false">Campus Safety</button>
+  <div class="ec__layout">
+    <div class="ec__visual">
+      <div class="ec__body">
+        <svg class="ec__svg" viewBox="0 0 500 440" aria-hidden="true">
+          <circle class="ec__ring ec__ring--outer" cx="250" cy="200" r="175" />
+          <circle class="ec__ring ec__ring--main" cx="250" cy="200" r="140" />
+          <circle class="ec__ring ec__ring--inner" cx="250" cy="200" r="70" />
+          
+          <g class="ec__ticks"></g>
+          
+          <g class="ec__spokes">
+            <line class="ec__spoke" data-dim="fairness" x1="250" y1="200" x2="250" y2="60" />
+            <line class="ec__spoke" data-dim="privacy" x1="250" y1="200" x2="371" y2="130" />
+            <line class="ec__spoke" data-dim="accountability" x1="250" y1="200" x2="371" y2="270" />
+            <line class="ec__spoke" data-dim="safety" x1="250" y1="200" x2="250" y2="340" />
+            <line class="ec__spoke" data-dim="bias" x1="250" y1="200" x2="129" y2="270" />
+            <line class="ec__spoke" data-dim="usefulness" x1="250" y1="200" x2="129" y2="130" />
+          </g>
+          
+          <polygon class="ec__polygon" points="" />
+          
+          <g class="ec__dim" data-dim="fairness" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0" aria-valuetext="not weighted" aria-label="Fairness weight">
+            <circle class="ec__dim-glow" cx="250" cy="60" r="32" />
+            <circle class="ec__dim-ring" cx="250" cy="60" r="16" />
+            <circle class="ec__dim-dot" cx="250" cy="60" r="6" />
+            <text class="ec__dim-text" x="250" y="30" text-anchor="middle">Fairness</text>
+            <text class="ec__dim-val" x="250" y="86" text-anchor="middle"></text>
+          </g>
+          <g class="ec__dim" data-dim="privacy" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0" aria-valuetext="not weighted" aria-label="Privacy weight">
+            <circle class="ec__dim-glow" cx="371" cy="130" r="32" />
+            <circle class="ec__dim-ring" cx="371" cy="130" r="16" />
+            <circle class="ec__dim-dot" cx="371" cy="130" r="6" />
+            <text class="ec__dim-text" x="395" y="134" text-anchor="start">Privacy</text>
+            <text class="ec__dim-val" x="395" y="152" text-anchor="start"></text>
+          </g>
+          <g class="ec__dim" data-dim="accountability" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0" aria-valuetext="not weighted" aria-label="Accountability weight">
+            <circle class="ec__dim-glow" cx="371" cy="270" r="32" />
+            <circle class="ec__dim-ring" cx="371" cy="270" r="16" />
+            <circle class="ec__dim-dot" cx="371" cy="270" r="6" />
+            <text class="ec__dim-text" x="395" y="274" text-anchor="start">Accountability</text>
+            <text class="ec__dim-val" x="395" y="292" text-anchor="start"></text>
+          </g>
+          <g class="ec__dim" data-dim="safety" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0" aria-valuetext="not weighted" aria-label="Safety weight">
+            <circle class="ec__dim-glow" cx="250" cy="340" r="32" />
+            <circle class="ec__dim-ring" cx="250" cy="340" r="16" />
+            <circle class="ec__dim-dot" cx="250" cy="340" r="6" />
+            <text class="ec__dim-text" x="250" y="378" text-anchor="middle">Safety</text>
+            <text class="ec__dim-val" x="250" y="396" text-anchor="middle"></text>
+          </g>
+          <g class="ec__dim" data-dim="bias" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0" aria-valuetext="not weighted" aria-label="Bias weight">
+            <circle class="ec__dim-glow" cx="129" cy="270" r="32" />
+            <circle class="ec__dim-ring" cx="129" cy="270" r="16" />
+            <circle class="ec__dim-dot" cx="129" cy="270" r="6" />
+            <text class="ec__dim-text" x="105" y="274" text-anchor="end">Bias</text>
+            <text class="ec__dim-val" x="105" y="292" text-anchor="end"></text>
+          </g>
+          <g class="ec__dim" data-dim="usefulness" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0" aria-valuetext="not weighted" aria-label="Usefulness weight">
+            <circle class="ec__dim-glow" cx="129" cy="130" r="32" />
+            <circle class="ec__dim-ring" cx="129" cy="130" r="16" />
+            <circle class="ec__dim-dot" cx="129" cy="130" r="6" />
+            <text class="ec__dim-text" x="105" y="134" text-anchor="end">Usefulness</text>
+            <text class="ec__dim-val" x="105" y="152" text-anchor="end"></text>
+          </g>
+        </svg>
+        <div class="ec__center" aria-hidden="true">
+          <span class="ec__center-title">Impact Compass</span>
+          <span class="ec__center-sub">Adjust priorities</span>
+        </div>
+      </div>
+      <div class="ec__scenarios" role="group" aria-label="Workshop scenarios">
+        <button class="ec__btn" type="button" data-scenario="marking" aria-pressed="false">AI Marking</button>
+        <button class="ec__btn" type="button" data-scenario="transcription" aria-pressed="false">Lecture Transcription</button>
+        <button class="ec__btn" type="button" data-scenario="internships" aria-pressed="false">Hiring Internships</button>
+        <button class="ec__btn" type="button" data-scenario="triage" aria-pressed="false">Healthcare Triage</button>
+        <button class="ec__btn" type="button" data-scenario="coursework" aria-pressed="false">Creative Coursework</button>
+        <button class="ec__btn" type="button" data-scenario="safety" aria-pressed="false">Campus Safety</button>
+      </div>
     </div>
     
-    <div class="ec__insight-box">
-      <p class="ec__insight" role="status" aria-live="polite">AI systems do not just process data; they affect students, power, society, and trust. Choose an exercise above.</p>
+    <div class="ec__panel">
+      <div class="ec__panel-header">
+        <h3 class="ec__panel-title">Ethics Assessment</h3>
+        <button class="ec__btn ec__btn--primary" type="button" data-action="assess">Run Assessment</button>
+      </div>
+      
+      <div class="ec__results-box">
+        <div class="ec__loading" style="display: none;">
+          <div class="ec__spinner"></div>
+          <span>Analyzing scenario impacts...</span>
+        </div>
+        
+        <div class="ec__results-content" aria-live="polite">
+          <div class="ec__empty-state">
+            <p>Select a scenario and adjust dimension weights, then run the assessment to generate ethical tradeoffs and safeguards.</p>
+          </div>
+        </div>
+        <div class="ec__source" style="display: none;"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -95,17 +113,14 @@
     --ec-bg-hover: var(--ai-bg-hover, rgba(59, 130, 246, 0.08));
     --ec-bg-active: var(--ai-bg-active, rgba(59, 130, 246, 0.15));
     --ec-border: var(--ai-border, rgba(148, 163, 184, 0.2));
+    --ec-surface: var(--ai-surface, #ffffff);
     
     width: 100%;
     height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 32px;
-    padding: 32px;
     font-family: var(--font-sans, system-ui, sans-serif);
     box-sizing: border-box;
+    padding: 24px;
+    background: var(--ai-bg, transparent);
   }
 
   :global([data-theme="dark"]) .ethics-compass {
@@ -116,14 +131,35 @@
     --ec-bg-hover: var(--ai-bg-hover, rgba(96, 165, 250, 0.12));
     --ec-bg-active: var(--ai-bg-active, rgba(96, 165, 250, 0.2));
     --ec-border: var(--ai-border, rgba(148, 163, 184, 0.2));
+    --ec-surface: var(--ai-surface, #1e293b);
+  }
+
+  .ec__layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    height: 100%;
+    align-items: start;
+  }
+
+  @media (max-width: 900px) {
+    .ec__layout {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .ec__visual {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
   }
 
   .ec__body {
     position: relative;
     width: 100%;
-    max-width: 500px;
-    flex-shrink: 1;
-    min-height: 0;
+    max-width: 440px;
+    aspect-ratio: 1;
   }
 
   .ec__svg {
@@ -182,7 +218,7 @@
     stroke-opacity: 0;
     stroke-width: 2;
     stroke-linejoin: round;
-    transition: fill-opacity 600ms ease, stroke-opacity 600ms ease;
+    transition: fill-opacity 600ms ease, stroke-opacity 600ms ease, points 400ms ease;
   }
 
   .ec__polygon.is-active {
@@ -276,61 +312,48 @@
     transform: translate(-50%, -50%);
     text-align: center;
     pointer-events: none;
-    width: 140px;
+    width: 120px;
     margin-top: -20px;
   }
 
   .ec__center-title {
     display: block;
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 800;
     color: var(--ec-text-main);
     letter-spacing: 0.02em;
     line-height: 1.2;
-    transition: color 300ms ease;
   }
 
   .ec__center-sub {
     display: block;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: var(--ec-text-muted);
     margin-top: 4px;
     line-height: 1.4;
-    transition: color 300ms ease;
-  }
-
-  .ec__controls {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 24px;
-    flex-shrink: 0;
-    width: 100%;
-    max-width: 700px;
   }
 
   .ec__scenarios {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 8px;
     justify-content: center;
   }
 
   .ec__btn {
-    padding: 10px 18px;
-    border: 1px solid var(--ec-border, rgba(148, 163, 184, 0.2));
-    border-radius: 24px;
+    padding: 8px 16px;
+    border: 1px solid var(--ec-border);
+    border-radius: 999px;
     background: transparent;
     color: var(--ec-text-muted);
     font-family: inherit;
-    font-size: 0.95rem;
+    font-size: 0.875rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 200ms ease;
-    line-height: 1.4;
   }
 
-  .ec__btn:hover {
+  .ec__btn:hover:not(:disabled) {
     color: var(--ec-text-main);
     border-color: var(--ec-accent);
     background: var(--ec-bg-hover);
@@ -345,59 +368,137 @@
     color: var(--ec-text-main);
     background: var(--ec-bg-active);
     border-color: var(--ec-accent);
-    box-shadow: 0 0 16px var(--ec-bg-hover);
+  }
+  
+  .ec__btn--primary {
+    background: var(--ec-accent);
+    color: white;
+    border-color: var(--ec-accent);
+  }
+  
+  .ec__btn--primary:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--ec-accent) 80%, black);
+    color: white;
+  }
+  
+  .ec__btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
-  .ec__insight-box {
-    background: var(--ec-bg-hover);
-    border-left: 4px solid var(--ec-accent);
-    padding: 16px 24px;
-    border-radius: 6px;
-    width: 100%;
-    max-width: 500px;
+  .ec__panel {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: 100%;
+    min-height: 400px;
   }
-
-  .ec__insight {
-    font-size: 0.95rem;
+  
+  .ec__panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--ec-border);
+    padding-bottom: 12px;
+  }
+  
+  .ec__panel-title {
+    font-size: 1.125rem;
+    font-weight: 700;
     color: var(--ec-text-main);
-    text-align: left;
     margin: 0;
+  }
+
+  .ec__results-box {
+    background: var(--ec-surface);
+    border: 1px solid var(--ec-border);
+    border-radius: 12px;
+    padding: 24px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow-y: auto;
+  }
+  
+  .ec__empty-state {
+    color: var(--ec-text-muted);
+    font-size: 0.95rem;
     line-height: 1.6;
+    text-align: center;
+    margin: auto;
+    max-width: 300px;
+  }
+
+  .ec__loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    height: 100%;
+    color: var(--ec-text-muted);
+    font-size: 0.9rem;
     font-weight: 500;
   }
 
+  .ec__spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid var(--ec-border);
+    border-top-color: var(--ec-accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
 
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
 
-  @media (max-width: 768px) {
-    .ethics-compass {
-      padding: 16px 12px;
-      gap: 16px;
-    }
-    
-    .ec__dim-text {
-      font-size: 12px;
-    }
-    .ec__dim[data-level="1"] .ec__dim-text { font-size: 12px; }
-    .ec__dim[data-level="2"] .ec__dim-text { font-size: 13px; }
-    .ec__dim[data-level="3"] .ec__dim-text { font-size: 14px; }
+  .ec__result-section {
+    margin-bottom: 24px;
+  }
+  
+  .ec__result-section:last-child {
+    margin-bottom: 0;
+  }
 
-    .ec__btn {
-      font-size: 0.75rem;
-      padding: 6px 12px;
-    }
+  .ec__result-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ec-text-main);
+    margin: 0 0 12px 0;
+  }
 
-    .ec__center-title {
-      font-size: 0.9rem;
-    }
-    .ec__center-sub {
-      font-size: 0.65rem;
-    }
-    .ec__insight-box {
-      padding: 10px 16px;
-    }
-    .ec__insight {
-      font-size: 0.8rem;
-    }
+  .ec__result-text {
+    font-size: 0.95rem;
+    color: var(--ec-text-muted);
+    line-height: 1.6;
+    margin: 0;
+  }
+  
+  .ec__result-list {
+    margin: 0;
+    padding-left: 20px;
+    color: var(--ec-text-muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+  
+  .ec__result-list li {
+    margin-bottom: 8px;
+  }
+
+  .ec__source {
+    font-size: 0.75rem;
+    color: var(--ec-text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--ec-border);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -429,62 +530,28 @@
     
     const LEVEL_LABELS = ["not weighted", "low", "medium", "high"];
 
-    const SCENARIOS: Record<string, {
-      label: string;
-      desc: string;
-      impacts: Record<string, number>;
-      insight: string;
-    }> = {
-      marking: {
-        label: "AI Marking",
-        desc: "AI grades essays and recommends course modules",
-        impacts: { fairness: 3, privacy: 2, accountability: 3, safety: 1, bias: 3, usefulness: 3 },
-        insight: "When an AI evaluates your work, whose standards apply? It is efficient but poses large fairness and accountability questions.",
-      },
-      transcription: {
-        label: "Lecture Transcription",
-        desc: "Automated real-time captions for lectures",
-        impacts: { fairness: 1, privacy: 1, accountability: 1, safety: 1, bias: 2, usefulness: 3 },
-        insight: "Highly useful for accessibility, but inconsistent accuracy across accents can subtly disadvantage certain students.",
-      },
-      internships: {
-        label: "Hiring Internships",
-        desc: "AI filtering student CVs for placements",
-        impacts: { fairness: 3, privacy: 3, accountability: 2, safety: 1, bias: 3, usefulness: 2 },
-        insight: "Automated CV screening can perpetuate historical biases. Students' privacy and fairness are major tradeoffs here.",
-      },
-      triage: {
-        label: "Healthcare Triage",
-        desc: "AI sorting student patients at the university clinic",
-        impacts: { fairness: 2, privacy: 3, accountability: 3, safety: 3, bias: 2, usefulness: 3 },
-        insight: "A wrong prediction here is an active harm. High safety, accountability, and privacy are absolutely critical.",
-      },
-      coursework: {
-        label: "Creative Coursework",
-        desc: "Using generative AI for essays or art assignments",
-        impacts: { fairness: 2, privacy: 1, accountability: 2, safety: 1, bias: 2, usefulness: 3 },
-        insight: "Sparks debates on originality and academic integrity. Accountability is key: where does the student's work end?",
-      },
-      safety: {
-        label: "Campus Safety",
-        desc: "Predictive AI monitoring security cameras across campus",
-        impacts: { fairness: 3, privacy: 3, accountability: 3, safety: 3, bias: 3, usefulness: 2 },
-        insight: "Heavy surveillance affects student privacy. Bias in monitoring algorithms can disproportionately profile specific groups.",
-      },
+    const SCENARIOS: Record<string, { label: string; impacts: Record<string, number> }> = {
+      marking: { label: "AI Marking", impacts: { fairness: 3, privacy: 2, accountability: 3, safety: 1, bias: 3, usefulness: 3 } },
+      transcription: { label: "Lecture Transcription", impacts: { fairness: 1, privacy: 1, accountability: 1, safety: 1, bias: 2, usefulness: 3 } },
+      internships: { label: "Hiring Internships", impacts: { fairness: 3, privacy: 3, accountability: 2, safety: 1, bias: 3, usefulness: 2 } },
+      triage: { label: "Healthcare Triage", impacts: { fairness: 2, privacy: 3, accountability: 3, safety: 3, bias: 2, usefulness: 3 } },
+      coursework: { label: "Creative Coursework", impacts: { fairness: 2, privacy: 1, accountability: 2, safety: 1, bias: 2, usefulness: 3 } },
+      safety: { label: "Campus Safety", impacts: { fairness: 3, privacy: 3, accountability: 3, safety: 3, bias: 3, usefulness: 2 } },
     };
 
-    let activeScenario: string | null = null;
+    let activeScenarioId: string | null = null;
     const weights: Record<string, number> = {};
     DIMS.forEach((d) => { weights[d] = 0; });
 
     const polygon = root.querySelector<SVGPolygonElement>(".ec__polygon");
-    const centerTitle = root.querySelector(".ec__center-title");
-    const centerSub = root.querySelector(".ec__center-sub");
-    const insightEl = root.querySelector(".ec__insight");
     const dimGroups = Array.from(root.querySelectorAll<SVGGElement>(".ec__dim"));
     const spokes = Array.from(root.querySelectorAll<SVGLineElement>(".ec__spoke"));
-    const btns = Array.from(root.querySelectorAll<HTMLButtonElement>(".ec__btn"));
+    const btns = Array.from(root.querySelectorAll<HTMLButtonElement>(".ec__btn[data-scenario]"));
     const ticksGroup = root.querySelector<SVGGElement>(".ec__ticks");
+    const assessBtn = root.querySelector<HTMLButtonElement>("[data-action='assess']");
+    const contentBox = root.querySelector(".ec__results-content");
+    const loadingBox = root.querySelector(".ec__loading");
+    const sourceBox = root.querySelector<HTMLElement>(".ec__source");
 
     function buildTicks() {
       if (!ticksGroup) return;
@@ -545,39 +612,25 @@
         spoke.classList.toggle("is-active", weights[dim] > 0);
       });
 
-      if (centerTitle && centerSub && insightEl) {
-        if (activeScenario && SCENARIOS[activeScenario]) {
-          const s = SCENARIOS[activeScenario];
-          centerTitle.textContent = s.label;
-          centerSub.textContent = s.desc;
-          insightEl.textContent = s.insight;
-        } else {
-          const hasAny = activeDims.length > 0;
-          centerTitle.textContent = hasAny ? "Custom Workshop" : "Impact Compass";
-          centerSub.textContent = hasAny
-            ? "Tradeoffs visualized"
-            : "Select a scenario to analyze";
-          insightEl.textContent = hasAny
-            ? "Every dimension you weight shapes the ethical picture. Discuss the tradeoffs of this configuration with your group."
-            : "AI systems do not just process data; they affect students, power, society, and trust. Choose an exercise above.";
-        }
-      }
-
       btns.forEach((btn) => {
-        const isActive = btn.dataset.scenario === activeScenario;
+        const isActive = btn.dataset.scenario === activeScenarioId;
         btn.classList.toggle("is-active", isActive);
         btn.setAttribute("aria-pressed", String(isActive));
       });
+      
+      if (assessBtn) {
+        assessBtn.disabled = activeDims.length === 0 && !activeScenarioId;
+      }
     }
 
     btns.forEach((btn) => {
       btn.addEventListener("click", () => {
         const id = btn.dataset.scenario!;
-        if (activeScenario === id) {
-          activeScenario = null;
+        if (activeScenarioId === id) {
+          activeScenarioId = null;
           DIMS.forEach((d) => { weights[d] = 0; });
         } else {
-          activeScenario = id;
+          activeScenarioId = id;
           const impacts = SCENARIOS[id].impacts;
           DIMS.forEach((d) => { weights[d] = impacts[d]; });
         }
@@ -589,7 +642,7 @@
       function cycleWeight() {
         const dim = g.dataset.dim!;
         weights[dim] = (weights[dim] + 1) % 4;
-        activeScenario = null;
+        activeScenarioId = null;
         update();
       }
       g.addEventListener("click", cycleWeight);
@@ -601,17 +654,143 @@
           e.preventDefault();
           const dim = g.dataset.dim!;
           weights[dim] = Math.min(weights[dim] + 1, 3);
-          activeScenario = null;
+          activeScenarioId = null;
           update();
         } else if (e.key === "ArrowDown" || e.key === "ArrowLeft") {
           e.preventDefault();
           const dim = g.dataset.dim!;
           weights[dim] = Math.max(weights[dim] - 1, 0);
-          activeScenario = null;
+          activeScenarioId = null;
           update();
         }
       });
     });
+
+    function isRecord(value: unknown): value is Record<string, unknown> {
+      return typeof value === "object" && value !== null && !Array.isArray(value);
+    }
+
+    function cleanText(value: unknown, maxLength: number): string {
+      const text = typeof value === "string" || typeof value === "number" || typeof value === "boolean"
+        ? String(value)
+        : "";
+      const normalized = text.replace(/\s+/g, " ").trim();
+      return normalized.length <= maxLength ? normalized : `${normalized.slice(0, maxLength - 3).trimEnd()}...`;
+    }
+
+    function cleanArray(value: unknown, maxItems: number, maxLength: number): string[] {
+      if (!Array.isArray(value)) return [];
+      return value.map((item) => cleanText(item, maxLength)).filter(Boolean).slice(0, maxItems);
+    }
+
+    function normalizeEthicsOutput(value: unknown) {
+      if (!isRecord(value)) return null;
+      const output = {
+        summary: cleanText(value.summary, 340),
+        tradeoffs: cleanArray(value.tradeoffs, 5, 150),
+        safeguards: cleanArray(value.safeguards, 5, 150),
+        discussionQuestion: cleanText(value.discussionQuestion, 220),
+      };
+      return output.summary && output.discussionQuestion ? output : null;
+    }
+
+    function createEl(tag: string, className: string, text?: string): HTMLElement {
+      const el = document.createElement(tag);
+      if (className) el.className = className;
+      if (text !== undefined) el.textContent = text;
+      return el;
+    }
+
+    function appendTextSection(parent: Node, title: string, text: string) {
+      const section = createEl("div", "ec__result-section");
+      section.appendChild(createEl("h4", "ec__result-title", title));
+      section.appendChild(createEl("p", "ec__result-text", text));
+      parent.appendChild(section);
+    }
+
+    function appendListSection(parent: Node, title: string, items: string[]) {
+      if (items.length === 0) return;
+      const section = createEl("div", "ec__result-section");
+      section.appendChild(createEl("h4", "ec__result-title", title));
+      const list = createEl("ul", "ec__result-list");
+      items.forEach((item) => list.appendChild(createEl("li", "", item)));
+      section.appendChild(list);
+      parent.appendChild(section);
+    }
+
+    function appendDiscussion(parent: Node, text: string) {
+      const section = createEl("div", "ec__result-section");
+      section.appendChild(createEl("h4", "ec__result-title", "Discussion Starter"));
+      const p = createEl("p", "ec__result-text");
+      const em = document.createElement("em");
+      em.textContent = text;
+      p.appendChild(em);
+      section.appendChild(p);
+      parent.appendChild(section);
+    }
+
+    function setEmptyMessage(message: string) {
+      if (!contentBox) return;
+      const empty = createEl("div", "ec__empty-state");
+      empty.appendChild(createEl("p", "", message));
+      contentBox.replaceChildren(empty);
+    }
+
+    function renderAssessment(output: ReturnType<typeof normalizeEthicsOutput>, source: unknown) {
+      if (!contentBox || !output) throw new Error("Invalid output");
+      const frag = document.createDocumentFragment();
+      appendTextSection(frag, "Summary", output.summary);
+      appendListSection(frag, "Key Tradeoffs", output.tradeoffs);
+      appendListSection(frag, "Suggested Safeguards", output.safeguards);
+      appendDiscussion(frag, output.discussionQuestion);
+      contentBox.replaceChildren(frag);
+
+      if (sourceBox) {
+        sourceBox.textContent = `Generated by ${source === "ai" ? "Gemini AI" : "Deterministic Fallback"}`;
+        sourceBox.style.display = "block";
+      }
+    }
+
+    if (assessBtn) {
+      assessBtn.addEventListener("click", async () => {
+        if (assessBtn.disabled) return;
+        
+        let scenarioLabel = activeScenarioId ? SCENARIOS[activeScenarioId].label : "Custom Student Scenario";
+        
+        assessBtn.disabled = true;
+        if (contentBox) (contentBox as HTMLElement).style.display = "none";
+        if (sourceBox) sourceBox.style.display = "none";
+        if (loadingBox) (loadingBox as HTMLElement).style.display = "flex";
+
+        let timeout: ReturnType<typeof setTimeout> | undefined;
+        try {
+          const controller = new AbortController();
+          timeout = setTimeout(() => controller.abort(), 6000);
+          const res = await fetch("/api/ai/track-lab", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              feature: "ethics-assess",
+              scenario: scenarioLabel,
+              scores: weights,
+            }),
+            signal: controller.signal,
+          });
+
+          if (!res.ok) throw new Error("API error");
+          const data = await res.json();
+          const { source, output } = data;
+          renderAssessment(normalizeEthicsOutput(output), source);
+        } catch (err) {
+          setEmptyMessage("Failed to generate assessment. Please try again.");
+        } finally {
+          if (timeout) clearTimeout(timeout);
+          assessBtn.disabled = false;
+          if (loadingBox) (loadingBox as HTMLElement).style.display = "none";
+          if (contentBox) (contentBox as HTMLElement).style.display = "block";
+        }
+      });
+    }
 
     buildTicks();
     update();

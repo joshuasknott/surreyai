@@ -95,6 +95,183 @@ const SPRINT_STAGES: Record<string, string[]> = {
   ],
 };
 
+export type TaskRelayStructuredOutput = {
+  stageName: string;
+  action: string;
+  artifact: string;
+  nextStep: string;
+  risk: string;
+};
+
+export type BuildSprintOutput = {
+  description: string;
+  backlog?: string[];
+  roles?: string[];
+  milestones?: string[];
+  demoChecklist?: string[];
+  risks?: string[];
+};
+
+export type MlExplainOutput = {
+  title: string;
+  summary: string;
+  pattern: string;
+  examples: string[];
+  nextSteps: string[];
+  tags: string[];
+};
+
+export type CvExplainOutput = {
+  label: string;
+  confidence: number;
+  explanation: string;
+  signals: string[];
+  limitation: string;
+  nextStep: string;
+};
+
+export type EthicsDimension =
+  | "fairness"
+  | "privacy"
+  | "accountability"
+  | "safety"
+  | "bias"
+  | "usefulness";
+
+export type EthicsScoreMap = Record<EthicsDimension, number>;
+
+export type EthicsAssessOutput = {
+  scenario: string;
+  summary: string;
+  scores: EthicsScoreMap;
+  tradeoffs: string[];
+  safeguards: string[];
+  discussionQuestion: string;
+};
+
+type TaskRelayFallbackOptions = {
+  structured?: boolean;
+  customGoal?: string;
+};
+
+type BuildSprintFallbackOptions = {
+  structured?: boolean;
+};
+
+const TASK_STAGE_NAMES = ["Understand", "Research", "Plan", "Draft", "Review", "Finalise"];
+
+const GOAL_LABELS: Record<string, string> = {
+  "plan-event": "society event plan",
+  research: "research topic",
+  build: "group project",
+  organise: "study notes",
+  launch: "project team launch",
+};
+
+const SPRINT_STAGE_LABELS = ["Idea", "Team", "Prototype", "Demo", "Showcase"];
+
+const SPRINT_THEME_LABELS: Record<string, string> = {
+  campus: "campus assistant",
+  study: "revision tool",
+  creative: "creative AI tool",
+  vision: "computer vision demo",
+  automation: "automation helper",
+  ethics: "ethics debate tool",
+};
+
+const SPRINT_ROLES: Record<string, string[]> = {
+  campus: ["UX researcher", "full-stack developer", "campus content lead"],
+  study: ["ML engineer", "learning designer", "QA tester"],
+  creative: ["creative coder", "digital artist", "interaction designer"],
+  vision: ["CV specialist", "mobile developer", "accessibility tester"],
+  automation: ["automation developer", "event planner", "integrations lead"],
+  ethics: ["ethics facilitator", "full-stack developer", "workshop designer"],
+};
+
+const ML_DOMAIN_LABELS: Record<string, string> = {
+  creative: "media and arts",
+  coding: "software engineering",
+  research: "research",
+  societies: "student societies",
+  business: "business and startups",
+  games: "game development",
+  design: "UX/UI design",
+  science: "natural sciences",
+};
+
+const CV_OBJECTS: Record<string, Omit<CvExplainOutput, "confidence">> = {
+  whiteboard: {
+    label: "Whiteboard",
+    explanation: "The detector groups a large bright rectangle with marker-like strokes, then treats the text lines as classroom context.",
+    signals: ["rectangular surface", "high contrast writing", "wall-mounted position"],
+    limitation: "Glare or faint marker ink can reduce text recognition even when the board itself is detected.",
+    nextStep: "Run OCR on the detected board region and summarize the key points.",
+  },
+  laptop: {
+    label: "Laptop",
+    explanation: "The detector combines the screen rectangle, keyboard base, and desk placement into a laptop object hypothesis.",
+    signals: ["screen aspect ratio", "hinge/base shape", "near-table location"],
+    limitation: "Closed laptops or tablets with keyboards can look similar from this angle.",
+    nextStep: "Classify whether the screen is active before extracting app context.",
+  },
+  poster: {
+    label: "Poster",
+    explanation: "The detector sees a tall flat region with repeated text blocks, matching event-poster layout patterns.",
+    signals: ["vertical layout", "stacked text blocks", "wall attachment"],
+    limitation: "Small print is hard to read unless the crop is high resolution.",
+    nextStep: "Crop the poster area and extract dates, location, and call-to-action text.",
+  },
+  notebook: {
+    label: "Notebook",
+    explanation: "The detector uses the small paper-like rectangle and line markings to identify a notebook on the desk.",
+    signals: ["paper rectangle", "ruled line texture", "desk-level placement"],
+    limitation: "Loose sheets and notebooks may need extra context to separate reliably.",
+    nextStep: "Detect handwriting regions and ask for permission before transcription.",
+  },
+};
+
+const ETHICS_DIMENSIONS: EthicsDimension[] = [
+  "fairness",
+  "privacy",
+  "accountability",
+  "safety",
+  "bias",
+  "usefulness",
+];
+
+const ETHICS_SCENARIOS: Record<string, { label: string; summary: string; scores: EthicsScoreMap }> = {
+  marking: {
+    label: "AI Marking",
+    summary: "Automated grading can speed up feedback, but it must prove consistency, appeal routes, and fairness across writing styles.",
+    scores: { fairness: 3, privacy: 2, accountability: 3, safety: 1, bias: 3, usefulness: 3 },
+  },
+  transcription: {
+    label: "Lecture Transcription",
+    summary: "Real-time captions improve access, but accents, consent, and storage rules need explicit handling.",
+    scores: { fairness: 1, privacy: 1, accountability: 1, safety: 1, bias: 2, usefulness: 3 },
+  },
+  internships: {
+    label: "Hiring Internships",
+    summary: "AI CV screening can scale shortlisting, but historical hiring data can reproduce bias against students.",
+    scores: { fairness: 3, privacy: 3, accountability: 2, safety: 1, bias: 3, usefulness: 2 },
+  },
+  triage: {
+    label: "Healthcare Triage",
+    summary: "Clinical triage needs strong safety checks because a wrong priority score can create direct harm.",
+    scores: { fairness: 2, privacy: 3, accountability: 3, safety: 3, bias: 2, usefulness: 3 },
+  },
+  coursework: {
+    label: "Creative Coursework",
+    summary: "Generative tools can support creativity, but attribution and academic integrity need clear boundaries.",
+    scores: { fairness: 2, privacy: 1, accountability: 2, safety: 1, bias: 2, usefulness: 3 },
+  },
+  safety: {
+    label: "Campus Safety",
+    summary: "Predictive monitoring may improve response times, but surveillance and profiling risks are high.",
+    scores: { fairness: 3, privacy: 3, accountability: 3, safety: 3, bias: 3, usefulness: 2 },
+  },
+};
+
 function hashStr(str: string): number {
   let h = 5381;
   for (let i = 0; i < str.length; i++) {
@@ -274,16 +451,319 @@ function remixBeginner(input: string, h: number) {
   };
 }
 
-export function getTaskRelayFallback(goal: string, stage: number): string {
-  if (goal === "custom") return GENERIC_OUTPUTS[stage] || "";
-  const bank = GOAL_OUTPUTS[goal];
-  if (bank) return bank[stage] || "";
-  return GENERIC_OUTPUTS[stage] || "";
+function clampIndex(index: number, max: number): number {
+  if (!Number.isFinite(index)) return 0;
+  return Math.max(0, Math.min(max, Math.floor(index)));
 }
 
-export function getBuildSprintFallback(theme: string, stage: number): { description: string } {
+function cleanText(input: string, fallback: string): string {
+  const text = input.replace(/\s+/g, " ").trim();
+  return text || fallback;
+}
+
+function readableGoal(goal: string, customGoal?: string): string {
+  const custom = cleanText(customGoal || "", "");
+  if (custom) return custom;
+  if (goal !== "custom" && GOAL_LABELS[goal]) return GOAL_LABELS[goal];
+  if (goal !== "custom") return cleanText(goal, "student goal");
+  return "student goal";
+}
+
+function customTaskLine(goalText: string, stage: number): string {
+  const h = hashStr(goalText);
+  const kw = keywords(goalText);
+  const main = kw[0] || "goal";
+  const second = kw[1] || pick(["audience", "timeline", "resources", "scope"], h, 1);
+  const owner = pick(["student", "team", "society", "project"], h, 2);
+
+  switch (stage) {
+    case 0:
+      return `Scoped ${main}: outcome, ${second}, constraints, and first deliverable`;
+    case 1:
+      return `Found examples for ${main}. Strongest signal: ${second} needs clear evidence`;
+    case 2:
+      return `Plan set: 4 steps, owner ${owner}, milestone focused on ${main}`;
+    case 3:
+      return `Drafted ${main} artifact with ${second} notes and handoff checklist`;
+    case 4:
+      return `Reviewed ${main} output. Tightened ${second} and flagged delivery risk`;
+    default:
+      return `Packaged ${main} workflow with summary, next action, and owner notes`;
+  }
+}
+
+function getTaskRelayLine(goal: string, stage: number, customGoal?: string): string {
+  const stageIndex = clampIndex(stage, TASK_STAGE_NAMES.length - 1);
+  const bank = GOAL_OUTPUTS[goal];
+  if (bank) return bank[stageIndex] || "";
+
+  const goalText = readableGoal(goal, customGoal);
+  if (goalText !== "student goal") return customTaskLine(goalText, stageIndex);
+
+  return GENERIC_OUTPUTS[stageIndex] || "";
+}
+
+function getTaskRelayStructuredFallback(
+  goal: string,
+  stage: number,
+  customGoal?: string
+): TaskRelayStructuredOutput {
+  const stageIndex = clampIndex(stage, TASK_STAGE_NAMES.length - 1);
+  const goalText = readableGoal(goal, customGoal);
+  const h = hashStr(goalText + stageIndex);
+  const kw = keywords(goalText);
+  const main = kw[0] || "goal";
+  const second = kw[1] || pick(["audience", "timeline", "scope", "evidence"], h, 1);
+  const line = getTaskRelayLine(goal, stageIndex, customGoal);
+  const artifacts = [
+    `${cap(main)} scope note`,
+    `${cap(main)} research brief`,
+    `${cap(main)} action plan`,
+    `${cap(main)} draft artifact`,
+    `${cap(main)} review log`,
+    `${cap(main)} delivery pack`,
+  ];
+  const nextSteps = [
+    `Gather examples for ${second}`,
+    `Turn findings into a staged plan`,
+    `Draft the first ${main} deliverable`,
+    `Review the artifact against constraints`,
+    `Prepare final handoff notes`,
+    "Share the package with stakeholders",
+  ];
+  const risks = [
+    `Scope around ${second} may drift`,
+    `Evidence for ${main} may be too thin`,
+    "Dependencies may be underestimated",
+    "Draft may miss one user need",
+    "Review may find late edge cases",
+    "Handoff may need clearer ownership",
+  ];
+
+  return {
+    stageName: TASK_STAGE_NAMES[stageIndex],
+    action: line,
+    artifact: artifacts[stageIndex],
+    nextStep: nextSteps[stageIndex],
+    risk: risks[stageIndex],
+  };
+}
+
+function getSprintDescription(theme: string, stage: number): string {
+  const stageIndex = clampIndex(stage, SPRINT_STAGE_LABELS.length - 1);
   const stages = SPRINT_STAGES[theme];
-  return { description: stages ? stages[stage] || "" : "" };
+  if (stages) return stages[stageIndex] || "";
+
+  const themeText = readableSprintTheme(theme);
+  const kw = keywords(themeText);
+  const main = kw[0] || "project";
+  const h = hashStr(themeText);
+  const audience = pick(["students", "societies", "project teams", "new members"], h, 0);
+
+  switch (stageIndex) {
+    case 0:
+      return `A focused ${main} concept for ${audience}, scoped around one clear user problem`;
+    case 1:
+      return `Formed a balanced team for ${main}: product, build, design, and testing roles`;
+    case 2:
+      return `Prototype built for ${main} with the core flow working end to end`;
+    case 3:
+      return `Demo rehearsed with realistic ${audience} feedback and a clear success metric`;
+    default:
+      return `${cap(main)} packaged for showcase with lessons learned and next iteration notes`;
+  }
+}
+
+function readableSprintTheme(theme: string): string {
+  return SPRINT_THEME_LABELS[theme] || cleanText(theme, "student project");
+}
+
+function getBuildSprintStructuredFallback(theme: string, stage: number): BuildSprintOutput {
+  const stageIndex = clampIndex(stage, SPRINT_STAGE_LABELS.length - 1);
+  const themeText = readableSprintTheme(theme);
+  const h = hashStr(themeText + stageIndex);
+  const kw = keywords(themeText);
+  const main = kw[0] || "project";
+  const roles = SPRINT_ROLES[theme] || [
+    `${cap(main)} lead`,
+    "prototype developer",
+    "user tester",
+  ];
+
+  return {
+    description: getSprintDescription(theme, stageIndex),
+    backlog: [
+      `Define the smallest useful ${main} workflow`,
+      `Create a clickable prototype for the ${SPRINT_STAGE_LABELS[stageIndex].toLowerCase()} stage`,
+      "Collect feedback from at least three students",
+      "Document assumptions before the next sprint",
+    ],
+    roles,
+    milestones: [
+      `${SPRINT_STAGE_LABELS[stageIndex]} evidence captured`,
+      `Prototype decision logged for ${main}`,
+      "Demo script drafted with fallback path",
+    ],
+    demoChecklist: [
+      "Open with the user problem",
+      "Show the core interaction in under one minute",
+      "Explain what AI adds and what remains human-reviewed",
+      "Close with the next measurable improvement",
+    ],
+    risks: [
+      pick(["Scope creep", "Weak user evidence", "Integration delay", "Unclear ownership"], h, 0),
+      pick(["Demo data may be too perfect", "Accessibility needs another pass", "Feedback sample may be narrow"], h, 1),
+    ],
+  };
+}
+
+function normalizeDomain(domain: string): string {
+  return ML_DOMAIN_LABELS[domain] || cleanText(domain, "AI");
+}
+
+function scoreFromHash(hash: number, offset: number): number {
+  return 72 + ((hash + offset * 11) % 24);
+}
+
+function scenarioFromText(scenario: string): { label: string; summary: string; scores: EthicsScoreMap } {
+  const key = cleanText(scenario, "student AI scenario").toLowerCase();
+  const known = ETHICS_SCENARIOS[key];
+  if (known) return known;
+
+  const h = hashStr(key);
+  const scores = ETHICS_DIMENSIONS.reduce((acc, dim, index) => {
+    acc[dim] = 1 + ((h + index) % 3);
+    return acc;
+  }, {} as EthicsScoreMap);
+
+  return {
+    label: cap(keywords(key)[0] || "Scenario") + " Assessment",
+    summary: `${cleanText(scenario, "This AI scenario")} needs a balanced review of benefits, harms, oversight, and student consent.`,
+    scores,
+  };
+}
+
+function mergeEthicsScores(
+  base: EthicsScoreMap,
+  overrides?: Partial<Record<EthicsDimension, number>>
+): EthicsScoreMap {
+  return ETHICS_DIMENSIONS.reduce((acc, dim) => {
+    const value = overrides?.[dim];
+    acc[dim] = typeof value === "number" && Number.isFinite(value)
+      ? Math.max(0, Math.min(3, Math.round(value)))
+      : base[dim];
+    return acc;
+  }, {} as EthicsScoreMap);
+}
+
+export function getTaskRelayFallback(goal: string, stage: number): string;
+export function getTaskRelayFallback(
+  goal: string,
+  stage: number,
+  options: TaskRelayFallbackOptions & { structured: true }
+): TaskRelayStructuredOutput;
+export function getTaskRelayFallback(
+  goal: string,
+  stage: number,
+  options: TaskRelayFallbackOptions
+): string | TaskRelayStructuredOutput;
+export function getTaskRelayFallback(
+  goal: string,
+  stage: number,
+  options: TaskRelayFallbackOptions = {}
+): string | TaskRelayStructuredOutput {
+  if (options.structured) {
+    return getTaskRelayStructuredFallback(goal, stage, options.customGoal);
+  }
+
+  return getTaskRelayLine(goal, stage, options.customGoal);
+}
+
+export function getBuildSprintFallback(
+  theme: string,
+  stage: number,
+  options: BuildSprintFallbackOptions = {}
+): BuildSprintOutput {
+  if (options.structured) return getBuildSprintStructuredFallback(theme, stage);
+  return { description: getSprintDescription(theme, stage) };
+}
+
+export function getMlExplainFallback(input: string, domains: string[] = []): MlExplainOutput {
+  const topic = cleanText(input || domains.join(" "), "machine learning use case");
+  const h = hashStr(topic + domains.join(","));
+  const kw = keywords(topic);
+  const main = kw[0] || "pattern";
+  const domainLabels = domains.length > 0 ? domains.map(normalizeDomain) : [pick(Object.values(ML_DOMAIN_LABELS), h, 0)];
+  const tagSource = [...domainLabels, "classification", "features", "prototype"];
+
+  return {
+    title: `${cap(main)} Pattern Finder`,
+    summary: `Machine learning can compare examples in ${domainLabels.join(" and ")} to spot repeatable signals, then turn those signals into a prediction or recommendation.`,
+    pattern: `Start with labelled examples, extract features around ${main}, train a small model, then test it on cases the model has not seen before.`,
+    examples: [
+      `Cluster similar ${main} examples before deciding categories`,
+      `Rank the strongest signals for ${domainLabels[0]}`,
+      "Keep a human review step for uncertain predictions",
+    ],
+    nextSteps: [
+      "Collect 20 representative examples",
+      "Write down the target label before training",
+      "Compare model output against a simple rules baseline",
+    ],
+    tags: tagSource.slice(0, 4).map((tag) => cap(tag.split(" ")[0])),
+  };
+}
+
+export function getCvExplainFallback(target: string): CvExplainOutput {
+  const key = cleanText(target, "object").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const known = CV_OBJECTS[key];
+  const h = hashStr(key);
+
+  if (known) {
+    return { ...known, confidence: scoreFromHash(h, 0) };
+  }
+
+  const label = cap(keywords(target)[0] || "Object");
+  return {
+    label,
+    confidence: scoreFromHash(h, 1),
+    explanation: `The vision model would look for shape, texture, position, and nearby context before labelling this as ${label.toLowerCase()}.`,
+    signals: [
+      pick(["outline shape", "surface texture", "text regions", "object scale"], h, 0),
+      pick(["scene position", "contrast boundary", "repeated pattern", "nearby objects"], h, 1),
+      pick(["edge density", "aspect ratio", "colour grouping", "shadow cues"], h, 2),
+    ],
+    limitation: "Confidence can drop when lighting, occlusion, or unusual viewing angles hide the strongest signals.",
+    nextStep: "Ask for a second frame or crop the region before taking action.",
+  };
+}
+
+export function getEthicsAssessFallback(
+  scenario: string,
+  scores?: Partial<Record<EthicsDimension, number>>
+): EthicsAssessOutput {
+  const base = scenarioFromText(scenario);
+  const mergedScores = mergeEthicsScores(base.scores, scores);
+  const ranked = [...ETHICS_DIMENSIONS].sort((a, b) => mergedScores[b] - mergedScores[a]);
+  const top = ranked[0];
+  const second = ranked[1];
+
+  return {
+    scenario: base.label,
+    summary: base.summary,
+    scores: mergedScores,
+    tradeoffs: [
+      `${cap(top)} is the highest-pressure dimension and needs explicit evidence before launch.`,
+      `${cap(second)} should be reviewed with affected students, not just the delivery team.`,
+      "Benefits should be measured alongside harms, appeals, and opt-out paths.",
+    ],
+    safeguards: [
+      `Add a human review checkpoint for ${top}.`,
+      "Publish clear data retention and escalation rules.",
+      "Test the system with edge cases before using it in a real decision.",
+    ],
+    discussionQuestion: `Who is accountable if the ${base.label.toLowerCase()} system helps most students but harms a small group?`,
+  };
 }
 
 export function getRemixStudioFallback(input: string, mode: string): Record<string, unknown> {

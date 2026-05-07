@@ -124,6 +124,14 @@
       <span class="cv-lens__hud-unit">objects found</span>
     </div>
   </div>
+
+  <div class="cv-lens__details" data-cv-details hidden aria-live="polite">
+    <div class="cv-lens__details-head">
+      <span class="cv-lens__details-title" data-cv-detail-title></span>
+      <span class="cv-lens__details-source" data-cv-detail-source></span>
+    </div>
+    <p class="cv-lens__details-text" data-cv-detail-text></p>
+  </div>
 </div>
 
 <style>
@@ -536,6 +544,41 @@
     color: var(--cv-text-muted);
   }
 
+  .cv-lens__details {
+    padding: 12px 16px 14px;
+    border-top: 1px solid var(--cv-grid);
+    background: var(--cv-hud-bg);
+  }
+
+  .cv-lens__details-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+
+  .cv-lens__details-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--cv-text-main);
+  }
+
+  .cv-lens__details-source {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--cv-text-muted);
+  }
+
+  .cv-lens__details-text {
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--cv-text-muted);
+  }
+
   @media (max-width: 768px) {
     .cv-lens__scanner {
       width: 70px;
@@ -602,8 +645,106 @@
     const statusText = root.querySelector(".cv-lens__hud-status");
     const zones = Array.from(root.querySelectorAll("[data-zone]"));
     const labels = Array.from(root.querySelectorAll("[data-label-for]"));
+    const details = root.querySelector("[data-cv-details]");
+    const detailTitle = root.querySelector("[data-cv-detail-title]");
+    const detailSource = root.querySelector("[data-cv-detail-source]");
+    const detailText = root.querySelector("[data-cv-detail-text]");
 
     let interacted = false;
+    const explanationCache = new Map();
+    let activeExplanationZone = "";
+
+    function cleanText(value, maxLength) {
+      const text = typeof value === "string" || typeof value === "number" || typeof value === "boolean"
+        ? String(value)
+        : "";
+      const normalized = text.replace(/\s+/g, " ").trim();
+      return normalized.length <= maxLength ? normalized : normalized.slice(0, maxLength - 3).trimEnd() + "...";
+    }
+
+    function normalizeExplanation(value) {
+      if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+      const label = cleanText(value.label, 80);
+      const confidence = Number.isFinite(Number(value.confidence))
+        ? Math.max(0, Math.min(100, Math.floor(Number(value.confidence))))
+        : null;
+      const explanation = cleanText(value.explanation, 320);
+      const limitation = cleanText(value.limitation, 220);
+      return label && explanation
+        ? { label, confidence, explanation, limitation }
+        : null;
+    }
+
+    function labelForZone(zone) {
+      const label = labels.find((l) => l.dataset.labelFor === zone.dataset.zone);
+      const text = label && label.querySelector(".cv-lens__label-text");
+      return cleanText(text && text.textContent, 80) || cleanText(zone.dataset.zone, 80) || "Object";
+    }
+
+    function showExplanation(result, source) {
+      if (!details || !detailTitle || !detailSource || !detailText) return;
+      const confidence = typeof result.confidence === "number" ? ` (${result.confidence}%)` : "";
+      detailTitle.textContent = result.label + confidence;
+      detailSource.textContent = source === "ai" ? "Gemini AI" : "Fallback";
+      detailText.textContent = result.limitation
+        ? `${result.explanation} Limitation: ${result.limitation}`
+        : result.explanation;
+      details.removeAttribute("hidden");
+    }
+
+    function hideExplanation() {
+      activeExplanationZone = "";
+      if (details) details.setAttribute("hidden", "");
+    }
+
+    function localExplanation(zone) {
+      const label = labelForZone(zone);
+      return {
+        label,
+        confidence: null,
+        explanation: `The scanner selected ${label.toLowerCase()}. Try again for a server-generated vision explanation.`,
+        limitation: "No model explanation was available for this interaction.",
+      };
+    }
+
+    async function explainZone(zone) {
+      const zoneId = zone.dataset.zone || "object";
+      activeExplanationZone = zoneId;
+
+      const cached = explanationCache.get(zoneId);
+      if (cached) {
+        showExplanation(cached.output, cached.source);
+        return;
+      }
+
+      let timeout;
+      try {
+        const controller = new AbortController();
+        timeout = setTimeout(() => controller.abort(), 6000);
+        const res = await fetch("/api/ai/track-lab", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            feature: "cv-explain",
+            target: labelForZone(zone),
+          }),
+          signal: controller.signal,
+        });
+        if (!res.ok) throw new Error("API error");
+        const data = await res.json();
+        const output = normalizeExplanation(data && data.output);
+        if (!output) throw new Error("Invalid output");
+        const result = { output, source: data && data.source === "ai" ? "ai" : "fallback" };
+        explanationCache.set(zoneId, result);
+        if (activeExplanationZone === zoneId) showExplanation(result.output, result.source);
+      } catch {
+        const result = { output: localExplanation(zone), source: "fallback" };
+        explanationCache.set(zoneId, result);
+        if (activeExplanationZone === zoneId) showExplanation(result.output, result.source);
+      } finally {
+        if (timeout) clearTimeout(timeout);
+      }
+    }
 
     function handlePointer(clientX, clientY) {
       if (!interacted) {
@@ -642,11 +783,13 @@
           count++;
           if (!wasDetected && label) {
              newlyDetected.push(label.querySelector('.cv-lens__label-text').textContent);
+             void explainZone(zone);
           }
         }
       });
 
       countEl.textContent = count;
+      if (count === 0) hideExplanation();
       
       if (newlyDetected.length > 0) {
         announcer.textContent = `Found: ${newlyDetected.join(", ")}`;
@@ -658,6 +801,7 @@
       labels.forEach((label) => label.classList.remove("is-visible"));
       countEl.textContent = "0";
       statusText.textContent = "Ready to scan";
+      hideExplanation();
     }
 
     viewport.addEventListener("pointermove", (e) => {
@@ -713,6 +857,7 @@
         
         const label = labels.find((l) => l.dataset.labelFor === zone.dataset.zone);
         if (label) label.classList.add("is-visible");
+        void explainZone(zone);
         
         countEl.textContent = "1";
         statusText.textContent = "Object selected";
@@ -751,4 +896,3 @@
     });
   });
 </script>
-

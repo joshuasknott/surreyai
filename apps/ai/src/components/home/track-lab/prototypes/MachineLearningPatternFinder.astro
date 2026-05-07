@@ -64,8 +64,8 @@ const edges = edgePairs.map(([a, b]) => {
 
 <div data-track-prototype="ml" class="mlpf">
   <div class="mlpf__top">
-    <span class="mlpf__badge">Use Case Discovery</span>
-    <div class="mlpf__chips" role="group" aria-label="Study domains">
+    <span class="mlpf__badge">Dataset Features</span>
+    <div class="mlpf__chips" role="group" aria-label="Feature selection">
       {chipData.map((chip) => (
         <button
           class="mlpf__chip"
@@ -81,59 +81,74 @@ const edges = edgePairs.map(([a, b]) => {
     </div>
   </div>
 
-  <div class="mlpf__canvas">
-    <svg
-      class="mlpf__svg"
-      aria-hidden="true"
-      width="100%"
-      height="100%"
-    >
-      <g class="mlpf__edges">
-        {edges.map((edge) => (
-          <line
-            class="mlpf__edge"
-            data-mlpf-edge={edge.sharedChips.join(",")}
-            data-mlpf-edge-nodes={`${edge.a}-${edge.b}`}
-            x1={`${edge.x1}%`}
-            y1={`${edge.y1}%`}
-            x2={`${edge.x2}%`}
-            y2={`${edge.y2}%`}
-            stroke-width="1.5"
-          />
-        ))}
-      </g>
-    </svg>
+  <div class="mlpf__layout">
+    <div class="mlpf__canvas" aria-label="Clustering visualization">
+      <svg
+        class="mlpf__svg"
+        aria-hidden="true"
+        width="100%"
+        height="100%"
+      >
+        <g class="mlpf__edges">
+          {edges.map((edge) => (
+            <line
+              class="mlpf__edge"
+              data-mlpf-edge={edge.sharedChips.join(",")}
+              data-mlpf-edge-nodes={`${edge.a}-${edge.b}`}
+              x1={`${edge.x1}%`}
+              y1={`${edge.y1}%`}
+              x2={`${edge.x2}%`}
+              y2={`${edge.y2}%`}
+              stroke-width="1.5"
+            />
+          ))}
+        </g>
+      </svg>
 
-    <div class="mlpf__nodes">
-      {nodeData.map((node, i) => {
-        const primaryChip = chipData.find((c) => c.id === node.chips[0]);
-        return (
-          <button
-            class="mlpf__node"
-            type="button"
-            data-mlpf-node={i}
-            data-mlpf-node-chips={node.chips.join(",")}
-            data-mlpf-node-label={node.label}
-            data-mlpf-node-desc={node.desc}
-            style={`left: ${node.x}%; top: ${node.y}%; --node-color: ${primaryChip?.color ?? "currentColor"}`}
-            aria-label={`${node.label}. ${node.desc}`}
-          >
-            <div class="mlpf__node-dot"></div>
-            <span class="mlpf__node-label">{node.label}</span>
-          </button>
-        );
-      })}
-    </div>
-  </div>
-
-  <div class="mlpf__info" aria-live="polite" aria-atomic="true">
-    <div class="mlpf__info-content">
-      <div class="mlpf__info-header">
-        <h3 class="mlpf__info-title" data-mlpf-info-title>Use Case Discovery</h3>
-        <span class="mlpf__count" data-mlpf-count style="display: none;"></span>
+      <div class="mlpf__nodes">
+        {nodeData.map((node, i) => {
+          const primaryChip = chipData.find((c) => c.id === node.chips[0]);
+          return (
+            <button
+              class="mlpf__node"
+              type="button"
+              data-mlpf-node={i}
+              data-mlpf-node-chips={node.chips.join(",")}
+              data-mlpf-node-label={node.label}
+              data-mlpf-node-desc={node.desc}
+              style={`left: ${node.x}%; top: ${node.y}%; --node-color: ${primaryChip?.color ?? "currentColor"}`}
+              aria-label={`${node.label}. ${node.desc}`}
+            >
+              <div class="mlpf__node-dot"></div>
+              <span class="mlpf__node-label">{node.label}</span>
+            </button>
+          );
+        })}
       </div>
-      <p class="mlpf__info-desc" data-mlpf-info-desc>Select study domains above or explore the map to see how AI is applied.</p>
-      <div class="mlpf__info-chips" data-mlpf-info-chips></div>
+    </div>
+
+    <div class="mlpf__panel">
+      <div class="mlpf__panel-header">
+        <div class="mlpf__panel-titles">
+          <h3 class="mlpf__panel-title">Pattern Analysis</h3>
+          <span class="mlpf__count" data-mlpf-count style="display: none;"></span>
+        </div>
+        <button class="mlpf__btn mlpf__btn--primary" type="button" data-action="analyze" disabled>Analyze Selection</button>
+      </div>
+
+      <div class="mlpf__results-box">
+        <div class="mlpf__loading" style="display: none;">
+          <div class="mlpf__spinner"></div>
+          <span>Analyzing feature clusters...</span>
+        </div>
+        
+        <div class="mlpf__results-content" aria-live="polite">
+          <div class="mlpf__empty-state">
+            <p data-mlpf-empty-text>Select features (domains) or a data point (use case) to analyze underlying patterns.</p>
+          </div>
+        </div>
+        <div class="mlpf__source" style="display: none;"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -143,12 +158,13 @@ const edges = edgePairs.map(([a, b]) => {
     display: flex;
     flex-direction: column;
     height: 100%;
-    gap: 16px;
     padding: 24px;
+    gap: 24px;
     position: relative;
     background: var(--ai-bg, transparent);
     color: var(--ai-fg, inherit);
     font-family: var(--font-sans, system-ui, sans-serif);
+    box-sizing: border-box;
   }
 
   .mlpf__top {
@@ -169,6 +185,7 @@ const edges = edgePairs.map(([a, b]) => {
     border: 1px solid var(--ai-border);
     border-radius: 9999px;
     white-space: nowrap;
+    margin-top: 4px;
   }
 
   .mlpf__chips {
@@ -181,13 +198,13 @@ const edges = edgePairs.map(([a, b]) => {
   .mlpf__chip {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 16px; /* Increased touch target */
+    gap: 6px;
+    padding: 4px 10px;
     border: 1px solid var(--ai-border);
     border-radius: 9999px;
     background: var(--ai-surface);
     color: var(--ai-fg);
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -222,13 +239,28 @@ const edges = edgePairs.map(([a, b]) => {
     opacity: 1;
   }
 
-  .mlpf__canvas {
+  .mlpf__layout {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 24px;
     flex: 1;
-    min-height: 450px;
+    min-height: 400px;
+  }
+
+  @media (max-width: 960px) {
+    .mlpf__layout {
+      grid-template-columns: 1fr;
+      min-height: auto;
+    }
+  }
+
+  .mlpf__canvas {
     position: relative;
     border-radius: 16px;
     background: var(--ai-surface);
     border: 1px solid var(--ai-border);
+    overflow: hidden;
+    min-height: 400px;
   }
 
   .mlpf__svg {
@@ -266,7 +298,7 @@ const edges = edgePairs.map(([a, b]) => {
     gap: 6px;
     background: transparent;
     border: none;
-    padding: 16px; /* Increased touch target */
+    padding: 12px;
     cursor: pointer;
     z-index: 2;
     transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease, filter 0.3s ease;
@@ -284,8 +316,8 @@ const edges = edgePairs.map(([a, b]) => {
   }
 
   .mlpf__node-dot {
-    width: 14px;
-    height: 14px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
     background: var(--ai-border-strong);
     border: 2px solid var(--ai-surface);
@@ -297,90 +329,207 @@ const edges = edgePairs.map(([a, b]) => {
   .mlpf__node:not(.is-dimmed):focus-visible .mlpf__node-dot {
     background: var(--node-color);
     border-color: var(--ai-surface);
-    transform: scale(1.2);
+    transform: scale(1.4);
   }
 
   .mlpf__node-label {
-    font-size: 0.875rem; /* Increased readability */
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    margin-top: 6px;
+    font-size: 0.75rem;
     font-weight: 500;
     color: var(--ai-fg);
-    background: color-mix(in srgb, var(--ai-bg) 90%, transparent);
-    padding: 4px 10px;
+    background: var(--ai-surface);
+    padding: 4px 8px;
     border-radius: 6px;
     backdrop-filter: blur(4px);
     white-space: nowrap;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     pointer-events: none;
-    border: 1px solid var(--ai-border); /* Subtle definition */
+    border: 1px solid var(--ai-border);
+    opacity: 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  .mlpf__node.is-active .mlpf__node-label,
+  .mlpf__node:not(.is-dimmed):hover .mlpf__node-label,
+  .mlpf__node:not(.is-dimmed):focus-visible .mlpf__node-label {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
   }
 
   .mlpf__node.is-active .mlpf__node-label {
     font-weight: 700;
     border-color: var(--node-color);
+    z-index: 20;
   }
 
-  .mlpf__info {
-    background: var(--ai-surface);
-    border: 1px solid var(--ai-border);
-    border-radius: 12px;
-    padding: 20px; /* Increased padding */
-    margin-top: 8px;
-    min-height: 120px;
+  .mlpf__panel {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    gap: 16px;
+    height: 100%;
   }
-
-  .mlpf__info-content {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .mlpf__info-header {
+  
+  .mlpf__panel-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 8px;
+    align-items: center;
+    border-bottom: 1px solid var(--ai-border);
+    padding-bottom: 12px;
   }
 
-  .mlpf__info-title {
-    font-size: 1.125rem; /* Larger */
+  .mlpf__panel-titles {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .mlpf__panel-title {
+    font-size: 1.125rem;
     font-weight: 700;
     color: var(--ai-fg);
     margin: 0;
   }
 
-  .mlpf__info-desc {
-    font-size: 0.9375rem; /* Increased readability */
-    color: var(--ai-fg-muted);
-    margin: 0;
-    line-height: 1.5;
-  }
-
   .mlpf__count {
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
     font-weight: 600;
     color: var(--ai-fg-muted);
-    background: var(--ai-border);
-    padding: 4px 10px;
-    border-radius: 9999px;
   }
 
-  .mlpf__info-chips {
-    display: flex;
-    gap: 8px;
-    margin-top: 12px;
-    flex-wrap: wrap;
-  }
-
-  .mlpf__info-chip {
-    font-size: 0.75rem; /* Increased readability */
+  .mlpf__btn {
+    padding: 8px 16px;
+    border: 1px solid var(--ai-border);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ai-fg-muted);
+    font-family: inherit;
+    font-size: 0.875rem;
     font-weight: 600;
+    cursor: pointer;
+    transition: all 200ms ease;
+  }
+
+  .mlpf__btn:hover:not(:disabled) {
     color: var(--ai-fg);
-    background: color-mix(in srgb, var(--chip-color) 15%, transparent);
-    border: 1px solid color-mix(in srgb, var(--chip-color) 30%, transparent);
-    padding: 4px 10px;
-    border-radius: 6px;
+    border-color: var(--ai-primary);
+    background: var(--ai-bg-hover);
+  }
+
+  .mlpf__btn:focus-visible {
+    outline: 2px solid var(--ai-primary);
+    outline-offset: 2px;
+  }
+
+  .mlpf__btn--primary {
+    background: var(--ai-primary);
+    color: white;
+    border-color: var(--ai-primary);
+  }
+  
+  .mlpf__btn--primary:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--ai-primary) 80%, black);
+    color: white;
+  }
+
+  .mlpf__btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .mlpf__results-box {
+    background: var(--ai-surface);
+    border: 1px solid var(--ai-border);
+    border-radius: 12px;
+    padding: 24px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow-y: auto;
+  }
+  
+  .mlpf__empty-state {
+    color: var(--ai-fg-muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    text-align: center;
+    margin: auto;
+    max-width: 300px;
+  }
+
+  .mlpf__loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    height: 100%;
+    color: var(--ai-fg-muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  .mlpf__spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid var(--ai-border);
+    border-top-color: var(--ai-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .mlpf__result-section {
+    margin-bottom: 24px;
+  }
+  
+  .mlpf__result-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .mlpf__result-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ai-fg);
+    margin: 0 0 12px 0;
+  }
+
+  .mlpf__result-text {
+    font-size: 0.95rem;
+    color: var(--ai-fg-muted);
+    line-height: 1.6;
+    margin: 0;
+  }
+  
+  .mlpf__result-list {
+    margin: 0;
+    padding-left: 20px;
+    color: var(--ai-fg-muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+  
+  .mlpf__result-list li {
+    margin-bottom: 8px;
+  }
+
+  .mlpf__source {
+    font-size: 0.75rem;
+    color: var(--ai-fg-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--ai-border);
   }
 
   @media (max-width: 768px) {
@@ -417,14 +566,17 @@ const edges = edgePairs.map(([a, b]) => {
       const edgeEls = Array.from(
         root.querySelectorAll<SVGLineElement>("[data-mlpf-edge]")
       );
-      const infoTitle = root.querySelector<HTMLElement>("[data-mlpf-info-title]");
-      const infoDesc = root.querySelector<HTMLElement>("[data-mlpf-info-desc]");
-      const infoChips = root.querySelector<HTMLElement>("[data-mlpf-info-chips]");
       const countEl = root.querySelector<HTMLElement>("[data-mlpf-count]");
+      const analyzeBtn = root.querySelector<HTMLButtonElement>("[data-action='analyze']");
+      const contentBox = root.querySelector(".mlpf__results-content");
+      const loadingBox = root.querySelector(".mlpf__loading");
+      const sourceBox = root.querySelector<HTMLElement>(".mlpf__source");
+      const emptyText = root.querySelector<HTMLElement>("[data-mlpf-empty-text]");
 
-      if (!infoTitle || !infoDesc || !infoChips || !countEl) return;
+      if (!contentBox || !countEl) return;
 
-      const selected = new Set<string>();
+      const selectedChips = new Set<string>();
+      let selectedNodeLabel: string | null = null;
 
       const chipMeta: Record<string, { color: string; label: string }> = {
         creative: { color: "var(--ai-purple, #a78bfa)", label: "Media & Arts" },
@@ -437,69 +589,32 @@ const edges = edgePairs.map(([a, b]) => {
         science: { color: "var(--color-emerald-500, #10b981)", label: "Natural Sciences" },
       };
 
-      let activeHoverNode: HTMLButtonElement | null = null;
-
       function updateGlobalInfo() {
-        if (activeHoverNode) {
-          showNodeInfo(activeHoverNode);
-          return;
-        }
+        const hasSelection = selectedChips.size > 0;
+        const activeCount = nodeEls.filter(n => n.classList.contains("is-active")).length;
 
-        const hasSelection = selected.size > 0;
-        if (!hasSelection) {
-          infoTitle!.textContent = "Use Case Discovery";
-          infoDesc!.textContent = "Select study domains above or explore the map to see how AI is applied.";
-          infoChips!.innerHTML = "";
-          countEl!.style.display = "none";
+        if (hasSelection) {
+          countEl!.textContent = `${activeCount} data point${activeCount !== 1 ? "s" : ""} found`;
+          countEl!.style.display = "inline-flex";
+          if (analyzeBtn) analyzeBtn.disabled = false;
+          if (emptyText) {
+            emptyText.textContent = selectedNodeLabel 
+              ? `Ready to analyze "${selectedNodeLabel}" in the current feature space.`
+              : `Ready to analyze clusters for ${Array.from(selectedChips).map(c => chipMeta[c]?.label).join(", ")}.`;
+          }
         } else {
-          const names = Array.from(selected).map((c) => chipMeta[c]?.label ?? c);
-          let title: string;
-          let desc: string;
-          
-          if (selected.size === 1) {
-            title = `${names[0]} Applications`;
-            desc = "Showing how AI is used within this field.";
-          } else if (selected.size === 2) {
-            title = `Intersecting ${names[0]} & ${names[1]}`;
-            desc = `Exploring how ${names[0]} and ${names[1]} overlap in student projects.`;
-          } else {
-            title = `Cross-Disciplinary: ${names.slice(0, 3).join(", ")}${names.length > 3 ? "..." : ""}`;
-            desc = "Multiple overlapping domains highlighted.";
-          }
-          
-          infoTitle!.textContent = title;
-          infoDesc!.textContent = desc;
-          infoChips!.innerHTML = "";
-          
-          const activeCount = nodeEls.filter(n => n.classList.contains("is-active")).length;
-          if (activeCount > 0) {
-            countEl!.textContent = `${activeCount} path${activeCount !== 1 ? "s" : ""} found`;
-            countEl!.style.display = "inline-flex";
-          } else {
-            countEl!.style.display = "none";
-          }
+          countEl!.style.display = "none";
+          if (analyzeBtn) analyzeBtn.disabled = true;
+          if (emptyText) emptyText.textContent = "Select features (domains) or a data point (use case) to analyze underlying patterns.";
         }
-      }
-
-      function showNodeInfo(node: HTMLButtonElement) {
-        infoTitle!.textContent = node.dataset.mlpfNodeLabel ?? "";
-        infoDesc!.textContent = node.dataset.mlpfNodeDesc ?? "";
-        
-        const nodeChips = node.dataset.mlpfNodeChips!.split(",");
-        infoChips!.innerHTML = nodeChips.map((c) => {
-          const meta = chipMeta[c];
-          return `<span class="mlpf__info-chip" style="--chip-color: ${meta?.color ?? 'currentColor'}">${meta?.label ?? c}</span>`;
-        }).join("");
-        
-        countEl!.style.display = "none";
       }
 
       function update() {
-        const hasSelection = selected.size > 0;
+        const hasSelection = selectedChips.size > 0;
 
         nodeEls.forEach((node) => {
           const nodeChips = node.dataset.mlpfNodeChips!.split(",");
-          const isActive = !hasSelection || nodeChips.some((c) => selected.has(c));
+          const isActive = !hasSelection || nodeChips.some((c) => selectedChips.has(c));
           
           if (hasSelection && isActive) {
             node.classList.add("is-active");
@@ -528,7 +643,7 @@ const edges = edgePairs.map(([a, b]) => {
           if (aMatch && bMatch) {
             const sharedChip = edge.dataset.mlpfEdge!
               .split(",")
-              .find((c) => selected.has(c));
+              .find((c) => selectedChips.has(c));
             
             if (sharedChip) {
               edge.setAttribute("stroke", chipMeta[sharedChip]?.color ?? "currentColor");
@@ -546,11 +661,12 @@ const edges = edgePairs.map(([a, b]) => {
       chips.forEach((chip) => {
         chip.addEventListener("click", () => {
           const id = chip.dataset.mlpfChip!;
-          if (selected.has(id)) {
-            selected.delete(id);
+          selectedNodeLabel = null; // Clear specific node focus on chip toggle
+          if (selectedChips.has(id)) {
+            selectedChips.delete(id);
             chip.setAttribute("aria-pressed", "false");
           } else {
-            selected.add(id);
+            selectedChips.add(id);
             chip.setAttribute("aria-pressed", "true");
           }
           update();
@@ -558,38 +674,22 @@ const edges = edgePairs.map(([a, b]) => {
       });
 
       nodeEls.forEach((node) => {
-        node.addEventListener("mouseenter", () => {
-          activeHoverNode = node;
-          updateGlobalInfo();
-        });
-        node.addEventListener("mouseleave", () => {
-          activeHoverNode = null;
-          updateGlobalInfo();
-        });
-        node.addEventListener("focus", () => {
-          activeHoverNode = node;
-          updateGlobalInfo();
-        });
-        node.addEventListener("blur", () => {
-          activeHoverNode = null;
-          updateGlobalInfo();
-        });
-        
         node.addEventListener("click", () => {
           const nodeChips = node.dataset.mlpfNodeChips!.split(",");
-          const isExactMatch = selected.size === nodeChips.length && nodeChips.every(c => selected.has(c));
+          const isExactMatch = selectedChips.size === nodeChips.length && nodeChips.every(c => selectedChips.has(c));
           
+          selectedNodeLabel = node.dataset.mlpfNodeLabel || null;
+
           chips.forEach(chip => {
             const id = chip.dataset.mlpfChip!;
             if (isExactMatch) {
-              selected.delete(id);
-              chip.setAttribute("aria-pressed", "false");
+              // If already exactly matching this node, just keep it, but we update label
             } else {
               if (nodeChips.includes(id)) {
-                selected.add(id);
+                selectedChips.add(id);
                 chip.setAttribute("aria-pressed", "true");
               } else {
-                selected.delete(id);
+                selectedChips.delete(id);
                 chip.setAttribute("aria-pressed", "false");
               }
             }
@@ -597,6 +697,122 @@ const edges = edgePairs.map(([a, b]) => {
           update();
         });
       });
+
+      function isRecord(value: unknown): value is Record<string, unknown> {
+        return typeof value === "object" && value !== null && !Array.isArray(value);
+      }
+
+      function cleanText(value: unknown, maxLength: number): string {
+        const text = typeof value === "string" || typeof value === "number" || typeof value === "boolean"
+          ? String(value)
+          : "";
+        const normalized = text.replace(/\s+/g, " ").trim();
+        return normalized.length <= maxLength ? normalized : `${normalized.slice(0, maxLength - 3).trimEnd()}...`;
+      }
+
+      function cleanArray(value: unknown, maxItems: number, maxLength: number): string[] {
+        if (!Array.isArray(value)) return [];
+        return value.map((item) => cleanText(item, maxLength)).filter(Boolean).slice(0, maxItems);
+      }
+
+      function normalizeMlOutput(value: unknown) {
+        if (!isRecord(value)) return null;
+        const output = {
+          title: cleanText(value.title, 90),
+          summary: cleanText(value.summary, 320),
+          pattern: cleanText(value.pattern, 260),
+          examples: cleanArray(value.examples, 5, 130),
+          nextSteps: cleanArray(value.nextSteps, 5, 130),
+        };
+        return output.title && output.summary && output.pattern ? output : null;
+      }
+
+      function createEl(tag: string, className: string, text?: string): HTMLElement {
+        const el = document.createElement(tag);
+        if (className) el.className = className;
+        if (text !== undefined) el.textContent = text;
+        return el;
+      }
+
+      function appendTextSection(parent: Node, title: string, text: string) {
+        const section = createEl("div", "mlpf__result-section");
+        section.appendChild(createEl("h4", "mlpf__result-title", title));
+        section.appendChild(createEl("p", "mlpf__result-text", text));
+        parent.appendChild(section);
+      }
+
+      function appendListSection(parent: Node, title: string, items: string[]) {
+        if (items.length === 0) return;
+        const section = createEl("div", "mlpf__result-section");
+        section.appendChild(createEl("h4", "mlpf__result-title", title));
+        const list = createEl("ul", "mlpf__result-list");
+        items.forEach((item) => list.appendChild(createEl("li", "", item)));
+        section.appendChild(list);
+        parent.appendChild(section);
+      }
+
+      function setEmptyMessage(message: string) {
+        const empty = createEl("div", "mlpf__empty-state");
+        empty.appendChild(createEl("p", "", message));
+        contentBox.replaceChildren(empty);
+      }
+
+      function renderOutput(output: ReturnType<typeof normalizeMlOutput>, source: unknown) {
+        if (!output) throw new Error("Invalid output");
+        const frag = document.createDocumentFragment();
+        appendTextSection(frag, output.title, output.summary);
+        appendTextSection(frag, "Pattern Details", output.pattern);
+        appendListSection(frag, "Examples", output.examples);
+        appendListSection(frag, "Next Steps", output.nextSteps);
+        contentBox.replaceChildren(frag);
+
+        if (sourceBox) {
+          sourceBox.textContent = `Generated by ${source === "ai" ? "Gemini AI" : "Deterministic Fallback"}`;
+          sourceBox.style.display = "block";
+        }
+      }
+
+      if (analyzeBtn) {
+        analyzeBtn.addEventListener("click", async () => {
+          if (analyzeBtn.disabled) return;
+          
+          const domainNames = Array.from(selectedChips).map(c => chipMeta[c]?.label || c);
+          const topic = selectedNodeLabel || "Machine Learning cluster patterns";
+          
+          analyzeBtn.disabled = true;
+          if (contentBox) (contentBox as HTMLElement).style.display = "none";
+          if (sourceBox) sourceBox.style.display = "none";
+          if (loadingBox) (loadingBox as HTMLElement).style.display = "flex";
+
+          let timeout: ReturnType<typeof setTimeout> | undefined;
+          try {
+            const controller = new AbortController();
+            timeout = setTimeout(() => controller.abort(), 6000);
+            const res = await fetch("/api/ai/track-lab", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                feature: "ml-explain",
+                input: topic,
+                domains: domainNames,
+              }),
+              signal: controller.signal,
+            });
+
+            if (!res.ok) throw new Error("API error");
+            const data = await res.json();
+            const { source, output } = data;
+            renderOutput(normalizeMlOutput(output), source);
+          } catch (err) {
+            setEmptyMessage("Failed to analyze pattern. Please try again.");
+          } finally {
+            if (timeout) clearTimeout(timeout);
+            analyzeBtn.disabled = false;
+            if (loadingBox) (loadingBox as HTMLElement).style.display = "none";
+            if (contentBox) (contentBox as HTMLElement).style.display = "block";
+          }
+        });
+      }
 
       const chipContainer = root.querySelector(".mlpf__chips");
       if (chipContainer) {
@@ -620,5 +836,3 @@ const edges = edgePairs.map(([a, b]) => {
     }
   })();
 </script>
-
-

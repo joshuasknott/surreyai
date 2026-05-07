@@ -23,8 +23,8 @@
         <span class="bs-board__stage" data-stage-badge aria-live="polite"></span>
       </div>
       <button type="button" class="bs-ai-btn" data-ai-btn hidden aria-live="polite">
-        <span aria-hidden="true">✨</span>
-        <span class="bs-ai-btn__text">AI Assist</span>
+        <span aria-hidden="true">↻</span>
+        <span class="bs-ai-btn__text">Refresh Stage</span>
       </button>
     </div>
 
@@ -57,7 +57,7 @@
 
     <div class="bs-card" data-bs-card aria-live="polite" aria-atomic="true">
       <p class="bs-card__text" data-stage-desc></p>
-      <span class="bs-card__ai-tag" data-ai-tag hidden>AI-enhanced</span>
+      <span class="bs-card__ai-tag" data-ai-tag hidden></span>
     </div>
 
     <div class="bs-actions">
@@ -558,66 +558,24 @@
 </style>
 
 <script>
-  const THEMES: Record<string, { label: string; stages: string[] }> = {
+  const THEMES: Record<string, { label: string }> = {
     campus: {
       label: "Campus Assistant",
-      stages: [
-        "A society chatbot that answers freshers' questions about campus facilities and events",
-        "Assembled a 3-person squad \u2014 designer, backend developer, and content strategist",
-        "Working chat interface connected to a university knowledge base with natural language queries",
-        "Presented live to 30 students at the society meetup \u2014 answered real questions in real time",
-        "Published to the society website, now helping students navigate campus every day",
-      ],
     },
     study: {
       label: "Revision Tool",
-      stages: [
-        "Smart flashcard generator that transforms lecture notes into interactive revision decks",
-        "Formed a 4-person crew \u2014 ML engineer, full-stack dev, UX designer, and tester",
-        "Web app that parses lecture PDFs, extracts key concepts, and generates spaced-repetition cards",
-        "Demonstrated to computer science students \u2014 processed a real ML lecture live",
-        "Open-sourced on GitHub \u2014 adopted by students across multiple university modules",
-      ],
     },
     creative: {
       label: "Creative AI",
-      stages: [
-        "An interactive collaborative art tool where students and AI co-create visual compositions",
-        "Gathered a 3-person collective \u2014 creative coder, digital artist, and interaction designer",
-        "Canvas-based app with style transfer, generative patterns, and real-time collaboration",
-        "Interactive gallery at the end-of-semester exhibition \u2014 200 visitors tried it",
-        "Featured in the university\u2019s digital arts showcase alongside professional work",
-      ],
     },
     vision: {
       label: "Vision Demo",
-      stages: [
-        "A computer vision accessibility app to help visually impaired students navigate lecture halls",
-        "Recruited a 4-person team \u2014 CV specialist, mobile dev, accessibility lead, and tester",
-        "Camera-based app that identifies and describes objects and text in the surroundings",
-        "Live demo with student volunteers testing real-world recognition accuracy on campus",
-        "Submitted to the university\u2019s accessibility innovation challenge and won recognition",
-      ],
     },
     automation: {
       label: "Automation Helper",
-      stages: [
-        "A script to automate the entire lifecycle of society events from ticketing to feedback",
-        "Built a 3-person ops team \u2014 automation dev, event planner, and integrations specialist",
-        "Automated pipeline: RSVP collection, reminder scheduling, attendance tracking, and feedback forms",
-        "Ran a real society event end-to-end through the system \u2014 80 attendees, zero manual overhead",
-        "Adopted by three other societies for their own event management workflows",
-      ],
     },
     ethics: {
       label: "Ethics Debate Tool",
-      stages: [
-        "A platform used in tutorials to explore ethical tradeoffs in AI hiring algorithms",
-        "Convened a 4-person panel \u2014 ethicist, full-stack dev, UX researcher, and content lead",
-        "Web app with timed debate rounds, argument mapping, stakeholder analysis, and scoring rubrics",
-        "Hosted a live debate night with 40 participants tackling real AI ethics case studies",
-        "Integrated into the society\u2019s regular ethics workshop series as a permanent tool",
-      ],
     },
   };
 
@@ -655,12 +613,10 @@
     const pipeStages = root.querySelectorAll("[data-pipe-stage]") as NodeListOf<HTMLDivElement>;
     const pipeLines = root.querySelectorAll("[data-pipe-line]") as NodeListOf<HTMLDivElement>;
 
-    const lab = document.querySelector("[data-track-lab]");
-    const aiEnabled = lab != null && lab.hasAttribute("data-ai-enabled");
-
     let currentTheme = "";
     let currentStage = 0;
-    let aiDescriptions: string[] | null = null;
+    let descriptions: Record<number, { text: string; source: "ai" | "fallback" }> = {};
+    let requestSeq = 0;
 
     function show(el: HTMLElement) {
       el.removeAttribute("hidden");
@@ -705,20 +661,29 @@
       });
     }
 
-    function getDescription(stage: number): string {
-      if (aiDescriptions && aiDescriptions[stage]) return aiDescriptions[stage];
-      const theme = THEMES[currentTheme];
-      if (!theme) return "";
-      return theme.stages[stage] || "";
+    function localStageFallback(themeId: string, stage: number): string {
+      const theme = THEMES[themeId]?.label || "Student project";
+      return `${STAGE_LABELS[stage]} stage for ${theme} is ready. Try again for server-generated sprint detail.`;
     }
 
-    function updateDescription(text?: string) {
-      const content = text || getDescription(currentStage);
+    function selectedDescription(stage: number) {
+      return descriptions[stage] || { text: localStageFallback(currentTheme, stage), source: "fallback" as const };
+    }
+
+    function updateDescription(text: string, source?: "ai" | "fallback") {
+      const content = text;
       stageDesc.style.opacity = "0";
       setTimeout(() => {
         stageDesc.textContent = content;
         stageDesc.style.opacity = "1";
       }, 200);
+
+      if (source) {
+        aiTag.textContent = source === "ai" ? "Gemini AI" : "Deterministic fallback";
+        show(aiTag);
+      } else {
+        hide(aiTag);
+      }
     }
 
     function selectTheme(themeId: string) {
@@ -727,7 +692,7 @@
 
       currentTheme = themeId;
       currentStage = 0;
-      aiDescriptions = null;
+      descriptions = {};
       hide(aiTag);
 
       pills.forEach((pill) => {
@@ -739,18 +704,19 @@
       stageBadge.textContent = STAGE_LABELS[0];
       resetPipeline();
       renderPipeline();
-      updateDescription(theme.stages[0]);
+      updateDescription("Preparing generated sprint description...");
 
       hide(intro);
       hide(done);
       show(board);
       show(advanceBtn);
       
+      void loadStageDescription(0, true);
+
       // Ensure advance button is focused to guide keyboard users
       advanceBtn.focus();
 
-      if (aiEnabled) show(aiBtn);
-      else hide(aiBtn);
+      show(aiBtn);
     }
 
     function advanceStage() {
@@ -776,59 +742,83 @@
 
       renderPipeline();
       stageBadge.textContent = STAGE_LABELS[currentStage];
-      updateDescription();
+      const cached = descriptions[currentStage];
+      if (cached) updateDescription(cached.text, cached.source);
+      else {
+        updateDescription("Preparing generated sprint description...");
+        void loadStageDescription(currentStage, true);
+      }
     }
 
-    async function callAI() {
-      if (!aiEnabled || !currentTheme) return;
+    async function loadStageDescription(stage: number, force = false) {
+      if (!currentTheme) return;
+      if (!force && descriptions[stage]) {
+        const cached = descriptions[stage];
+        updateDescription(cached.text, cached.source);
+        return;
+      }
 
+      const themeAtRequest = currentTheme;
+      const seq = ++requestSeq;
       aiBtn.setAttribute("aria-busy", "true");
-      if (aiBtnText) aiBtnText.textContent = "Loading\u2026";
+      if (aiBtnText) aiBtnText.textContent = "Loading...";
 
+      let timeout: ReturnType<typeof setTimeout> | undefined;
       try {
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 5000);
+        timeout = setTimeout(() => controller.abort(), 6000);
 
         const res = await fetch("/api/ai/track-lab", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             feature: "build-sprint",
-            theme: currentTheme,
-            currentStage,
+            theme: themeAtRequest,
+            currentStage: stage,
+            structured: true,
           }),
           signal: controller.signal,
         });
 
-        clearTimeout(timeout);
-
         if (!res.ok) throw new Error("not ok");
         const data = await res.json();
+        const text = cleanText(data?.output?.description || data?.description, 320);
+        if (!text) throw new Error("invalid output");
 
-        if (data.stages && Array.isArray(data.stages)) {
-          aiDescriptions = data.stages;
-        } else if (typeof data.description === "string") {
-          if (!aiDescriptions) {
-            const fallback = THEMES[currentTheme].stages.slice();
-            aiDescriptions = fallback;
-          }
-          aiDescriptions[currentStage] = data.description;
-        }
-
-        updateDescription();
-        show(aiTag);
+        descriptions[stage] = {
+          text,
+          source: data?.source === "ai" ? "ai" : "fallback",
+        };
       } catch {
-        updateDescription();
+        descriptions[stage] = {
+          text: localStageFallback(themeAtRequest, stage),
+          source: "fallback",
+        };
       } finally {
+        if (timeout) clearTimeout(timeout);
         aiBtn.setAttribute("aria-busy", "false");
-        if (aiBtnText) aiBtnText.textContent = "AI Assist";
+        if (aiBtnText) aiBtnText.textContent = "Refresh Stage";
       }
+
+      if (seq === requestSeq && currentTheme === themeAtRequest && currentStage === stage) {
+        const result = selectedDescription(stage);
+        updateDescription(result.text, result.source);
+      }
+    }
+
+    function cleanText(value: unknown, maxLength: number) {
+      const text = typeof value === "string" || typeof value === "number" || typeof value === "boolean"
+        ? String(value)
+        : "";
+      const normalized = text.replace(/\s+/g, " ").trim();
+      return normalized.length <= maxLength ? normalized : `${normalized.slice(0, maxLength - 3).trimEnd()}...`;
     }
 
     function resetSprint() {
       currentTheme = "";
       currentStage = 0;
-      aiDescriptions = null;
+      descriptions = {};
+      requestSeq++;
 
       pills.forEach((pill) => pill.setAttribute("aria-pressed", "false"));
       resetPipeline();
@@ -838,7 +828,6 @@
       hide(board);
       show(intro);
       
-      // Focus first pill for keyboard users
       pills[0]?.focus();
     }
 
@@ -848,10 +837,9 @@
 
     advanceBtn.addEventListener("click", advanceStage);
 
-    if (aiBtn) aiBtn.addEventListener("click", callAI);
+    if (aiBtn) aiBtn.addEventListener("click", () => loadStageDescription(currentStage, true));
     resetBtn.addEventListener("click", resetSprint);
   }
 
   initBuildSprint();
 </script>
-

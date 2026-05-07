@@ -17,10 +17,10 @@ const seedIdeas = [
 ];
 
 const modes = [
-  { id: "sharpen", label: "Sharpen", icon: "◇", tip: "Refine & clarify" },
-  { id: "visual", label: "Visual", icon: "◈", tip: "Design direction" },
-  { id: "project", label: "Project", icon: "◆", tip: "Action plan" },
-  { id: "beginner", label: "Beginner", icon: "○", tip: "Simplify & explain" },
+  { id: "sharpen", label: "Sharpen", icon: "-", tip: "Refine & clarify" },
+  { id: "visual", label: "Visual", icon: "-^", tip: "Design direction" },
+  { id: "project", label: "Project", icon: "-", tip: "Action plan" },
+  { id: "beginner", label: "Beginner", icon: "-<", tip: "Simplify & explain" },
 ];
 ---
 
@@ -39,14 +39,19 @@ const modes = [
 
     <div class="remix-studio__input-group">
       <label class="remix-studio__label" for="remix-idea-input">Your Idea</label>
-      <input
-        id="remix-idea-input"
-        type="text"
-        class="remix-studio__field"
-        placeholder="Type a rough idea or pick one below..."
-        data-remix-input
-        autocomplete="off"
-      />
+      <div class="remix-studio__field-wrapper">
+        <input
+          id="remix-idea-input"
+          type="text"
+          class="remix-studio__field"
+          placeholder="Type a rough idea or pick one below..."
+          data-remix-input
+          autocomplete="off"
+        />
+        <button type="button" class="remix-studio__action" data-remix-action aria-label="Remix your idea">
+          <span class="remix-studio__action-text" data-remix-action-text>Remix</span>
+        </button>
+      </div>
     </div>
 
     <div class="remix-studio__seeds" aria-label="Seed ideas">
@@ -57,41 +62,26 @@ const modes = [
       ))}
     </div>
 
-    <div class="remix-studio__input-group">
-      <span class="remix-studio__label" id="transform-mode-label">Transform Mode</span>
-      <div class="remix-studio__modes" role="radiogroup" aria-labelledby="transform-mode-label">
-        {modes.map((mode) => (
-          <button
-            type="button"
-            role="radio"
-            class={`remix-studio__mode${mode.id === "sharpen" ? " is-active" : ""}`}
-            data-remix-mode={mode.id}
-            aria-checked={mode.id === "sharpen" ? "true" : "false"}
-            tabindex={mode.id === "sharpen" ? "0" : "-1"}
-            title={mode.tip}
-          >
-            <span class="remix-studio__mode-icon" aria-hidden="true">{mode.icon}</span>
-            <span>{mode.label}</span>
-          </button>
-        ))}
-      </div>
+    <div class="remix-studio__modes" role="radiogroup" aria-label="Transform Mode">
+      {modes.map((mode) => (
+        <button
+          type="button"
+          role="radio"
+          class={`remix-studio__mode${mode.id === "sharpen" ? " is-active" : ""}`}
+          data-remix-mode={mode.id}
+          aria-checked={mode.id === "sharpen" ? "true" : "false"}
+          tabindex={mode.id === "sharpen" ? "0" : "-1"}
+          title={mode.tip}
+        >
+          <span class="remix-studio__mode-icon" aria-hidden="true">{mode.icon}</span>
+          <span>{mode.label}</span>
+        </button>
+      ))}
     </div>
-
-    <button type="button" class="remix-studio__action" data-remix-action aria-label="Remix your idea">
-      <span class="remix-studio__action-spark" aria-hidden="true">&#x2726;</span>
-      <span class="remix-studio__action-text" data-remix-action-text>Remix Idea</span>
-    </button>
   </div>
 
-  <div class="remix-studio__divider" aria-hidden="true"></div>
-
-  <div class="remix-studio__panel remix-studio__panel--output">
+  <div class="remix-studio__panel remix-studio__panel--output" data-remix-output-panel hidden>
     <div class="sr-only" aria-live="polite" data-remix-status></div>
-
-    <div class="remix-studio__idle" data-remix-idle>
-      <span class="remix-studio__idle-icon" aria-hidden="true">&#x2727;</span>
-      <span class="remix-studio__idle-text">Your remixed concept will appear here</span>
-    </div>
 
     <div class="remix-studio__processing" data-remix-processing hidden>
       <div class="remix-studio__shimmer" aria-hidden="true"></div>
@@ -118,78 +108,53 @@ const modes = [
   }
 
   .remix-studio {
-    /* Theme variables mapped to global --ai-* tokens */
-    --rs-bg: var(--ai-core-bg, #0B1120);
-    --rs-panel-bg: var(--ai-surface, rgba(15, 23, 42, 0.4));
-    --rs-card-bg: var(--ai-surface-raised, rgba(30, 41, 59, 0.7));
-    --rs-border: var(--ai-border, rgba(148, 163, 184, 0.2));
-    --rs-border-strong: var(--ai-border-strong, rgba(148, 163, 184, 0.3));
-    --rs-text: var(--ai-text, #F8FAFC);
-    --rs-text-muted: var(--ai-text-muted, #94A3B8);
-    --rs-text-faint: var(--ai-text-faint, #64748B);
-    --rs-hover: var(--ai-surface-hover, rgba(255, 255, 255, 0.05));
     --rs-focus-ring: rgba(var(--remix-accent-rgb), 0.4);
 
     width: 100%;
-    height: 100%;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 32px;
-    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 24px;
     font-family: var(--font-sans);
-    color: var(--rs-text);
-    background: var(--rs-bg);
-    border-radius: 16px;
-    overflow: hidden;
+    color: var(--ai-fg);
+    background: transparent;
     box-sizing: border-box;
-  }
-
-  /* Support for light themes via data-theme */
-  :global([data-theme="light"]) .remix-studio {
-    --rs-bg: var(--ai-core-bg, #ffffff);
-    --rs-panel-bg: var(--ai-surface, #f8fafc);
-    --rs-card-bg: var(--ai-surface-raised, #ffffff);
-    --rs-border: var(--ai-border, #e2e8f0);
-    --rs-border-strong: var(--ai-border-strong, #cbd5e1);
-    --rs-text: var(--ai-text, #0f172a);
-    --rs-text-muted: var(--ai-text-muted, #475569);
-    --rs-text-faint: var(--ai-text-faint, #64748B);
-    --rs-hover: var(--ai-surface-hover, rgba(0, 0, 0, 0.05));
   }
 
   .remix-studio__panel {
     display: flex;
     flex-direction: column;
     gap: 16px;
-    min-width: 0;
   }
 
   .remix-studio__panel--output {
-    justify-content: center;
-    background: var(--rs-panel-bg);
+    background: var(--ai-surface);
     border-radius: 12px;
     padding: 16px;
-    border: 1px solid var(--rs-border);
+    border: 1px solid var(--ai-border);
+  }
+  
+  .remix-studio__panel--output[hidden] {
+    display: none;
   }
 
   .remix-studio__header {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    margin-bottom: 8px;
+    gap: 4px;
   }
 
   .remix-studio__title {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     font-weight: 800;
     margin: 0;
-    color: var(--rs-text);
+    color: var(--ai-fg);
     letter-spacing: -0.02em;
   }
 
   .remix-studio__desc {
-    font-size: 1rem;
-    color: var(--rs-text-muted);
+    font-size: 0.95rem;
+    color: var(--ai-fg-muted);
     line-height: 1.5;
     margin: 0;
   }
@@ -197,32 +162,38 @@ const modes = [
   .remix-studio__input-group {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
   }
 
   .remix-studio__label {
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: var(--rs-text-faint);
+    color: var(--ai-fg-muted);
+  }
+
+  .remix-studio__field-wrapper {
+    display: flex;
+    gap: 8px;
   }
 
   .remix-studio__field {
-    width: 100%;
-    padding: 14px 18px;
-    border: 1px solid var(--rs-border-strong);
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid var(--ai-border);
     border-radius: 8px;
-    background: var(--rs-bg);
-    color: var(--rs-text);
-    font-size: 1.125rem;
+    background: var(--ai-bg);
+    color: var(--ai-fg);
+    font-size: 1rem;
     font-family: inherit;
     outline: none;
     transition: border-color 200ms ease, box-shadow 200ms ease;
   }
 
   .remix-studio__field::placeholder {
-    color: var(--rs-text-faint);
+    color: var(--ai-fg-muted);
+    opacity: 0.7;
   }
 
   .remix-studio__field:focus-visible {
@@ -235,117 +206,25 @@ const modes = [
     cursor: not-allowed;
   }
 
-  .remix-studio__seeds {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .remix-studio__seed {
-    padding: 8px 16px;
-    border: 1px solid var(--rs-border);
-    border-radius: 20px;
-    background: var(--rs-panel-bg);
-    color: var(--rs-text-muted);
-    font-size: 0.9375rem;
-    font-weight: 500;
-    font-family: inherit;
-    cursor: pointer;
-    transition: all 180ms ease;
-    white-space: nowrap;
-  }
-
-  .remix-studio__seed:hover:not(:disabled) {
-    color: var(--rs-text);
-    border-color: rgba(var(--remix-accent-rgb), 0.4);
-    background: rgba(var(--remix-accent-rgb), 0.05);
-  }
-
-  .remix-studio__seed:focus-visible {
-    outline: 2px solid var(--rs-focus-ring);
-    outline-offset: 2px;
-  }
-
-  .remix-studio__seed:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  .remix-studio__modes {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .remix-studio__mode {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 10px 16px;
-    border: 1px solid var(--rs-border);
-    border-radius: 8px;
-    background: var(--rs-panel-bg);
-    color: var(--rs-text-muted);
-    font-size: 1rem;
-    font-weight: 600;
-    font-family: inherit;
-    cursor: pointer;
-    transition: all 180ms ease;
-    white-space: nowrap;
-  }
-
-  .remix-studio__mode:hover:not(:disabled) {
-    color: var(--rs-text);
-    background: var(--rs-hover);
-    border-color: var(--rs-border-strong);
-  }
-
-  .remix-studio__mode[aria-checked="true"] {
-    color: var(--remix-accent);
-    border-color: rgba(var(--remix-accent-rgb), 0.4);
-    background: rgba(var(--remix-accent-rgb), 0.1);
-    box-shadow: 0 0 12px rgba(var(--remix-accent-rgb), 0.05);
-  }
-
-  .remix-studio__mode:focus-visible {
-    outline: 2px solid var(--rs-focus-ring);
-    outline-offset: 2px;
-  }
-
-  .remix-studio__mode:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  .remix-studio__mode-icon {
-    font-size: 1rem;
-    line-height: 1;
-  }
-
   .remix-studio__action {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    width: 100%;
-    padding: 16px 24px;
+    padding: 0 20px;
     border: none;
     border-radius: 8px;
-    background: linear-gradient(135deg, var(--remix-accent), rgba(var(--remix-accent-rgb), 0.8));
-    color: #ffffff; /* Explicitly light for contrast against accent */
-    font-size: 1.125rem;
+    background: var(--remix-accent);
+    color: #ffffff;
+    font-size: 0.95rem;
     font-weight: 700;
     font-family: inherit;
     cursor: pointer;
     transition: transform 150ms ease, box-shadow 200ms ease, opacity 200ms ease;
-    letter-spacing: 0.02em;
-    margin-top: 8px;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
   }
 
   .remix-studio__action:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(var(--remix-accent-rgb), 0.3);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(var(--remix-accent-rgb), 0.3);
   }
 
   .remix-studio__action:active:not(:disabled) {
@@ -364,46 +243,90 @@ const modes = [
     box-shadow: none;
   }
 
-  .remix-studio__action-spark {
-    font-size: 1.1rem;
-    line-height: 1;
-    transition: transform 300ms ease;
-  }
-
-  .remix-studio__action:hover:not(:disabled) .remix-studio__action-spark {
-    transform: rotate(90deg);
-  }
-
-  .remix-studio__action.is-loading .remix-studio__action-spark {
-    animation: spin 1s linear infinite;
-  }
-
-  .remix-studio__divider {
-    width: 1px;
-    background: linear-gradient(to bottom, transparent, var(--rs-border-strong), transparent);
-    align-self: stretch;
-  }
-
-  .remix-studio__idle {
+  .remix-studio__seeds {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    text-align: center;
-    padding: 32px;
+    flex-wrap: wrap;
+    gap: 6px;
   }
 
-  .remix-studio__idle-icon {
-    font-size: 2.5rem;
-    color: rgba(var(--remix-accent-rgb), 0.4);
-    animation: remix-idle-pulse 3s ease-in-out infinite;
-  }
-
-  .remix-studio__idle-text {
-    font-size: 1.125rem;
+  .remix-studio__seed {
+    padding: 6px 12px;
+    border: 1px solid var(--ai-border);
+    border-radius: 16px;
+    background: var(--ai-surface);
+    color: var(--ai-fg-muted);
+    font-size: 0.85rem;
     font-weight: 500;
-    color: var(--rs-text-muted);
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 180ms ease;
+    white-space: nowrap;
+  }
+
+  .remix-studio__seed:hover:not(:disabled) {
+    color: var(--ai-fg);
+    border-color: rgba(var(--remix-accent-rgb), 0.4);
+    background: rgba(var(--remix-accent-rgb), 0.05);
+  }
+
+  .remix-studio__seed:focus-visible {
+    outline: 2px solid var(--rs-focus-ring);
+    outline-offset: 2px;
+  }
+
+  .remix-studio__seed:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .remix-studio__modes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .remix-studio__mode {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border: 1px solid var(--ai-border);
+    border-radius: 8px;
+    background: var(--ai-surface);
+    color: var(--ai-fg-muted);
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 180ms ease;
+    white-space: nowrap;
+  }
+
+  .remix-studio__mode:hover:not(:disabled) {
+    color: var(--ai-fg);
+    background: var(--ai-bg);
+  }
+
+  .remix-studio__mode[aria-checked="true"] {
+    color: var(--remix-accent);
+    border-color: rgba(var(--remix-accent-rgb), 0.4);
+    background: rgba(var(--remix-accent-rgb), 0.1);
+  }
+
+  .remix-studio__mode:focus-visible {
+    outline: 2px solid var(--rs-focus-ring);
+    outline-offset: 2px;
+  }
+
+  .remix-studio__mode:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .remix-studio__mode-icon {
+    font-size: 0.9rem;
+    line-height: 1;
   }
 
   .remix-studio__processing {
@@ -420,9 +343,9 @@ const modes = [
     border-radius: 8px;
     background: linear-gradient(
       90deg,
-      var(--rs-border),
-      rgba(var(--remix-accent-rgb), 0.08),
-      var(--rs-border)
+      var(--ai-border),
+      rgba(var(--remix-accent-rgb), 0.1),
+      var(--ai-border)
     );
     background-size: 200% 100%;
     animation: remix-shimmer 2s ease-in-out infinite;
@@ -449,22 +372,13 @@ const modes = [
   .remix-studio__card {
     position: relative;
     border-radius: 12px;
-    background: var(--rs-card-bg);
-    border: 1px solid var(--rs-border-strong);
-    padding: 24px;
+    background: var(--ai-bg);
+    border: 1px solid var(--ai-border);
+    padding: 20px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    overflow-y: auto;
-    max-height: 100%;
-    backdrop-filter: blur(8px);
-    transition: border-color 200ms ease, box-shadow 200ms ease;
+    gap: 12px;
     animation: remix-card-enter 450ms ease both;
-  }
-
-  .remix-studio__card:hover {
-    border-color: rgba(var(--remix-accent-rgb), 0.2);
-    box-shadow: 0 4px 20px rgba(var(--remix-accent-rgb), 0.05);
   }
 
   .remix-studio__card::before {
@@ -482,13 +396,13 @@ const modes = [
   /* Classes used via JavaScript */
   :global(.remix-studio__card-badge) {
     display: inline-block;
-    font-size: 0.6875rem;
+    font-size: 0.65rem;
     font-weight: 700;
     font-family: inherit;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--remix-accent);
-    padding: 4px 10px;
+    padding: 4px 8px;
     border: 1px solid rgba(var(--remix-accent-rgb), 0.3);
     border-radius: 6px;
     background: rgba(var(--remix-accent-rgb), 0.1);
@@ -496,24 +410,33 @@ const modes = [
   }
 
   :global(.remix-studio__card-title) {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     font-weight: 800;
-    color: var(--rs-text);
+    color: var(--ai-fg);
     letter-spacing: -0.02em;
     line-height: 1.25;
+    margin: 0;
   }
 
   :global(.remix-studio__card-tagline) {
-    font-size: 1.125rem;
+    font-size: 1rem;
     font-style: italic;
-    color: var(--rs-text-muted);
-    line-height: 1.5;
+    color: var(--ai-fg-muted);
+    line-height: 1.4;
+  }
+
+  :global(.remix-studio__card-source) {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ai-fg-muted);
   }
 
   :global(.remix-studio__card-section) {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
     animation: remix-section-in 350ms ease both;
   }
 
@@ -522,7 +445,7 @@ const modes = [
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: var(--rs-text-faint);
+    color: var(--ai-fg-muted);
   }
 
   :global(.remix-studio__card-section ul),
@@ -532,14 +455,14 @@ const modes = [
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
   }
 
   :global(.remix-studio__card-section li) {
-    font-size: 1rem;
-    color: var(--rs-text-muted);
-    line-height: 1.5;
-    padding-left: 16px;
+    font-size: 0.95rem;
+    color: var(--ai-fg-muted);
+    line-height: 1.4;
+    padding-left: 14px;
     position: relative;
   }
 
@@ -547,23 +470,23 @@ const modes = [
     content: "";
     position: absolute;
     left: 0;
-    top: 9px;
-    width: 6px;
-    height: 6px;
+    top: 8px;
+    width: 5px;
+    height: 5px;
     border-radius: 50%;
     background: rgba(var(--remix-accent-rgb), 0.6);
   }
 
   :global(.remix-studio__card-section li strong) {
-    color: var(--rs-text);
+    color: var(--ai-fg);
     font-weight: 600;
   }
 
   :global(.remix-studio__card-section p),
   :global(.remix-studio__card-section > span:not(.remix-studio__card-section-label)) {
-    font-size: 1rem;
-    line-height: 1.6;
-    color: var(--rs-text-muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--ai-fg-muted);
   }
 
   :global(.remix-studio__card-tags) {
@@ -576,16 +499,16 @@ const modes = [
   :global(.remix-studio__card-tag) {
     font-size: 0.75rem;
     font-weight: 600;
-    padding: 4px 10px;
+    padding: 4px 8px;
     border-radius: 6px;
-    background: var(--rs-panel-bg);
-    color: var(--rs-text);
-    border: 1px solid var(--rs-border-strong);
+    background: var(--ai-surface);
+    color: var(--ai-fg);
+    border: 1px solid var(--ai-border);
   }
 
   :global(.remix-studio__swatches) {
     display: flex;
-    gap: 12px;
+    gap: 8px;
     align-items: center;
     flex-wrap: wrap;
     margin-top: 4px;
@@ -595,15 +518,15 @@ const modes = [
     display: flex;
     align-items: center;
     gap: 6px;
-    background: var(--rs-panel-bg);
+    background: var(--ai-surface);
     padding: 4px 8px 4px 4px;
     border-radius: 20px;
-    border: 1px solid var(--rs-border);
+    border: 1px solid var(--ai-border);
   }
 
   :global(.remix-studio__swatch-dot) {
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
     border: 1px solid rgba(0, 0, 0, 0.1);
     flex-shrink: 0;
@@ -611,7 +534,7 @@ const modes = [
 
   :global(.remix-studio__swatch-name) {
     font-size: 0.75rem;
-    color: var(--rs-text);
+    color: var(--ai-fg);
     font-weight: 500;
   }
 
@@ -633,30 +556,14 @@ const modes = [
   }
 
   :global(.remix-studio__level-pip--off) {
-    background: var(--rs-border-strong);
+    background: var(--ai-border);
   }
 
   :global(.remix-studio__level-label) {
-    font-size: 0.8125rem;
-    color: var(--rs-text);
+    font-size: 0.8rem;
+    color: var(--ai-fg);
     font-weight: 500;
     margin-left: 4px;
-  }
-
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
-
-  @keyframes remix-idle-pulse {
-    0%,
-    100% {
-      opacity: 0.3;
-      transform: scale(0.95);
-    }
-    50% {
-      opacity: 0.6;
-      transform: scale(1.05);
-    }
   }
 
   @keyframes remix-shimmer {
@@ -671,7 +578,7 @@ const modes = [
   @keyframes remix-card-enter {
     from {
       opacity: 0;
-      transform: translateY(12px) scale(0.98);
+      transform: translateY(8px) scale(0.98);
     }
     to {
       opacity: 1;
@@ -682,35 +589,11 @@ const modes = [
   @keyframes remix-section-in {
     from {
       opacity: 0;
-      transform: translateY(8px);
+      transform: translateY(6px);
     }
     to {
       opacity: 1;
       transform: translateY(0);
-    }
-  }
-
-  @media (max-width: 860px) {
-    .remix-studio {
-      grid-template-columns: 1fr;
-      gap: 24px;
-      padding: 24px;
-    }
-
-    .remix-studio__divider {
-      width: 100%;
-      height: 1px;
-      background: linear-gradient(
-        to right,
-        transparent,
-        var(--rs-border-strong),
-        transparent
-      );
-    }
-
-    .remix-studio__panel--output {
-      order: -1;
-      min-height: 200px;
     }
   }
 
@@ -720,11 +603,6 @@ const modes = [
     .remix-studio *::after {
       animation: none !important;
       transition: none !important;
-    }
-    
-    .remix-studio__action.is-loading .remix-studio__action-spark {
-      animation: none !important;
-      transform: rotate(45deg);
     }
   }
 </style>
@@ -739,7 +617,7 @@ const modes = [
     const modeEls = studio.querySelectorAll("[data-remix-mode]");
     const actionEl = studio.querySelector("[data-remix-action]");
     const actionTextEl = studio.querySelector("[data-remix-action-text]");
-    const idleEl = studio.querySelector("[data-remix-idle]");
+    const outputPanel = studio.querySelector("[data-remix-output-panel]");
     const processingEl = studio.querySelector("[data-remix-processing]");
     const cardEl = studio.querySelector("[data-remix-card]");
     const statusEl = studio.querySelector("[data-remix-status]");
@@ -781,7 +659,6 @@ const modes = [
     async function runRemix(input, mode) {
       remixing = true;
       actionEl.disabled = true;
-      actionEl.classList.add("is-loading");
       actionEl.setAttribute("aria-busy", "true");
       actionTextEl.textContent = "Remixing...";
       if (statusEl) statusEl.textContent = "Remixing your idea...";
@@ -790,365 +667,159 @@ const modes = [
       modeEls.forEach(m => m.disabled = true);
       seedEls.forEach(s => s.disabled = true);
 
-      idleEl.hidden = true;
+      outputPanel.hidden = false;
       cardEl.hidden = true;
       processingEl.hidden = false;
 
-      const result = (await tryAI(input, mode)) || localTransform(input, mode);
+      const result = (await requestRemix(input, mode)) || {
+        source: "fallback",
+        output: buildUnavailableResult(input),
+      };
 
       processingEl.hidden = true;
       
-      // Use replaceChildren to avoid unsafe innerHTML while clearing
       cardEl.replaceChildren();
-      cardEl.appendChild(buildCard(result, mode));
+      cardEl.appendChild(buildCard(result.output, result.source));
       cardEl.hidden = false;
       if (statusEl) statusEl.textContent = "Remix complete.";
 
       remixing = false;
       actionEl.disabled = false;
-      actionEl.classList.remove("is-loading");
       actionEl.removeAttribute("aria-busy");
-      actionTextEl.textContent = "Remix Idea";
+      actionTextEl.textContent = "Remix";
       
       inputEl.disabled = false;
       modeEls.forEach(m => m.disabled = false);
       seedEls.forEach(s => s.disabled = false);
       
-      // Focus the new content for screen readers
       cardEl.setAttribute("tabindex", "-1");
       cardEl.focus();
     }
 
-    async function tryAI(input, mode) {
-      const lab = studio.closest("[data-track-lab]");
-      if (!lab || lab.dataset.aiEnabled !== "true") return null;
+    async function requestRemix(input, mode) {
+      let tid;
       try {
         const ctrl = new AbortController();
-        const tid = setTimeout(() => ctrl.abort(), 5000);
+        tid = setTimeout(() => ctrl.abort(), 6000);
         const res = await fetch("/api/ai/track-lab", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ feature: "remix-studio", input, mode }),
           signal: ctrl.signal,
         });
-        clearTimeout(tid);
         if (!res.ok) return null;
         const data = await res.json();
-        return data && data.output ? data.output : null;
+        const output = normalizeRemixResult(data && data.output);
+        if (!output) return null;
+        return {
+          source: data && data.source === "ai" ? "ai" : "fallback",
+          output,
+        };
       } catch {
         return null;
+      } finally {
+        if (tid) clearTimeout(tid);
       }
     }
 
-    function hash(str) {
-      let h = 5381;
-      for (let i = 0; i < str.length; i++) {
-        h = ((h << 5) + h + str.charCodeAt(i)) & 0x7fffffff;
-      }
-      return h;
-    }
-
-    function pick(arr, h, off) {
-      return arr[((h >>> 0) + (off || 0)) % arr.length];
-    }
-
-    function cap(s) {
-      return s.charAt(0).toUpperCase() + s.slice(1);
-    }
-
-    const STOP = new Set([
-      "a","an","the","that","this","is","are","was","were","it","its","for","to","of",
-      "in","on","at","by","with","from","and","or","but","not","your","my","our","their",
-      "what","which","who","how","can","will","do","does","did","has","have","had","be",
-      "been","am","i","you","he","she","we","they","me","him","her","us","them","up",
-      "down","out","into","about","some","any","all","each","every","both","few","more",
-      "most","other","than","too","very","just","also","then","so","if","when","while",
-      "where","here","there","like","help","make","need","want","use","get","new","own",
-    ]);
-
-    function keywords(input) {
-      return input
-        .toLowerCase()
-        .replace(/[^a-z0-9\s]/g, "")
-        .split(/\s+/)
-        .filter((w) => w.length > 2 && !STOP.has(w));
-    }
-
-    const SUFFIXES = [
-      "Flow","Pulse","Hub","Scout","Sync","Lens","Forge","Spark","Wave","Kit",
-      "Base","Loop","Mind","Craft","Sense","Dash","Stack","Nest","Graph","Arc",
-    ];
-
-    const ADJS = [
-      "Smart","Adaptive","Intelligent","Seamless","Intuitive","Dynamic",
-      "Personalized","Predictive","Elegant","Context-aware","Proactive",
-      "Responsive","Effortless","Precise","Collaborative",
-    ];
-
-    const VERBS = [
-      "analyzes","suggests","adapts to","discovers","predicts","optimizes",
-      "personalizes","curates","matches","maps","tracks","generates",
-      "connects","learns","surfaces","orchestrates",
-    ];
-
-    const NOUNS = [
-      "patterns","insights","preferences","trends","habits","goals",
-      "routines","connections","progress","behaviors","needs","workflow",
-      "context","environment","signals","choices",
-    ];
-
-    const BENEFITS = [
-      "save time","stay focused","make better decisions","build consistency",
-      "reduce friction","gain clarity","stay organized","discover opportunities",
-      "build momentum","improve outcomes","work smarter","learn faster",
-    ];
-
-    const AUDIENCES = [
-      "Students balancing busy schedules",
-      "Professionals optimizing productivity",
-      "Creators seeking inspiration",
-      "Teams collaborating on projects",
-      "Researchers exploring new territory",
-      "Beginners learning new skills",
-      "Hobbyists pursuing their passions",
-      "Entrepreneurs building products",
-    ];
-
-    const TECH_TAGS = [
-      "ML","UX","Data","Mobile","API","Cloud","Real-time","Personal",
-      "Analytics","IoT","Responsive","Adaptive","NLP","Automation",
-    ];
-
-    const MOODS = [
-      "Calm & Minimalist","Bold & Energetic","Clean & Professional",
-      "Warm & Friendly","Dark & Sophisticated","Playful & Colorful",
-      "Elegant & Refined","Modern & Geometric",
-    ];
-
-    const COLORS = [
-      { name: "Slate Blue", hex: "#64748B" },
-      { name: "Soft Lavender", hex: "#C4B5FD" },
-      { name: "Mint Cream", hex: "#D1FAE5" },
-      { name: "Deep Teal", hex: "#0D9488" },
-      { name: "Warm Amber", hex: "#F59E0B" },
-      { name: "Off-White", hex: "#F1F5F9" },
-      { name: "Midnight", hex: "#1E1B4B" },
-      { name: "Electric Cyan", hex: "#22D3EE" },
-      { name: "Charcoal", hex: "#374151" },
-      { name: "Forest Green", hex: "#166534" },
-      { name: "Peach", hex: "#FB923C" },
-      { name: "Warm Gray", hex: "#9CA3AF" },
-      { name: "Indigo", hex: "#4F46E5" },
-      { name: "Rose Quartz", hex: "#FDA4AF" },
-      { name: "Pale Gold", hex: "#EAB308" },
-      { name: "Burnt Orange", hex: "#EA580C" },
-      { name: "Cream", hex: "#FEF3C7" },
-      { name: "Steel Blue", hex: "#3B82F6" },
-      { name: "Coral", hex: "#FB7185" },
-      { name: "Plum", hex: "#9333EA" },
-      { name: "Sage", hex: "#86EFAC" },
-      { name: "Ivory", hex: "#FFFBEB" },
-    ];
-
-    const TYPOGRAPHY = [
-      "Clean Sans-serif","Modern Geometric Sans","Friendly Rounded Sans",
-      "Elegant Serif","Technical Monospace","Bold Display",
-    ];
-
-    const UI_ELEMENTS = [
-      "Card-based dashboard","Timeline view","Interactive map",
-      "Split-panel workspace","Feed-style list","Canvas workspace",
-      "Tabbed interface","Command palette",
-    ];
-
-    const METAPHORS = [
-      "a personal compass","a smart assistant","a thoughtful curator",
-      "a reliable co-pilot","a creative partner","a fitness tracker for your goals",
-      "a recipe for success","a well-organized desk",
-    ];
-
-    const PHASE_SETS = [
-      ["Understand users","Sketch core flows","Build working prototype","Ship & iterate"],
-      ["Research landscape","Define key features","Develop MVP","Gather feedback"],
-      ["Explore ideas freely","Design the system","Implement core logic","Test & refine"],
-      ["Map the problem space","Architect a solution","Code & integrate","Launch & learn"],
-    ];
-
-    const STACKS = [
-      ["React","Node.js","SQLite"],
-      ["Next.js","Python","PostgreSQL"],
-      ["Vue","Firebase","Tailwind"],
-      ["Svelte","Supabase","Vercel"],
-    ];
-
-    const TIMELINES = ["2\u20133 weeks","3\u20134 weeks","4\u20136 weeks","1\u20132 weeks","6\u20138 weeks"];
-
-    const ANALOGIES = [
-      "a helpful librarian who knows exactly what you need",
-      "a fitness tracker, but for your goals and ideas",
-      "a GPS that navigates complex decisions",
-      "a personal chef that preps your workflow",
-      "a study group that never sleeps",
-      "a smart notebook that organizes itself",
-      "a trusted advisor who\u2019s always available",
-      "a playlist that adapts to your mood",
-    ];
-
-    const STEP_SETS = [
-      ["Start with one simple feature","Test it with a real person","Iterate based on what you learn"],
-      ["Write down your core idea in one sentence","Sketch the main screen","Build just that one thing"],
-      ["Pick your smallest assumption","Create a quick experiment","Learn and adjust"],
-      ["Define the problem clearly","Find one existing solution","Improve one specific thing about it"],
-      ["List what you already know","Identify your biggest gap","Fill that gap first"],
-    ];
-
-    const LEARNINGS = [
-      "How to break complex problems into manageable pieces",
-      "The basics of user-centered design thinking",
-      "How to iterate quickly and learn from feedback",
-      "Core concepts of data-driven decision making",
-      "How to communicate ideas clearly and effectively",
-      "Practical skills in prototyping and testing",
-    ];
-
-    const BEGINNER_TAGS = [
-      "No-Code","Templates","Guided","Step-by-step","Visual","Interactive",
-      "Community","Resources","Hands-on","Beginner-friendly",
-    ];
-
-    const PHASE_LABELS = ["Research","Design","Build","Launch"];
-
-    function localTransform(input, mode) {
-      const h = hash(input + mode);
-      const kw = keywords(input);
-      const main = kw[0] || "idea";
-
-      switch (mode) {
-        case "sharpen":
-          return transformSharpen(main, kw, h);
-        case "visual":
-          return transformVisual(main, h);
-        case "project":
-          return transformProject(main, h);
-        case "beginner":
-          return transformBeginner(main, h);
-        default:
-          return transformSharpen(main, kw, h);
-      }
-    }
-
-    function transformSharpen(main, kw, h) {
-      const title = cap(main) + pick(SUFFIXES, h, 0);
-      const adj = pick(ADJS, h, 1);
-      const verb = pick(VERBS, h, 2);
-      const noun = pick(NOUNS, h, 3);
-      const tagline = `${adj} system that ${verb} your ${noun}`;
-
-      const features = [
-        `${pick(VERBS, h, 4)} ${pick(NOUNS, h, 5)} to ${pick(BENEFITS, h, 6)}`,
-        `${cap(pick(VERBS, h, 7).replace(/s$/, ""))}s ${pick(NOUNS, h, 8)} with minimal user input`,
-        `${pick(ADJS, h, 9)} ${pick(NOUNS, h, 10)} that evolves over time`,
-      ];
-
-      const audience = pick(AUDIENCES, h, 11);
-      const tags = [
-        pick(TECH_TAGS, h, 12),
-        pick(TECH_TAGS, h, 13),
-        pick(TECH_TAGS, h, 14),
-      ];
-
+    function buildUnavailableResult(input) {
+      const title = cleanText(input, 80) || "Remix unavailable";
       return {
-        badge: "Refined Concept",
-        title,
-        tagline,
-        sections: [
-          { label: "Key Features", items: features },
-          { label: "Target", text: audience },
-        ],
-        tags,
-      };
-    }
-
-    function transformVisual(main, h) {
-      const title = cap(main) + " \u2014 Visual Direction";
-      const mood = pick(MOODS, h, 0);
-
-      const ci = (h + 1) % (COLORS.length - 2);
-      const palette = [COLORS[ci], COLORS[ci + 1], COLORS[ci + 2]];
-
-      const typo = pick(TYPOGRAPHY, h, 3);
-      const elems = [pick(UI_ELEMENTS, h, 4), pick(UI_ELEMENTS, h, 5)];
-      const metaphor = pick(METAPHORS, h, 6);
-
-      return {
-        badge: "Visual Concept",
+        badge: "Fallback",
         title,
         sections: [
-          { label: "Mood", text: mood },
-          { label: "Palette", swatches: palette },
-          { label: "Typography", text: typo },
-          { label: "Key Elements", items: elems },
-          { label: "Visual Metaphor", text: `Like ${metaphor}` },
-        ],
-      };
-    }
-
-    function transformProject(main, h) {
-      const projectName = cap(main) + pick(SUFFIXES, h, 0);
-      const title = projectName + " \u2014 Project Brief";
-      const phases = pick(PHASE_SETS, h, 1);
-      const stack = pick(STACKS, h, 2);
-      const timeline = pick(TIMELINES, h, 3);
-      const milestone = PHASE_LABELS[0] + " complete with documented findings";
-
-      const phaseItems = phases.map((p, i) => `${PHASE_LABELS[i]} \u2014 ${p}`);
-
-      return {
-        badge: "Project Brief",
-        title,
-        tagline: `Estimated timeline: ${timeline}`,
-        sections: [
-          { label: "Phases", items: phaseItems },
-          { label: "Stack", stackTags: stack },
-          { label: "First Milestone", text: milestone },
-        ],
-      };
-    }
-
-    function transformBeginner(main, h) {
-      const title = cap(main) + " \u2014 Simplified";
-      const simple = `${cap(main)} made simple and approachable for anyone starting out.`;
-      const analogy = `Think of it like ${pick(ANALOGIES, h, 0)}.`;
-      const steps = pick(STEP_SETS, h, 1);
-      const learning = pick(LEARNINGS, h, 2);
-      const diff = (h % 3) + 1;
-      const tags = [
-        pick(BEGINNER_TAGS, h, 3),
-        pick(BEGINNER_TAGS, h, 4),
-        pick(BEGINNER_TAGS, h, 5),
-      ];
-
-      const levelLabels = ["Beginner","Intermediate","Advanced"];
-      const stepItems = steps.map((s, i) => `${i + 1}. ${s}`);
-
-      return {
-        badge: "Simplified",
-        title,
-        sections: [
-          { label: "In Simple Terms", text: simple },
-          { label: "Think of it like\u2026", text: analogy },
-          { label: "Getting Started", items: stepItems },
-          { label: "You\u2019ll Learn", text: learning },
           {
-            label: "Level",
-            level: { filled: diff, total: 3, label: levelLabels[diff - 1] },
+            label: "Status",
+            text: "The generation endpoint was unavailable. Try again to request a fresh server-generated remix.",
           },
         ],
-        tags,
       };
     }
 
-    function buildCard(result, mode) {
+    function normalizeRemixResult(value) {
+      if (!isRecord(value)) return null;
+      const title = cleanText(value.title, 90);
+      const sections = Array.isArray(value.sections)
+        ? value.sections.map(normalizeSection).filter(Boolean)
+        : [];
+      if (!title || sections.length === 0) return null;
+
+      const result = {
+        badge: cleanText(value.badge, 40) || "Generated Concept",
+        title,
+        sections,
+      };
+      const tagline = cleanText(value.tagline, 180);
+      const tags = cleanArray(value.tags, 5, 28);
+      if (tagline) result.tagline = tagline;
+      if (tags.length) result.tags = tags;
+      return result;
+    }
+
+    function normalizeSection(value) {
+      if (!isRecord(value)) return null;
+      const label = cleanText(value.label, 50);
+      if (!label) return null;
+      const section = { label };
+      const text = cleanText(value.text, 260);
+      const items = cleanArray(value.items, 6, 130);
+      const stackTags = cleanArray(value.stackTags, 6, 28);
+      const swatches = Array.isArray(value.swatches)
+        ? value.swatches.map(normalizeSwatch).filter(Boolean).slice(0, 6)
+        : [];
+      const level = normalizeLevel(value.level);
+
+      if (text) section.text = text;
+      if (items.length) section.items = items;
+      if (stackTags.length) section.stackTags = stackTags;
+      if (swatches.length) section.swatches = swatches;
+      if (level) section.level = level;
+      return Object.keys(section).length > 1 ? section : null;
+    }
+
+    function normalizeSwatch(value) {
+      if (!isRecord(value)) return null;
+      const name = cleanText(value.name, 40);
+      const hex = cleanText(value.hex, 12);
+      return name && /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(hex)
+        ? { name, hex }
+        : null;
+    }
+
+    function normalizeLevel(value) {
+      if (!isRecord(value)) return null;
+      const total = clampNumber(value.total, 1, 5, 3);
+      return {
+        filled: clampNumber(value.filled, 0, total, 1),
+        total,
+        label: cleanText(value.label, 40) || "Beginner",
+      };
+    }
+
+    function cleanArray(value, maxItems, maxLength) {
+      if (!Array.isArray(value)) return [];
+      return value.map((item) => cleanText(item, maxLength)).filter(Boolean).slice(0, maxItems);
+    }
+
+    function cleanText(value, maxLength) {
+      const text = typeof value === "string" || typeof value === "number" || typeof value === "boolean"
+        ? String(value)
+        : "";
+      const normalized = text.replace(/\s+/g, " ").trim();
+      return normalized.length <= maxLength ? normalized : `${normalized.slice(0, maxLength - 3).trimEnd()}...`;
+    }
+
+    function clampNumber(value, min, max, fallback) {
+      const number = typeof value === "number" ? value : Number.parseInt(String(value), 10);
+      if (!Number.isFinite(number)) return fallback;
+      return Math.max(min, Math.min(max, Math.floor(number)));
+    }
+
+    function isRecord(value) {
+      return typeof value === "object" && value !== null && !Array.isArray(value);
+    }
+
+    function buildCard(result, source) {
       const frag = document.createDocumentFragment();
       const wrapper = document.createElement("div");
       wrapper.className = "remix-studio__card-inner";
@@ -1158,6 +829,15 @@ const modes = [
       const badge = el("span", "remix-studio__card-badge", result.badge);
       badge.style.animationDelay = `${delay}ms`;
       wrapper.appendChild(badge);
+
+      delay += 40;
+      const sourceEl = el(
+        "span",
+        "remix-studio__card-source",
+        source === "ai" ? "Generated by Gemini AI" : "Deterministic fallback"
+      );
+      sourceEl.style.animationDelay = `${delay}ms`;
+      wrapper.appendChild(sourceEl);
 
       delay += 60;
       const title = el("h4", "remix-studio__card-title", result.title);
