@@ -141,6 +141,86 @@ img.duotone-tint {
   filter: none; /* no aggressive image distortion */
 }
 
+/* ── Button: primary ──
+   Solid accent button with theme-safe contrast text. */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.875rem 2rem;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  line-height: 1;
+  border-radius: 0.5rem;
+  background: var(--ai-cyan);
+  color: #fff;
+  border: 1px solid transparent;
+  transition: opacity 0.15s, box-shadow 0.15s;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+:root:not([data-theme="dark"]) .btn-primary {
+  color: #fff;
+  /* Light theme: cyan (#0891b2) is dark enough for white text */
+}
+
+:root[data-theme="dark"] .btn-primary {
+  color: #0a0a0a;
+  /* Dark theme: cyan (#22d3ee) is light — use dark text */
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+.btn-primary:focus-visible {
+  outline: 2px solid var(--ai-cyan);
+  outline-offset: 2px;
+}
+
+/* ── Button: secondary ──
+   Ghost / outlined button safe in both themes. */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.875rem 2rem;
+  font-weight: 500;
+  font-size: 0.9375rem;
+  line-height: 1;
+  border-radius: 0.5rem;
+  background: var(--ai-surface);
+  color: var(--ai-fg);
+  border: 1px solid var(--ai-border);
+  transition: background-color 0.15s, border-color 0.15s;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: var(--ai-border);
+}
+
+.btn-secondary:focus-visible {
+  outline: 2px solid var(--ai-cyan);
+  outline-offset: 2px;
+}
+
+/* ── Utility: media scrim ──
+   Semi-transparent overlay to ensure text readability over images/video. */
+.media-scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--ai-bg) 65%, transparent),
+    color-mix(in srgb, var(--ai-bg) 20%, transparent)
+  );
+}
+
 /* ── Legacy compatibility: node-dot ──
    Small accent dot, softened from 6px to 5px with rounded shape. */
 .node-dot {

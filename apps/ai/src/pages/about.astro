@@ -1,135 +1,119 @@
 ---
 export const prerender = true;
 import Layout from '../layouts/Layout.astro';
-import { Picture } from "astro:assets";
-import studentsWhiteboardCoding from "../assets/images/studentswhiteboardcoding.jpg";
-import studentsCodingWorkshop from "../assets/images/studentscodingworkshop.jpg";
 import '../styles/global.css';
 ---
 
 <Layout title="About" description="Learn about Surrey Artificial Intelligence Society — our mission, values, and what members can expect from our student-led AI community.">
 
-  <!-- Header -->
-  <header class="bg-ai-bg text-ai-fg py-16 sm:py-24 px-6 relative border-b border-ai-border overflow-hidden">
-    <div class="absolute inset-0 z-0 opacity-20 pointer-events-none">
-      <Picture
-        src={studentsWhiteboardCoding}
-        alt="Students collaborating on a whiteboard"
-        widths={[768, 1280, 1920]}
-        sizes="100vw"
-        class="w-full h-full object-cover"
-        style={{ objectPosition: 'center 30%' }}
-        pictureAttributes={{ class: 'w-full h-full block overflow-hidden' }}
-      />
-    </div>
-    <div class="mx-auto max-w-5xl relative z-10">
-      <div class="inline-flex items-center gap-2 mb-6">
-        <span class="w-8 h-px bg-ai-purple"></span>
-        <span class="font-mono-tech text-ai-purple text-sm font-semibold uppercase tracking-wider">Overview</span>
-      </div>
-      <h1 class="text-4xl sm:text-6xl font-black tracking-tight mb-6">About the Society</h1>
-      <p class="text-ai-fg-muted text-xl max-w-2xl leading-relaxed">
+  <section class="bg-ai-bg text-ai-fg border-b border-ai-border">
+    <div class="mx-auto max-w-5xl px-6 pt-10 pb-8 sm:pt-14 sm:pb-10">
+      <span class="text-ai-purple text-xs font-semibold uppercase tracking-widest block mb-3">Overview</span>
+      <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight leading-[1.1] mb-4">About the Society</h1>
+      <p class="text-ai-fg-muted text-base sm:text-lg leading-relaxed max-w-2xl">
         Demystifying artificial intelligence, fostering discussion, and building the next generation of technical literacy at the University of Surrey.
       </p>
     </div>
-  </header>
+  </section>
 
   <!-- Mission -->
-  <section class="py-16 sm:py-24 px-6 bg-ai-surface text-ai-fg border-b border-ai-border">
+  <section class="py-10 sm:py-14 px-6 bg-ai-surface text-ai-fg border-b border-ai-border">
     <div class="mx-auto max-w-5xl">
-      <div class="grid lg:grid-cols-2 gap-12 items-start">
-        <section>
-          <h2 class="text-3xl font-bold mb-8 font-mono-tech text-ai-cyan">Our Mission</h2>
-          <div class="space-y-6 text-ai-fg-muted leading-relaxed text-lg">
+      <div class="grid lg:grid-cols-2 gap-10 lg:gap-14 items-start">
+        <div>
+          <h2 class="text-2xl sm:text-3xl font-bold mb-5 text-ai-fg">Our Mission</h2>
+          <div class="space-y-4 text-ai-fg-muted leading-relaxed text-base sm:text-lg">
             <p>
-              Surrey Artificial Intelligence Society exists to make artificial intelligence accessible, understandable, and engaging for students — regardless of their course or prior experience.
+              Surrey Artificial Intelligence Society exists to make artificial intelligence accessible, understandable, and engaging for students — regardless of course or prior experience.
             </p>
             <p>
               We believe AI literacy will be critical across every discipline. Whether you're studying computer science, law, medicine, business, or the arts, understanding how AI works and what it means for your field matters.
             </p>
             <p>
-              As a student-led society under the Surrey Students' Union, we provide a space to learn, debate, and build.
+              As a student-led society under the Surrey Students' Union, we provide a space to learn, debate, and build — with no gatekeeping and no jargon.
             </p>
           </div>
-          
-          <div class="mt-8 border border-ai-border bg-ai-bg p-6">
-            <h3 class="font-bold text-lg mb-4 font-mono-tech">What We Run</h3>
-            <ul class="space-y-3 font-mono-tech text-sm text-ai-fg-muted">
-              <li class="flex items-start gap-2"><span class="text-ai-cyan">>&nbsp;</span>Beginner-friendly ML & NLP workshops</li>
-              <li class="flex items-start gap-2"><span class="text-ai-cyan">>&nbsp;</span>Hands-on hackathons and build nights</li>
-              <li class="flex items-start gap-2"><span class="text-ai-cyan">>&nbsp;</span>AI ethics, policy, and impact panels</li>
-              <li class="flex items-start gap-2"><span class="text-ai-cyan">>&nbsp;</span>Industry insight and careers sessions</li>
+
+          <div class="mt-8 bg-ai-bg border border-ai-border rounded-xl p-5">
+            <h3 class="font-semibold text-base mb-4 text-ai-fg">What We Run</h3>
+            <ul class="space-y-3">
+              {[
+                "Beginner-friendly ML & NLP workshops",
+                "Hands-on hackathons and build nights",
+                "AI ethics, policy, and impact panels",
+                "Industry insight and careers sessions",
+              ].map(item => (
+                <li class="flex items-start gap-3 text-sm text-ai-fg-muted">
+                  <svg class="w-4 h-4 text-ai-cyan shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  {item}
+                </li>
+              ))}
             </ul>
           </div>
-        </section>
-
-        <div class="relative h-64 sm:h-[500px] w-full border border-ai-border overflow-hidden">
-          <Picture
-            src={studentsCodingWorkshop}
-            alt="Students collaborating at a coding workshop"
-            widths={[768, 1280]}
-            sizes="(max-width: 768px) 100vw, 50vw"
-            class="w-full h-full object-cover"
-            pictureAttributes={{ class: 'absolute inset-0 w-full h-full block overflow-hidden' }}
-          />
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Target Audience -->
-  <section class="bg-ai-bg py-16 sm:py-24 px-6 border-b border-ai-border text-ai-fg">
+  <!-- Who It's For -->
+  <section class="bg-ai-bg py-10 sm:py-14 px-6 border-b border-ai-border text-ai-fg">
     <div class="mx-auto max-w-5xl">
-      <h2 class="text-3xl font-bold mb-12 font-mono-tech">Who It's For</h2>
+      <div class="max-w-2xl mb-8">
+        <h2 class="text-2xl sm:text-3xl font-bold mb-3">Who It's For</h2>
+        <p class="text-ai-fg-muted leading-relaxed">Every discipline, every year group, every experience level. AI shapes all of our futures — you don't need to be a computer scientist to be curious about it.</p>
+      </div>
       <div class="grid sm:grid-cols-3 gap-6">
-        <article class="border border-ai-border p-8 hover:border-ai-cyan transition-colors bg-ai-surface">
-          <div class="text-ai-cyan font-mono-tech mb-4">01</div>
-          <h3 class="font-bold text-lg mb-3">Beginners</h3>
-          <p class="text-ai-fg-muted text-sm leading-relaxed">Never touched AI before? That's completely fine. Many of our events are designed as starting points, with no prerequisites or coding required.</p>
-        </article>
-        <article class="border border-ai-border p-8 hover:border-ai-cyan transition-colors bg-ai-surface">
-          <div class="text-ai-cyan font-mono-tech mb-4">02</div>
-          <h3 class="font-bold text-lg mb-3">Builders</h3>
-          <p class="text-ai-fg-muted text-sm leading-relaxed">If you already code and want to apply your skills to AI projects, our build nights, hackathons, and project groups provide the perfect sandbox.</p>
-        </article>
-        <article class="border border-ai-border p-8 hover:border-ai-cyan transition-colors bg-ai-surface">
-          <div class="text-ai-cyan font-mono-tech mb-4">03</div>
-          <h3 class="font-bold text-lg mb-3">Thinkers</h3>
-          <p class="text-ai-fg-muted text-sm leading-relaxed">Interested in the ethics, policy, or societal implications of AI? We host debates and panels focusing on the philosophical and regulatory side.</p>
-        </article>
+        {[
+          {
+            num: "01",
+            title: "Beginners",
+            body: "Never touched AI before? That's completely fine. Many of our events are designed as starting points, with no prerequisites or coding required.",
+            accent: "text-ai-cyan",
+          },
+          {
+            num: "02",
+            title: "Builders",
+            body: "Already code and want to apply your skills to AI? Our build nights, hackathons, and project groups provide the space to experiment and ship.",
+            accent: "text-ai-purple",
+          },
+          {
+            num: "03",
+            title: "Thinkers",
+            body: "Interested in the ethics, policy, or societal implications of AI? We host debates and panels focusing on the bigger picture.",
+            accent: "text-ai-cyan",
+          },
+        ].map(card => (
+          <article class="bg-ai-surface border border-ai-border rounded-xl p-7 hover:border-ai-cyan transition-colors duration-200">
+            <div class:list={[card.accent, "text-xs font-semibold uppercase tracking-widest mb-4"]}>{card.num}</div>
+            <h3 class="font-semibold text-lg mb-3 text-ai-fg">{card.title}</h3>
+            <p class="text-ai-fg-muted text-sm leading-relaxed">{card.body}</p>
+          </article>
+        ))}
       </div>
     </div>
   </section>
 
   <!-- Principles -->
-  <section class="py-16 sm:py-24 px-6 bg-ai-bg text-ai-fg">
+  <section class="py-10 sm:py-14 px-6 bg-ai-surface text-ai-fg">
     <div class="mx-auto max-w-5xl">
-      <h2 class="text-3xl font-bold mb-12 font-mono-tech">Our Principles</h2>
-      <div class="grid sm:grid-cols-2 gap-8">
-        <div class="flex gap-6 border-l border-ai-purple pl-6 py-2">
-          <div>
-            <h3 class="font-bold text-lg mb-2">Accessibility First</h3>
-            <p class="text-ai-fg-muted leading-relaxed">Every event should be approachable. We don't gatekeep knowledge or use unnecessary jargon. If a concept is complex, we break it down.</p>
+      <div class="max-w-2xl mb-8">
+        <h2 class="text-2xl sm:text-3xl font-bold mb-3">Our Principles</h2>
+        <p class="text-ai-fg-muted leading-relaxed">The values that shape how we run the society — practically, not just on paper.</p>
+      </div>
+      <div class="grid sm:grid-cols-2 gap-x-16 gap-y-10">
+        {[
+          { title: "Accessibility First", body: "Every event should be approachable. We don't gatekeep knowledge or use unnecessary jargon. If a concept is complex, we break it down.", accent: "border-ai-purple" },
+          { title: "Responsible AI", body: "We care about how AI is built and deployed, not just what it can do. Safety, bias, and ethics are regular topics of our discussions.", accent: "border-ai-cyan" },
+          { title: "Learn by Doing", body: "Theory matters, but building things teaches you faster. We emphasize practical application over purely academic lectures.", accent: "border-ai-cyan" },
+          { title: "Cross-Disciplinary", body: "AI touches every field. We actively recruit and welcome students from non-STEM backgrounds to ensure diverse perspectives.", accent: "border-ai-purple" },
+        ].map(p => (
+          <div class:list={["pl-6 py-1 border-l-2", p.accent]}>
+            <h3 class="font-semibold text-lg mb-2 text-ai-fg">{p.title}</h3>
+            <p class="text-ai-fg-muted leading-relaxed text-sm">{p.body}</p>
           </div>
-        </div>
-        <div class="flex gap-6 border-l border-ai-cyan pl-6 py-2">
-          <div>
-            <h3 class="font-bold text-lg mb-2">Responsible AI</h3>
-            <p class="text-ai-fg-muted leading-relaxed">We care about how AI is built and deployed, not just what it can do. Safety, bias, and ethics are regular topics of our discussions.</p>
-          </div>
-        </div>
-        <div class="flex gap-6 border-l border-ai-cyan pl-6 py-2">
-          <div>
-            <h3 class="font-bold text-lg mb-2">Learn by Doing</h3>
-            <p class="text-ai-fg-muted leading-relaxed">Theory matters, but building things teaches you faster. We emphasize practical application over purely academic lectures.</p>
-          </div>
-        </div>
-        <div class="flex gap-6 border-l border-ai-purple pl-6 py-2">
-          <div>
-            <h3 class="font-bold text-lg mb-2">Cross-Disciplinary</h3>
-            <p class="text-ai-fg-muted leading-relaxed">AI touches every field. We actively recruit and welcome students from non-STEM backgrounds to ensure diverse perspectives.</p>
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   </section>

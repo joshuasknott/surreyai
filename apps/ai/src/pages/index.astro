@@ -4,7 +4,6 @@ import Layout from "../layouts/Layout.astro";
 import { createConvexClient } from "@surreysocieties/admin";
 import "../styles/global.css";
 
-import HomeHero from "../components/home/HomeHero.astro";
 import WhatWeDoSection from "../components/home/WhatWeDoSection.astro";
 import AITracksExhibit from "../components/home/AITracksExhibit.astro";
 import EventsPreview from "../components/home/EventsPreview.astro";
@@ -33,7 +32,20 @@ const committee: any[] = (
   title="Home"
   description="Surrey Artificial Intelligence Society — A student-led community for learning, building, and discussing artificial intelligence at the University of Surrey."
 >
-  <HomeHero />
+  <section class="bg-ai-bg text-ai-fg border-b border-ai-border">
+    <div class="mx-auto max-w-5xl px-6 pt-12 pb-8 sm:pt-16 sm:pb-10">
+      <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-[1.1] mb-4">
+        Empowering Students in <span class="text-ai-cyan">Artificial Intelligence</span>
+      </h1>
+      <p class="text-ai-fg-muted text-base sm:text-lg leading-relaxed max-w-2xl mb-6">
+        A student-led community dedicated to learning, building, and discussing artificial intelligence. Open to every discipline and experience level.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-3 sm:w-auto">
+        <a href="/join" class="btn-primary text-center">Join the Society</a>
+        <a href="#events" class="btn-secondary text-center">View Events</a>
+      </div>
+    </div>
+  </section>
   <WhatWeDoSection />
   <AITracksExhibit />
   <EventsPreview events={events} />

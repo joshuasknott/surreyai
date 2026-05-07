@@ -2,11 +2,11 @@
 import BackgroundVideo from "@surreysocieties/ui/components/BackgroundVideo";
 ---
 
-<section class="bg-ai-bg text-ai-fg relative overflow-hidden flex items-center min-h-[85vh] border-b border-ai-border">
-  <div class="mx-auto max-w-7xl px-6 py-24 sm:py-32 relative z-10 w-full">
-    <div class="grid lg:grid-cols-[minmax(0,1fr)_minmax(400px,1fr)] gap-12 lg:gap-16 items-center">
+<section class="bg-ai-bg text-ai-fg relative overflow-hidden flex items-center border-b border-ai-border">
+  <div class="mx-auto max-w-6xl px-6 py-24 sm:py-32 relative z-10 w-full">
+    <div class="grid lg:grid-cols-[1fr_minmax(340px,520px)] gap-12 lg:gap-16 items-center">
       <div class="flex flex-col items-start max-w-2xl">
-        <span class="text-ai-cyan font-semibold text-sm sm:text-base mb-4 block" aria-hidden="true">
+        <span class="text-ai-cyan font-semibold text-xs uppercase tracking-widest mb-4 block" aria-hidden="true">
           University of Surrey
         </span>
         <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.1] mb-6">
@@ -16,16 +16,10 @@ import BackgroundVideo from "@surreysocieties/ui/components/BackgroundVideo";
           We are a student-led community dedicated to learning, building, and discussing artificial intelligence. Open to every discipline and experience level.
         </p>
         <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-          <a
-            href="/join"
-            class="px-8 py-3.5 bg-ai-cyan hover:opacity-90 text-white font-semibold rounded-lg transition-colors text-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ai-cyan"
-          >
+          <a href="/join" class="btn-primary text-center">
             Join the Society
           </a>
-          <a
-            href="#events"
-            class="px-8 py-3.5 bg-ai-surface hover:bg-ai-border text-ai-fg font-medium rounded-lg border border-ai-border transition-colors text-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ai-cyan"
-          >
+          <a href="#events" class="btn-secondary text-center">
             View Events
           </a>
         </div>
@@ -38,8 +32,23 @@ import BackgroundVideo from "@surreysocieties/ui/components/BackgroundVideo";
           poster="/videos/posters/ai-hero.poster.jpg"
           objectPosition="center center"
         />
+        {/* Theme-safe scrim over video for visual polish */}
+        <div class="hero-video-scrim"></div>
       </div>
     </div>
   </div>
 </section>
 
+<style>
+  .hero-video-scrim {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+    background: linear-gradient(
+      to top,
+      color-mix(in srgb, var(--ai-bg) 30%, transparent),
+      transparent 50%
+    );
+  }
+</style>

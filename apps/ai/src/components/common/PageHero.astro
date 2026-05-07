@@ -1,0 +1,125 @@
+---
+/**
+ * PageHero — Reusable hero banner for public pages.
+ *
+ * Supports:
+ *   - eyebrow / title / description text
+ *   - optional image (Astro `ImageMetadata`) with responsive side panel
+ *   - accent colour token ('cyan' | 'purple')
+ *   - object-position override for image cropping
+ *   - default slot for CTA buttons / extra content beneath description
+ */
+import { Picture } from "astro:assets";
+
+interface Props {
+  /** Small label above the title, e.g. "Overview" */
+  eyebrow?: string;
+  /** Page heading */
+  title: string;
+  /** Supporting paragraph */
+  description?: string;
+  /** Theme accent — controls eyebrow colour and decorative line */
+  accent?: "cyan" | "purple";
+  /** Astro image import for side panel (use `import img from '…'`) */
+  image?: ImageMetadata;
+  /** Alt text for the image */
+  imageAlt?: string;
+  /** CSS object-position value for the image */
+  imagePosition?: string;
+  /** Background variant: uses bg-ai-bg or bg-ai-surface */
+  surface?: boolean;
+}
+
+const {
+  eyebrow,
+  title,
+  description,
+  accent = "cyan",
+  image,
+  imageAlt = "",
+  imagePosition = "center",
+  surface = false,
+} = Astro.props;
+
+const accentColor = accent === "purple" ? "var(--ai-purple)" : "var(--ai-cyan)";
+const accentTextClass = accent === "purple" ? "text-ai-purple" : "text-ai-cyan";
+const bgClass = surface ? "bg-ai-surface" : "bg-ai-bg";
+---
+
+<header
+  class:list={[
+    bgClass,
+    "text-ai-fg relative overflow-hidden border-b border-ai-border",
+  ]}
+>
+  <div class="mx-auto max-w-6xl px-6 py-16 sm:py-24 relative z-10">
+    <div
+      class:list={[
+        image ? "grid lg:grid-cols-[1fr_minmax(280px,400px)] gap-10 lg:gap-16 items-center" : "",
+      ]}
+    >
+      <!-- Text column -->
+      <div class="max-w-2xl">
+        {eyebrow && (
+          <div class="inline-flex items-center gap-2.5 mb-5">
+            <span class="w-8 h-px" style={`background: ${accentColor}`}></span>
+            <span
+              class:list={[
+                accentTextClass,
+                "text-xs font-semibold uppercase tracking-widest",
+              ]}
+            >
+              {eyebrow}
+            </span>
+          </div>
+        )}
+
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.1] mb-5">
+          {title}
+        </h1>
+
+        {description && (
+          <p class="text-ai-fg-muted text-lg leading-relaxed max-w-xl">
+            {description}
+          </p>
+        )}
+
+        {/* Default slot — used for CTA buttons or extra content */}
+        <div class="mt-8">
+          <slot />
+        </div>
+      </div>
+
+      <!-- Image column -->
+      {image && (
+        <div class="relative w-full aspect-[4/3] rounded-xl overflow-hidden ring-1 ring-ai-border shadow-lg hidden lg:block">
+          <Picture
+            src={image}
+            alt={imageAlt}
+            widths={[400, 640, 800]}
+            sizes="(max-width: 1024px) 0px, 400px"
+            class="w-full h-full object-cover"
+            style={{ objectPosition: imagePosition }}
+            pictureAttributes={{ class: "absolute inset-0 w-full h-full block" }}
+          />
+          {/* Theme-safe scrim overlay */}
+          <div class="hero-image-scrim"></div>
+        </div>
+      )}
+    </div>
+  </div>
+</header>
+
+<style>
+  .hero-image-scrim {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--ai-bg) 12%, transparent),
+      color-mix(in srgb, var(--ai-bg) 4%, transparent)
+    );
+  }
+</style>
