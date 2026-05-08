@@ -1,5 +1,4 @@
 ---
-import BackgroundVideo from "@surreysocieties/ui/components/BackgroundVideo";
 ---
 
 <section class="bg-ai-bg text-ai-fg relative overflow-hidden flex items-center border-b border-ai-border">
@@ -25,30 +24,15 @@ import BackgroundVideo from "@surreysocieties/ui/components/BackgroundVideo";
         </div>
       </div>
       
-      <div class="relative w-full aspect-video lg:aspect-[4/3] rounded-2xl overflow-hidden shadow-xl ring-1 ring-ai-border">
-        <BackgroundVideo
-          src="/videos/optimized/ai-hero.optimized.mp4"
-          webmSrc="/videos/optimized/ai-hero.optimized.webm"
-          poster="/videos/posters/ai-hero.poster.jpg"
-          objectPosition="center center"
-        />
-        {/* Theme-safe scrim over video for visual polish */}
-        <div class="hero-video-scrim"></div>
+      <div class="relative w-full aspect-video lg:aspect-[4/3] rounded-2xl overflow-hidden shadow-xl ring-1 ring-ai-border bg-ai-surface flex items-center justify-center">
+        <!-- Abstract signal/grid motif -->
+        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 2px 2px, var(--ai-cyan) 1px, transparent 0); background-size: 24px 24px;"></div>
+        <svg class="w-1/2 h-1/2 text-ai-cyan opacity-80" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50 10 L90 50 L50 90 L10 50 L50 10Z" stroke="currentColor" stroke-width="2" stroke-dasharray="4 4" />
+          <circle cx="50" cy="50" r="20" stroke="var(--ai-purple)" stroke-width="2" />
+          <circle cx="50" cy="50" r="4" fill="currentColor" class="animate-pulse" />
+        </svg>
       </div>
     </div>
   </div>
 </section>
-
-<style>
-  .hero-video-scrim {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 2;
-    background: linear-gradient(
-      to top,
-      color-mix(in srgb, var(--ai-bg) 30%, transparent),
-      transparent 50%
-    );
-  }
-</style>
