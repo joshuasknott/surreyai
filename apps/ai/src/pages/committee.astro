@@ -63,9 +63,13 @@ const getInitials = (name?: string, role?: string) => {
           <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {committee.map(member => (
               <article class="bg-ai-bg border border-ai-border rounded-xl p-6 flex flex-col hover:border-ai-purple transition-colors duration-200">
-                <div class="w-12 h-12 rounded-full bg-ai-purple/10 flex items-center justify-center text-ai-purple font-bold text-sm mb-5">
-                  {getInitials(member.name, member.role)}
-                </div>
+                {member.imageUrl ? (
+                  <img src={member.imageUrl} alt={member.name || member.role} class="w-12 h-12 rounded-full object-cover mb-5" />
+                ) : (
+                  <div class="w-12 h-12 rounded-full bg-ai-purple/10 flex items-center justify-center text-ai-purple font-bold text-sm mb-5">
+                    {getInitials(member.name, member.role)}
+                  </div>
+                )}
                 <h2 class="font-semibold text-base text-ai-fg mb-1">{member.role}</h2>
                 {member.name && <p class="text-ai-fg-muted text-sm">{member.name}</p>}
               </article>
@@ -92,9 +96,13 @@ const getInitials = (name?: string, role?: string) => {
                 <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
                   {pastCommittee.filter(member => member.yearLabel === yearLabel).map(member => (
                     <article class="bg-ai-bg border border-ai-border rounded-xl p-5 flex items-start gap-4">
-                      <div class="w-10 h-10 rounded-full bg-ai-cyan/10 flex items-center justify-center text-ai-cyan font-bold text-xs shrink-0">
-                        {getInitials(member.name, member.role)}
-                      </div>
+                      {member.imageUrl ? (
+                        <img src={member.imageUrl} alt={member.name || member.role} class="w-10 h-10 rounded-full object-cover shrink-0" />
+                      ) : (
+                        <div class="w-10 h-10 rounded-full bg-ai-cyan/10 flex items-center justify-center text-ai-cyan font-bold text-xs shrink-0">
+                          {getInitials(member.name, member.role)}
+                        </div>
+                      )}
                       <div>
                         <h4 class="font-semibold text-sm text-ai-fg">{member.role}</h4>
                         <p class="text-ai-fg-muted text-sm mt-1">{member.name}</p>

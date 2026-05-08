@@ -40,6 +40,7 @@ export interface CreateEventInput {
   location?: string;
   category?: string;
   image?: string;
+  imageStorageId?: string;
   registrationUrl?: string;
   status?: 'draft' | 'published';
   isFeatured?: boolean;
@@ -52,6 +53,7 @@ export interface CreateCommitteeMemberInput {
   role: string;
   bio?: string;
   image?: string;
+  imageStorageId?: string;
   email?: string;
   linkedIn?: string;
   displayOrder?: number;
@@ -66,6 +68,7 @@ export interface CreatePastCommitteeMemberInput {
   yearLabel: string;
   bio?: string;
   image?: string;
+  imageStorageId?: string;
   email?: string;
   linkedIn?: string;
   displayOrder?: number;

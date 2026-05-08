@@ -87,17 +87,35 @@ const getEventMeta = (event: any) => {
           <div class="grid gap-5">
             {events.map(event => (
               <article class="group bg-ai-bg border border-ai-border hover:border-ai-cyan transition-colors duration-200 rounded-xl p-6 sm:p-8 flex flex-col sm:flex-row gap-6 sm:gap-10 sm:items-start">
-                <div class="sm:w-44 shrink-0">
-                  <time datetime={event.date || ''} class="text-ai-cyan text-sm font-semibold block mb-2">
-                    {formatEventDate(event.date)}
-                  </time>
-                  {event.category && (
-                    <span class="inline-block text-xs font-medium text-ai-fg-muted bg-ai-surface border border-ai-border px-2.5 py-1 rounded-md uppercase tracking-wide">
-                      {event.category}
-                    </span>
-                  )}
-                </div>
+                {event.imageUrl ? (
+                  <div class="sm:w-36 shrink-0">
+                    <img src={event.imageUrl} alt={event.title} class="w-full aspect-[4/3] object-cover rounded-lg" />
+                  </div>
+                ) : (
+                  <div class="sm:w-44 shrink-0">
+                    <time datetime={event.date || ''} class="text-ai-cyan text-sm font-semibold block mb-2">
+                      {formatEventDate(event.date)}
+                    </time>
+                    {event.category && (
+                      <span class="inline-block text-xs font-medium text-ai-fg-muted bg-ai-surface border border-ai-border px-2.5 py-1 rounded-md uppercase tracking-wide">
+                        {event.category}
+                      </span>
+                    )}
+                  </div>
+                )}
                 <div class="flex-grow min-w-0">
+                  {!event.imageUrl && (
+                    <>
+                      <time datetime={event.date || ''} class="text-ai-cyan text-sm font-semibold block mb-2 sm:hidden">
+                        {formatEventDate(event.date)}
+                      </time>
+                      {event.category && (
+                        <span class="inline-block text-xs font-medium text-ai-fg-muted bg-ai-surface border border-ai-border px-2.5 py-1 rounded-md uppercase tracking-wide mb-2 sm:hidden">
+                          {event.category}
+                        </span>
+                      )}
+                    </>
+                  )}
                   <h2 class="font-bold text-xl mb-2 group-hover:text-ai-cyan transition-colors">{event.title}</h2>
                   <p class="text-ai-fg-muted leading-relaxed mb-3 text-sm">{event.description || 'Details to be announced.'}</p>
                   {getEventMeta(event) && (

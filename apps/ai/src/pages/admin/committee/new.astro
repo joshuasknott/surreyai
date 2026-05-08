@@ -21,6 +21,7 @@ if (Astro.request.method === 'POST') {
     role: formData.get('role')?.toString() || '',
     bio: formData.get('bio')?.toString() || '',
     image: formData.get('image')?.toString() || '',
+    imageStorageId: formData.get('imageStorageId')?.toString() || '',
     email: formData.get('email')?.toString() || '',
     linkedIn: formData.get('linkedIn')?.toString() || '',
     displayOrder: formData.get('displayOrder')?.toString() ? parseInt(formData.get('displayOrder')!.toString()) : undefined,
@@ -81,7 +82,13 @@ if (Astro.request.method === 'POST') {
       </div>
 
       <div class="form-group">
-        <label for="image" class="form-label">Image URL</label>
+        <label class="form-label">Photo</label>
+        <input type="file" id="imageFile" accept="image/jpeg,image/png,image/webp" />
+        <input type="hidden" name="imageStorageId" value="" />
+        <div id="uploadStatus" style="font-size: 0.875rem; margin-top: 0.25rem;"></div>
+      </div>
+      <div class="form-group">
+        <label for="image" class="form-label">Or image URL (fallback)</label>
         <input type="text" id="image" name="image" class="form-input" value={values.image || ''} />
       </div>
 
@@ -97,4 +104,36 @@ if (Astro.request.method === 'POST') {
     </form>
   </div>
 
+<script is:inline>
+(function() {
+  var fileInput = document.getElementById('imageFile');
+  var hiddenField = document.querySelector('[name="imageStorageId"]');
+  var statusEl = document.getElementById('uploadStatus');
+  if (!fileInput) return;
+  fileInput.addEventListener('change', function(e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    if (['image/jpeg','image/png','image/webp'].indexOf(file.type) === -1) {
+      statusEl.textContent = 'Only JPEG, PNG, and WebP images are allowed.';
+      statusEl.style.color = 'red';
+      e.target.value = '';
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      statusEl.textContent = 'File must be under 5MB.';
+      statusEl.style.color = 'red';
+      e.target.value = '';
+      return;
+    }
+    statusEl.textContent = 'Uploading...';
+    statusEl.style.color = '';
+    fetch('/api/admin/upload-url', { method: 'POST' })
+      .then(function(res) { if (!res.ok) throw new Error('Failed'); return res.json(); })
+      .then(function(data) { return fetch(data.uploadUrl, { method: 'POST', body: file }); })
+      .then(function(res) { if (!res.ok) throw new Error('Upload failed'); return res.json(); })
+      .then(function(data) { hiddenField.value = data.storageId; statusEl.textContent = 'Image uploaded successfully.'; statusEl.style.color = 'green'; })
+      .catch(function() { statusEl.textContent = 'Upload failed. Please try again.'; statusEl.style.color = 'red'; e.target.value = ''; });
+  });
+})();
+</script>
 </AdminLayout>

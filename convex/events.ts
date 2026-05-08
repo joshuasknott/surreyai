@@ -30,13 +30,21 @@ export const listPublished = query({
       .first();
     if (!society) return [];
 
-    return await ctx.db
+    const events = await ctx.db
       .query("events")
       .withIndex("by_society_status", (q) =>
         q.eq("societyId", society._id).eq("status", "published")
       )
       .order("desc")
       .collect();
+
+    return Promise.all(events.map(async (event) => {
+      if (event.imageStorageId) {
+        const url = await ctx.storage.getUrl(event.imageStorageId);
+        return { ...event, imageUrl: url };
+      }
+      return { ...event, imageUrl: event.image || null };
+    }));
   },
 });
 
@@ -66,7 +74,12 @@ export const getById = query({
     if (!event) return null;
 
     await requireExistingMembership(ctx, event.societyId);
-    return event;
+
+    if (event.imageStorageId) {
+      const url = await ctx.storage.getUrl(event.imageStorageId);
+      return { ...event, imageUrl: url };
+    }
+    return { ...event, imageUrl: event.image || null };
   },
 });
 
@@ -81,6 +94,7 @@ export const create = mutation({
     location: v.optional(v.string()),
     category: v.optional(v.string()),
     image: v.optional(v.string()),
+    imageStorageId: v.optional(v.id("_storage")),
     registrationUrl: v.optional(v.string()),
     status: v.optional(v.union(v.literal("draft"), v.literal("published"))),
     isFeatured: v.optional(v.boolean()),
@@ -105,6 +119,7 @@ export const create = mutation({
       location: input.location ?? "",
       category: input.category ?? "Other",
       image: input.image ?? "",
+      imageStorageId: input.imageStorageId,
       registrationUrl: input.registrationUrl ?? "",
       status: input.status ?? "draft",
       isFeatured: input.isFeatured ?? false,
@@ -135,6 +150,7 @@ export const update = mutation({
     location: v.optional(v.string()),
     category: v.optional(v.string()),
     image: v.optional(v.string()),
+    imageStorageId: v.optional(v.union(v.id("_storage"), v.literal(""))),
     registrationUrl: v.optional(v.string()),
     status: v.optional(v.union(v.literal("draft"), v.literal("published"))),
     isFeatured: v.optional(v.boolean()),
@@ -157,7 +173,11 @@ export const update = mutation({
     const filteredUpdates: Record<string, any> = {};
     for (const [key, value] of Object.entries(updates)) {
       if (value !== undefined) {
-        filteredUpdates[key] = value;
+        if (key === "imageStorageId" && value === "") {
+          filteredUpdates[key] = undefined;
+        } else {
+          filteredUpdates[key] = value;
+        }
       }
     }
 

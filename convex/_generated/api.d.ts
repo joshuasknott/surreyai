@@ -16,6 +16,7 @@ import type * as permissions from "../permissions.js";
 import type * as seed from "../seed.js";
 import type * as settings from "../settings.js";
 import type * as societies from "../societies.js";
+import type * as storage from "../storage.js";
 import type * as users from "../users.js";
 
 import type {
@@ -33,6 +34,7 @@ declare const fullApi: ApiFromModules<{
   seed: typeof seed;
   settings: typeof settings;
   societies: typeof societies;
+  storage: typeof storage;
   users: typeof users;
 }>;
 

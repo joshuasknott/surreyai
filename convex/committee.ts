@@ -29,12 +29,20 @@ export const listActive = query({
       .first();
     if (!society) return [];
 
-    return await ctx.db
+    const members = await ctx.db
       .query("committeeMembers")
       .withIndex("by_society_active", (q) =>
         q.eq("societyId", society._id).eq("isActive", true)
       )
       .collect();
+
+    return Promise.all(members.map(async (member) => {
+      if (member.imageStorageId) {
+        const url = await ctx.storage.getUrl(member.imageStorageId);
+        return { ...member, imageUrl: url };
+      }
+      return { ...member, imageUrl: member.image || null };
+    }));
   },
 });
 
@@ -45,7 +53,12 @@ export const getById = query({
     if (!member) return null;
 
     await requireExistingMembership(ctx, member.societyId);
-    return member;
+
+    if (member.imageStorageId) {
+      const url = await ctx.storage.getUrl(member.imageStorageId);
+      return { ...member, imageUrl: url };
+    }
+    return { ...member, imageUrl: member.image || null };
   },
 });
 
@@ -56,6 +69,7 @@ export const create = mutation({
     role: v.string(),
     bio: v.optional(v.string()),
     image: v.optional(v.string()),
+    imageStorageId: v.optional(v.id("_storage")),
     email: v.optional(v.string()),
     linkedIn: v.optional(v.string()),
     displayOrder: v.optional(v.number()),
@@ -84,6 +98,7 @@ export const create = mutation({
       role: input.role,
       bio: input.bio ?? "",
       image: input.image ?? "",
+      imageStorageId: input.imageStorageId,
       email: input.email ?? "",
       linkedIn: input.linkedIn ?? "",
       displayOrder,
@@ -111,6 +126,7 @@ export const update = mutation({
     role: v.optional(v.string()),
     bio: v.optional(v.string()),
     image: v.optional(v.string()),
+    imageStorageId: v.optional(v.union(v.id("_storage"), v.literal(""))),
     email: v.optional(v.string()),
     linkedIn: v.optional(v.string()),
     displayOrder: v.optional(v.number()),
@@ -134,7 +150,11 @@ export const update = mutation({
     const filteredUpdates: Record<string, any> = {};
     for (const [key, value] of Object.entries(updates)) {
       if (value !== undefined) {
-        filteredUpdates[key] = value;
+        if (key === "imageStorageId" && value === "") {
+          filteredUpdates[key] = undefined;
+        } else {
+          filteredUpdates[key] = value;
+        }
       }
     }
 
@@ -194,10 +214,18 @@ export const listPast = query({
       .first();
     if (!society) return [];
 
-    return await ctx.db
+    const members = await ctx.db
       .query("pastCommitteeMembers")
       .withIndex("by_society", (q) => q.eq("societyId", society._id))
       .take(500);
+
+    return Promise.all(members.map(async (member) => {
+      if (member.imageStorageId) {
+        const url = await ctx.storage.getUrl(member.imageStorageId);
+        return { ...member, imageUrl: url };
+      }
+      return { ...member, imageUrl: member.image || null };
+    }));
   },
 });
 
@@ -260,7 +288,12 @@ export const getPastById = query({
     if (!member) return null;
 
     await requireExistingMembership(ctx, member.societyId);
-    return member;
+
+    if (member.imageStorageId) {
+      const url = await ctx.storage.getUrl(member.imageStorageId);
+      return { ...member, imageUrl: url };
+    }
+    return { ...member, imageUrl: member.image || null };
   },
 });
 
@@ -272,6 +305,7 @@ export const createPast = mutation({
     yearLabel: v.string(),
     bio: v.optional(v.string()),
     image: v.optional(v.string()),
+    imageStorageId: v.optional(v.id("_storage")),
     email: v.optional(v.string()),
     linkedIn: v.optional(v.string()),
     displayOrder: v.optional(v.number()),
@@ -302,6 +336,7 @@ export const createPast = mutation({
       yearLabel: input.yearLabel,
       bio: input.bio ?? "",
       image: input.image ?? "",
+      imageStorageId: input.imageStorageId,
       email: input.email ?? "",
       linkedIn: input.linkedIn ?? "",
       displayOrder: input.displayOrder ?? existingForYear.length + 1,
@@ -329,6 +364,7 @@ export const updatePast = mutation({
     yearLabel: v.optional(v.string()),
     bio: v.optional(v.string()),
     image: v.optional(v.string()),
+    imageStorageId: v.optional(v.union(v.id("_storage"), v.literal(""))),
     email: v.optional(v.string()),
     linkedIn: v.optional(v.string()),
     displayOrder: v.optional(v.number()),
@@ -353,7 +389,11 @@ export const updatePast = mutation({
     const filteredUpdates: Record<string, any> = {};
     for (const [key, value] of Object.entries(updates)) {
       if (value !== undefined) {
-        filteredUpdates[key] = value;
+        if (key === "imageStorageId" && value === "") {
+          filteredUpdates[key] = undefined;
+        } else {
+          filteredUpdates[key] = value;
+        }
       }
     }
 
