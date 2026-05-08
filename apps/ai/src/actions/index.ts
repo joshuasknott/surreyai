@@ -34,6 +34,21 @@ export const server = {
       },
     }),
 
+    deletePastCommitteeMember: defineAction({
+      accept: 'form',
+      input: z.object({
+        id: z.string().min(1, 'Past committee member ID is required'),
+      }),
+      handler: async (input, context) => {
+        const { client, societySlug } = requireAdmin(context);
+        await client.mutation('committee:removePast', {
+          societySlug,
+          memberId: input.id,
+        });
+        return { success: true };
+      },
+    }),
+
     removeAdmin: defineAction({
       accept: 'form',
       input: z.object({

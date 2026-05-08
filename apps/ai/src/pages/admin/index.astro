@@ -8,6 +8,7 @@ const client = Astro.locals.convexClient;
 
 const events: any[] = await client.query("events:list", { societySlug: SOCIETY_ID });
 const committee: any[] = await client.query("committee:list", { societySlug: SOCIETY_ID });
+const pastCommittee: any[] = await client.query("committee:listPastForAdmin", { societySlug: SOCIETY_ID });
 const members: any[] = await client.query("memberships:listBySociety", { societySlug: SOCIETY_ID });
 
 const publishedEvents = events.filter(e => e.status === 'published');
@@ -38,12 +39,17 @@ const activeMembers = committee.filter(m => m.isActive);
       <div class="stat-card-label">Admin Users</div>
       <div class="stat-card-value">{members.length}</div>
     </div>
+    <div class="stat-card">
+      <div class="stat-card-label">Past Committee</div>
+      <div class="stat-card-value">{pastCommittee.length}</div>
+    </div>
   </div>
 
   <h2 style="font-size: 1rem; font-weight: 700; margin-bottom: 1rem;">Quick Actions</h2>
   <div class="quick-actions">
     <a href="/admin/events/new" class="btn btn-primary">+ Add Event</a>
     <a href="/admin/committee/new" class="btn btn-primary">+ Add Committee Member</a>
+    <a href="/admin/past-committee/new" class="btn btn-outline">+ Add Past Committee</a>
     {(user.role === 'owner' || user.role === 'protectedAdmin' || user.role === 'admin') && (
       <a href="/admin/admins/invite" class="btn btn-outline">Invite Admin</a>
     )}

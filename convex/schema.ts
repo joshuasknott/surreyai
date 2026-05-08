@@ -7,6 +7,7 @@ export default defineSchema({
     shortName: v.string(),
     slug: v.string(),
     domain: v.string(),
+    establishedYear: v.optional(v.number()),
     logo: v.optional(v.string()),
     contactEmail: v.optional(v.string()),
     socials: v.optional(
@@ -105,6 +106,20 @@ export default defineSchema({
   })
     .index("by_society", ["societyId"])
     .index("by_society_active", ["societyId", "isActive"]),
+
+  pastCommitteeMembers: defineTable({
+    societyId: v.id("societies"),
+    name: v.string(),
+    role: v.string(),
+    yearLabel: v.string(),
+    bio: v.optional(v.string()),
+    image: v.optional(v.string()),
+    email: v.optional(v.string()),
+    linkedIn: v.optional(v.string()),
+    displayOrder: v.number(),
+  })
+    .index("by_society", ["societyId"])
+    .index("by_society_and_year_label", ["societyId", "yearLabel"]),
 
   siteSettings: defineTable({
     societyId: v.id("societies"),

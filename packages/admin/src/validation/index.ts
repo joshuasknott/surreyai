@@ -1,3 +1,3 @@
 export { validateEventInput } from './events.js';
-export { validateCommitteeInput } from './committee.js';
+export { validateCommitteeInput, validatePastCommitteeInput } from './committee.js';
 export { validateInviteInput } from './admins.js';

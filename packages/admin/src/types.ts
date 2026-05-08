@@ -6,6 +6,7 @@ export interface Society {
   adminBasePath: string;
   publicBasePath: string;
   domain: string;
+  establishedYear?: number;
   logo: string;
   contactEmail: string;
   socials: SocietySocials;
@@ -58,6 +59,19 @@ export interface CreateCommitteeMemberInput {
 }
 
 export interface UpdateCommitteeMemberInput extends Partial<CreateCommitteeMemberInput> {}
+
+export interface CreatePastCommitteeMemberInput {
+  name: string;
+  role: string;
+  yearLabel: string;
+  bio?: string;
+  image?: string;
+  email?: string;
+  linkedIn?: string;
+  displayOrder?: number;
+}
+
+export interface UpdatePastCommitteeMemberInput extends Partial<CreatePastCommitteeMemberInput> {}
 
 export interface InviteAdminInput {
   email: string;

@@ -1,0 +1,74 @@
+---
+export const prerender = false;
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { actions } from 'astro:actions';
+
+const SOCIETY_ID = 'ai';
+const client = Astro.locals.convexClient;
+const members: any[] = (await client.query('committee:listPastForAdmin', { societySlug: SOCIETY_ID }))
+  .sort((a: any, b: any) =>
+    (b.yearLabel || '').localeCompare(a.yearLabel || '') ||
+    (a.displayOrder ?? Number.MAX_SAFE_INTEGER) - (b.displayOrder ?? Number.MAX_SAFE_INTEGER) ||
+    (a.name || '').localeCompare(b.name || '')
+  );
+const success = Astro.url.searchParams.get('success');
+const deleted = Astro.url.searchParams.get('deleted');
+
+const actionResult = Astro.getActionResult(actions.admin.deletePastCommitteeMember);
+const actionDeleted = actionResult && !actionResult.error;
+---
+<AdminLayout title="Past Committee" societyId={SOCIETY_ID} currentPath="/admin/past-committee">
+
+  <div class="admin-page-header">
+    <h1 class="admin-page-title">Past Committee</h1>
+    <a href="/admin/past-committee/new" class="btn btn-primary">+ Add Past Member</a>
+  </div>
+
+  {success && <div class="alert alert-success">Past committee member saved.</div>}
+  {(deleted || actionDeleted) && <div class="alert alert-success">Past committee member removed.</div>}
+
+  {members.length === 0 ? (
+    <div class="admin-table-wrapper">
+      <div class="empty-state">
+        <div class="empty-state-icon">👥</div>
+        <div class="empty-state-title">No past committee records yet</div>
+        <p>Add confirmed past committee records once available.</p>
+        <a href="/admin/past-committee/new" class="btn btn-primary" style="margin-top: 1rem;">+ Add Past Member</a>
+      </div>
+    </div>
+  ) : (
+    <div class="admin-table-wrapper">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Year / Term</th>
+            <th>Name</th>
+            <th>Role</th>
+            <th>Order</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {members.map(member => (
+            <tr>
+              <td>{member.yearLabel}</td>
+              <td style="font-weight: 600;">{member.name}</td>
+              <td>{member.role}</td>
+              <td>{member.displayOrder}</td>
+              <td>
+                <div class="table-actions">
+                  <a href={`/admin/past-committee/${member._id}/edit`} class="btn btn-outline btn-sm">Edit</a>
+                  <form method="POST" action={actions.admin.deletePastCommitteeMember} style="display:inline;" onsubmit="return confirm('Remove this past committee member?')">
+                    <input type="hidden" name="id" value={member._id} />
+                    <button type="submit" class="btn btn-ghost btn-sm" style="color: var(--color-admin-danger);">Remove</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+
+</AdminLayout>

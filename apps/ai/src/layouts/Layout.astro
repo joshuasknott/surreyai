@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '@surreysocieties/ui/components/BaseLayout';
+import { getSocietyById } from '@surreysocieties/admin/config';
 
 interface Props {
   title: string;
@@ -10,7 +11,8 @@ interface Props {
 
 const { title, description, ogImage } = Astro.props;
 
-const siteName = 'Surrey Artificial Intelligence Society';
+const society = getSocietyById('ai')!;
+const siteName = society.name;
 const fullTitle = `${title} — ${siteName}`;
 
 // Canonical URL from Astro.site + current path
@@ -171,6 +173,7 @@ const navLinks = [
           <p class="text-sm leading-relaxed max-w-xs">
             A student-led society under Surrey Students' Union. Exploring AI through learning, building, and open discussion.
           </p>
+          <p class="mt-3 text-xs font-semibold uppercase tracking-widest text-ai-cyan">Established {society.establishedYear}</p>
         </div>
         <div>
           <h4 class="text-ai-fg font-semibold mb-3 text-sm">Pages</h4>
@@ -183,15 +186,16 @@ const navLinks = [
         <div>
           <h4 class="text-ai-fg font-semibold mb-3 text-sm">Connect</h4>
           <div class="flex flex-col gap-2 text-sm">
-            <span class="text-ai-fg-muted/50 cursor-not-allowed select-none" aria-disabled="true">Instagram — coming soon</span>
-            <span class="text-ai-fg-muted/50 cursor-not-allowed select-none" aria-disabled="true">Email — coming soon</span>
-            <a href="https://surreyunion.org/" target="_blank" rel="noopener noreferrer" class="hover:text-ai-cyan transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan w-max rounded">Surrey Students' Union</a>
+            <a href={society.socials.instagram} target="_blank" rel="noopener noreferrer" class="hover:text-ai-cyan transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan w-max rounded">Instagram</a>
+            <a href={`mailto:${society.contactEmail}`} class="hover:text-ai-cyan transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan w-max rounded">Email</a>
+            <a href={society.studentsUnionUrl} target="_blank" rel="noopener noreferrer" class="hover:text-ai-cyan transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan w-max rounded">Surrey Students' Union</a>
+            <a href={society.membershipUrl} target="_blank" rel="noopener noreferrer" class="hover:text-ai-cyan transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan w-max rounded">Membership</a>
           </div>
         </div>
       </div>
       <div class="border-t border-ai-border pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
         <p>&copy; {new Date().getFullYear()} Surrey Artificial Intelligence Society.</p>
-        <p class="text-ai-fg-muted">surreyaisociety.org</p>
+        <p class="text-ai-fg-muted">{society.domain}</p>
       </div>
     </div>
   </footer>

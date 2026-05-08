@@ -1,0 +1,115 @@
+---
+export const prerender = false;
+import AdminLayout from '../../../../layouts/AdminLayout.astro';
+import { validatePastCommitteeInput, generateCsrfToken, verifyCsrfToken } from '@surreysocieties/admin';
+
+const SOCIETY_ID = 'ai';
+const { id } = Astro.params;
+const client = Astro.locals.convexClient;
+
+let member: any = await client.query('committee:getPastById', { id });
+
+if (!member) return Astro.redirect('/admin/past-committee');
+
+const userId = Astro.locals.user?._id || '';
+const csrfToken = generateCsrfToken(userId);
+let errors: Record<string, string> = {};
+
+if (Astro.request.method === 'POST') {
+  const formData = await Astro.request.formData();
+
+  if (!verifyCsrfToken(formData.get('_csrf')?.toString(), userId)) {
+    errors._csrf = 'Invalid or expired form submission. Please try again.';
+  } else {
+    const input = {
+      name: formData.get('name')?.toString() || '',
+      role: formData.get('role')?.toString() || '',
+      yearLabel: formData.get('yearLabel')?.toString() || '',
+      bio: formData.get('bio')?.toString() || '',
+      image: formData.get('image')?.toString() || '',
+      email: formData.get('email')?.toString() || '',
+      linkedIn: formData.get('linkedIn')?.toString() || '',
+      displayOrder: formData.get('displayOrder')?.toString() ? parseInt(formData.get('displayOrder')!.toString()) : undefined,
+    };
+
+    const validation = validatePastCommitteeInput(input, true);
+    if (validation.valid) {
+      await client.mutation('committee:updatePast', {
+        societySlug: SOCIETY_ID,
+        memberId: member._id,
+        ...input,
+      });
+      return Astro.redirect('/admin/past-committee?success=1');
+    }
+    errors = validation.errors;
+    member = { ...member, ...input };
+  }
+}
+---
+<AdminLayout title="Edit Past Committee Member" societyId={SOCIETY_ID} currentPath="/admin/past-committee">
+
+  <div class="admin-page-header">
+    <h1 class="admin-page-title">Edit Past Committee Member</h1>
+    <a href="/admin/past-committee" class="btn btn-outline">← Back</a>
+  </div>
+
+  {errors._csrf && <div class="alert alert-error">{errors._csrf}</div>}
+
+  <div class="form-card">
+    <form method="POST">
+      <input type="hidden" name="_csrf" value={csrfToken} />
+      <div class="form-group">
+        <label for="yearLabel" class="form-label">Year / Term *</label>
+        <input type="text" id="yearLabel" name="yearLabel" class="form-input" value={member.yearLabel} required />
+        {errors.yearLabel && <div class="form-error">{errors.yearLabel}</div>}
+      </div>
+
+      <div class="form-group">
+        <label for="name" class="form-label">Name *</label>
+        <input type="text" id="name" name="name" class="form-input" value={member.name} required />
+        {errors.name && <div class="form-error">{errors.name}</div>}
+      </div>
+
+      <div class="form-group">
+        <label for="role" class="form-label">Role *</label>
+        <input type="text" id="role" name="role" class="form-input" value={member.role} required />
+        {errors.role && <div class="form-error">{errors.role}</div>}
+      </div>
+
+      <div class="form-group">
+        <label for="bio" class="form-label">Bio</label>
+        <textarea id="bio" name="bio" class="form-textarea">{member.bio}</textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" id="email" name="email" class="form-input" value={member.email} />
+        {errors.email && <div class="form-error">{errors.email}</div>}
+      </div>
+
+      <div class="form-group">
+        <label for="linkedIn" class="form-label">LinkedIn</label>
+        <input type="url" id="linkedIn" name="linkedIn" class="form-input" value={member.linkedIn} />
+        {errors.linkedIn && <div class="form-error">{errors.linkedIn}</div>}
+      </div>
+
+      <div class="form-group">
+        <label for="image" class="form-label">Image URL</label>
+        <input type="text" id="image" name="image" class="form-input" value={member.image} />
+        {errors.image && <div class="form-error">{errors.image}</div>}
+      </div>
+
+      <div class="form-group">
+        <label for="displayOrder" class="form-label">Display Order</label>
+        <input type="number" id="displayOrder" name="displayOrder" class="form-input" value={member.displayOrder} />
+        {errors.displayOrder && <div class="form-error">{errors.displayOrder}</div>}
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a href="/admin/past-committee" class="btn btn-outline">Cancel</a>
+      </div>
+    </form>
+  </div>
+
+</AdminLayout>

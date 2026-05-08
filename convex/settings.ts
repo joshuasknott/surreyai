@@ -30,6 +30,7 @@ export const getSettings = query({
         shortName: society.shortName,
         slug: society.slug,
         domain: society.domain,
+        establishedYear: society.establishedYear,
         logo: society.logo,
         contactEmail: society.contactEmail,
         socials: society.socials,
@@ -46,6 +47,7 @@ export const updateSettings = mutation({
     societySlug: v.string(),
     updates: v.object({
       contactEmail: v.optional(v.string()),
+      establishedYear: v.optional(v.number()),
       membershipUrl: v.optional(v.string()),
       studentsUnionUrl: v.optional(v.string()),
       logo: v.optional(v.string()),
@@ -71,9 +73,35 @@ export const updateSettings = mutation({
 
     const { user } = await requireContentEditor(ctx, society._id);
 
-    const societyUpdates: Record<string, any> = {};
+    if (
+      updates.establishedYear !== undefined &&
+      (!Number.isInteger(updates.establishedYear) ||
+        updates.establishedYear < 1800 ||
+        updates.establishedYear > new Date().getFullYear() + 1)
+    ) {
+      throw new Error("Established year must be a valid year");
+    }
+
+    const societyUpdates: {
+      contactEmail?: string;
+      establishedYear?: number;
+      membershipUrl?: string;
+      studentsUnionUrl?: string;
+      logo?: string;
+      socials?: {
+        instagram?: string;
+        linkedin?: string;
+        tiktok?: string;
+        twitter?: string;
+        discord?: string;
+        whatsapp?: string;
+        email?: string;
+      };
+    } = {};
     if (updates.contactEmail !== undefined)
       societyUpdates.contactEmail = updates.contactEmail;
+    if (updates.establishedYear !== undefined)
+      societyUpdates.establishedYear = updates.establishedYear;
     if (updates.membershipUrl !== undefined)
       societyUpdates.membershipUrl = updates.membershipUrl;
     if (updates.studentsUnionUrl !== undefined)
