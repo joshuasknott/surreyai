@@ -1,0 +1,572 @@
+---
+import StudentProjectSlot from "./StudentProjectSlot.astro";
+
+const projects = [
+  {
+    id: "drift-lab",
+    title: "Surrey Drift Lab",
+    type: "Playable game",
+    status: "Live prototype",
+    description: "A tiny top-down browser racing game built for the AI Society student projects showcase.",
+    action: "Play",
+    color: "var(--ai-azure)"
+  },
+  {
+    id: "deadline-survival",
+    title: "Deadline Survival",
+    type: "Arcade game",
+    status: "Coming soon",
+    description: "Dodge deadlines, collect coffee, and survive the semester as the chaos ramps up.",
+    action: "Preview",
+    color: "var(--ai-coral)"
+  },
+  {
+    id: "campus-quest",
+    title: "Campus Quest",
+    type: "Story game",
+    status: "Coming soon",
+    description: "A branching campus adventure where every choice sends you somewhere stranger.",
+    action: "Preview",
+    color: "var(--ai-sage)"
+  },
+  {
+    id: "tiny-campus-builder",
+    title: "Tiny Campus Builder",
+    type: "Creative sandbox",
+    status: "Coming soon",
+    description: "Build a miniature Surrey-inspired campus with tiles, decorations, and animated student life.",
+    action: "Preview",
+    color: "var(--ai-azure)"
+  },
+  {
+    id: "poster-studio",
+    title: "Poster Studio",
+    type: "Creative tool",
+    status: "Coming soon",
+    description: "Generate slick event poster concepts for societies, workshops, socials, and hackathons.",
+    action: "Preview",
+    color: "var(--ai-coral)"
+  },
+  {
+    id: "token-rush",
+    title: "Token Rush",
+    type: "Reaction game",
+    status: "Coming soon",
+    description: "A fast typing/reaction game where you chase prompts, dodge bugs, and keep your streak alive.",
+    action: "Preview",
+    color: "var(--ai-sage)"
+  }
+];
+---
+
+<section class="student-projects-section" aria-labelledby="student-projects-title">
+  <div class="projects-container">
+    <div class="projects-header">
+      <h2 id="student-projects-title" class="projects-title">Student Projects</h2>
+      <p class="projects-subtitle">An interactive gallery of prototypes, games, and tools built by our members.</p>
+    </div>
+
+    <div class="projects-grid" role="tablist" aria-label="Student projects list">
+      {projects.map((p, i) => (
+        <button 
+          class:list={["project-card", i === 0 ? "active" : ""]} 
+          data-project-id={p.id}
+          role="tab"
+          aria-selected={i === 0 ? "true" : "false"}
+          aria-controls={`panel-${p.id}`}
+          id={`tab-${p.id}`}
+          style={`--brand-color: ${p.color}`}
+        >
+          <div class="card-glow"></div>
+          <div class="card-content">
+            <div class="card-meta">
+              <span class="card-type">{p.type}</span>
+              <span class:list={["card-status", p.status === "Live prototype" ? "status-live" : "status-soon"]}>
+                {p.status}
+              </span>
+            </div>
+            <h3 class="card-title">{p.title}</h3>
+            <p class="card-description">{p.description}</p>
+            <div class="card-action">
+              <span class="action-text">{p.action}</span>
+              <svg class="action-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+            </div>
+          </div>
+        </button>
+      ))}
+    </div>
+
+    <div class="projects-display" aria-live="polite">
+      <!-- Surrey Drift Lab -->
+      <div 
+        id={`panel-drift-lab`} 
+        class="project-panel active"
+        role="tabpanel"
+        aria-labelledby={`tab-drift-lab`}
+      >
+        <div class="panel-inner">
+          <StudentProjectSlot />
+        </div>
+      </div>
+
+      <!-- Placeholders -->
+      {projects.slice(1).map(p => (
+        <div 
+          id={`panel-${p.id}`} 
+          class="project-panel placeholder-panel"
+          role="tabpanel"
+          aria-labelledby={`tab-${p.id}`}
+          hidden
+        >
+          <div class="placeholder-inner" style={`--brand-color: ${p.color}`}>
+            <div class="placeholder-glow"></div>
+            <div class="placeholder-content">
+              <div class="placeholder-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg>
+              </div>
+              <span class="placeholder-badge">Concept Slot</span>
+              <h3 class="placeholder-title">{p.title}</h3>
+              <p class="placeholder-desc">{p.description}</p>
+              
+              <div class="placeholder-details">
+                <div class="detail-row">
+                  <span class="detail-label">Type</span>
+                  <span class="detail-value">{p.type}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Status</span>
+                  <span class="detail-value">{p.status}</span>
+                </div>
+              </div>
+              
+              <p class="placeholder-note">
+                This project is currently in the ideation phase.<br/>
+                Check back later or join the society to help build it!
+              </p>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .student-projects-section {
+    padding: 6rem 1.5rem;
+    background: var(--ai-bg);
+    border-top: 1px solid var(--ai-border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .projects-container {
+    max-width: 72rem;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+  }
+
+  .projects-header {
+    margin-bottom: 4rem;
+    text-align: center;
+  }
+
+  .projects-title {
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    color: var(--ai-fg);
+    margin-bottom: 1rem;
+  }
+
+  .projects-subtitle {
+    font-size: 1.125rem;
+    color: var(--ai-fg-muted);
+    max-width: 42rem;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .project-card {
+    position: relative;
+    text-align: left;
+    background: var(--ai-surface);
+    border: 1px solid var(--ai-border);
+    border-radius: 1.25rem;
+    padding: 2rem;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    min-height: 240px;
+    font-family: inherit;
+    outline: none;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+  }
+
+  .card-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 100% 100%, color-mix(in srgb, var(--brand-color) 8%, transparent), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .project-card:hover .card-glow,
+  .project-card.active .card-glow {
+    opacity: 1;
+  }
+
+  .project-card:hover {
+    transform: translateY(-4px);
+    border-color: color-mix(in srgb, var(--brand-color) 40%, var(--ai-border));
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06);
+  }
+
+  .project-card:focus-visible {
+    outline: 2px solid var(--ai-azure);
+    outline-offset: 4px;
+  }
+
+  .project-card.active {
+    border-color: var(--brand-color);
+    box-shadow: 0 0 0 1px var(--brand-color), 0 12px 32px color-mix(in srgb, var(--brand-color) 15%, transparent);
+  }
+
+  .card-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .card-type {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ai-fg-muted);
+  }
+
+  .card-status {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .status-live {
+    background: color-mix(in srgb, var(--ai-azure) 12%, transparent);
+    color: var(--ai-azure);
+  }
+
+  .status-live::before {
+    content: '';
+    display: block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--ai-azure);
+    box-shadow: 0 0 8px var(--ai-azure);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  .status-soon {
+    background: var(--ai-border);
+    color: var(--ai-fg-muted);
+  }
+
+  .card-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--ai-fg);
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.02em;
+  }
+
+  .card-description {
+    font-size: 0.9375rem;
+    color: var(--ai-fg-muted);
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    flex-grow: 1;
+  }
+
+  .card-action {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--brand-color);
+    font-weight: 700;
+    font-size: 0.9375rem;
+    margin-top: auto;
+    transition: transform 0.2s ease;
+  }
+
+  .project-card:hover .card-action {
+    transform: translateX(4px);
+  }
+
+  .project-card.active .card-action {
+    color: var(--ai-fg);
+  }
+
+  /* ── Display Area ── */
+
+  .projects-display {
+    position: relative;
+    border-radius: 1.5rem;
+    background: var(--ai-slate-base);
+    min-height: 600px;
+    overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.1);
+  }
+
+  :root:not([data-theme="dark"]) .projects-display {
+    border: 1px solid var(--ai-border);
+  }
+
+  .project-panel {
+    width: 100%;
+    height: 100%;
+  }
+
+  .project-panel[hidden] {
+    display: none;
+  }
+
+  .panel-inner {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Hide inner redundant headers and backgrounds from StudentProjectSlot to make it fit */
+  .panel-inner :global(.drift-lab-section) {
+    border: none;
+    background: transparent;
+    padding: 4rem 1.5rem;
+  }
+
+  /* ── Placeholder Concept Panels ── */
+
+  .placeholder-panel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    color: #F8FAFC;
+    position: relative;
+  }
+
+  .placeholder-inner {
+    text-align: center;
+    max-width: 32rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  .placeholder-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120%;
+    height: 120%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--brand-color) 15%, transparent) 0%, transparent 70%);
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .placeholder-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    border-radius: 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--brand-color);
+    margin-bottom: 2rem;
+  }
+
+  .placeholder-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--brand-color);
+    margin-bottom: 1rem;
+  }
+
+  .placeholder-title {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 1rem;
+    color: #fff;
+  }
+
+  .placeholder-desc {
+    font-size: 1.125rem;
+    color: #94A3B8;
+    line-height: 1.6;
+    margin-bottom: 2.5rem;
+  }
+
+  .placeholder-details {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 2.5rem;
+    text-align: left;
+  }
+
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .detail-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .detail-label {
+    font-size: 0.875rem;
+    color: #64748B;
+    font-weight: 600;
+  }
+
+  .detail-value {
+    font-size: 0.875rem;
+    color: #E2E8F0;
+    font-weight: 500;
+  }
+
+  .placeholder-note {
+    font-size: 0.875rem;
+    color: #475569;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 768px) {
+    .student-projects-section {
+      padding: 4rem 1rem;
+    }
+    .projects-grid {
+      grid-template-columns: 1fr;
+    }
+    .projects-display {
+      min-height: 500px;
+    }
+    .panel-inner :global(.drift-lab-section) {
+      padding: 2rem 0.5rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .project-card {
+      transition: none;
+    }
+    .card-glow {
+      display: none;
+    }
+    .status-live::before {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  // Vanilla JS for tab selection
+  document.addEventListener('DOMContentLoaded', () => {
+    const tabs = document.querySelectorAll('.project-card[role="tab"]');
+    const panels = document.querySelectorAll('.project-panel[role="tabpanel"]');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const targetId = tab.getAttribute('aria-controls');
+        
+        // Deactivate all
+        tabs.forEach(t => {
+          t.setAttribute('aria-selected', 'false');
+          t.classList.remove('active');
+        });
+        panels.forEach(p => p.setAttribute('hidden', ''));
+        
+        // Activate selected
+        tab.setAttribute('aria-selected', 'true');
+        tab.classList.add('active');
+        
+        const targetPanel = document.getElementById(targetId);
+        if (targetPanel) {
+          targetPanel.removeAttribute('hidden');
+          // Scroll into view gently if on mobile
+          if (window.innerWidth < 768) {
+            targetPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        }
+      });
+
+      // Keyboard support
+      tab.addEventListener('keydown', e => {
+        const index = Array.from(tabs).indexOf(tab);
+        let nextIndex = null;
+
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+          e.preventDefault();
+          nextIndex = (index + 1) % tabs.length;
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          nextIndex = (index - 1 + tabs.length) % tabs.length;
+        } else if (e.key === 'Home') {
+          e.preventDefault();
+          nextIndex = 0;
+        } else if (e.key === 'End') {
+          e.preventDefault();
+          nextIndex = tabs.length - 1;
+        }
+
+        if (nextIndex !== null) {
+          tabs[nextIndex].focus();
+          tabs[nextIndex].click();
+        }
+      });
+    });
+  });
+</script>
