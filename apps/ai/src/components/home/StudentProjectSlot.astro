@@ -1,20 +1,1018 @@
 ---
 ---
 
-<section class="student-project-slot border-y border-ai-border bg-ai-slate-base text-white">
-  <div class="mx-auto max-w-5xl py-24 px-6 text-center">
-    <div class="mb-12">
-      <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight mb-4 text-[#F8FAFC]">
-        We don't just talk about AI. We build it.
-      </h2>
-      <p class="text-lg text-[#94A3B8] max-w-2xl mx-auto">
-        This is a placeholder for a conceptual student project prototype.
+<section class="drift-lab-section" aria-label="Student Project: Surrey Drift Lab">
+  <div class="drift-lab-inner">
+    <div class="drift-lab-header">
+      <span class="drift-lab-badge">Student Project</span>
+      <h2 class="drift-lab-title">Surrey Drift Lab</h2>
+      <p class="drift-lab-subtitle">
+        A tiny browser racing prototype built for the AI Society student projects showcase.
       </p>
     </div>
-    
-    <div id="student-project-prototype-slot" class="w-full min-h-[50vh] flex flex-col items-center justify-center border border-white/10 bg-[#0B0F19] rounded-2xl p-8">
-      <div class="animate-pulse w-12 h-12 border-4 border-[#FF6B6B] border-t-transparent rounded-full mb-6"></div>
-      <p class="text-[#94A3B8] font-mono text-sm tracking-widest uppercase">Interactive prototype loading...</p>
+
+    <div id="drift-lab-game" class="drift-lab-game">
+      <canvas id="drift-lab-canvas" width="900" height="550"></canvas>
+
+      <div id="drift-lab-start" class="drift-lab-overlay">
+        <div class="drift-lab-overlay-inner">
+          <h3 class="drift-lab-game-title">Surrey Drift Lab</h3>
+          <p class="drift-lab-game-subtitle">Race the figure-8. Beat your best time.</p>
+          <button id="drift-lab-play-btn" class="drift-lab-play-btn" type="button">
+            Press to Play
+          </button>
+          <div class="drift-lab-controls-info">
+            <div class="drift-lab-key-row"><kbd>W</kbd> / <kbd>↑</kbd> Accelerate&emsp;<kbd>S</kbd> / <kbd>↓</kbd> Brake</div>
+            <div class="drift-lab-key-row"><kbd>A</kbd> / <kbd>←</kbd> Steer left&emsp;<kbd>D</kbd> / <kbd>→</kbd> Steer right</div>
+            <div class="drift-lab-key-row"><kbd>R</kbd> Restart&emsp;<kbd>Esc</kbd> Menu</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="drift-lab-hud" class="drift-lab-hud" hidden>
+        <div class="hud-left">
+          <div class="hud-time" id="drift-lab-time">0:00.00</div>
+          <div class="hud-lap" id="drift-lab-lap">Lap 1</div>
+        </div>
+        <div class="hud-right">
+          <div class="hud-best" id="drift-lab-best">Best: --:--.--</div>
+          <div class="hud-checkpoints" id="drift-lab-cp" aria-label="Checkpoints">
+            <span class="cp-dot"></span>
+            <span class="cp-dot"></span>
+            <span class="cp-dot"></span>
+            <span class="cp-dot"></span>
+          </div>
+        </div>
+        <button id="drift-lab-restart-btn" class="hud-restart" type="button" aria-label="Restart race">&#x21BA; Restart</button>
+      </div>
+
+      <div id="drift-lab-complete" class="drift-lab-overlay" hidden>
+        <div class="drift-lab-overlay-inner">
+          <h3 class="drift-lab-complete-title">Lap Complete!</h3>
+          <div class="drift-lab-complete-time" id="drift-lab-final-time">0:00.00</div>
+          <div class="drift-lab-complete-best" id="drift-lab-final-best"></div>
+          <button id="drift-lab-again-btn" class="drift-lab-play-btn" type="button">
+            Race Again
+          </button>
+          <p class="drift-lab-complete-hint">Press Space or click to race again</p>
+        </div>
+      </div>
+
+      <div id="drift-lab-mobile" class="drift-lab-mobile" hidden>
+        <div class="mobile-side mobile-left-side">
+          <button type="button" class="mobile-btn" aria-label="Steer left" data-key="left">&#9664;</button>
+          <button type="button" class="mobile-btn" aria-label="Steer right" data-key="right">&#9654;</button>
+        </div>
+        <div class="mobile-side mobile-right-side">
+          <button type="button" class="mobile-btn" aria-label="Accelerate" data-key="up">&#9650;</button>
+          <button type="button" class="mobile-btn" aria-label="Brake" data-key="down">&#9660;</button>
+        </div>
+      </div>
+
+      <noscript>
+        <div class="drift-lab-nojs">
+          <p>JavaScript is required to play Surrey Drift Lab.</p>
+        </div>
+      </noscript>
     </div>
+
+    <p class="drift-lab-note">
+      A lightweight browser prototype built for the Student Projects showcase. Built with HTML Canvas and vanilla JavaScript.
+    </p>
   </div>
 </section>
+
+<style>
+  .drift-lab-section {
+    border-top: 1px solid var(--ai-border);
+    border-bottom: 1px solid var(--ai-border);
+    background: var(--ai-slate-base);
+    color: #F8FAFC;
+    padding: 4.5rem 1.5rem;
+  }
+
+  .drift-lab-inner {
+    max-width: 56rem;
+    margin: 0 auto;
+  }
+
+  .drift-lab-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .drift-lab-badge {
+    display: inline-block;
+    padding: 0.35rem 1rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    border-radius: 9999px;
+    background: rgba(79, 70, 229, 0.15);
+    color: #818CF8;
+    border: 1px solid rgba(79, 70, 229, 0.25);
+    margin-bottom: 1.25rem;
+  }
+
+  .drift-lab-title {
+    font-size: clamp(2.2rem, 5vw, 3.2rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    margin-bottom: 0.75rem;
+    color: #F8FAFC;
+  }
+
+  .drift-lab-subtitle {
+    font-size: 1.05rem;
+    color: #94A3B8;
+    max-width: 34rem;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  .drift-lab-game {
+    position: relative;
+    width: 100%;
+    border-radius: 1rem;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    box-shadow:
+      0 0 60px rgba(79, 70, 229, 0.08),
+      0 0 120px rgba(255, 107, 107, 0.04),
+      0 2px 20px rgba(0, 0, 0, 0.3);
+    aspect-ratio: 900 / 550;
+    background: #060a12;
+  }
+
+  .drift-lab-game canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .drift-lab-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(6, 10, 18, 0.9);
+    backdrop-filter: blur(14px);
+    z-index: 10;
+  }
+
+  .drift-lab-overlay[hidden] {
+    display: none;
+  }
+
+  .drift-lab-overlay-inner {
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .drift-lab-game-title {
+    font-size: clamp(1.6rem, 4vw, 2.6rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.4rem;
+    color: #F8FAFC;
+  }
+
+  .drift-lab-game-subtitle {
+    color: #94A3B8;
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+  }
+
+  .drift-lab-play-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.9rem 2.4rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #fff;
+    background: #4F46E5;
+    border: none;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s;
+    box-shadow: 0 8px 28px rgba(79, 70, 229, 0.35);
+    font-family: inherit;
+  }
+
+  .drift-lab-play-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 36px rgba(79, 70, 229, 0.45);
+  }
+
+  .drift-lab-play-btn:focus-visible {
+    outline: 2px solid #818CF8;
+    outline-offset: 3px;
+  }
+
+  .drift-lab-controls-info {
+    margin-top: 1.8rem;
+    color: #64748B;
+    font-size: 0.78rem;
+    line-height: 2.2;
+  }
+
+  .drift-lab-key-row {
+    white-space: nowrap;
+  }
+
+  .drift-lab-controls-info kbd {
+    display: inline-block;
+    padding: 0.1rem 0.45rem;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.75rem;
+    color: #CBD5E1;
+    margin: 0 0.1rem;
+  }
+
+  .drift-lab-hud {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 5;
+    padding: 0.75rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    font-family: 'Fira Code', ui-monospace, monospace;
+  }
+
+  .drift-lab-hud[hidden] {
+    display: none;
+  }
+
+  .hud-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .hud-time {
+    font-size: clamp(0.95rem, 2.5vw, 1.4rem);
+    font-weight: 700;
+    color: #F8FAFC;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  }
+
+  .hud-lap {
+    font-size: 0.7rem;
+    color: #94A3B8;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  .hud-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.3rem;
+  }
+
+  .hud-best {
+    font-size: 0.75rem;
+    color: #94A3B8;
+  }
+
+  .hud-checkpoints {
+    display: flex;
+    gap: 0.3rem;
+  }
+
+  .cp-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(79, 70, 229, 0.45);
+    background: transparent;
+    transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+  }
+
+  .cp-dot.passed {
+    background: #10B981;
+    border-color: #10B981;
+  }
+
+  .cp-dot.current {
+    border-color: #818CF8;
+    box-shadow: 0 0 8px rgba(79, 70, 229, 0.5);
+  }
+
+  .hud-restart {
+    pointer-events: auto;
+    position: absolute;
+    bottom: 0.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.35rem 1rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #94A3B8;
+    background: rgba(11, 15, 25, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+    font-family: inherit;
+  }
+
+  .hud-restart:hover {
+    color: #F8FAFC;
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+
+  .hud-restart:focus-visible {
+    outline: 2px solid #818CF8;
+    outline-offset: 2px;
+  }
+
+  .drift-lab-complete-title {
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    color: #10B981;
+  }
+
+  .drift-lab-complete-time {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 800;
+    font-family: 'Fira Code', ui-monospace, monospace;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.4rem;
+    color: #F8FAFC;
+  }
+
+  .drift-lab-complete-best {
+    font-size: 0.9rem;
+    color: #FF6B6B;
+    margin-bottom: 1.5rem;
+    min-height: 1.4em;
+  }
+
+  .drift-lab-complete-hint {
+    margin-top: 1rem;
+    font-size: 0.75rem;
+    color: #475569;
+  }
+
+  .drift-lab-mobile {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 0.5rem;
+    z-index: 8;
+    pointer-events: none;
+  }
+
+  .drift-lab-mobile[hidden] {
+    display: none;
+  }
+
+  .mobile-side {
+    display: flex;
+    gap: 0.35rem;
+    pointer-events: auto;
+  }
+
+  .mobile-right-side {
+    flex-direction: column;
+  }
+
+  .mobile-btn {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.6);
+    background: rgba(11, 15, 25, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    font-family: inherit;
+  }
+
+  .mobile-btn:active {
+    background: rgba(79, 70, 229, 0.25);
+    color: #fff;
+  }
+
+  .drift-lab-nojs {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94A3B8;
+    font-size: 0.85rem;
+  }
+
+  .drift-lab-note {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.8rem;
+    color: #475569;
+  }
+
+  @media (max-width: 640px) {
+    .drift-lab-section {
+      padding: 2.5rem 0.75rem;
+    }
+
+    .drift-lab-controls-info {
+      display: none;
+    }
+
+    .mobile-btn {
+      width: 56px;
+      height: 56px;
+      font-size: 1.3rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .drift-lab-play-btn {
+      transition: none;
+    }
+
+    .cp-dot {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const canvas = document.getElementById('drift-lab-canvas');
+  if (!canvas) throw new Error('drift-lab-canvas not found');
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('2d context unavailable');
+
+  const TW = 900, TH = 550;
+  const CX = TW / 2, CY = TH / 2;
+  const TA = 235, TB = 155;
+  const TRACK_W = 66;
+  const CAR_W = 14, CAR_H = 26;
+  const MAX_SPEED = 370;
+  const ACCEL = 310;
+  const BRAKE_F = 230;
+  const TURN_RATE = 2.7;
+  const GRIP = 0.085;
+  const OFF_DRAG = 0.91;
+  const SAMPLES = 400;
+  const ST = { MENU: 0, PLAY: 1, DONE: 2 };
+
+  const startEl = document.getElementById('drift-lab-start');
+  const hudEl = document.getElementById('drift-lab-hud');
+  const doneEl = document.getElementById('drift-lab-complete');
+  const mobileEl = document.getElementById('drift-lab-mobile');
+  const gameEl = document.getElementById('drift-lab-game');
+  const timeEl = document.getElementById('drift-lab-time');
+  const bestEl = document.getElementById('drift-lab-best');
+  const lapEl = document.getElementById('drift-lab-lap');
+  const cpDots = document.querySelectorAll('.cp-dot');
+  const finalTimeEl = document.getElementById('drift-lab-final-time');
+  const finalBestEl = document.getElementById('drift-lab-final-best');
+  const playBtn = document.getElementById('drift-lab-play-btn');
+  const restartBtn = document.getElementById('drift-lab-restart-btn');
+  const againBtn = document.getElementById('drift-lab-again-btn');
+
+  function tPos(t) { return [CX + TA * Math.sin(t), CY + TB * Math.sin(2 * t)]; }
+  function tTan(t) { return [TA * Math.cos(t), 2 * TB * Math.cos(2 * t)]; }
+
+  const pts = [];
+  for (let i = 0; i < SAMPLES; i++) {
+    const t = (i / SAMPLES) * Math.PI * 2;
+    const [x, y] = tPos(t);
+    const [tx, ty] = tTan(t);
+    pts.push({ x, y, t, tx, ty });
+  }
+
+  const tPath = new Path2D();
+  tPath.moveTo(pts[0].x, pts[0].y);
+  for (let i = 1; i < pts.length; i++) tPath.lineTo(pts[i].x, pts[i].y);
+  tPath.closePath();
+
+  const CP_T = [Math.PI / 3, 2 * Math.PI / 3, 4 * Math.PI / 3, 5 * Math.PI / 3];
+  const cps = CP_T.map(t => {
+    const [x, y] = tPos(t);
+    const [tx, ty] = tTan(t);
+    return { x, y, t, a: Math.atan2(ty, tx), passed: false };
+  });
+
+  let state = ST.MENU;
+  let car = { x: 0, y: 0, a: 0, spd: 0, va: 0 };
+  let lapT = 0, bestT = Infinity, nextCP = 0, lastF = 0, visible = false;
+  let marks = [], parts = [], cpFx = [];
+
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  try {
+    const s = localStorage.getItem('surrey-drift-lab-best');
+    if (s && !isNaN(parseFloat(s))) bestT = parseFloat(s);
+  } catch {}
+
+  function na(a) {
+    while (a > Math.PI) a -= Math.PI * 2;
+    while (a < -Math.PI) a += Math.PI * 2;
+    return a;
+  }
+
+  function fmtT(s) {
+    if (!isFinite(s) || s <= 0) return '--:--.--';
+    const m = Math.floor(s / 60);
+    const sc = s % 60;
+    return m + ':' + sc.toFixed(2).padStart(5, '0');
+  }
+
+  function nearDist(px, py) {
+    let mn = Infinity;
+    for (let i = 0; i < pts.length; i++) {
+      const dx = px - pts[i].x, dy = py - pts[i].y;
+      const d = dx * dx + dy * dy;
+      if (d < mn) mn = d;
+    }
+    return Math.sqrt(mn);
+  }
+
+  function nearPt(px, py) {
+    let mn = Infinity, idx = 0;
+    for (let i = 0; i < pts.length; i++) {
+      const dx = px - pts[i].x, dy = py - pts[i].y;
+      const d = dx * dx + dy * dy;
+      if (d < mn) { mn = d; idx = i; }
+    }
+    return { ...pts[idx], dist: Math.sqrt(mn) };
+  }
+
+  function resetCar() {
+    const st = 0.15;
+    const [x, y] = tPos(st);
+    const [tx, ty] = tTan(st);
+    car.x = x; car.y = y;
+    car.a = Math.atan2(ty, tx);
+    car.spd = 0; car.va = car.a;
+  }
+
+  function resetRace() {
+    resetCar();
+    lapT = 0; nextCP = 0;
+    marks = []; parts = []; cpFx = [];
+    cps.forEach(c => c.passed = false);
+    updDots();
+  }
+
+  const keys = { up: false, down: false, left: false, right: false };
+  const kmap = { ArrowUp: 'up', KeyW: 'up', ArrowDown: 'down', KeyS: 'down', ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right' };
+  const gk = new Set(Object.keys(kmap));
+
+  document.addEventListener('keydown', e => {
+    if (state === ST.PLAY && gk.has(e.code)) e.preventDefault();
+    if (kmap[e.code]) keys[kmap[e.code]] = true;
+    if (e.code === 'Space') {
+      e.preventDefault();
+      if (state === ST.MENU || state === ST.DONE) startGame();
+    }
+    if (e.code === 'KeyR' && state === ST.PLAY) resetRace();
+    if (e.code === 'Escape' && state === ST.PLAY) toMenu();
+  });
+  document.addEventListener('keyup', e => { if (kmap[e.code]) keys[kmap[e.code]] = false; });
+
+  const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+  if (isTouch) {
+    mobileEl.removeAttribute('hidden');
+    mobileEl.querySelectorAll('[data-key]').forEach(btn => {
+      const k = btn.dataset.key;
+      const on = () => { keys[k] = true; };
+      const off = () => { keys[k] = false; };
+      btn.addEventListener('touchstart', e => { e.preventDefault(); on(); });
+      btn.addEventListener('touchend', e => { e.preventDefault(); off(); });
+      btn.addEventListener('touchcancel', off);
+    });
+  }
+
+  function updDots() {
+    cpDots.forEach((d, i) => {
+      d.classList.toggle('passed', cps[i].passed);
+      d.classList.toggle('current', i === nextCP && !cps[i].passed);
+    });
+  }
+
+  function updHUD() {
+    timeEl.textContent = fmtT(lapT);
+    bestEl.textContent = bestT < Infinity ? 'Best: ' + fmtT(bestT) : 'Best: --:--.--';
+  }
+
+  function startGame() {
+    resetRace();
+    state = ST.PLAY;
+    startEl.setAttribute('hidden', '');
+    doneEl.setAttribute('hidden', '');
+    hudEl.removeAttribute('hidden');
+    lastF = 0;
+  }
+
+  function toMenu() {
+    state = ST.MENU;
+    keys.up = keys.down = keys.left = keys.right = false;
+    startEl.removeAttribute('hidden');
+    doneEl.setAttribute('hidden', '');
+    hudEl.setAttribute('hidden', '');
+  }
+
+  function finishLap() {
+    state = ST.DONE;
+    keys.up = keys.down = keys.left = keys.right = false;
+    const nb = lapT < bestT;
+    if (nb) {
+      bestT = lapT;
+      try { localStorage.setItem('surrey-drift-lab-best', bestT.toString()); } catch {}
+    }
+    finalTimeEl.textContent = fmtT(lapT);
+    finalBestEl.textContent = nb ? 'New best time!' : 'Best: ' + fmtT(bestT);
+    finalBestEl.style.color = nb ? '#FF6B6B' : '#94A3B8';
+    hudEl.setAttribute('hidden', '');
+    doneEl.removeAttribute('hidden');
+  }
+
+  playBtn.addEventListener('click', startGame);
+  restartBtn.addEventListener('click', () => { resetRace(); });
+  againBtn.addEventListener('click', startGame);
+
+  const obs = new IntersectionObserver(([e]) => { visible = e.isIntersecting; }, { threshold: 0 });
+  obs.observe(gameEl);
+
+  function physics(dt) {
+    if (keys.up) car.spd += ACCEL * dt;
+    if (keys.down) car.spd -= BRAKE_F * dt;
+    if (!keys.up && !keys.down) car.spd *= Math.pow(0.992, dt * 60);
+    car.spd = Math.max(-120, Math.min(MAX_SPEED, car.spd));
+    if (Math.abs(car.spd) < 1.5) car.spd = 0;
+
+    if (Math.abs(car.spd) > 3) {
+      const ss = car.spd >= 0 ? 1 : -1;
+      const sf = Math.min(1, Math.abs(car.spd) / 130);
+      if (keys.left) car.a -= TURN_RATE * dt * sf * ss;
+      if (keys.right) car.a += TURN_RATE * dt * sf * ss;
+    }
+
+    const ad = na(car.a - car.va);
+    car.va += ad * GRIP;
+    car.va = na(car.va);
+    car.x += Math.cos(car.va) * car.spd * dt;
+    car.y += Math.sin(car.va) * car.spd * dt;
+
+    const dist = nearDist(car.x, car.y);
+    if (dist > TRACK_W / 2) {
+      car.spd *= Math.pow(OFF_DRAG, dt * 60);
+      if (dist > TRACK_W * 0.85) {
+        const n = nearPt(car.x, car.y);
+        car.x += (n.x - car.x) * 0.06;
+        car.y += (n.y - car.y) * 0.06;
+      }
+    }
+
+    car.x = Math.max(CAR_H, Math.min(TW - CAR_H, car.x));
+    car.y = Math.max(CAR_H, Math.min(TH - CAR_H, car.y));
+  }
+
+  function chkCP() {
+    if (nextCP >= cps.length) {
+      const [sx, sy] = tPos(0.15);
+      const dx = car.x - sx, dy = car.y - sy;
+      if (Math.sqrt(dx * dx + dy * dy) < TRACK_W * 0.55) finishLap();
+      return;
+    }
+    const c = cps[nextCP];
+    const dx = car.x - c.x, dy = car.y - c.y;
+    if (Math.sqrt(dx * dx + dy * dy) < TRACK_W * 0.6) {
+      c.passed = true;
+      cpFx.push({ x: c.x, y: c.y, age: 0 });
+      nextCP++;
+      updDots();
+    }
+  }
+
+  function fx(dt) {
+    const da = Math.abs(na(car.a - car.va));
+    const fast = Math.abs(car.spd) > 50;
+    const drifting = da > 0.12 && fast;
+
+    if (!reducedMotion && drifting) {
+      const cos = Math.cos(car.a), sin = Math.sin(car.a);
+      const rx = car.x - cos * CAR_H * 0.35;
+      const ry = car.y - sin * CAR_H * 0.35;
+      marks.push(
+        { x: rx + sin * CAR_W * 0.35, y: ry - cos * CAR_W * 0.35, age: 0 },
+        { x: rx - sin * CAR_W * 0.35, y: ry + cos * CAR_W * 0.35, age: 0 }
+      );
+      if (marks.length > 500) marks.splice(0, marks.length - 500);
+    }
+
+    for (let i = marks.length - 1; i >= 0; i--) {
+      marks[i].age += dt;
+      if (marks[i].age > 18) marks.splice(i, 1);
+    }
+
+    if (!reducedMotion && da > 0.18 && Math.abs(car.spd) > 70) {
+      const cos = Math.cos(car.a), sin = Math.sin(car.a);
+      const rx = car.x - cos * CAR_H * 0.4;
+      const ry = car.y - sin * CAR_H * 0.4;
+      for (let i = 0; i < 2; i++) {
+        parts.push({
+          x: rx + (Math.random() - 0.5) * CAR_W * 0.5,
+          y: ry + (Math.random() - 0.5) * CAR_W * 0.5,
+          vx: (Math.random() - 0.5) * 20 - cos * car.spd * 0.07,
+          vy: (Math.random() - 0.5) * 20 - sin * car.spd * 0.07,
+          life: 0.5 + Math.random() * 0.3,
+          ml: 0.5 + Math.random() * 0.3,
+          sz: 2 + Math.random() * 2.5,
+        });
+      }
+    }
+
+    for (let i = parts.length - 1; i >= 0; i--) {
+      const p = parts[i];
+      p.x += p.vx * dt; p.y += p.vy * dt; p.life -= dt;
+      if (p.life <= 0) parts.splice(i, 1);
+    }
+
+    for (let i = cpFx.length - 1; i >= 0; i--) {
+      cpFx[i].age += dt;
+      if (cpFx[i].age > 0.9) cpFx.splice(i, 1);
+    }
+  }
+
+  function drawTrack() {
+    ctx.fillStyle = '#080c14';
+    ctx.fillRect(0, 0, TW, TH);
+
+    for (let i = 0; i < 120; i++) {
+      const gx = (i * 137.5) % TW;
+      const gy = (i * 97.3) % TH;
+      ctx.fillStyle = 'rgba(20, 45, 30, 0.15)';
+      ctx.fillRect(gx, gy, 1.5, 1.5);
+    }
+
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.setLineDash([]);
+
+    ctx.lineWidth = TRACK_W + 14;
+    ctx.strokeStyle = '#0c1018';
+    ctx.stroke(tPath);
+
+    ctx.lineWidth = TRACK_W + 6;
+    ctx.strokeStyle = '#18181b';
+    ctx.setLineDash([8, 8]);
+    ctx.stroke(tPath);
+    ctx.setLineDash([]);
+
+    ctx.lineWidth = TRACK_W;
+    ctx.strokeStyle = '#1a2030';
+    ctx.stroke(tPath);
+
+    ctx.lineWidth = TRACK_W + 2;
+    ctx.strokeStyle = 'rgba(79, 70, 229, 0.035)';
+    ctx.stroke(tPath);
+
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+    ctx.setLineDash([18, 14]);
+    ctx.stroke(tPath);
+    ctx.setLineDash([]);
+  }
+
+  function drawStartLine() {
+    const t = 0.15;
+    const [x, y] = tPos(t);
+    const [tx, ty] = tTan(t);
+    const pa = Math.atan2(ty, tx) + Math.PI / 2;
+    const hw = TRACK_W / 2 - 3;
+
+    ctx.save();
+    ctx.globalAlpha = 0.5;
+    const ns = 8;
+    for (let i = 0; i < ns; i++) {
+      const f = ((i / ns) - 0.5) * TRACK_W * 0.85;
+      const sx = x + Math.cos(pa) * f;
+      const sy = y + Math.sin(pa) * f;
+      ctx.fillStyle = i % 2 === 0 ? 'rgba(255,255,255,0.6)' : 'rgba(30,30,50,0.6)';
+      ctx.fillRect(sx - 3, sy - 3, 6, 6);
+    }
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
+
+  function drawCPs() {
+    for (let i = 0; i < cps.length; i++) {
+      const c = cps[i];
+      const pa = c.a + Math.PI / 2;
+      const hw = TRACK_W / 2 - 6;
+      const passed = c.passed;
+      const isNext = i === nextCP && !passed;
+
+      ctx.save();
+      if (isNext) {
+        ctx.strokeStyle = 'rgba(79, 70, 229, 0.45)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(c.x + Math.cos(pa) * hw, c.y + Math.sin(pa) * hw);
+        ctx.lineTo(c.x - Math.cos(pa) * hw, c.y - Math.sin(pa) * hw);
+        ctx.stroke();
+
+        ctx.shadowColor = 'rgba(79, 70, 229, 0.5)';
+        ctx.shadowBlur = 12;
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, 5, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(129, 140, 248, 0.7)';
+        ctx.fill();
+      } else if (passed) {
+        ctx.strokeStyle = 'rgba(16, 185, 129, 0.25)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(c.x + Math.cos(pa) * hw, c.y + Math.sin(pa) * hw);
+        ctx.lineTo(c.x - Math.cos(pa) * hw, c.y - Math.sin(pa) * hw);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(16, 185, 129, 0.5)';
+        ctx.fill();
+      } else {
+        ctx.strokeStyle = 'rgba(79, 70, 229, 0.12)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(c.x + Math.cos(pa) * hw, c.y + Math.sin(pa) * hw);
+        ctx.lineTo(c.x - Math.cos(pa) * hw, c.y - Math.sin(pa) * hw);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+  }
+
+  function drawCPFx() {
+    for (const f of cpFx) {
+      const p = f.age / 0.9;
+      const r = 12 + p * 55;
+      const a = (1 - p) * 0.6;
+      ctx.strokeStyle = `rgba(16, 185, 129, ${a})`;
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.arc(f.x, f.y, r, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  }
+
+  function drawMarks() {
+    for (const m of marks) {
+      const a = Math.max(0, 0.3 - m.age * 0.02);
+      ctx.fillStyle = `rgba(15, 20, 35, ${a})`;
+      ctx.fillRect(m.x - 1.8, m.y - 1.8, 3.6, 3.6);
+    }
+  }
+
+  function drawCar() {
+    ctx.save();
+
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.beginPath();
+    ctx.ellipse(car.x + 2, car.y + 3, CAR_H * 0.4, CAR_W * 0.3, car.a, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.translate(car.x, car.y);
+    ctx.rotate(car.a);
+
+    ctx.fillStyle = '#111118';
+    ctx.fillRect(-CAR_H / 2 + 2, -CAR_W / 2 - 2.5, 5, 2.5);
+    ctx.fillRect(-CAR_H / 2 + 2, CAR_W / 2, 5, 2.5);
+    ctx.fillRect(CAR_H / 2 - 7, -CAR_W / 2 - 2.5, 5, 2.5);
+    ctx.fillRect(CAR_H / 2 - 7, CAR_W / 2, 5, 2.5);
+
+    ctx.fillStyle = '#FF6B6B';
+    ctx.fillRect(-CAR_H / 2, -CAR_W / 2, CAR_H, CAR_W);
+
+    ctx.fillStyle = 'rgba(255,255,255,0.12)';
+    ctx.fillRect(-CAR_H / 2 + 1, -CAR_W / 2, CAR_H - 2, CAR_W / 2 - 1);
+
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.fillRect(CAR_H / 2 - 9, -CAR_W / 2 + 2, 6, CAR_W - 4);
+
+    ctx.fillStyle = 'rgba(255,255,255,0.2)';
+    ctx.fillRect(CAR_H / 2 - 1.5, -CAR_W / 2 + 1, 1.5, CAR_W - 2);
+
+    ctx.fillStyle = '#FFE066';
+    ctx.fillRect(CAR_H / 2 - 1, -CAR_W / 2 + 1.5, 1.5, 2.5);
+    ctx.fillRect(CAR_H / 2 - 1, CAR_W / 2 - 4, 1.5, 2.5);
+
+    ctx.fillStyle = '#cc2222';
+    ctx.fillRect(-CAR_H / 2 - 0.5, -CAR_W / 2 + 1.5, 1.5, 2.5);
+    ctx.fillRect(-CAR_H / 2 - 0.5, CAR_W / 2 - 4, 1.5, 2.5);
+
+    ctx.restore();
+
+    if (!reducedMotion && Math.abs(car.spd) > 80) {
+      const intensity = Math.min(1, Math.abs(car.spd) / MAX_SPEED);
+      ctx.save();
+      ctx.globalAlpha = intensity * 0.25;
+      const cos = Math.cos(car.a), sin = Math.sin(car.a);
+      const bx = car.x - cos * CAR_H * 0.55;
+      const by = car.y - sin * CAR_H * 0.55;
+
+      const grad = ctx.createRadialGradient(bx, by, 0, bx, by, 25 + intensity * 20);
+      grad.addColorStop(0, 'rgba(255, 230, 100, 0.3)');
+      grad.addColorStop(1, 'rgba(255, 230, 100, 0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(bx, by, 25 + intensity * 20, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  function drawParts() {
+    for (const p of parts) {
+      const a = (p.life / p.ml) * 0.2;
+      ctx.fillStyle = `rgba(180, 190, 215, ${a})`;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.sz * (p.life / p.ml), 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function drawVignette() {
+    const vg = ctx.createRadialGradient(TW / 2, TH / 2, TW * 0.28, TW / 2, TH / 2, TW * 0.62);
+    vg.addColorStop(0, 'rgba(0,0,0,0)');
+    vg.addColorStop(1, 'rgba(0,0,0,0.3)');
+    ctx.fillStyle = vg;
+    ctx.fillRect(0, 0, TW, TH);
+  }
+
+  function drawSpeedBar() {
+    if (state !== ST.PLAY) return;
+    const pct = Math.abs(car.spd) / MAX_SPEED;
+    const bw = 80, bh = 4;
+    const bx = TW - bw - 12;
+    const by = TH - 16;
+
+    ctx.fillStyle = 'rgba(255,255,255,0.08)';
+    ctx.fillRect(bx, by, bw, bh);
+
+    const grad = ctx.createLinearGradient(bx, 0, bx + bw, 0);
+    grad.addColorStop(0, 'rgba(79, 70, 229, 0.7)');
+    grad.addColorStop(0.6, 'rgba(255, 107, 107, 0.7)');
+    grad.addColorStop(1, 'rgba(255, 200, 50, 0.8)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(bx, by, bw * pct, bh);
+  }
+
+  function render() {
+    drawTrack();
+    drawStartLine();
+    drawCPs();
+    drawMarks();
+    drawCar();
+    drawParts();
+    drawCPFx();
+    drawSpeedBar();
+    drawVignette();
+  }
+
+  function loop(ts) {
+    requestAnimationFrame(loop);
+    if (!visible) { lastF = 0; return; }
+    if (lastF === 0) { lastF = ts; }
+    const dt = Math.min((ts - lastF) / 1000, 0.1);
+    lastF = ts;
+
+    if (state === ST.PLAY) {
+      physics(dt);
+      chkCP();
+      fx(dt);
+      lapT += dt;
+      updHUD();
+    }
+
+    render();
+  }
+
+  resetCar();
+  updHUD();
+  requestAnimationFrame(loop);
+</script>
