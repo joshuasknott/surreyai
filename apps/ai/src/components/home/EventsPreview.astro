@@ -27,13 +27,18 @@ const formatEventDate = (date?: string) => {
 };
 ---
 
-<section id="events" class="bg-ai-surface text-ai-fg py-12 sm:py-16 px-6 relative overflow-hidden border-b border-ai-border">
+<section id="events" class="bg-ai-surface text-ai-fg py-16 sm:py-24 px-6 relative overflow-hidden border-b border-ai-border">
+  <div class="events-preview__backdrop" aria-hidden="true"></div>
   <div class="mx-auto max-w-6xl relative z-10">
     <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
       <div>
-        <h2 class="text-2xl sm:text-3xl font-bold tracking-tight">
-          What's Coming Up
+        <p class="events-preview__kicker">Programme</p>
+        <h2 class="text-3xl sm:text-5xl font-extrabold tracking-[-0.055em]">
+          Upcoming Events
         </h2>
+        <p class="mt-3 max-w-2xl text-ai-fg-muted leading-relaxed">
+          Workshops, build nights, discussions, and speakers — pulled live from our events system.
+        </p>
       </div>
       <a href="/events" class="text-ai-cyan hover:underline text-sm font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ai-cyan rounded-sm">
         View all events <span aria-hidden="true">&rarr;</span>
@@ -41,14 +46,21 @@ const formatEventDate = (date?: string) => {
     </div>
 
     {events.length === 0 ? (
-      <div class="border border-ai-border bg-ai-bg rounded-xl p-8 sm:p-12 text-center flex flex-col items-center shadow-sm">
-        <div class="w-16 h-16 rounded-full bg-ai-cyan/10 flex items-center justify-center mb-6" aria-hidden="true">
-          <svg class="w-8 h-8 text-ai-cyan" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
+      <div class="events-preview__empty">
+        <div class="events-preview__empty-visual" aria-hidden="true">
+          <div class="events-preview__empty-orbit"></div>
+          <div class="events-preview__empty-card events-preview__empty-card--one">
+            <span></span><b>workshop</b><i>sync pending</i>
+          </div>
+          <div class="events-preview__empty-card events-preview__empty-card--two">
+            <span></span><b>build night</b><i>queue empty</i>
+          </div>
+          <div class="events-preview__empty-card events-preview__empty-card--three">
+            <span></span><b>discussion</b><i>awaiting publish</i>
+          </div>
         </div>
-        <h3 class="font-semibold text-xl mb-2 text-ai-fg">Events being announced soon</h3>
-        <p class="text-ai-fg-muted text-base leading-relaxed max-w-md mx-auto mb-8">
+        <h3 class="font-extrabold text-2xl sm:text-3xl tracking-tight mb-3 text-ai-fg">Events being announced soon</h3>
+        <p class="text-ai-fg-muted text-base leading-relaxed max-w-xl mx-auto mb-8">
           We're planning workshops, build nights, discussions, and more for the year ahead. Check back soon or follow our socials for updates.
         </p>
         <a href="/join" class="btn-primary">
@@ -58,8 +70,8 @@ const formatEventDate = (date?: string) => {
     ) : (
       <div class="flex flex-col gap-4">
         {events.slice(0, 4).map((event) => (
-          <div class="group relative bg-ai-bg border border-ai-border rounded-xl p-6 hover:shadow-md transition-shadow flex flex-col sm:flex-row gap-4 sm:gap-8 sm:items-center overflow-hidden">
-            <div class="absolute left-0 top-0 bottom-0 w-1 bg-ai-cyan opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div class="group relative bg-ai-bg border border-ai-border rounded-2xl p-6 hover:shadow-xl transition-shadow flex flex-col sm:flex-row gap-4 sm:gap-8 sm:items-center overflow-hidden">
+            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-ai-cyan to-ai-purple opacity-80 transition-opacity duration-300"></div>
 
             <div class="flex-shrink-0 w-40 text-sm font-medium text-ai-fg-muted">
               <div>{formatEventDate(event.date)}</div>
@@ -91,3 +103,126 @@ const formatEventDate = (date?: string) => {
     )}
   </div>
 </section>
+
+<style>
+  .events-preview__backdrop {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 14% 16%, color-mix(in srgb, var(--ai-cyan) 12%, transparent), transparent 24rem),
+      linear-gradient(120deg, transparent, color-mix(in srgb, var(--ai-purple) 8%, transparent), transparent);
+    pointer-events: none;
+  }
+
+  .events-preview__kicker {
+    margin: 0 0 0.6rem;
+    color: var(--ai-cyan);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 850;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .events-preview__empty {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--ai-cyan) 22%, var(--ai-border));
+    border-radius: 1.75rem;
+    padding: clamp(2rem, 5vw, 4rem);
+    text-align: center;
+    background:
+      radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--ai-cyan) 18%, transparent), transparent 20rem),
+      var(--ai-bg);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, #ffffff 46%, transparent);
+  }
+
+  .events-preview__empty-visual {
+    position: relative;
+    width: min(100%, 36rem);
+    min-height: 13rem;
+    margin: 0 auto 1.8rem;
+  }
+
+  .events-preview__empty-orbit {
+    position: absolute;
+    inset: 1rem 2rem;
+    border: 1px dashed color-mix(in srgb, var(--ai-cyan) 42%, var(--ai-border));
+    border-radius: 9999px;
+  }
+
+  .events-preview__empty-card {
+    position: absolute;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.2rem 0.65rem;
+    align-items: center;
+    min-width: 11rem;
+    padding: 0.8rem 0.9rem;
+    border: 1px solid var(--ai-border);
+    border-radius: 1rem;
+    background: color-mix(in srgb, var(--ai-surface) 84%, transparent);
+    box-shadow: 0 16px 36px color-mix(in srgb, var(--ai-graphite) 10%, transparent);
+    text-align: left;
+  }
+
+  .events-preview__empty-card span {
+    grid-row: span 2;
+    width: 0.62rem;
+    height: 0.62rem;
+    border-radius: 9999px;
+    background: var(--ai-cyan);
+    box-shadow: 0 0 1rem color-mix(in srgb, var(--ai-cyan) 72%, transparent);
+  }
+
+  .events-preview__empty-card b,
+  .events-preview__empty-card i {
+    font-family: var(--font-mono);
+    font-style: normal;
+    line-height: 1.15;
+  }
+
+  .events-preview__empty-card b {
+    color: var(--ai-fg);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .events-preview__empty-card i {
+    color: var(--ai-fg-muted);
+    font-size: 0.68rem;
+  }
+
+  .events-preview__empty-card--one {
+    left: 0;
+    top: 1.4rem;
+  }
+
+  .events-preview__empty-card--two {
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+  }
+
+  .events-preview__empty-card--three {
+    right: 0;
+    bottom: 1rem;
+  }
+
+  @media (max-width: 640px) {
+    .events-preview__empty-visual {
+      min-height: 18rem;
+    }
+
+    .events-preview__empty-card {
+      left: 50%;
+      right: auto;
+      transform: translateX(-50%);
+    }
+
+    .events-preview__empty-card--one { top: 0; }
+    .events-preview__empty-card--two { top: 5.6rem; }
+    .events-preview__empty-card--three { top: 11.2rem; bottom: auto; }
+  }
+</style>

@@ -6,17 +6,36 @@ import TrackInfoPanel from "./TrackInfoPanel.astro";
 import TrackStage from "./TrackStage.astro";
 
 const activeId = aiTracks[0].id;
+const activeTrack = aiTracks[0];
 const aiEnabled = isAIEnabled();
 ---
 
-<div class="track-lab" data-track-lab data-ai-enabled={aiEnabled ? "true" : undefined}>
+<div
+  class="track-lab"
+  data-track-lab
+  data-ai-enabled={aiEnabled ? "true" : undefined}
+  style={`--active-track: ${activeTrack.accentColor}; --active-track-rgb: ${activeTrack.accentRgb};`}
+>
+  <div class="track-lab__topbar">
+    <div class="track-lab__identity">
+      <span class="track-lab__pulse" aria-hidden="true"></span>
+      <div>
+        <p class="track-lab__label">Track Lab Interface</p>
+        <h3 class="track-lab__name">Choose one track. The system reconfigures.</h3>
+      </div>
+    </div>
+    <div class="track-lab__status" aria-label="AI enhancement status">
+      <span>{aiEnabled ? "AI assist online" : "Guided mode"}</span>
+    </div>
+  </div>
+
   <TrackSelectors tracks={aiTracks} activeId={activeId} />
 
   <div class="track-lab__body">
-    <div class="track-lab__info">
+    <aside class="track-lab__info" aria-label="Selected track details">
       <TrackInfoPanel tracks={aiTracks} activeId={activeId} />
-    </div>
-    <div class="track-lab__stage">
+    </aside>
+    <div class="track-lab__stage" aria-label="Selected track prototype">
       <TrackStage tracks={aiTracks} activeId={activeId} />
     </div>
   </div>
@@ -24,27 +43,117 @@ const aiEnabled = isAIEnabled();
 
 <style>
   .track-lab {
-    border: 1px solid var(--ai-border);
-    border-radius: 16px;
-    background: var(--ai-surface);
-    box-shadow: 0 4px 24px color-mix(in srgb, var(--ai-fg) 4%, transparent);
+    position: relative;
     overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--ai-border-strong) 64%, transparent);
+    border-radius: 2rem;
+    background:
+      radial-gradient(circle at 24% 18%, rgba(var(--active-track-rgb), 0.22), transparent 24rem),
+      radial-gradient(circle at 84% 70%, color-mix(in srgb, var(--ai-purple) 18%, transparent), transparent 26rem),
+      linear-gradient(180deg, color-mix(in srgb, var(--ai-surface) 92%, transparent), color-mix(in srgb, var(--ai-bg) 94%, transparent));
+    box-shadow:
+      0 34px 90px color-mix(in srgb, var(--ai-graphite) 20%, transparent),
+      inset 0 1px 0 color-mix(in srgb, #ffffff 50%, transparent);
+    transition: background 280ms ease;
+  }
+
+  .track-lab::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(color-mix(in srgb, var(--ai-border) 46%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in srgb, var(--ai-border) 46%, transparent) 1px, transparent 1px);
+    background-size: 34px 34px;
+    mask-image: linear-gradient(180deg, #000, transparent 72%);
+    opacity: 0.38;
+  }
+
+  .track-lab__topbar,
+  .track-lab__body {
+    position: relative;
+    z-index: 1;
+  }
+
+  .track-lab__topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.1rem 1.25rem;
+    border-bottom: 1px solid var(--ai-border);
+    background: color-mix(in srgb, var(--ai-surface) 76%, transparent);
+    backdrop-filter: blur(18px);
+  }
+
+  .track-lab__identity {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    min-width: 0;
+  }
+
+  .track-lab__pulse {
+    width: 0.85rem;
+    height: 0.85rem;
+    border-radius: 9999px;
+    background: var(--active-track);
+    box-shadow: 0 0 0 0.55rem rgba(var(--active-track-rgb), 0.14), 0 0 1.6rem rgba(var(--active-track-rgb), 0.72);
+  }
+
+  .track-lab__label,
+  .track-lab__name {
+    margin: 0;
+  }
+
+  .track-lab__label {
+    color: var(--active-track);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .track-lab__name {
+    margin-top: 0.1rem;
+    color: var(--ai-fg);
+    font-size: 0.98rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .track-lab__status {
+    flex: 0 0 auto;
+    padding: 0.48rem 0.72rem;
+    border: 1px solid color-mix(in srgb, var(--active-track) 38%, var(--ai-border));
+    border-radius: 9999px;
+    color: var(--ai-fg);
+    background: rgba(var(--active-track-rgb), 0.1);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 
   .track-lab__body {
     display: grid;
-    grid-template-columns: minmax(280px, 320px) 1fr;
-    gap: 32px;
-    padding: 24px;
-    min-height: 500px;
+    grid-template-columns: minmax(18rem, 24rem) minmax(0, 1fr);
+    gap: 1rem;
+    padding: 1rem;
+    min-height: 40rem;
     align-items: stretch;
   }
 
+  .track-lab__info,
+  .track-lab__stage {
+    min-width: 0;
+  }
+
   .track-lab__info {
-    position: relative;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
   }
 
   .track-lab__stage {
@@ -53,32 +162,40 @@ const aiEnabled = isAIEnabled();
     justify-content: stretch;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 980px) {
     .track-lab__body {
       grid-template-columns: 1fr;
-      padding: 24px;
       min-height: auto;
-      gap: 32px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .track-lab {
+      border-radius: 1.4rem;
     }
 
-    .track-lab__stage {
-      order: -1;
+    .track-lab__topbar {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .track-lab__body {
+      padding: 0.75rem;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .track-lab *,
-    .track-lab *::before,
-    .track-lab *::after {
+    .track-lab,
+    .track-lab * {
+      transition-duration: 0.01ms !important;
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
     }
   }
 </style>
 
 <script>
-  const lab = document.querySelector("[data-track-lab]");
+  const lab = document.querySelector<HTMLElement>("[data-track-lab]");
   if (lab) {
     const tabs = Array.from(
       lab.querySelectorAll<HTMLButtonElement>("[data-track-tab]")
@@ -91,6 +208,14 @@ const aiEnabled = isAIEnabled();
     );
 
     const activateTrack = (trackId: string) => {
+      const activeTab = tabs.find((tab) => tab.dataset.trackTab === trackId);
+      if (activeTab?.dataset.accent) {
+        lab.style.setProperty("--active-track", activeTab.dataset.accent);
+      }
+      if (activeTab?.dataset.accentRgb) {
+        lab.style.setProperty("--active-track-rgb", activeTab.dataset.accentRgb);
+      }
+
       tabs.forEach((tab) => {
         const isActive = tab.dataset.trackTab === trackId;
         tab.classList.toggle("is-active", isActive);

@@ -25,14 +25,24 @@ const { tracks, activeId } = Astro.props;
       data-track-stage={track.id}
       hidden={track.id !== activeId}
       aria-hidden={track.id !== activeId ? "true" : "false"}
+      style={`--stage-accent: ${track.accentColor}; --stage-accent-rgb: ${track.accentRgb};`}
     >
       <div class="track-stage__frame">
-        {track.id === "ml" && <MachineLearningPatternFinder />}
-        {track.id === "genai" && <GenerativeRemixStudio track={track} />}
-        {track.id === "cv" && <ComputerVisionLens />}
-        {track.id === "ethics" && <EthicsImpactCompass />}
-        {track.id === "agents" && <AgentsTaskRelay />}
-        {track.id === "projects" && <ProjectsBuildSprint />}
+        <div class="track-stage__chrome" aria-hidden="true">
+          <span class="track-stage__dot"></span>
+          <span class="track-stage__dot"></span>
+          <span class="track-stage__dot"></span>
+          <b>{track.prototypeTitle}</b>
+          <i>{track.aiMode}</i>
+        </div>
+        <div class="track-stage__viewport">
+          {track.id === "ml" && <MachineLearningPatternFinder />}
+          {track.id === "genai" && <GenerativeRemixStudio track={track} />}
+          {track.id === "cv" && <ComputerVisionLens />}
+          {track.id === "ethics" && <EthicsImpactCompass />}
+          {track.id === "agents" && <AgentsTaskRelay />}
+          {track.id === "projects" && <ProjectsBuildSprint />}
+        </div>
       </div>
     </div>
   ))}
@@ -42,42 +52,122 @@ const { tracks, activeId } = Astro.props;
   .track-stage-panels {
     position: relative;
     width: 100%;
-    height: 100%;
+    min-height: 100%;
     display: flex;
   }
 
   .track-stage {
     display: none;
-    opacity: 0;
     width: 100%;
-    height: 100%;
-    transform: scale(0.98);
+    min-height: 100%;
+    opacity: 0;
+    transform: translateY(0.35rem) scale(0.992);
     transition: opacity 300ms ease, transform 300ms ease;
   }
 
   .track-stage.is-active {
     display: flex;
-    opacity: 1;
-    transform: scale(1);
     flex-grow: 1;
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 
   .track-stage__frame {
-    width: 100%;
-    min-height: 480px;
-    border: 1px solid var(--ai-border);
-    border-radius: 12px;
-    background: var(--ai-bg);
-    display: flex;
-    align-items: stretch;
-    justify-content: stretch;
     position: relative;
+    width: 100%;
+    min-height: 40rem;
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--stage-accent) 34%, var(--ai-border));
+    border-radius: 1.35rem;
+    background:
+      radial-gradient(circle at 72% 8%, rgba(var(--stage-accent-rgb), 0.16), transparent 16rem),
+      color-mix(in srgb, var(--ai-bg) 88%, transparent);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, #ffffff 42%, transparent);
+  }
+
+  .track-stage__frame::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    background: linear-gradient(135deg, rgba(var(--stage-accent-rgb), 0.09), transparent 38%, color-mix(in srgb, var(--ai-purple) 8%, transparent));
+  }
+
+  .track-stage__chrome {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-height: 3.2rem;
+    padding: 0.78rem 1rem;
+    border-bottom: 1px solid var(--ai-border);
+    background: color-mix(in srgb, var(--ai-surface) 76%, transparent);
+    backdrop-filter: blur(16px);
+    font-family: var(--font-mono);
+  }
+
+  .track-stage__dot {
+    width: 0.58rem;
+    height: 0.58rem;
+    border-radius: 9999px;
+    background: color-mix(in srgb, var(--stage-accent) 80%, var(--ai-border));
+  }
+
+  .track-stage__dot:nth-child(2) {
+    opacity: 0.55;
+  }
+
+  .track-stage__dot:nth-child(3) {
+    opacity: 0.28;
+  }
+
+  .track-stage__chrome b {
+    margin-left: 0.55rem;
+    color: var(--ai-fg);
+    font-size: 0.75rem;
+    font-weight: 850;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .track-stage__chrome i {
+    margin-left: auto;
+    color: var(--stage-accent);
+    font-size: 0.68rem;
+    font-style: normal;
+    font-weight: 850;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .track-stage__viewport {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .track-stage__viewport > * {
+    flex: 1;
   }
 
   @media (max-width: 768px) {
     .track-stage__frame {
-      min-height: 400px;
+      min-height: 34rem;
+    }
+
+    .track-stage__chrome {
+      flex-wrap: wrap;
+    }
+
+    .track-stage__chrome i {
+      margin-left: 0;
+      width: 100%;
     }
   }
 

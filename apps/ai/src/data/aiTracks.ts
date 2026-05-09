@@ -18,14 +18,14 @@ export const aiTracks: AITrack[] = [
     id: "ml",
     title: "Machine Learning",
     explanation:
-      "Learn how computers find patterns in data to make predictions.",
+      "Start with the core idea: models learn patterns from examples, then use those patterns to make predictions.",
     bullets: [
       "Train models on real datasets",
       "Understand how algorithms learn",
       "Build your first predictive models",
     ],
-    accentColor: "#06B6D4",
-    accentRgb: "6, 182, 212",
+    accentColor: "#00A7C7",
+    accentRgb: "0, 167, 199",
     icon: "\u25B2",
     societyBullets: [
       "Weekly practical coding sessions",
@@ -35,21 +35,21 @@ export const aiTracks: AITrack[] = [
     prototypeTitle: "Pattern Finder",
     meaning:
       "See how an algorithm naturally groups similar data points together without being told what they are.",
-    interactionCue: "Select or hover over clusters to see their labels",
+    interactionCue: "Pick this track to see the lab focus on patterns, features, and predictions.",
     aiMode: "Finding Patterns",
   },
   {
     id: "genai",
     title: "Generative AI",
     explanation:
-      "Explore AI that generates text, images, code, and ideas.",
+      "Understand systems that turn prompts, context, and examples into text, images, code, and structured ideas.",
     bullets: [
       "Get hands-on with large language models",
       "Learn effective prompt engineering",
       "Discuss the limits of generation",
     ],
-    accentColor: "#A78BFA",
-    accentRgb: "167, 139, 250",
+    accentColor: "#9B7CFF",
+    accentRgb: "155, 124, 255",
     icon: "\u2726",
     societyBullets: [
       "Prompt engineering workshops",
@@ -59,21 +59,21 @@ export const aiTracks: AITrack[] = [
     prototypeTitle: "Remix Studio",
     meaning:
       "Watch a simple idea evolve into a detailed result as the AI refines it step by step.",
-    interactionCue: "Activate to try a new random input",
+    interactionCue: "Pick this track to see the lab focus on prompts, refinement, and useful outputs.",
     aiMode: "Creating Content",
   },
   {
     id: "cv",
     title: "Computer Vision",
     explanation:
-      "Understand how computers process and interpret images and video.",
+      "See how models turn pixels into signals: edges, objects, labels, confidence, and decisions.",
     bullets: [
       "Build image recognition projects",
       "Learn about object detection",
       "Explore how self-driving cars \u2018see\u2019",
     ],
-    accentColor: "#38BDF8",
-    accentRgb: "56, 189, 248",
+    accentColor: "#2AB8FF",
+    accentRgb: "42, 184, 255",
     icon: "\u25C9",
     societyBullets: [
       "Camera-based build nights",
@@ -83,21 +83,21 @@ export const aiTracks: AITrack[] = [
     prototypeTitle: "Vision Lens",
     meaning:
       "See how a model identifies and labels different parts of an image as it looks around.",
-    interactionCue: "Use your pointer or keyboard to move the scanning lens",
+    interactionCue: "Pick this track to see the lab focus on scanning, detection, and visual understanding.",
     aiMode: "Analysing Images",
   },
   {
     id: "ethics",
     title: "AI Ethics",
     explanation:
-      "Discuss how AI impacts fairness, privacy, and society.",
+      "Learn to evaluate AI systems through fairness, privacy, safety, accountability, and social impact.",
     bullets: [
       "Identify bias in AI systems",
       "Debate policy and regulation",
       "Review real-world case studies",
     ],
-    accentColor: "#60A5FA",
-    accentRgb: "96, 165, 250",
+    accentColor: "#6C8CFF",
+    accentRgb: "108, 140, 255",
     icon: "\u2731",
     societyBullets: [
       "Structured discussion groups",
@@ -107,21 +107,21 @@ export const aiTracks: AITrack[] = [
     prototypeTitle: "Impact Compass",
     meaning:
       "Explore how focusing on one ethical priority can sometimes affect another.",
-    interactionCue: "Select a quadrant to increase its importance",
+    interactionCue: "Pick this track to see the lab focus on tradeoffs, safeguards, and responsible choices.",
     aiMode: "Weighing Choices",
   },
   {
     id: "agents",
     title: "Agents & Automation",
     explanation:
-      "Build AI systems that can plan tasks and use tools automatically.",
+      "Explore AI systems that break goals into steps, use tools, and coordinate work across a workflow.",
     bullets: [
       "Create AI agents that solve problems",
       "Automate complex workflows",
       "Connect different AI tools together",
     ],
-    accentColor: "#22D3EE",
-    accentRgb: "34, 211, 238",
+    accentColor: "#29D8FF",
+    accentRgb: "41, 216, 255",
     icon: "\u26A1",
     societyBullets: [
       "Agent building workshops",
@@ -131,7 +131,7 @@ export const aiTracks: AITrack[] = [
     prototypeTitle: "Task Relay",
     meaning:
       "Follow a request as it automatically moves from planning to execution.",
-    interactionCue: "Select a stage to interrupt the process and see it adapt",
+    interactionCue: "Pick this track to see the lab focus on planning, tool use, and workflow handoffs.",
     aiMode: "Automating Workflows",
   },
   {
@@ -144,8 +144,8 @@ export const aiTracks: AITrack[] = [
       "Compete in society hackathons",
       "Get feedback on your work",
     ],
-    accentColor: "#8B5CF6",
-    accentRgb: "139, 92, 246",
+    accentColor: "#7C5CFF",
+    accentRgb: "124, 92, 255",
     icon: "\u2605",
     societyBullets: [
       "Semester-long team projects",
@@ -155,7 +155,7 @@ export const aiTracks: AITrack[] = [
     prototypeTitle: "Build Sprint",
     meaning:
       "Watch the journey of a project from the initial idea to the final presentation.",
-    interactionCue: "Select a milestone to update the project's progress",
+    interactionCue: "Pick this track to see the lab focus on turning an idea into a working demo.",
     aiMode: "Building Together",
   },
 ];

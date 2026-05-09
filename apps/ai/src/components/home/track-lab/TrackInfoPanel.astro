@@ -10,7 +10,7 @@ const { tracks, activeId } = Astro.props;
 ---
 
 <div class="track-info-panels" data-track-info-panels>
-  {tracks.map((track) => (
+  {tracks.map((track, index) => (
     <div
       class={`track-info-panel${track.id === activeId ? " is-active" : ""}`}
       id={`track-panel-${track.id}`}
@@ -19,18 +19,29 @@ const { tracks, activeId } = Astro.props;
       data-track-info={track.id}
       hidden={track.id !== activeId}
       aria-hidden={track.id !== activeId ? "true" : "false"}
+      style={`--panel-accent: ${track.accentColor}; --panel-accent-rgb: ${track.accentRgb};`}
     >
-      <h3 class="track-info-panel__title" style={`color: ${track.accentColor}`}>
-        {track.title}
-      </h3>
-      <p class="track-info-panel__explanation">{track.explanation}</p>
+      <div class="track-info-panel__header">
+        <span class="track-info-panel__index">Track {String(index + 1).padStart(2, "0")}</span>
+        <span class="track-info-panel__mode">{track.aiMode}</span>
+      </div>
+
+      <div>
+        <h3 class="track-info-panel__title">{track.title}</h3>
+        <p class="track-info-panel__explanation">{track.explanation}</p>
+      </div>
+
+      <div class="track-info-panel__meaning">
+        <span class="track-info-panel__section-label">What this demonstrates</span>
+        <p>{track.meaning}</p>
+      </div>
 
       <div class="track-info-panel__society">
-        <span class="track-info-panel__section-label">What we do</span>
-        <ul class="track-info-panel__society-list" aria-label="Society Activities">
+        <span class="track-info-panel__section-label">How the society makes it practical</span>
+        <ul class="track-info-panel__society-list" aria-label={`${track.title} society activities`}>
           {track.societyBullets.map((sb) => (
             <li class="track-info-panel__society-item">
-              <span class="track-info-panel__society-marker" style={`background: ${track.accentColor};`} aria-hidden="true"></span>
+              <span class="track-info-panel__society-marker" aria-hidden="true"></span>
               <span>{sb}</span>
             </li>
           ))}
@@ -38,7 +49,7 @@ const { tracks, activeId } = Astro.props;
       </div>
 
       <div class="track-info-panel__cue">
-        <span class="track-info-panel__cue-icon" aria-hidden="true" style={`color: ${track.accentColor};`}>&#x2197;</span>
+        <span class="track-info-panel__cue-icon" aria-hidden="true">&#x2197;</span>
         <span class="track-info-panel__cue-text">{track.interactionCue}</span>
       </div>
     </div>
@@ -48,15 +59,25 @@ const { tracks, activeId } = Astro.props;
 <style>
   .track-info-panels {
     display: flex;
-    flex-direction: column;
+    width: 100%;
   }
 
   .track-info-panel {
+    position: relative;
     display: none;
+    width: 100%;
+    min-height: 100%;
     flex-direction: column;
-    gap: 16px;
+    gap: 1.2rem;
+    padding: 1.25rem;
+    border: 1px solid color-mix(in srgb, var(--panel-accent) 32%, var(--ai-border));
+    border-radius: 1.35rem;
+    background:
+      radial-gradient(circle at 20% 0%, rgba(var(--panel-accent-rgb), 0.17), transparent 11rem),
+      color-mix(in srgb, var(--ai-surface) 82%, transparent);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, #ffffff 48%, transparent);
     opacity: 0;
-    transform: translateY(4px);
+    transform: translateY(0.35rem);
     transition: opacity 280ms ease, transform 280ms ease;
   }
 
@@ -66,18 +87,67 @@ const { tracks, activeId } = Astro.props;
     transform: translateY(0);
   }
 
+  .track-info-panel__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .track-info-panel__index,
+  .track-info-panel__mode,
+  .track-info-panel__section-label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 850;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .track-info-panel__index {
+    color: var(--panel-accent);
+  }
+
+  .track-info-panel__mode {
+    padding: 0.38rem 0.55rem;
+    border: 1px solid rgba(var(--panel-accent-rgb), 0.34);
+    border-radius: 9999px;
+    color: var(--ai-fg-muted);
+    background: rgba(var(--panel-accent-rgb), 0.08);
+  }
+
   .track-info-panel__title {
-    font-size: clamp(1.25rem, 2vw, 1.75rem);
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    line-height: 1.2;
+    margin: 0;
+    color: var(--ai-fg);
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 900;
+    letter-spacing: -0.07em;
+    line-height: 0.95;
   }
 
   .track-info-panel__explanation {
+    margin: 0.9rem 0 0;
     color: var(--ai-fg);
-    font-size: 1rem;
-    line-height: 1.5;
-    max-width: 480px;
+    font-size: 1.02rem;
+    line-height: 1.62;
+  }
+
+  .track-info-panel__meaning,
+  .track-info-panel__society {
+    padding-top: 1rem;
+    border-top: 1px solid var(--ai-border);
+  }
+
+  .track-info-panel__section-label {
+    display: block;
+    margin-bottom: 0.65rem;
+    color: var(--ai-fg-muted);
+  }
+
+  .track-info-panel__meaning p {
+    margin: 0;
+    color: var(--ai-fg-muted);
+    line-height: 1.55;
   }
 
   .track-info-panel__society-list {
@@ -86,61 +156,54 @@ const { tracks, activeId } = Astro.props;
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 0.7rem;
   }
 
   .track-info-panel__society-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    color: var(--ai-fg-muted);
-    font-size: 0.9rem;
-    line-height: 1.4;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.7rem;
+    color: var(--ai-fg);
+    font-size: 0.93rem;
+    line-height: 1.45;
   }
 
   .track-info-panel__society-marker {
-    width: 6px;
-    height: 6px;
-    border-radius: 2px;
-    flex-shrink: 0;
-    margin-top: 6px;
-  }
-
-  .track-info-panel__section-label {
-    display: block;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--ai-fg-muted);
-    margin-bottom: 8px;
+    width: 0.48rem;
+    height: 0.48rem;
+    border-radius: 9999px;
+    margin-top: 0.42rem;
+    background: var(--panel-accent);
+    box-shadow: 0 0 1rem rgba(var(--panel-accent-rgb), 0.72);
   }
 
   .track-info-panel__cue {
     display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px;
-    border: 1px solid var(--ai-border);
-    border-radius: 8px;
-    background: var(--ai-bg);
+    align-items: flex-start;
+    gap: 0.7rem;
     margin-top: auto;
+    padding: 0.95rem;
+    border: 1px solid rgba(var(--panel-accent-rgb), 0.3);
+    border-radius: 1rem;
+    background: linear-gradient(135deg, rgba(var(--panel-accent-rgb), 0.12), color-mix(in srgb, var(--ai-bg) 70%, transparent));
   }
 
   .track-info-panel__cue-icon {
+    color: var(--panel-accent);
     font-size: 1rem;
-    line-height: 1;
+    line-height: 1.2;
   }
 
   .track-info-panel__cue-text {
-    font-size: 0.85rem;
-    font-weight: 500;
     color: var(--ai-fg);
+    font-size: 0.9rem;
+    font-weight: 750;
+    line-height: 1.45;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 980px) {
     .track-info-panel {
-      gap: 12px;
+      min-height: auto;
     }
   }
 </style>
