@@ -17,14 +17,14 @@
       <div id="drift-lab-start" class="drift-lab-overlay">
         <div class="drift-lab-overlay-inner">
           <h3 class="drift-lab-game-title">Surrey Drift Lab</h3>
-          <p class="drift-lab-game-subtitle">Race the figure-8. Beat your best time.</p>
+          <p class="drift-lab-game-subtitle">3-lap figure-8. Chase the ghost. Beat your best time.</p>
           <button id="drift-lab-play-btn" class="drift-lab-play-btn" type="button">
             Press to Play
           </button>
           <div class="drift-lab-controls-info">
-            <div class="drift-lab-key-row"><kbd>W</kbd> / <kbd>↑</kbd> Accelerate&emsp;<kbd>S</kbd> / <kbd>↓</kbd> Brake</div>
-            <div class="drift-lab-key-row"><kbd>A</kbd> / <kbd>←</kbd> Steer left&emsp;<kbd>D</kbd> / <kbd>→</kbd> Steer right</div>
-            <div class="drift-lab-key-row"><kbd>R</kbd> Restart&emsp;<kbd>Esc</kbd> Menu</div>
+            <div class="drift-lab-key-row"><kbd>W</kbd> / <kbd>&uarr;</kbd> Accelerate&emsp;<kbd>S</kbd> / <kbd>&darr;</kbd> Brake</div>
+            <div class="drift-lab-key-row"><kbd>A</kbd> / <kbd>&larr;</kbd> Steer left&emsp;<kbd>D</kbd> / <kbd>&rarr;</kbd> Steer right</div>
+            <div class="drift-lab-key-row"><kbd>R</kbd> Restart&emsp;<kbd>M</kbd> Mute&emsp;<kbd>Esc</kbd> Menu</div>
           </div>
         </div>
       </div>
@@ -32,10 +32,10 @@
       <div id="drift-lab-hud" class="drift-lab-hud" hidden>
         <div class="hud-left">
           <div class="hud-time" id="drift-lab-time">0:00.00</div>
-          <div class="hud-lap" id="drift-lab-lap">Lap 1</div>
+          <div class="hud-lap" id="drift-lab-lap">Lap 1 / 3</div>
         </div>
         <div class="hud-right">
-          <div class="hud-best" id="drift-lab-best">Best: --:--.--</div>
+          <div class="hud-best" id="drift-lab-best">Best lap: --:--.--</div>
           <div class="hud-checkpoints" id="drift-lab-cp" aria-label="Checkpoints">
             <span class="cp-dot"></span>
             <span class="cp-dot"></span>
@@ -43,13 +43,17 @@
             <span class="cp-dot"></span>
           </div>
         </div>
-        <button id="drift-lab-restart-btn" class="hud-restart" type="button" aria-label="Restart race">&#x21BA; Restart</button>
+        <div class="hud-bottom">
+          <button id="drift-lab-sound-btn" class="hud-sound" type="button" aria-label="Toggle sound">Sound: On</button>
+          <button id="drift-lab-restart-btn" class="hud-restart" type="button" aria-label="Restart race">&#x21BA; Restart</button>
+        </div>
       </div>
 
       <div id="drift-lab-complete" class="drift-lab-overlay" hidden>
         <div class="drift-lab-overlay-inner">
-          <h3 class="drift-lab-complete-title">Lap Complete!</h3>
+          <h3 class="drift-lab-complete-title">Race Complete!</h3>
           <div class="drift-lab-complete-time" id="drift-lab-final-time">0:00.00</div>
+          <div class="drift-lab-lap-breakdown" id="drift-lap-breakdown"></div>
           <div class="drift-lab-complete-best" id="drift-lab-final-best"></div>
           <button id="drift-lab-again-btn" class="drift-lab-play-btn" type="button">
             Race Again
@@ -169,6 +173,8 @@
   .drift-lab-overlay-inner {
     text-align: center;
     padding: 2rem;
+    max-height: 100%;
+    overflow-y: auto;
   }
 
   .drift-lab-game-title {
@@ -279,7 +285,7 @@
   }
 
   .hud-best {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: #94A3B8;
   }
 
@@ -307,12 +313,40 @@
     box-shadow: 0 0 8px rgba(79, 70, 229, 0.5);
   }
 
-  .hud-restart {
-    pointer-events: auto;
+  .hud-bottom {
     position: absolute;
     bottom: 0.75rem;
     left: 50%;
     transform: translateX(-50%);
+    display: flex;
+    gap: 0.5rem;
+    pointer-events: auto;
+  }
+
+  .hud-sound {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #94A3B8;
+    background: rgba(11, 15, 25, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+    font-family: inherit;
+  }
+
+  .hud-sound:hover {
+    color: #F8FAFC;
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+
+  .hud-sound:focus-visible {
+    outline: 2px solid #818CF8;
+    outline-offset: 2px;
+  }
+
+  .hud-restart {
     padding: 0.35rem 1rem;
     font-size: 0.7rem;
     font-weight: 600;
@@ -349,6 +383,26 @@
     letter-spacing: -0.02em;
     margin-bottom: 0.4rem;
     color: #F8FAFC;
+  }
+
+  .drift-lab-lap-breakdown {
+    margin-bottom: 0.6rem;
+  }
+
+  .lap-row {
+    font-size: 0.8rem;
+    font-family: 'Fira Code', ui-monospace, monospace;
+    color: #64748B;
+    line-height: 1.8;
+  }
+
+  .lap-row.lap-best {
+    color: #10B981;
+  }
+
+  .lap-row.lap-best::after {
+    content: ' (best)';
+    font-size: 0.7rem;
   }
 
   .drift-lab-complete-best {
@@ -464,18 +518,12 @@
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('2d context unavailable');
 
-  const TW = 900, TH = 550;
-  const CX = TW / 2, CY = TH / 2;
-  const TA = 235, TB = 155;
-  const TRACK_W = 66;
+  const TW = 900, TH = 550, CX = TW / 2, CY = TH / 2;
+  const TA = 235, TB = 155, TRACK_W = 66;
   const CAR_W = 14, CAR_H = 26;
-  const MAX_SPEED = 370;
-  const ACCEL = 310;
-  const BRAKE_F = 230;
-  const TURN_RATE = 2.7;
-  const GRIP = 0.085;
-  const OFF_DRAG = 0.91;
-  const SAMPLES = 400;
+  const MAX_SPEED = 370, ACCEL = 310, BRAKE_F = 230, TURN_RATE = 2.7;
+  const GRIP = 0.085, OFF_DRAG = 0.91, SAMPLES = 400;
+  const TOTAL_LAPS = 3;
   const ST = { MENU: 0, PLAY: 1, DONE: 2 };
 
   const startEl = document.getElementById('drift-lab-start');
@@ -489,9 +537,11 @@
   const cpDots = document.querySelectorAll('.cp-dot');
   const finalTimeEl = document.getElementById('drift-lab-final-time');
   const finalBestEl = document.getElementById('drift-lab-final-best');
+  const breakdownEl = document.getElementById('drift-lap-breakdown');
   const playBtn = document.getElementById('drift-lab-play-btn');
   const restartBtn = document.getElementById('drift-lab-restart-btn');
   const againBtn = document.getElementById('drift-lab-again-btn');
+  const soundBtn = document.getElementById('drift-lab-sound-btn');
 
   function tPos(t) { return [CX + TA * Math.sin(t), CY + TB * Math.sin(2 * t)]; }
   function tTan(t) { return [TA * Math.cos(t), 2 * TB * Math.cos(2 * t)]; }
@@ -516,16 +566,48 @@
     return { x, y, t, a: Math.atan2(ty, tx), passed: false };
   });
 
+  const BR = 0.26;
+  const BR_STEPS = 25;
+  const bottomSeg = new Path2D();
+  for (let i = 0; i <= BR_STEPS; i++) {
+    const t = -BR + (i / BR_STEPS) * 2 * BR;
+    const tt = ((t % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+    const [x, y] = tPos(tt);
+    if (i === 0) bottomSeg.moveTo(x, y); else bottomSeg.lineTo(x, y);
+  }
+  const bridgeSeg = new Path2D();
+  for (let i = 0; i <= BR_STEPS; i++) {
+    const t = Math.PI - BR + (i / BR_STEPS) * 2 * BR;
+    const [x, y] = tPos(t);
+    if (i === 0) bridgeSeg.moveTo(x, y); else bridgeSeg.lineTo(x, y);
+  }
+
   let state = ST.MENU;
   let car = { x: 0, y: 0, a: 0, spd: 0, va: 0 };
-  let lapT = 0, bestT = Infinity, nextCP = 0, lastF = 0, visible = false;
+  let lapT = 0, bestLapT = Infinity, bestRaceT = Infinity;
+  let curLap = 1, lapTimes = [], totalRaceT = 0;
+  let nextCP = 0, lastF = 0, visible = false;
   let marks = [], parts = [], cpFx = [];
-
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  const GHOST_DT = 0.04;
+  let ghostRec = [], ghostTimer = 0;
+  let ghostBest = [], hasGhost = false;
+
+  let audioCtx = null, engineOsc = null, engineGain = null, engineOsc2 = null, engineGain2 = null;
+  let soundOn = true;
+
   try {
-    const s = localStorage.getItem('surrey-drift-lab-best');
-    if (s && !isNaN(parseFloat(s))) bestT = parseFloat(s);
+    const sl = localStorage.getItem('surrey-drift-lab-best-lap');
+    if (sl && !isNaN(parseFloat(sl))) bestLapT = parseFloat(sl);
+  } catch {}
+  try {
+    const sr = localStorage.getItem('surrey-drift-lab-best-race');
+    if (sr && !isNaN(parseFloat(sr))) bestRaceT = parseFloat(sr);
+  } catch {}
+  try {
+    const sg = localStorage.getItem('surrey-drift-lab-ghost');
+    if (sg) { ghostBest = JSON.parse(sg); hasGhost = ghostBest.length > 0; }
   } catch {}
 
   function na(a) {
@@ -544,8 +626,7 @@
   function nearDist(px, py) {
     let mn = Infinity;
     for (let i = 0; i < pts.length; i++) {
-      const dx = px - pts[i].x, dy = py - pts[i].y;
-      const d = dx * dx + dy * dy;
+      const dx = px - pts[i].x, dy = py - pts[i].y, d = dx * dx + dy * dy;
       if (d < mn) mn = d;
     }
     return Math.sqrt(mn);
@@ -554,8 +635,7 @@
   function nearPt(px, py) {
     let mn = Infinity, idx = 0;
     for (let i = 0; i < pts.length; i++) {
-      const dx = px - pts[i].x, dy = py - pts[i].y;
-      const d = dx * dx + dy * dy;
+      const dx = px - pts[i].x, dy = py - pts[i].y, d = dx * dx + dy * dy;
       if (d < mn) { mn = d; idx = i; }
     }
     return { ...pts[idx], dist: Math.sqrt(mn) };
@@ -572,10 +652,100 @@
 
   function resetRace() {
     resetCar();
-    lapT = 0; nextCP = 0;
-    marks = []; parts = []; cpFx = [];
+    lapT = 0; curLap = 1; lapTimes = []; totalRaceT = 0;
+    nextCP = 0; marks = []; parts = []; cpFx = [];
+    ghostRec = []; ghostTimer = 0;
     cps.forEach(c => c.passed = false);
     updDots();
+  }
+
+  function resetLap() {
+    lapT = 0; nextCP = 0;
+    cps.forEach(c => c.passed = false);
+    updDots();
+    ghostRec = []; ghostTimer = 0;
+  }
+
+  function initAudio() {
+    if (audioCtx) return;
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      engineOsc = audioCtx.createOscillator();
+      engineGain = audioCtx.createGain();
+      engineOsc.type = 'sawtooth';
+      engineOsc.frequency.value = 55;
+      engineGain.gain.value = 0;
+      const filt = audioCtx.createBiquadFilter();
+      filt.type = 'lowpass';
+      filt.frequency.value = 400;
+      engineOsc.connect(filt);
+      filt.connect(engineGain);
+      engineGain.connect(audioCtx.destination);
+      engineOsc.start();
+
+      engineOsc2 = audioCtx.createOscillator();
+      engineGain2 = audioCtx.createGain();
+      engineOsc2.type = 'triangle';
+      engineOsc2.frequency.value = 110;
+      engineGain2.gain.value = 0;
+      const filt2 = audioCtx.createBiquadFilter();
+      filt2.type = 'lowpass';
+      filt2.frequency.value = 300;
+      engineOsc2.connect(filt2);
+      filt2.connect(engineGain2);
+      engineGain2.connect(audioCtx.destination);
+      engineOsc2.start();
+    } catch {}
+  }
+
+  function updateAudio() {
+    if (!audioCtx || !soundOn) {
+      if (engineGain) engineGain.gain.setTargetAtTime(0, audioCtx ? audioCtx.currentTime : 0, 0.1);
+      if (engineGain2) engineGain2.gain.setTargetAtTime(0, audioCtx ? audioCtx.currentTime : 0, 0.1);
+      return;
+    }
+    const pct = Math.abs(car.spd) / MAX_SPEED;
+    const f = 55 + pct * 180;
+    const f2 = 110 + pct * 260;
+    const vol = state === ST.PLAY ? (0.015 + pct * 0.04) : 0;
+    const vol2 = state === ST.PLAY ? (0.008 + pct * 0.02) : 0;
+    const now = audioCtx.currentTime;
+    engineOsc.frequency.setTargetAtTime(f, now, 0.06);
+    engineGain.gain.setTargetAtTime(vol, now, 0.08);
+    engineOsc2.frequency.setTargetAtTime(f2, now, 0.06);
+    engineGain2.gain.setTargetAtTime(vol2, now, 0.08);
+  }
+
+  function playTone(freq, dur, vol, type) {
+    if (!audioCtx || !soundOn) return;
+    try {
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = type || 'sine';
+      o.frequency.value = freq;
+      g.gain.value = vol;
+      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(); o.stop(audioCtx.currentTime + dur);
+    } catch {}
+  }
+
+  function sndCheckpoint() {
+    playTone(523, 0.12, 0.07, 'sine');
+    setTimeout(() => playTone(659, 0.12, 0.07, 'sine'), 70);
+  }
+
+  function sndLapDone() {
+    playTone(523, 0.1, 0.08, 'sine');
+    setTimeout(() => playTone(659, 0.1, 0.08, 'sine'), 100);
+    setTimeout(() => playTone(784, 0.15, 0.08, 'sine'), 200);
+  }
+
+  function sndRaceDone() {
+    playTone(523, 0.12, 0.1, 'sine');
+    setTimeout(() => playTone(659, 0.12, 0.1, 'sine'), 100);
+    setTimeout(() => playTone(784, 0.12, 0.1, 'sine'), 200);
+    setTimeout(() => playTone(1047, 0.25, 0.1, 'sine'), 320);
   }
 
   const keys = { up: false, down: false, left: false, right: false };
@@ -591,6 +761,7 @@
     }
     if (e.code === 'KeyR' && state === ST.PLAY) resetRace();
     if (e.code === 'Escape' && state === ST.PLAY) toMenu();
+    if (e.code === 'KeyM') toggleSound();
   });
   document.addEventListener('keyup', e => { if (kmap[e.code]) keys[kmap[e.code]] = false; });
 
@@ -616,10 +787,12 @@
 
   function updHUD() {
     timeEl.textContent = fmtT(lapT);
-    bestEl.textContent = bestT < Infinity ? 'Best: ' + fmtT(bestT) : 'Best: --:--.--';
+    lapEl.textContent = 'Lap ' + curLap + ' / ' + TOTAL_LAPS;
+    bestEl.textContent = bestLapT < Infinity ? 'Best lap: ' + fmtT(bestLapT) : 'Best lap: --:--.--';
   }
 
   function startGame() {
+    initAudio();
     resetRace();
     state = ST.PLAY;
     startEl.setAttribute('hidden', '');
@@ -636,17 +809,46 @@
     hudEl.setAttribute('hidden', '');
   }
 
-  function finishLap() {
+  function toggleSound() {
+    soundOn = !soundOn;
+    soundBtn.textContent = 'Sound: ' + (soundOn ? 'On' : 'Off');
+    soundBtn.setAttribute('aria-label', soundOn ? 'Sound is on, click to mute' : 'Sound is off, click to unmute');
+  }
+
+  function finishRace() {
     state = ST.DONE;
     keys.up = keys.down = keys.left = keys.right = false;
-    const nb = lapT < bestT;
-    if (nb) {
-      bestT = lapT;
-      try { localStorage.setItem('surrey-drift-lab-best', bestT.toString()); } catch {}
+    sndRaceDone();
+
+    const bestLapInRace = Math.min(...lapTimes);
+    const isNewBestRace = totalRaceT < bestRaceT;
+    const isNewBestLap = bestLapInRace < bestLapT;
+
+    if (isNewBestLap) {
+      bestLapT = bestLapInRace;
+      try { localStorage.setItem('surrey-drift-lab-best-lap', bestLapT.toString()); } catch {}
     }
-    finalTimeEl.textContent = fmtT(lapT);
-    finalBestEl.textContent = nb ? 'New best time!' : 'Best: ' + fmtT(bestT);
-    finalBestEl.style.color = nb ? '#FF6B6B' : '#94A3B8';
+    if (isNewBestRace) {
+      bestRaceT = totalRaceT;
+      try { localStorage.setItem('surrey-drift-lab-best-race', bestRaceT.toString()); } catch {}
+    }
+
+    finalTimeEl.textContent = fmtT(totalRaceT);
+
+    let bd = '';
+    lapTimes.forEach((t, i) => {
+      const isBest = t === bestLapInRace && lapTimes.length > 1;
+      bd += '<div class="lap-row' + (isBest ? ' lap-best' : '') + '">Lap ' + (i + 1) + ': ' + fmtT(t) + '</div>';
+    });
+    breakdownEl.innerHTML = bd;
+
+    const msgs = [];
+    if (isNewBestRace) msgs.push('New best race!');
+    if (isNewBestLap && !isNewBestRace) msgs.push('New best lap!');
+    if (!isNewBestRace && bestRaceT < Infinity) msgs.push('Best race: ' + fmtT(bestRaceT));
+    finalBestEl.textContent = msgs.join(' ');
+    finalBestEl.style.color = (isNewBestRace || isNewBestLap) ? '#FF6B6B' : '#94A3B8';
+
     hudEl.setAttribute('hidden', '');
     doneEl.removeAttribute('hidden');
   }
@@ -654,6 +856,7 @@
   playBtn.addEventListener('click', startGame);
   restartBtn.addEventListener('click', () => { resetRace(); });
   againBtn.addEventListener('click', startGame);
+  soundBtn.addEventListener('click', toggleSound);
 
   const obs = new IntersectionObserver(([e]) => { visible = e.isIntersecting; }, { threshold: 0 });
   obs.observe(gameEl);
@@ -696,7 +899,7 @@
     if (nextCP >= cps.length) {
       const [sx, sy] = tPos(0.15);
       const dx = car.x - sx, dy = car.y - sy;
-      if (Math.sqrt(dx * dx + dy * dy) < TRACK_W * 0.55) finishLap();
+      if (Math.sqrt(dx * dx + dy * dy) < TRACK_W * 0.55) completeLap();
       return;
     }
     const c = cps[nextCP];
@@ -706,6 +909,39 @@
       cpFx.push({ x: c.x, y: c.y, age: 0 });
       nextCP++;
       updDots();
+      sndCheckpoint();
+    }
+  }
+
+  function completeLap() {
+    lapTimes.push(lapT);
+    totalRaceT += lapT;
+
+    if (lapT < bestLapT) {
+      bestLapT = lapT;
+      try { localStorage.setItem('surrey-drift-lab-best-lap', bestLapT.toString()); } catch {}
+    }
+
+    if (ghostRec.length > 0 && (ghostBest.length === 0 || lapT <= bestLapT)) {
+      ghostBest = [...ghostRec];
+      hasGhost = true;
+      try { localStorage.setItem('surrey-drift-lab-ghost', JSON.stringify(ghostBest)); } catch {}
+    }
+
+    curLap++;
+    if (curLap > TOTAL_LAPS) {
+      finishRace();
+    } else {
+      sndLapDone();
+      resetLap();
+    }
+  }
+
+  function recordGhost() {
+    ghostTimer += 1 / 60;
+    while (ghostTimer >= GHOST_DT) {
+      ghostRec.push({ x: car.x, y: car.y, a: car.a });
+      ghostTimer -= GHOST_DT;
     }
   }
 
@@ -764,10 +1000,8 @@
     ctx.fillRect(0, 0, TW, TH);
 
     for (let i = 0; i < 120; i++) {
-      const gx = (i * 137.5) % TW;
-      const gy = (i * 97.3) % TH;
       ctx.fillStyle = 'rgba(20, 45, 30, 0.15)';
-      ctx.fillRect(gx, gy, 1.5, 1.5);
+      ctx.fillRect((i * 137.5) % TW, (i * 97.3) % TH, 1.5, 1.5);
     }
 
     ctx.lineCap = 'round';
@@ -799,18 +1033,58 @@
     ctx.setLineDash([]);
   }
 
+  function drawOverpass() {
+    ctx.save();
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.setLineDash([]);
+
+    ctx.lineWidth = TRACK_W + 16;
+    ctx.strokeStyle = '#080c14';
+    ctx.stroke(bottomSeg);
+
+    ctx.lineWidth = TRACK_W + 8;
+    ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+    ctx.stroke(bridgeSeg);
+
+    ctx.save();
+    ctx.translate(0, -2);
+    ctx.lineWidth = TRACK_W + 8;
+    ctx.strokeStyle = '#12161f';
+    ctx.stroke(bridgeSeg);
+    ctx.restore();
+
+    ctx.lineWidth = TRACK_W + 4;
+    ctx.strokeStyle = '#22283a';
+    ctx.stroke(bridgeSeg);
+
+    ctx.lineWidth = TRACK_W;
+    ctx.strokeStyle = '#1c2436';
+    ctx.stroke(bridgeSeg);
+
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+    ctx.stroke(bridgeSeg);
+
+    ctx.lineWidth = TRACK_W - 2;
+    ctx.strokeStyle = 'rgba(255,255,255,0.02)';
+    ctx.setLineDash([16, 12]);
+    ctx.stroke(bridgeSeg);
+    ctx.setLineDash([]);
+
+    ctx.restore();
+  }
+
   function drawStartLine() {
     const t = 0.15;
     const [x, y] = tPos(t);
     const [tx, ty] = tTan(t);
     const pa = Math.atan2(ty, tx) + Math.PI / 2;
-    const hw = TRACK_W / 2 - 3;
 
     ctx.save();
     ctx.globalAlpha = 0.5;
-    const ns = 8;
-    for (let i = 0; i < ns; i++) {
-      const f = ((i / ns) - 0.5) * TRACK_W * 0.85;
+    for (let i = 0; i < 8; i++) {
+      const f = ((i / 8) - 0.5) * TRACK_W * 0.85;
       const sx = x + Math.cos(pa) * f;
       const sy = y + Math.sin(pa) * f;
       ctx.fillStyle = i % 2 === 0 ? 'rgba(255,255,255,0.6)' : 'rgba(30,30,50,0.6)';
@@ -836,7 +1110,6 @@
         ctx.moveTo(c.x + Math.cos(pa) * hw, c.y + Math.sin(pa) * hw);
         ctx.lineTo(c.x - Math.cos(pa) * hw, c.y - Math.sin(pa) * hw);
         ctx.stroke();
-
         ctx.shadowColor = 'rgba(79, 70, 229, 0.5)';
         ctx.shadowBlur = 12;
         ctx.beginPath();
@@ -850,7 +1123,6 @@
         ctx.moveTo(c.x + Math.cos(pa) * hw, c.y + Math.sin(pa) * hw);
         ctx.lineTo(c.x - Math.cos(pa) * hw, c.y - Math.sin(pa) * hw);
         ctx.stroke();
-
         ctx.beginPath();
         ctx.arc(c.x, c.y, 3.5, 0, Math.PI * 2);
         ctx.fillStyle = 'rgba(16, 185, 129, 0.5)';
@@ -870,12 +1142,10 @@
   function drawCPFx() {
     for (const f of cpFx) {
       const p = f.age / 0.9;
-      const r = 12 + p * 55;
-      const a = (1 - p) * 0.6;
-      ctx.strokeStyle = `rgba(16, 185, 129, ${a})`;
+      ctx.strokeStyle = `rgba(16, 185, 129, ${(1 - p) * 0.6})`;
       ctx.lineWidth = 2.5;
       ctx.beginPath();
-      ctx.arc(f.x, f.y, r, 0, Math.PI * 2);
+      ctx.arc(f.x, f.y, 12 + p * 55, 0, Math.PI * 2);
       ctx.stroke();
     }
   }
@@ -888,9 +1158,38 @@
     }
   }
 
+  function drawGhost() {
+    if (!hasGhost || ghostBest.length === 0 || state !== ST.PLAY) return;
+    const gi = Math.min(Math.floor(lapT / GHOST_DT), ghostBest.length - 1);
+    const g = ghostBest[gi];
+    if (!g) return;
+
+    ctx.save();
+    ctx.globalAlpha = 0.22;
+    ctx.translate(g.x, g.y);
+    ctx.rotate(g.a);
+    ctx.fillStyle = '#4F46E5';
+    ctx.fillRect(-CAR_H / 2, -CAR_W / 2, CAR_H, CAR_W);
+    ctx.fillStyle = 'rgba(255,255,255,0.08)';
+    ctx.fillRect(-CAR_H / 2, -CAR_W / 2, CAR_H, CAR_W / 2);
+    ctx.restore();
+
+    if (!reducedMotion) {
+      ctx.save();
+      ctx.globalAlpha = 0.06;
+      const gg = ctx.createRadialGradient(g.x, g.y, 0, g.x, g.y, 22);
+      gg.addColorStop(0, 'rgba(79, 70, 229, 0.5)');
+      gg.addColorStop(1, 'rgba(79, 70, 229, 0)');
+      ctx.fillStyle = gg;
+      ctx.beginPath();
+      ctx.arc(g.x, g.y, 22, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
   function drawCar() {
     ctx.save();
-
     ctx.fillStyle = 'rgba(0,0,0,0.35)';
     ctx.beginPath();
     ctx.ellipse(car.x + 2, car.y + 3, CAR_H * 0.4, CAR_W * 0.3, car.a, 0, Math.PI * 2);
@@ -924,7 +1223,6 @@
     ctx.fillStyle = '#cc2222';
     ctx.fillRect(-CAR_H / 2 - 0.5, -CAR_W / 2 + 1.5, 1.5, 2.5);
     ctx.fillRect(-CAR_H / 2 - 0.5, CAR_W / 2 - 4, 1.5, 2.5);
-
     ctx.restore();
 
     if (!reducedMotion && Math.abs(car.spd) > 80) {
@@ -932,9 +1230,7 @@
       ctx.save();
       ctx.globalAlpha = intensity * 0.25;
       const cos = Math.cos(car.a), sin = Math.sin(car.a);
-      const bx = car.x - cos * CAR_H * 0.55;
-      const by = car.y - sin * CAR_H * 0.55;
-
+      const bx = car.x - cos * CAR_H * 0.55, by = car.y - sin * CAR_H * 0.55;
       const grad = ctx.createRadialGradient(bx, by, 0, bx, by, 25 + intensity * 20);
       grad.addColorStop(0, 'rgba(255, 230, 100, 0.3)');
       grad.addColorStop(1, 'rgba(255, 230, 100, 0)');
@@ -948,8 +1244,7 @@
 
   function drawParts() {
     for (const p of parts) {
-      const a = (p.life / p.ml) * 0.2;
-      ctx.fillStyle = `rgba(180, 190, 215, ${a})`;
+      ctx.fillStyle = `rgba(180, 190, 215, ${(p.life / p.ml) * 0.2})`;
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.sz * (p.life / p.ml), 0, Math.PI * 2);
       ctx.fill();
@@ -967,13 +1262,9 @@
   function drawSpeedBar() {
     if (state !== ST.PLAY) return;
     const pct = Math.abs(car.spd) / MAX_SPEED;
-    const bw = 80, bh = 4;
-    const bx = TW - bw - 12;
-    const by = TH - 16;
-
+    const bw = 80, bh = 4, bx = TW - bw - 12, by = TH - 16;
     ctx.fillStyle = 'rgba(255,255,255,0.08)';
     ctx.fillRect(bx, by, bw, bh);
-
     const grad = ctx.createLinearGradient(bx, 0, bx + bw, 0);
     grad.addColorStop(0, 'rgba(79, 70, 229, 0.7)');
     grad.addColorStop(0.6, 'rgba(255, 107, 107, 0.7)');
@@ -984,9 +1275,11 @@
 
   function render() {
     drawTrack();
+    drawOverpass();
     drawStartLine();
     drawCPs();
     drawMarks();
+    drawGhost();
     drawCar();
     drawParts();
     drawCPFx();
@@ -1005,10 +1298,12 @@
       physics(dt);
       chkCP();
       fx(dt);
+      recordGhost();
       lapT += dt;
       updHUD();
     }
 
+    updateAudio();
     render();
   }
 
