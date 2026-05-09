@@ -7,113 +7,46 @@ import '../styles/global.css';
 <Layout title="About" description="Learn about Surrey Artificial Intelligence Society — our mission, values, and what members can expect from our student-led AI community.">
 
   <section class="bg-ai-bg text-ai-fg border-b border-ai-border">
-    <div class="mx-auto max-w-5xl px-6 pt-14 pb-10 sm:pt-20 sm:pb-14">
-      <span class="text-ai-purple text-xs font-semibold uppercase tracking-widest block mb-3">Overview</span>
-      <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight leading-[1.1] mb-4">About the Society</h1>
-      <p class="text-ai-fg-muted text-base sm:text-lg leading-relaxed max-w-2xl">
-        Demystifying artificial intelligence, fostering discussion, and building the next generation of technical literacy at the University of Surrey.
-      </p>
+    <div class="mx-auto max-w-3xl px-6 pt-16 pb-12 sm:pt-24 sm:pb-16 text-center">
+      <h1 class="text-5xl sm:text-7xl font-extrabold tracking-tight leading-[1.1] mb-6">Why we built this society.</h1>
     </div>
   </section>
 
   <!-- Mission -->
-  <section class="py-14 sm:py-20 px-6 bg-ai-surface text-ai-fg border-b border-ai-border">
-    <div class="mx-auto max-w-5xl">
-      <div class="grid lg:grid-cols-2 gap-10 lg:gap-14 items-start">
-        <div>
-          <h2 class="text-2xl sm:text-3xl font-bold mb-5 text-ai-fg">Our Mission</h2>
-          <div class="space-y-4 text-ai-fg-muted leading-relaxed text-base sm:text-lg">
-            <p>
-              Surrey Artificial Intelligence Society exists to make artificial intelligence accessible, understandable, and engaging for students — regardless of course or prior experience.
-            </p>
-            <p>
-              We believe AI literacy will be critical across every discipline. Whether you're studying computer science, law, medicine, business, or the arts, understanding how AI works and what it means for your field matters.
-            </p>
-            <p>
-              As a student-led society under the Surrey Students' Union, we provide a space to learn, debate, and build — with no gatekeeping and no jargon.
-            </p>
-          </div>
-
-          <div class="mt-8 bg-ai-bg border border-ai-border rounded-xl p-5">
-            <h3 class="font-semibold text-base mb-4 text-ai-fg">What We Run</h3>
-            <ul class="space-y-3">
-              {[
-                "Beginner-friendly ML & NLP workshops",
-                "Hands-on hackathons and build nights",
-                "AI ethics, policy, and impact panels",
-                "Industry insight and careers sessions",
-              ].map(item => (
-                <li class="flex items-start gap-3 text-sm text-ai-fg-muted">
-                  <svg class="w-4 h-4 text-ai-cyan shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Who It's For -->
-  <section class="bg-ai-bg py-14 sm:py-20 px-6 border-b border-ai-border text-ai-fg">
-    <div class="mx-auto max-w-5xl">
-      <div class="max-w-2xl mb-8">
-        <h2 class="text-2xl sm:text-3xl font-bold mb-3">Who It's For</h2>
-        <p class="text-ai-fg-muted leading-relaxed">Every discipline, every year group, every experience level. AI shapes all of our futures — you don't need to be a computer scientist to be curious about it.</p>
-      </div>
-      <div class="grid sm:grid-cols-3 gap-6">
-        {[
-          {
-            num: "01",
-            title: "Beginners",
-            body: "Never touched AI before? That's completely fine. Many of our events are designed as starting points, with no prerequisites or coding required.",
-            accent: "text-ai-cyan",
-          },
-          {
-            num: "02",
-            title: "Builders",
-            body: "Already code and want to apply your skills to AI? Our build nights, hackathons, and project groups provide the space to experiment and ship.",
-            accent: "text-ai-purple",
-          },
-          {
-            num: "03",
-            title: "Thinkers",
-            body: "Interested in the ethics, policy, or societal implications of AI? We host debates and panels focusing on the bigger picture.",
-            accent: "text-ai-cyan",
-          },
-        ].map(card => (
-          <article class="bg-ai-surface border border-ai-border rounded-xl p-7 hover:border-ai-cyan transition-colors duration-200">
-            <div class:list={[card.accent, "text-xs font-semibold uppercase tracking-widest mb-4"]}>{card.num}</div>
-            <h3 class="font-semibold text-lg mb-3 text-ai-fg">{card.title}</h3>
-            <p class="text-ai-fg-muted text-sm leading-relaxed">{card.body}</p>
-          </article>
-        ))}
-      </div>
+  <section class="py-16 sm:py-24 px-6 bg-ai-surface text-ai-fg border-b border-ai-border">
+    <div class="mx-auto max-w-2xl text-lg sm:text-xl leading-relaxed text-ai-fg-muted space-y-6">
+      <p>
+        AI literacy is no longer just for computer scientists. It is a fundamental requirement for law, medicine, arts, and business.
+      </p>
+      <p>
+        Surrey Artificial Intelligence Society exists to make artificial intelligence accessible, understandable, and engaging for students — regardless of course or prior experience. We believe that understanding how AI works and what it means for your field matters more than ever.
+      </p>
+      <p>
+        As a student-led society under the Surrey Students' Union, we provide a space to learn, debate, and build — with no gatekeeping and no jargon. We welcome arts, humanities, and business students just as much as computer science students.
+      </p>
     </div>
   </section>
 
   <!-- Principles -->
-  <section class="py-14 sm:py-20 px-6 bg-ai-surface text-ai-fg">
+  <section class="py-16 sm:py-24 px-6 bg-ai-bg text-ai-fg">
     <div class="mx-auto max-w-5xl">
-      <div class="max-w-2xl mb-8">
-        <h2 class="text-2xl sm:text-3xl font-bold mb-3">Our Principles</h2>
-        <p class="text-ai-fg-muted leading-relaxed">The values that shape how we run the society — practically, not just on paper.</p>
+      <div class="max-w-2xl mb-12">
+        <h2 class="text-3xl sm:text-4xl font-extrabold mb-4">Our Approach</h2>
+        <p class="text-ai-fg-muted text-lg leading-relaxed">The values that shape how we run the society — practically, not just on paper.</p>
       </div>
-      <div class="grid sm:grid-cols-2 gap-x-16 gap-y-10">
-        {[
-          { title: "Accessibility First", body: "Every event should be approachable. We don't gatekeep knowledge or use unnecessary jargon. If a concept is complex, we break it down.", accent: "border-ai-purple" },
-          { title: "Responsible AI", body: "We care about how AI is built and deployed, not just what it can do. Safety, bias, and ethics are regular topics of our discussions.", accent: "border-ai-cyan" },
-          { title: "Learn by Doing", body: "Theory matters, but building things teaches you faster. We emphasize practical application over purely academic lectures.", accent: "border-ai-cyan" },
-          { title: "Cross-Disciplinary", body: "AI touches every field. We actively recruit and welcome students from non-STEM backgrounds to ensure diverse perspectives.", accent: "border-ai-purple" },
-        ].map(p => (
-          <div class:list={["pl-6 py-1 border-l-2", p.accent]}>
-            <h3 class="font-semibold text-lg mb-2 text-ai-fg">{p.title}</h3>
-            <p class="text-ai-fg-muted leading-relaxed text-sm">{p.body}</p>
-          </div>
-        ))}
+      <div class="space-y-16">
+        <div>
+          <h3 class="text-2xl font-bold mb-4 text-ai-fg">Beginner Friendly</h3>
+          <p class="text-ai-fg-muted leading-relaxed max-w-3xl text-lg">Every event should be approachable. We don't gatekeep knowledge or use unnecessary jargon. If a concept is complex, we break it down. We actively recruit and welcome students from non-STEM backgrounds to ensure diverse perspectives.</p>
+        </div>
+        <div>
+          <h3 class="text-2xl font-bold mb-4 text-ai-fg">Project Driven</h3>
+          <p class="text-ai-fg-muted leading-relaxed max-w-3xl text-lg">Theory matters, but building things teaches you faster. We emphasize practical application over purely academic lectures, hosting build nights and workshops designed to give you hands-on experience.</p>
+        </div>
+        <div>
+          <h3 class="text-2xl font-bold mb-4 text-ai-fg">Ethically Grounded</h3>
+          <p class="text-ai-fg-muted leading-relaxed max-w-3xl text-lg">We care about how AI is built and deployed, not just what it can do. Safety, bias, and ethics are regular topics of our discussions. We think about the long-term impacts of the systems we build.</p>
+        </div>
       </div>
     </div>
   </section>

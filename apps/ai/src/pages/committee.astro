@@ -31,81 +31,71 @@ const getInitials = (name?: string, role?: string) => {
 <Layout title="Committee" description="Meet the student committee running Surrey Artificial Intelligence Society — the team behind our workshops, events, and community.">
 
   <section class="bg-ai-bg text-ai-fg border-b border-ai-border">
-    <div class="mx-auto max-w-5xl px-6 pt-14 pb-10 sm:pt-20 sm:pb-14">
-      <span class="text-ai-purple text-xs font-semibold uppercase tracking-widest block mb-3">Leadership</span>
-      <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight leading-[1.1] mb-4">The Committee</h1>
-      <p class="text-ai-fg-muted text-base sm:text-lg leading-relaxed max-w-2xl">
+    <div class="mx-auto max-w-5xl px-6 pt-16 pb-12 sm:pt-24 sm:pb-16">
+      <h1 class="text-5xl sm:text-7xl font-extrabold tracking-tight leading-[1.1] mb-6">Meet the people running the society.</h1>
+      <p class="text-ai-fg-muted text-lg sm:text-xl leading-relaxed max-w-2xl">
         Student volunteers who plan and run the society — organising workshops, events, and everything in between.
       </p>
     </div>
   </section>
 
   <!-- Committee Grid -->
-  <section class="py-14 sm:py-20 px-6 bg-ai-bg text-ai-fg">
+  <section class="py-16 sm:py-24 px-6 bg-ai-surface text-ai-fg">
     <div class="mx-auto max-w-5xl">
       {committee.length === 0 ? (
-        <!-- Intentionally designed empty state -->
-        <div class="bg-ai-surface border border-ai-border rounded-xl p-8">
+        <div class="bg-ai-bg rounded-2xl p-10 text-center shadow-sm">
           <h2 class="text-2xl font-bold mb-4 text-ai-fg">Committee details will appear here once confirmed</h2>
-          <p class="text-ai-fg-muted leading-relaxed mb-5 max-w-2xl">
+          <p class="text-ai-fg-muted leading-relaxed mb-6 max-w-2xl mx-auto">
             Our current committee roster will be published once confirmed through the Surrey Students' Union.
           </p>
-          <a href="/join" class="inline-flex items-center gap-2 text-sm font-semibold text-ai-purple hover:text-ai-purple/80 transition-colors">
-            Learn about joining the society →
+          <a href="/join" class="btn-primary">
+            Learn about joining the society
           </a>
         </div>
       ) : (
         <div>
-          <div class="mb-8">
-            <h2 class="text-2xl font-bold text-ai-fg">Meet the Team</h2>
-            <p class="mt-2 text-ai-fg-muted">The students directing Surrey Artificial Intelligence Society.</p>
-          </div>
-          <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {committee.map(member => (
-              <article class="bg-ai-bg border border-ai-border rounded-xl p-6 flex flex-col hover:border-ai-purple transition-colors duration-200">
+              <article class="bg-ai-bg rounded-2xl p-8 flex flex-col shadow-sm border border-ai-border/50 hover:shadow-md transition-shadow">
                 {member.imageUrl ? (
-                  <img src={member.imageUrl} alt={member.name || member.role} class="w-12 h-12 rounded-full object-cover mb-5" />
+                  <img src={member.imageUrl} alt={member.name || member.role} class="w-20 h-20 rounded-full object-cover mb-6" />
                 ) : (
-                  <div class="w-12 h-12 rounded-full bg-ai-purple/10 flex items-center justify-center text-ai-purple font-bold text-sm mb-5">
+                  <div class="w-20 h-20 rounded-full bg-ai-surface flex items-center justify-center text-ai-coral font-bold text-xl mb-6 shadow-sm border border-ai-border">
                     {getInitials(member.name, member.role)}
                   </div>
                 )}
-                <h2 class="font-semibold text-base text-ai-fg mb-1">{member.role}</h2>
-                {member.name && <p class="text-ai-fg-muted text-sm">{member.name}</p>}
+                <h2 class="font-bold text-2xl text-ai-fg mb-2">{member.name || 'Pending Confirmation'}</h2>
+                <p class="text-ai-fg-muted text-sm font-semibold uppercase tracking-widest">{member.role}</p>
               </article>
             ))}
           </div>
         </div>
       )}
 
-      <div class="mt-14 pt-8 border-t border-ai-border">
-        <div class="mb-8">
-          <h2 class="text-2xl font-bold text-ai-fg">Past Committee</h2>
-          <p class="mt-2 text-ai-fg-muted">Confirmed previous committee records will appear here.</p>
+      <div class="mt-20 pt-12 border-t border-ai-border">
+        <div class="mb-10">
+          <h2 class="text-3xl font-extrabold text-ai-fg">Past Committee</h2>
         </div>
         {pastCommittee.length === 0 ? (
-          <div class="bg-ai-surface border border-ai-border rounded-xl p-6">
-            <h3 class="font-semibold text-base text-ai-fg mb-2">No past committee records yet</h3>
-            <p class="text-ai-fg-muted text-sm">Past committee details will be published once confirmed.</p>
-          </div>
+          <p class="text-ai-fg-muted text-lg">Past committee details will be published once confirmed.</p>
         ) : (
-          <div class="space-y-8">
+          <div class="space-y-12">
             {pastCommitteeYears.map(yearLabel => (
               <section>
-                <h3 class="font-semibold text-lg text-ai-fg mb-4">{yearLabel}</h3>
-                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <h3 class="font-bold text-xl text-ai-fg mb-6">{yearLabel}</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {pastCommittee.filter(member => member.yearLabel === yearLabel).map(member => (
-                    <article class="bg-ai-bg border border-ai-border rounded-xl p-5 flex items-start gap-4">
+                    <article class="bg-ai-bg rounded-xl p-6 flex items-start gap-4 shadow-sm border border-ai-border/50">
                       {member.imageUrl ? (
-                        <img src={member.imageUrl} alt={member.name || member.role} class="w-10 h-10 rounded-full object-cover shrink-0" />
+                        <img src={member.imageUrl} alt={member.name || member.role} class="w-12 h-12 rounded-full object-cover shrink-0" />
                       ) : (
-                        <div class="w-10 h-10 rounded-full bg-ai-cyan/10 flex items-center justify-center text-ai-cyan font-bold text-xs shrink-0">
+                        <div class="w-12 h-12 rounded-full bg-ai-surface flex items-center justify-center text-ai-azure font-bold text-sm shrink-0 border border-ai-border">
                           {getInitials(member.name, member.role)}
                         </div>
                       )}
                       <div>
-                        <h4 class="font-semibold text-sm text-ai-fg">{member.role}</h4>
-                        <p class="text-ai-fg-muted text-sm mt-1">{member.name}</p>
+                        <h4 class="font-semibold text-base text-ai-fg">{member.name || 'Pending Confirmation'}</h4>
+                        <p class="text-ai-fg-muted text-xs uppercase tracking-wider font-medium mt-1">{member.role}</p>
                       </div>
                     </article>
                   ))}
@@ -116,15 +106,6 @@ const getInitials = (name?: string, role?: string) => {
         )}
       </div>
 
-      <div class="mt-14 pt-8 border-t border-ai-border">
-        <h3 class="font-semibold text-lg mb-3 text-ai-fg">Get Involved</h3>
-        <p class="text-ai-fg-muted text-sm max-w-xl mb-5">
-          Interested in helping run the society or volunteering at events? We welcome students from any course who want to contribute.
-        </p>
-        <a href="/join" class="inline-flex items-center gap-2 text-ai-purple hover:text-ai-purple/80 text-sm font-semibold transition-colors">
-          See membership details →
-        </a>
-      </div>
     </div>
   </section>
 

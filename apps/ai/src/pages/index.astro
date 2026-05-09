@@ -5,11 +5,9 @@ import { createConvexClient } from "@surreysocieties/admin";
 import "../styles/global.css";
 
 import HomeHero from "../components/home/HomeHero.astro";
-import WhatWeDoSection from "../components/home/WhatWeDoSection.astro";
-import AITracksExhibit from "../components/home/AITracksExhibit.astro";
+import AreasWeExplore from "../components/home/AreasWeExplore.astro";
+import StudentProjectSlot from "../components/home/StudentProjectSlot.astro";
 import EventsPreview from "../components/home/EventsPreview.astro";
-import CommitteePreview from "../components/home/CommitteePreview.astro";
-import WhoItsForSection from "../components/home/WhoItsForSection.astro";
 import JoinCTA from "../components/home/JoinCTA.astro";
 
 const SOCIETY_ID = "ai";
@@ -18,15 +16,6 @@ const client = createConvexClient();
 const events: any[] = (
   await client.query("events:listPublished", { societySlug: SOCIETY_ID })
 ).filter((event: any) => event.status === "published");
-
-const committee: any[] = (
-  await client.query("committee:listActive", { societySlug: SOCIETY_ID })
-).sort(
-  (a: any, b: any) =>
-    (a.displayOrder ?? Number.MAX_SAFE_INTEGER) -
-    (b.displayOrder ?? Number.MAX_SAFE_INTEGER) ||
-    (a.name || "").localeCompare(b.name || "")
-);
 ---
 
 <Layout
@@ -34,10 +23,8 @@ const committee: any[] = (
   description="Surrey Artificial Intelligence Society — A student-led community for learning, building, and discussing artificial intelligence at the University of Surrey."
 >
   <HomeHero />
-  <WhatWeDoSection />
-  <AITracksExhibit />
+  <AreasWeExplore />
+  <StudentProjectSlot />
   <EventsPreview events={events} />
-  <CommitteePreview committee={committee} />
-  <WhoItsForSection />
   <JoinCTA />
 </Layout>

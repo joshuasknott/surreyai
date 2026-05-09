@@ -2,7 +2,9 @@
 
 @theme {
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  /* Fira Code only for code snippets now */
   --font-mono: 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  /* Headings typography: Geometric/Humanist (Inter is recommended with tight tracking, or Plus Jakarta Sans if added later. We will use Inter with tight tracking for now) */
 
   /* ── Design Tokens (source of truth) ── */
   --color-ai-bg: var(--ai-bg);
@@ -11,24 +13,26 @@
   --color-ai-surface: var(--ai-surface);
   --color-ai-border: var(--ai-border);
   --color-ai-border-strong: var(--ai-border-strong);
-  --color-ai-cyan: var(--ai-cyan);
-  --color-ai-purple: var(--ai-purple);
-  --color-ai-graphite: var(--ai-graphite);
+  
+  --color-ai-coral: var(--ai-coral);
+  --color-ai-azure: var(--ai-azure);
+  --color-ai-sage: var(--ai-sage);
+  --color-ai-slate-base: var(--ai-slate-base);
 
   /* ── Legacy compatibility aliases ──
      Prevent breakage in existing component CSS that
-     references the old token names. */
+     references the old token names. Map them to the new tokens. */
   --color-navy: var(--ai-surface);
   --color-navy-deep: var(--ai-bg);
   --color-navy-light: var(--ai-surface);
-  --color-accent-blue: var(--ai-cyan);
-  --color-accent-blue-light: var(--ai-cyan);
-  --color-accent-blue-dark: var(--ai-cyan);
-  --color-accent-blue-muted: color-mix(in srgb, var(--ai-cyan) 10%, transparent);
-  --color-accent-purple: var(--ai-purple);
-  --color-accent-purple-light: var(--ai-purple);
-  --color-accent-purple-dark: var(--ai-purple);
-  --color-accent-purple-muted: color-mix(in srgb, var(--ai-purple) 10%, transparent);
+  --color-accent-blue: var(--ai-azure);
+  --color-accent-blue-light: var(--ai-azure);
+  --color-accent-blue-dark: var(--ai-azure);
+  --color-accent-blue-muted: color-mix(in srgb, var(--ai-azure) 10%, transparent);
+  --color-accent-purple: var(--ai-coral);
+  --color-accent-purple-light: var(--ai-coral);
+  --color-accent-purple-dark: var(--ai-coral);
+  --color-accent-purple-muted: color-mix(in srgb, var(--ai-coral) 10%, transparent);
   --color-surface: var(--ai-bg);
   --color-surface-alt: var(--ai-surface);
   --color-surface-dark: var(--ai-bg);
@@ -41,33 +45,40 @@
   --color-text-on-dark-secondary: var(--ai-fg-muted);
   --color-border-subtle: var(--ai-border);
   --color-border-strong: var(--ai-border-strong);
+  
+  /* Retain these if they are somehow used directly without aliases */
+  --color-ai-cyan: var(--ai-azure);
+  --color-ai-purple: var(--ai-coral);
+  --color-ai-graphite: var(--ai-slate-base);
 }
 
 @layer base {
   /* ── Light theme (default) ── */
   :root {
-    --ai-bg: #f5f9ff;
-    --ai-fg: #0b1020;
-    --ai-fg-muted: #526072;
+    --ai-bg: #FDFBF7;
+    --ai-fg: #0F172A;
+    --ai-fg-muted: #475569;
     --ai-surface: #ffffff;
-    --ai-border: #dbe7f5;
-    --ai-border-strong: #b7c7dc;
-    --ai-cyan: #007ea7;
-    --ai-purple: #6741d9;
-    --ai-graphite: #111827;
+    --ai-border: #E2E8F0;
+    --ai-border-strong: #CBD5E1;
+    --ai-coral: #FF6B6B;
+    --ai-azure: #4F46E5;
+    --ai-sage: #10B981;
+    --ai-slate-base: #0F172A;
   }
 
   /* ── Dark theme ── */
   :root[data-theme="dark"] {
-    --ai-bg: #070a12;
-    --ai-fg: #f3f8ff;
-    --ai-fg-muted: #9baabd;
-    --ai-surface: #0d1320;
-    --ai-border: #1f2b3d;
-    --ai-border-strong: #39506d;
-    --ai-cyan: #29d8ff;
-    --ai-purple: #b69cff;
-    --ai-graphite: #0a0f1a;
+    --ai-bg: #0B0F19;
+    --ai-fg: #F8FAFC;
+    --ai-fg-muted: #94A3B8;
+    --ai-surface: #131A2B;
+    --ai-border: #1E293B;
+    --ai-border-strong: #334155;
+    --ai-coral: #FF6B6B;
+    --ai-azure: #4F46E5;
+    --ai-sage: #10B981;
+    --ai-slate-base: #0B0F19;
   }
 
   /* ── Reduced motion ── */
@@ -82,22 +93,18 @@
 
   /* ── Selection ── */
   ::selection {
-    background: color-mix(in srgb, var(--ai-cyan) 25%, transparent);
+    background: color-mix(in srgb, var(--ai-azure) 25%, transparent);
     color: var(--ai-fg);
   }
 }
 
 /* ── Utility: monospace text ──
-   Available for metadata, code snippets, and small data labels.
-   Should NOT be used for navigation, headings, or body copy. */
+   Available ONLY for metadata, code snippets. */
 .font-mono-tech {
   font-family: var(--font-mono);
 }
 
-/* ── Utility: subtle image tint ──
-   A gentle, non-destructive overlay for images that need slight brand
-   cohesion. Does NOT distort colours as aggressively as the old
-   duotone approach — real student photos remain natural. */
+/* ── Utility: subtle image tint ── */
 .image-brand-tint {
   position: relative;
 }
@@ -108,17 +115,15 @@
   inset: 0;
   background: linear-gradient(
     135deg,
-    color-mix(in srgb, var(--ai-cyan) 6%, transparent),
-    color-mix(in srgb, var(--ai-purple) 6%, transparent)
+    color-mix(in srgb, var(--ai-azure) 6%, transparent),
+    color-mix(in srgb, var(--ai-coral) 6%, transparent)
   );
   pointer-events: none;
   border-radius: inherit;
   z-index: 1;
 }
 
-/* ── Legacy compatibility: duotone-tint ──
-   Kept for existing page references but vastly softened.
-   Real student photos stay natural. */
+/* ── Legacy compatibility: duotone-tint ── */
 .duotone-tint {
   position: relative;
 }
@@ -129,8 +134,8 @@
   inset: 0;
   background: linear-gradient(
     135deg,
-    color-mix(in srgb, var(--ai-cyan) 8%, transparent),
-    color-mix(in srgb, var(--ai-purple) 8%, transparent)
+    color-mix(in srgb, var(--ai-azure) 8%, transparent),
+    color-mix(in srgb, var(--ai-coral) 8%, transparent)
   );
   pointer-events: none;
   border-radius: inherit;
@@ -138,83 +143,77 @@
 }
 
 img.duotone-tint {
-  filter: none; /* no aggressive image distortion */
+  filter: none;
 }
 
-/* ── Button: primary ──
-   Solid accent button with theme-safe contrast text. */
+/* ── Button: primary ── */
 .btn-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.95rem 2rem;
-  font-weight: 750;
-  font-size: 0.9375rem;
+  padding: 0.95rem 2.2rem;
+  font-weight: 700;
+  font-size: 1rem;
   line-height: 1;
   border-radius: 9999px;
-  background: linear-gradient(135deg, var(--ai-cyan), color-mix(in srgb, var(--ai-purple) 72%, var(--ai-cyan)));
-  color: #fff;
-  border: 1px solid color-mix(in srgb, var(--ai-cyan) 40%, transparent);
-  box-shadow: 0 18px 40px color-mix(in srgb, var(--ai-cyan) 24%, transparent);
-  transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+  background: var(--ai-azure);
+  color: #ffffff;
+  border: 1px solid color-mix(in srgb, var(--ai-azure) 40%, transparent);
+  box-shadow: 0 12px 24px color-mix(in srgb, var(--ai-azure) 15%, transparent);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s;
   text-decoration: none;
   cursor: pointer;
 }
 
 :root:not([data-theme="dark"]) .btn-primary {
-  color: #fff;
-  /* Light theme: cyan (#0891b2) is dark enough for white text */
+  color: #ffffff;
 }
 
 :root[data-theme="dark"] .btn-primary {
-  color: #0a0a0a;
-  /* Dark theme: cyan (#22d3ee) is light — use dark text */
+  color: #ffffff;
 }
 
 .btn-primary:hover {
-  filter: saturate(1.08) brightness(1.02);
-  transform: translateY(-1px);
-  box-shadow: 0 22px 50px color-mix(in srgb, var(--ai-purple) 24%, transparent);
+  background: color-mix(in srgb, var(--ai-azure) 90%, #000);
+  transform: translateY(-2px);
+  box-shadow: 0 16px 32px color-mix(in srgb, var(--ai-azure) 25%, transparent);
 }
 
 .btn-primary:focus-visible {
-  outline: 2px solid var(--ai-cyan);
+  outline: 2px solid var(--ai-azure);
   outline-offset: 2px;
 }
 
-/* ── Button: secondary ──
-   Ghost / outlined button safe in both themes. */
+/* ── Button: secondary ── */
 .btn-secondary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.95rem 2rem;
+  padding: 0.95rem 2.2rem;
   font-weight: 700;
-  font-size: 0.9375rem;
+  font-size: 1rem;
   line-height: 1;
   border-radius: 9999px;
-  background: color-mix(in srgb, var(--ai-surface) 82%, transparent);
+  background: transparent;
   color: var(--ai-fg);
-  border: 1px solid color-mix(in srgb, var(--ai-border-strong) 70%, transparent);
-  box-shadow: inset 0 1px 0 color-mix(in srgb, #ffffff 58%, transparent);
-  transition: background-color 0.15s, border-color 0.15s, transform 0.15s;
+  border: 1px solid var(--ai-border-strong);
+  transition: background-color 0.2s, border-color 0.2s, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   text-decoration: none;
   cursor: pointer;
 }
 
 .btn-secondary:hover {
-  background: color-mix(in srgb, var(--ai-cyan) 8%, var(--ai-surface));
-  border-color: color-mix(in srgb, var(--ai-cyan) 38%, var(--ai-border));
-  transform: translateY(-1px);
+  background: color-mix(in srgb, var(--ai-surface) 95%, var(--ai-fg));
+  border-color: var(--ai-fg);
+  transform: translateY(-2px);
 }
 
 .btn-secondary:focus-visible {
-  outline: 2px solid var(--ai-cyan);
+  outline: 2px solid var(--ai-fg);
   outline-offset: 2px;
 }
 
-/* ── Utility: media scrim ──
-   Semi-transparent overlay to ensure text readability over images/video. */
+/* ── Utility: media scrim ── */
 .media-scrim {
   position: absolute;
   inset: 0;
@@ -227,13 +226,12 @@ img.duotone-tint {
   );
 }
 
-/* ── Legacy compatibility: node-dot ──
-   Small accent dot, softened from 6px to 5px with rounded shape. */
+/* ── Legacy compatibility: node-dot ── */
 .node-dot {
   display: inline-block;
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: var(--ai-cyan);
+  background: var(--ai-azure);
   vertical-align: middle;
 }

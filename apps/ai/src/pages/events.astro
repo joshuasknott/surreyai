@@ -9,132 +9,67 @@ const client = createConvexClient();
 const events: any[] = (await client.query("events:listPublished", { societySlug: SOCIETY_ID }))
   .filter((event: any) => event.status === 'published');
 
-const formatEventDate = (date?: string) => {
-  if (!date) return 'Date TBC';
+const formatEventMonth = (date?: string) => {
+  if (!date) return 'TBC';
   const parsed = new Date(`${date}T00:00:00`);
-  if (Number.isNaN(parsed.getTime())) return date;
-  return parsed.toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  });
+  if (Number.isNaN(parsed.getTime())) return 'TBC';
+  return parsed.toLocaleDateString('en-GB', { month: 'short' }).toUpperCase();
 };
 
-const getEventMeta = (event: any) => {
-  if (event.location) return event.location;
-  if (event.startTime && event.endTime) return `${event.startTime} – ${event.endTime}`;
-  if (event.startTime) return event.startTime;
-  return null;
+const formatEventDay = (date?: string) => {
+  if (!date) return '-';
+  const parsed = new Date(`${date}T00:00:00`);
+  if (Number.isNaN(parsed.getTime())) return '-';
+  return parsed.toLocaleDateString('en-GB', { day: '2-digit' });
 };
 ---
 
 <Layout title="Events" description="Upcoming and planned events from Surrey Artificial Intelligence Society — workshops, build nights, discussions, and careers events.">
 
   <section class="bg-ai-bg text-ai-fg border-b border-ai-border">
-    <div class="mx-auto max-w-5xl px-6 pt-14 pb-10 sm:pt-20 sm:pb-14">
-      <span class="text-ai-cyan text-xs font-semibold uppercase tracking-widest block mb-3">Programme</span>
-      <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight leading-[1.1] mb-4">Events & Workshops</h1>
-      <p class="text-ai-fg-muted text-base sm:text-lg leading-relaxed max-w-2xl">
-        Technical deep-dives, hands-on build nights, and industry speakers. Open to all Surrey students regardless of experience.
+    <div class="mx-auto max-w-4xl px-6 pt-16 pb-12 sm:pt-24 sm:pb-16 text-center">
+      <h1 class="text-5xl sm:text-7xl font-extrabold tracking-tight leading-[1.1] mb-6">What's happening next.</h1>
+      <p class="text-ai-fg-muted text-lg sm:text-xl leading-relaxed max-w-2xl mx-auto">
+        Technical deep-dives, hands-on build nights, and industry speakers. Open to all Surrey students.
       </p>
     </div>
   </section>
 
   <!-- Events List -->
-  <section class="py-14 sm:py-20 px-6 bg-ai-bg text-ai-fg">
-    <div class="mx-auto max-w-5xl">
+  <section class="py-16 sm:py-24 px-6 bg-ai-surface text-ai-fg">
+    <div class="mx-auto max-w-4xl">
       {events.length === 0 ? (
-        <div>
-          <!-- Honest empty state — no invented events -->
-          <div class="mb-8 max-w-2xl">
-            <h2 class="text-2xl font-bold mb-3 text-ai-fg">Programme Being Finalised</h2>
-            <p class="text-ai-fg-muted leading-relaxed">
-              We are putting together our events schedule for the year. When events are confirmed, they will appear here. Check back soon.
-            </p>
-          </div>
-
-          <!-- What to expect cards — general, not invented specifics -->
-          <div class="grid sm:grid-cols-3 gap-5 mb-12">
-            {[
-              { label: "Workshops", body: "Beginner-friendly technical sessions covering ML, NLP, computer vision, and generative AI." },
-              { label: "Build Nights", body: "Collaborative evenings where you work on projects and learn from peers and society leads." },
-              { label: "Panels & Talks", body: "Discussions on AI ethics, industry trends, and career paths with guest speakers." },
-            ].map(card => (
-              <div class="bg-ai-surface border border-ai-border rounded-xl p-6">
-                <div class="w-8 h-8 rounded-lg bg-ai-cyan/10 flex items-center justify-center mb-4" aria-hidden="true">
-                  <svg class="w-4 h-4 text-ai-cyan" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <h3 class="font-semibold text-ai-fg mb-2">{card.label}</h3>
-                <p class="text-ai-fg-muted text-sm leading-relaxed">{card.body}</p>
-              </div>
-            ))}
-          </div>
-
-          <div class="border-t border-ai-border pt-8">
-            <p class="text-sm text-ai-fg-muted mb-4">Want to suggest a topic or be notified when events are announced?</p>
-            <a href="/join" class="inline-flex items-center gap-2 text-ai-cyan hover:text-ai-cyan/80 text-sm font-semibold transition-colors">
-              Join the society for updates →
-            </a>
-          </div>
+        <div class="text-center py-16 bg-ai-bg border border-ai-border rounded-2xl shadow-sm">
+          <p class="text-ai-fg-muted text-lg leading-relaxed max-w-xl mx-auto mb-8">
+            We're currently planning our next semester of events. Join our community to get notified.
+          </p>
+          <a href="/join" class="btn-primary">
+            Become a member
+          </a>
         </div>
       ) : (
-        <div>
-          <div class="mb-8">
-            <h2 class="text-2xl font-bold text-ai-fg">Upcoming Events</h2>
-          </div>
-          <div class="grid gap-5">
-            {events.map(event => (
-              <article class="group bg-ai-bg border border-ai-border hover:border-ai-cyan transition-colors duration-200 rounded-xl p-6 sm:p-8 flex flex-col sm:flex-row gap-6 sm:gap-10 sm:items-start">
-                {event.imageUrl ? (
-                  <div class="sm:w-36 shrink-0">
-                    <img src={event.imageUrl} alt={event.title} class="w-full aspect-[4/3] object-cover rounded-lg" />
-                  </div>
-                ) : (
-                  <div class="sm:w-44 shrink-0">
-                    <time datetime={event.date || ''} class="text-ai-cyan text-sm font-semibold block mb-2">
-                      {formatEventDate(event.date)}
-                    </time>
-                    {event.category && (
-                      <span class="inline-block text-xs font-medium text-ai-fg-muted bg-ai-surface border border-ai-border px-2.5 py-1 rounded-md uppercase tracking-wide">
-                        {event.category}
-                      </span>
-                    )}
-                  </div>
-                )}
-                <div class="flex-grow min-w-0">
-                  {!event.imageUrl && (
-                    <>
-                      <time datetime={event.date || ''} class="text-ai-cyan text-sm font-semibold block mb-2 sm:hidden">
-                        {formatEventDate(event.date)}
-                      </time>
-                      {event.category && (
-                        <span class="inline-block text-xs font-medium text-ai-fg-muted bg-ai-surface border border-ai-border px-2.5 py-1 rounded-md uppercase tracking-wide mb-2 sm:hidden">
-                          {event.category}
-                        </span>
-                      )}
-                    </>
-                  )}
-                  <h2 class="font-bold text-xl mb-2 group-hover:text-ai-cyan transition-colors">{event.title}</h2>
-                  <p class="text-ai-fg-muted leading-relaxed mb-3 text-sm">{event.description || 'Details to be announced.'}</p>
-                  {getEventMeta(event) && (
-                    <p class="text-xs text-ai-fg-muted">{getEventMeta(event)}</p>
-                  )}
+        <div class="flex flex-col gap-6">
+          {events.map(event => (
+            <article class="bg-ai-bg border border-ai-border rounded-xl p-6 sm:p-8 flex flex-col sm:flex-row gap-6 sm:gap-10 hover:shadow-md transition-shadow">
+              
+              <div class="flex flex-row sm:flex-col items-center sm:items-start gap-4 sm:gap-1 shrink-0 sm:w-32">
+                <div class="text-center bg-ai-surface border border-ai-border px-4 py-3 rounded-lg min-w-20">
+                  <span class="block text-ai-coral font-bold text-sm tracking-widest">{formatEventMonth(event.date)}</span>
+                  <span class="block text-ai-fg font-extrabold text-3xl">{formatEventDay(event.date)}</span>
                 </div>
-              </article>
-            ))}
-          </div>
+              </div>
 
-          <div class="mt-12 border-t border-ai-border pt-8">
-            <h3 class="font-semibold text-lg mb-2 text-ai-fg">Suggest a Topic</h3>
-            <p class="text-ai-fg-muted text-sm mb-4 max-w-xl">
-              Is there a specific model, architecture, or tool you'd like us to cover? We tailor our workshops to member interests.
-            </p>
-            <a href="/join" class="inline-flex items-center gap-2 text-ai-cyan hover:text-ai-cyan/80 text-sm font-semibold transition-colors">
-              Get in touch →
-            </a>
-          </div>
+              <div class="flex-grow flex flex-col justify-center">
+                <h2 class="font-bold text-2xl text-ai-fg mb-3">{event.title}</h2>
+                <div class="flex flex-wrap gap-x-4 gap-y-2 mb-4 text-sm font-medium text-ai-azure tracking-wide uppercase">
+                  {event.startTime && <span>{event.startTime}{event.endTime ? ` - ${event.endTime}` : ''}</span>}
+                  {event.location && <span>{event.location}</span>}
+                  {event.category && <span class="text-ai-fg-muted border border-ai-border px-2 py-0.5 rounded-md">{event.category}</span>}
+                </div>
+                <p class="text-ai-fg-muted leading-relaxed text-base">{event.description || 'Details to be announced.'}</p>
+              </div>
+            </article>
+          ))}
         </div>
       )}
     </div>

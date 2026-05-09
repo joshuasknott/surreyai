@@ -1,65 +1,20 @@
 ---
 ---
 
-<section class="join-cta bg-ai-bg text-ai-fg py-16 sm:py-24 px-6 relative overflow-hidden border-t border-ai-border">
-  <div class="join-cta__grid" aria-hidden="true"></div>
-  <div class="mx-auto max-w-4xl text-center relative z-10 join-cta__panel">
-    <p class="join-cta__kicker">Get Involved</p>
-    <h2 class="text-4xl sm:text-6xl font-extrabold tracking-[-0.07em] leading-[0.95] mb-5">
-      Choose a track. Find your people. Build something.
+<section class="bg-ai-bg text-ai-fg py-16 sm:py-24 px-6 relative border-t border-ai-border">
+  <div class="mx-auto max-w-4xl text-center">
+    <h2 class="text-4xl sm:text-6xl font-extrabold tracking-[-0.05em] leading-[1] mb-5">
+      Become a part of the future.
     </h2>
-    <p class="text-ai-fg-muted text-base mb-8 max-w-xl mx-auto leading-relaxed">
-      Whether you're studying computer science, business, psychology, or
-      anything else &mdash; if you're curious about AI, you're welcome here.
-    </p>
-    <div class="flex flex-col sm:flex-row gap-4 justify-center">
-      <a href="/join" class="btn-primary text-center">
-        Join Surrey AI Society
-      </a>
-      <a href="/events" class="btn-secondary text-center">
-        View Events
+    <ul class="text-ai-fg-muted text-lg sm:text-xl mb-10 max-w-2xl mx-auto leading-relaxed list-none p-0 flex flex-col gap-3">
+      <li>Access to hands-on workshops.</li>
+      <li>Entry to society hackathons.</li>
+      <li>Networking with industry speakers.</li>
+    </ul>
+    <div class="flex justify-center">
+      <a href="/join" class="btn-primary text-center text-lg px-8 py-4">
+        Join the Society via Student Union
       </a>
     </div>
   </div>
 </section>
-
-<style>
-  .join-cta {
-    background:
-      radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--ai-cyan) 16%, transparent), transparent 28rem),
-      linear-gradient(180deg, var(--ai-bg), color-mix(in srgb, var(--ai-bg) 88%, var(--ai-purple)));
-  }
-
-  .join-cta__grid {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    opacity: 0.42;
-    background-image:
-      linear-gradient(color-mix(in srgb, var(--ai-border) 54%, transparent) 1px, transparent 1px),
-      linear-gradient(90deg, color-mix(in srgb, var(--ai-border) 54%, transparent) 1px, transparent 1px);
-    background-size: 44px 44px;
-    mask-image: radial-gradient(circle at 50% 16%, #000, transparent 74%);
-  }
-
-  .join-cta__panel {
-    border: 1px solid color-mix(in srgb, var(--ai-border-strong) 50%, transparent);
-    border-radius: 2rem;
-    padding: clamp(2rem, 5vw, 4.5rem);
-    background: color-mix(in srgb, var(--ai-surface) 74%, transparent);
-    box-shadow:
-      0 26px 70px color-mix(in srgb, var(--ai-graphite) 14%, transparent),
-      inset 0 1px 0 color-mix(in srgb, #ffffff 48%, transparent);
-    backdrop-filter: blur(18px);
-  }
-
-  .join-cta__kicker {
-    margin: 0 0 0.8rem;
-    color: var(--ai-cyan);
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    font-weight: 850;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-  }
-</style>
