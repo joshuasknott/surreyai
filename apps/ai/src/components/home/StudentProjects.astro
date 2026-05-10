@@ -1,7 +1,7 @@
 ---
 import StudentProjectSlot from "./StudentProjectSlot.astro";
-import PosterStudio from "./student-projects/PosterStudio.astro";
-import TokenRush from "./student-projects/TokenRush.astro";
+import IdeaAnalyser from "./student-projects/IdeaAnalyser.astro";
+import AgenticWorkspace from "./student-projects/AgenticWorkspace.astro";
 
 const projects = [
   {
@@ -13,19 +13,19 @@ const projects = [
     color: "var(--ai-azure)"
   },
   {
-    id: "poster-studio",
-    title: "Poster Studio",
-    type: "Creative tool",
-    description: "Generate slick event poster concepts for societies, workshops, socials, and hackathons.",
-    action: "Create",
+    id: "idea-analyser",
+    title: "Idea Analyser",
+    type: "Live AI feedback",
+    description: "Instant AI feedback on business, startup, product, and project ideas.",
+    action: "Analyse",
     color: "var(--ai-coral)"
   },
   {
-    id: "token-rush",
-    title: "Token Rush",
-    type: "Reaction game",
-    description: "A fast typing/reaction game where you chase prompts, dodge bugs, and keep your streak alive.",
-    action: "Play",
+    id: "agentic-workspace",
+    title: "Agentic Workspace",
+    type: "Frontend simulation",
+    description: "A visual prototype of agents planning, building, reviewing, and handing off work inside a shared workspace.",
+    action: "Launch",
     color: "var(--ai-sage)"
   }
 ];
@@ -42,7 +42,7 @@ const projects = [
       <!-- Scrollable List -->
       <div class="projects-scroll-container">
         <div class="projects-scroll-row" aria-label="Student projects list">
-          {projects.map((p, i) => (
+          {projects.map((p) => (
             <button 
               class="project-card scrollable-card" 
               data-project-id={p.id}
@@ -75,24 +75,21 @@ const projects = [
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
         <div class="modal-content" aria-live="polite">
-          <!-- Racing Simulator -->
           <div id="panel-drift-lab" class="project-panel" hidden>
             <div class="panel-inner">
               <StudentProjectSlot />
             </div>
           </div>
 
-          <!-- Poster Studio -->
-          <div id="panel-poster-studio" class="project-panel" hidden>
+          <div id="panel-idea-analyser" class="project-panel" hidden>
             <div class="panel-inner">
-              <PosterStudio />
+              <IdeaAnalyser />
             </div>
           </div>
 
-          <!-- Token Rush -->
-          <div id="panel-token-rush" class="project-panel" hidden>
+          <div id="panel-agentic-workspace" class="project-panel" hidden>
             <div class="panel-inner">
-              <TokenRush />
+              <AgenticWorkspace />
             </div>
           </div>
         </div>
@@ -355,7 +352,7 @@ const projects = [
     max-width: 1600px;
     margin: 2.5vh;
     border-radius: 1.5rem;
-    background: var(--ai-slate-base);
+    background: var(--ai-bg);
     border: 1px solid var(--ai-border);
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
     overflow: hidden;
@@ -371,10 +368,10 @@ const projects = [
     height: 48px;
     padding: 0 1.25rem;
     border-radius: 9999px;
-    background: rgba(0, 0, 0, 0.5);
+    background: color-mix(in srgb, var(--ai-surface) 86%, transparent);
     backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #F8FAFC;
+    border: 1px solid var(--ai-border);
+    color: var(--ai-fg);
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -385,7 +382,7 @@ const projects = [
   }
 
   .close-modal-btn:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: color-mix(in srgb, var(--ai-surface) 94%, var(--ai-fg));
     transform: scale(1.02);
   }
 
@@ -427,125 +424,15 @@ const projects = [
   }
 
   /* Hide inner redundant headers and backgrounds from modules to make them fit */
-  .panel-inner :global(section) {
+  .panel-inner > :global(section) {
     border: none !important;
     background: transparent !important;
-    padding: 2rem 1.5rem !important;
+    padding: 1.5rem !important;
     height: 100%;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-  }
-
-  /* ── Placeholder Concept Panels ── */
-
-  .placeholder-panel {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 4rem 2rem;
-    color: #F8FAFC;
-    position: relative;
-  }
-
-  .placeholder-inner {
-    text-align: center;
-    max-width: 32rem;
-    position: relative;
-    z-index: 2;
-  }
-
-  .placeholder-glow {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 120%;
-    height: 120%;
-    background: radial-gradient(circle, color-mix(in srgb, var(--brand-color) 15%, transparent) 0%, transparent 70%);
-    z-index: -1;
-    pointer-events: none;
-  }
-
-  .placeholder-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 80px;
-    height: 80px;
-    border-radius: 1.5rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: var(--brand-color);
-    margin-bottom: 2rem;
-  }
-
-  .placeholder-badge {
-    display: inline-block;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    color: var(--brand-color);
-    margin-bottom: 1rem;
-  }
-
-  .placeholder-title {
-    font-size: clamp(2rem, 4vw, 3rem);
-    font-weight: 800;
-    letter-spacing: -0.03em;
-    margin-bottom: 1rem;
-    color: #fff;
-  }
-
-  .placeholder-desc {
-    font-size: 1.125rem;
-    color: #94A3B8;
-    line-height: 1.6;
-    margin-bottom: 2.5rem;
-  }
-
-  .placeholder-details {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 1rem;
-    padding: 1.5rem;
-    margin-bottom: 2.5rem;
-    text-align: left;
-  }
-
-  .detail-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  }
-
-  .detail-row:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
-  }
-
-  .detail-label {
-    font-size: 0.875rem;
-    color: #64748B;
-    font-weight: 600;
-  }
-
-  .detail-value {
-    font-size: 0.875rem;
-    color: #E2E8F0;
-    font-weight: 500;
-  }
-
-  .placeholder-note {
-    font-size: 0.875rem;
-    color: #475569;
-    line-height: 1.6;
+    overflow: hidden;
   }
 
   @media (max-width: 768px) {
@@ -561,10 +448,8 @@ const projects = [
     .modal-content {
       min-height: 500px;
     }
-    .panel-inner :global(.drift-lab-section),
-    .panel-inner :global(.ps-section),
-    .panel-inner :global(.tr-section) {
-      padding: 2rem 0.5rem;
+    .panel-inner > :global(.drift-lab-section) {
+      padding: 1rem 0.5rem;
     }
     .modal-wrapper {
       margin: 1rem;
