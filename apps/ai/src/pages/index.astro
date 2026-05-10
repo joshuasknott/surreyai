@@ -8,7 +8,6 @@ import HomeHero from "../components/home/HomeHero.astro";
 import AreasWeExplore from "../components/home/AreasWeExplore.astro";
 import StudentProjects from "../components/home/StudentProjects.astro";
 import EventsPreview from "../components/home/EventsPreview.astro";
-import JoinCTA from "../components/home/JoinCTA.astro";
 
 const SOCIETY_ID = "ai";
 const client = createConvexClient();
@@ -26,5 +25,4 @@ const events: any[] = (
   <AreasWeExplore />
   <StudentProjects />
   <EventsPreview events={events} />
-  <JoinCTA />
 </Layout>

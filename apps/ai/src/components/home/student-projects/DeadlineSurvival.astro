@@ -1,0 +1,1189 @@
+---
+---
+
+<section class="ds-section" data-deadline-survival aria-label="Student Project: Deadline Survival">
+  <div class="ds-inner">
+    <div class="ds-header">
+      <span class="ds-badge">Student Project</span>
+      <h2 class="ds-title">Deadline Survival</h2>
+      <p class="ds-subtitle">
+        Survive the semester. Collect coffee, notes, and chargers. Dodge the deadlines. How long can you last?
+      </p>
+    </div>
+
+    <div id="ds-game" class="ds-game">
+      <canvas id="ds-canvas" width="900" height="560"></canvas>
+
+      <div id="ds-start" class="ds-overlay">
+        <div class="ds-overlay-inner">
+          <h3 class="ds-game-title">Deadline Survival</h3>
+          <p class="ds-game-subtitle">Collect supplies, dodge deadlines, survive the chaos.</p>
+          <button id="ds-play-btn" class="ds-play-btn" type="button" aria-label="Start playing Deadline Survival">
+            Press to Play
+          </button>
+          <div class="ds-controls-info">
+            <div class="ds-key-row"><kbd>W</kbd> / <kbd>&uarr;</kbd> Up&emsp;<kbd>S</kbd> / <kbd>&darr;</kbd> Down</div>
+            <div class="ds-key-row"><kbd>A</kbd> / <kbd>&larr;</kbd> Left&emsp;<kbd>D</kbd> / <kbd>&rarr;</kbd> Right</div>
+            <div class="ds-key-row"><kbd>R</kbd> Restart&emsp;<kbd>Space</kbd> Start</div>
+          </div>
+          <div class="ds-legend">
+            <div class="ds-legend-item">
+              <span class="ds-legend-dot ds-legend-coffee"></span> Coffee = Speed Boost
+            </div>
+            <div class="ds-legend-item">
+              <span class="ds-legend-dot ds-legend-notes"></span> Notes = Score
+            </div>
+            <div class="ds-legend-item">
+              <span class="ds-legend-dot ds-legend-charger"></span> Charger = Shield
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="ds-hud" class="ds-hud" hidden>
+        <div class="ds-hud-left">
+          <div class="ds-hud-time" id="ds-time">0:00</div>
+          <div class="ds-hud-score" id="ds-score">Score: 0</div>
+        </div>
+        <div class="ds-hud-right">
+          <div class="ds-hud-best" id="ds-best">Best: --</div>
+          <div class="ds-hud-powerup" id="ds-powerup" aria-live="polite"></div>
+        </div>
+        <div class="ds-hud-bottom">
+          <button id="ds-restart-btn" class="ds-hud-btn" type="button" aria-label="Restart game">&#x21BA; Restart</button>
+        </div>
+      </div>
+
+      <div id="ds-gameover" class="ds-overlay" hidden>
+        <div class="ds-overlay-inner">
+          <h3 class="ds-gameover-title">Semester Over!</h3>
+          <div class="ds-gameover-stat">
+            <span class="ds-stat-label">Time Survived</span>
+            <span class="ds-stat-value" id="ds-final-time">0:00</span>
+          </div>
+          <div class="ds-gameover-stat">
+            <span class="ds-stat-label">Score</span>
+            <span class="ds-stat-value" id="ds-final-score">0</span>
+          </div>
+          <div class="ds-gameover-best" id="ds-final-best"></div>
+          <button id="ds-again-btn" class="ds-play-btn" type="button" aria-label="Play again">
+            Try Again
+          </button>
+          <p class="ds-gameover-hint">Press Space or click to retry</p>
+        </div>
+      </div>
+
+      <div id="ds-mobile" class="ds-mobile" hidden>
+        <div class="ds-mobile-layout">
+          <div class="ds-mobile-dpad">
+            <button type="button" class="ds-mob-btn ds-mob-up" aria-label="Move up" data-ds-key="up">&#9650;</button>
+            <div class="ds-mob-mid">
+              <button type="button" class="ds-mob-btn" aria-label="Move left" data-ds-key="left">&#9664;</button>
+              <div class="ds-mob-spacer"></div>
+              <button type="button" class="ds-mob-btn" aria-label="Move right" data-ds-key="right">&#9654;</button>
+            </div>
+            <button type="button" class="ds-mob-btn ds-mob-down" aria-label="Move down" data-ds-key="down">&#9660;</button>
+          </div>
+        </div>
+      </div>
+
+      <noscript>
+        <div class="ds-nojs">
+          <p>JavaScript is required to play Deadline Survival.</p>
+        </div>
+      </noscript>
+    </div>
+
+    <p class="ds-note">
+      A lightweight browser game built for the Student Projects showcase. Built with HTML Canvas and vanilla JavaScript.
+    </p>
+  </div>
+</section>
+
+<style>
+  .ds-section {
+    border-top: 1px solid var(--ai-border);
+    border-bottom: 1px solid var(--ai-border);
+    background: var(--ai-slate-base);
+    color: #F8FAFC;
+    padding: 4.5rem 1.5rem;
+  }
+
+  .ds-inner {
+    max-width: 56rem;
+    margin: 0 auto;
+  }
+
+  .ds-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .ds-badge {
+    display: inline-block;
+    padding: 0.35rem 1rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    border-radius: 9999px;
+    background: rgba(255, 107, 107, 0.15);
+    color: #FF6B6B;
+    border: 1px solid rgba(255, 107, 107, 0.25);
+    margin-bottom: 1.25rem;
+  }
+
+  .ds-title {
+    font-size: clamp(2.2rem, 5vw, 3.2rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    margin-bottom: 0.75rem;
+    color: #F8FAFC;
+  }
+
+  .ds-subtitle {
+    font-size: 1.05rem;
+    color: #94A3B8;
+    max-width: 34rem;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  .ds-game {
+    position: relative;
+    width: 100%;
+    border-radius: 1rem;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    box-shadow:
+      0 0 60px rgba(255, 107, 107, 0.06),
+      0 0 120px rgba(79, 70, 229, 0.04),
+      0 2px 20px rgba(0, 0, 0, 0.3);
+    aspect-ratio: 900 / 560;
+    background: #060a12;
+  }
+
+  .ds-game canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .ds-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(6, 10, 18, 0.92);
+    backdrop-filter: blur(14px);
+    z-index: 10;
+  }
+
+  .ds-overlay[hidden] {
+    display: none;
+  }
+
+  .ds-overlay-inner {
+    text-align: center;
+    padding: 2rem;
+    max-height: 100%;
+    overflow-y: auto;
+  }
+
+  .ds-game-title {
+    font-size: clamp(1.6rem, 4vw, 2.6rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.4rem;
+    color: #F8FAFC;
+  }
+
+  .ds-game-subtitle {
+    color: #94A3B8;
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+  }
+
+  .ds-play-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.9rem 2.4rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #fff;
+    background: #FF6B6B;
+    border: none;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s;
+    box-shadow: 0 8px 28px rgba(255, 107, 107, 0.35);
+    font-family: inherit;
+  }
+
+  .ds-play-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 36px rgba(255, 107, 107, 0.45);
+  }
+
+  .ds-play-btn:focus-visible {
+    outline: 2px solid #FF6B6B;
+    outline-offset: 3px;
+  }
+
+  .ds-controls-info {
+    margin-top: 1.8rem;
+    color: #64748B;
+    font-size: 0.78rem;
+    line-height: 2.2;
+  }
+
+  .ds-key-row {
+    white-space: nowrap;
+  }
+
+  .ds-controls-info kbd {
+    display: inline-block;
+    padding: 0.1rem 0.45rem;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.75rem;
+    color: #CBD5E1;
+    margin: 0 0.1rem;
+  }
+
+  .ds-legend {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .ds-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.75rem;
+    color: #94A3B8;
+  }
+
+  .ds-legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+
+  .ds-legend-coffee {
+    background: #F59E0B;
+    box-shadow: 0 0 6px rgba(245, 158, 11, 0.5);
+  }
+
+  .ds-legend-notes {
+    background: #60A5FA;
+    box-shadow: 0 0 6px rgba(96, 165, 250, 0.5);
+  }
+
+  .ds-legend-charger {
+    background: #10B981;
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
+  }
+
+  .ds-hud {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 5;
+    padding: 0.75rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    font-family: 'Fira Code', ui-monospace, monospace;
+  }
+
+  .ds-hud[hidden] {
+    display: none;
+  }
+
+  .ds-hud-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .ds-hud-time {
+    font-size: clamp(0.95rem, 2.5vw, 1.4rem);
+    font-weight: 700;
+    color: #F8FAFC;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  }
+
+  .ds-hud-score {
+    font-size: 0.7rem;
+    color: #94A3B8;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .ds-hud-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.3rem;
+  }
+
+  .ds-hud-best {
+    font-size: 0.7rem;
+    color: #94A3B8;
+  }
+
+  .ds-hud-powerup {
+    font-size: 0.7rem;
+    font-weight: 700;
+    min-height: 1.2em;
+  }
+
+  .ds-hud-bottom {
+    position: absolute;
+    bottom: 0.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: auto;
+  }
+
+  .ds-hud-btn {
+    padding: 0.35rem 1rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #94A3B8;
+    background: rgba(11, 15, 25, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+    font-family: inherit;
+  }
+
+  .ds-hud-btn:hover {
+    color: #F8FAFC;
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+
+  .ds-hud-btn:focus-visible {
+    outline: 2px solid #FF6B6B;
+    outline-offset: 2px;
+  }
+
+  .ds-gameover-title {
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    color: #FF6B6B;
+  }
+
+  .ds-gameover-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    margin-bottom: 1rem;
+  }
+
+  .ds-stat-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #64748B;
+  }
+
+  .ds-stat-value {
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 800;
+    font-family: 'Fira Code', ui-monospace, monospace;
+    color: #F8FAFC;
+    letter-spacing: -0.02em;
+  }
+
+  .ds-gameover-best {
+    font-size: 0.9rem;
+    color: #10B981;
+    margin-bottom: 1.5rem;
+    min-height: 1.4em;
+  }
+
+  .ds-gameover-hint {
+    margin-top: 1rem;
+    font-size: 0.75rem;
+    color: #475569;
+  }
+
+  .ds-mobile {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    padding: 0.5rem;
+    z-index: 8;
+    pointer-events: none;
+  }
+
+  .ds-mobile[hidden] {
+    display: none;
+  }
+
+  .ds-mobile-layout {
+    pointer-events: auto;
+  }
+
+  .ds-mobile-dpad {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .ds-mob-mid {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .ds-mob-spacer {
+    width: 50px;
+    height: 50px;
+  }
+
+  .ds-mob-btn {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.6);
+    background: rgba(11, 15, 25, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    font-family: inherit;
+  }
+
+  .ds-mob-btn:active {
+    background: rgba(255, 107, 107, 0.25);
+    color: #fff;
+  }
+
+  .ds-nojs {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94A3B8;
+    font-size: 0.85rem;
+  }
+
+  .ds-note {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.8rem;
+    color: #475569;
+  }
+
+  @media (max-width: 640px) {
+    .ds-section {
+      padding: 2.5rem 0.75rem;
+    }
+
+    .ds-controls-info {
+      display: none;
+    }
+
+    .ds-legend {
+      display: none;
+    }
+
+    .ds-mob-btn {
+      width: 56px;
+      height: 56px;
+      font-size: 1.3rem;
+    }
+
+    .ds-mob-spacer {
+      width: 56px;
+      height: 56px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ds-play-btn {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  (function () {
+    var root = document.querySelector('[data-deadline-survival]');
+    if (!root) return;
+
+    var canvas = root.querySelector('#ds-canvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    var TW = 900, TH = 560;
+    var ST = { MENU: 0, PLAY: 1, OVER: 2 };
+
+    var startEl = root.querySelector('#ds-start');
+    var hudEl = root.querySelector('#ds-hud');
+    var overEl = root.querySelector('#ds-gameover');
+    var mobileEl = root.querySelector('#ds-mobile');
+    var gameEl = root.querySelector('#ds-game');
+    var timeEl = root.querySelector('#ds-time');
+    var scoreEl = root.querySelector('#ds-score');
+    var bestEl = root.querySelector('#ds-best');
+    var powerupEl = root.querySelector('#ds-powerup');
+    var finalTimeEl = root.querySelector('#ds-final-time');
+    var finalScoreEl = root.querySelector('#ds-final-score');
+    var finalBestEl = root.querySelector('#ds-final-best');
+    var playBtn = root.querySelector('#ds-play-btn');
+    var restartBtn = root.querySelector('#ds-restart-btn');
+    var againBtn = root.querySelector('#ds-again-btn');
+
+    var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    var bestScore = 0;
+    var bestTime = 0;
+    try {
+      var bs = localStorage.getItem('ds-best-score');
+      if (bs && !isNaN(parseInt(bs))) bestScore = parseInt(bs);
+    } catch (e) {}
+    try {
+      var bt = localStorage.getItem('ds-best-time');
+      if (bt && !isNaN(parseFloat(bt))) bestTime = parseFloat(bt);
+    } catch (e) {}
+
+    var state = ST.MENU;
+    var lastF = 0;
+    var visible = false;
+
+    var player = { x: TW / 2, y: TH / 2, r: 12, speed: 220 };
+    var score = 0;
+    var survivalTime = 0;
+    var powerup = null;
+    var powerupTimer = 0;
+
+    var collectibles = [];
+    var enemies = [];
+    var particles = [];
+    var spawnTimerColl = 0;
+    var spawnTimerEnemy = 0;
+    var difficultyTimer = 0;
+    var enemySpeed = 70;
+    var enemySpawnRate = 3.5;
+    var difficultyLevel = 0;
+
+    var keys = { up: false, down: false, left: false, right: false };
+    var kmap = {
+      ArrowUp: 'up', KeyW: 'up',
+      ArrowDown: 'down', KeyS: 'down',
+      ArrowLeft: 'left', KeyA: 'left',
+      ArrowRight: 'right', KeyD: 'right'
+    };
+    var gk = new Set(Object.keys(kmap));
+
+    function fmtTime(s) {
+      if (!isFinite(s) || s <= 0) return '0:00';
+      var m = Math.floor(s / 60);
+      var sc = Math.floor(s % 60);
+      return m + ':' + (sc < 10 ? '0' : '') + sc;
+    }
+
+    function dist(ax, ay, bx, by) {
+      var dx = ax - bx, dy = ay - by;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    function rand(min, max) {
+      return min + Math.random() * (max - min);
+    }
+
+    function spawnCollectible() {
+      var types = ['coffee', 'notes', 'charger'];
+      var type = types[Math.floor(Math.random() * types.length)];
+      var margin = 30;
+      var x = rand(margin, TW - margin);
+      var y = rand(margin, TH - margin);
+      while (dist(x, y, player.x, player.y) < 80) {
+        x = rand(margin, TW - margin);
+        y = rand(margin, TH - margin);
+      }
+      collectibles.push({ x: x, y: y, r: 10, type: type, age: 0 });
+    }
+
+    function spawnEnemy() {
+      var edge = Math.floor(Math.random() * 4);
+      var x, y;
+      if (edge === 0) { x = -15; y = rand(0, TH); }
+      else if (edge === 1) { x = TW + 15; y = rand(0, TH); }
+      else if (edge === 2) { x = rand(0, TW); y = -15; }
+      else { x = rand(0, TW); y = TH + 15; }
+      var sz = rand(11, 16);
+      enemies.push({ x: x, y: y, r: sz, speed: enemySpeed + rand(-15, 15), phase: rand(0, Math.PI * 2) });
+    }
+
+    function spawnParticles(x, y, color, count) {
+      if (reducedMotion) return;
+      for (var i = 0; i < count; i++) {
+        var angle = rand(0, Math.PI * 2);
+        var spd = rand(40, 140);
+        particles.push({
+          x: x, y: y,
+          vx: Math.cos(angle) * spd,
+          vy: Math.sin(angle) * spd,
+          life: rand(0.3, 0.7),
+          maxLife: rand(0.3, 0.7),
+          sz: rand(2, 4.5),
+          color: color
+        });
+      }
+    }
+
+    function resetGame() {
+      player.x = TW / 2;
+      player.y = TH / 2;
+      player.speed = 220;
+      score = 0;
+      survivalTime = 0;
+      powerup = null;
+      powerupTimer = 0;
+      collectibles = [];
+      enemies = [];
+      particles = [];
+      spawnTimerColl = 0;
+      spawnTimerEnemy = 0;
+      difficultyTimer = 0;
+      enemySpeed = 70;
+      enemySpawnRate = 3.5;
+      difficultyLevel = 0;
+      for (var i = 0; i < 5; i++) spawnCollectible();
+    }
+
+    function startGame() {
+      resetGame();
+      state = ST.PLAY;
+      startEl.setAttribute('hidden', '');
+      overEl.setAttribute('hidden', '');
+      hudEl.removeAttribute('hidden');
+      lastF = 0;
+    }
+
+    function gameOver() {
+      state = ST.OVER;
+      keys.up = keys.down = keys.left = keys.right = false;
+
+      var newBestScore = score > bestScore;
+      var newBestTime = survivalTime > bestTime;
+      if (newBestScore) {
+        bestScore = score;
+        try { localStorage.setItem('ds-best-score', bestScore.toString()); } catch (e) {}
+      }
+      if (newBestTime) {
+        bestTime = survivalTime;
+        try { localStorage.setItem('ds-best-time', bestTime.toString()); } catch (e) {}
+      }
+
+      finalTimeEl.textContent = fmtTime(survivalTime);
+      finalScoreEl.textContent = score.toString();
+
+      var msgs = [];
+      if (newBestScore) msgs.push('New best score!');
+      if (newBestTime) msgs.push('New best time!');
+      if (!newBestScore && bestScore > 0) msgs.push('Best score: ' + bestScore);
+      if (!newBestTime && bestTime > 0) msgs.push('Best time: ' + fmtTime(bestTime));
+      finalBestEl.textContent = msgs.join(' ');
+      finalBestEl.style.color = (newBestScore || newBestTime) ? '#10B981' : '#94A3B8';
+
+      hudEl.setAttribute('hidden', '');
+      overEl.removeAttribute('hidden');
+    }
+
+    function updateHUD() {
+      timeEl.textContent = fmtTime(survivalTime);
+      scoreEl.textContent = 'Score: ' + score;
+      bestEl.textContent = 'Best: ' + (bestScore > 0 ? bestScore : '--');
+
+      if (powerup === 'speed') {
+        powerupEl.textContent = '\u2615 SPEED BOOST';
+        powerupEl.style.color = '#F59E0B';
+      } else if (powerup === 'shield') {
+        powerupEl.textContent = '\u26A1 SHIELDED';
+        powerupEl.style.color = '#10B981';
+      } else {
+        powerupEl.textContent = '';
+      }
+    }
+
+    document.addEventListener('keydown', function (e) {
+      if (state === ST.PLAY && gk.has(e.code)) e.preventDefault();
+      if (kmap[e.code]) keys[kmap[e.code]] = true;
+      if (e.code === 'Space') {
+        e.preventDefault();
+        if (state === ST.MENU || state === ST.OVER) startGame();
+      }
+      if (e.code === 'KeyR' && state === ST.PLAY) startGame();
+    });
+    document.addEventListener('keyup', function (e) {
+      if (kmap[e.code]) keys[kmap[e.code]] = false;
+    });
+
+    var isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    if (isTouch) {
+      mobileEl.removeAttribute('hidden');
+      mobileEl.querySelectorAll('[data-ds-key]').forEach(function (btn) {
+        var k = btn.getAttribute('data-ds-key');
+        var on = function () { keys[k] = true; };
+        var off = function () { keys[k] = false; };
+        btn.addEventListener('touchstart', function (e) { e.preventDefault(); on(); });
+        btn.addEventListener('touchend', function (e) { e.preventDefault(); off(); });
+        btn.addEventListener('touchcancel', off);
+      });
+    }
+
+    playBtn.addEventListener('click', startGame);
+    restartBtn.addEventListener('click', function () { startGame(); });
+    againBtn.addEventListener('click', startGame);
+
+    var obs = new IntersectionObserver(function (entries) {
+      visible = entries[0].isIntersecting;
+    }, { threshold: 0 });
+    obs.observe(gameEl);
+
+    function update(dt) {
+      if (state !== ST.PLAY) return;
+
+      survivalTime += dt;
+      difficultyTimer += dt;
+
+      if (difficultyTimer > 8) {
+        difficultyTimer = 0;
+        difficultyLevel++;
+        enemySpeed = Math.min(180, enemySpeed + 6);
+        enemySpawnRate = Math.max(0.8, enemySpawnRate - 0.25);
+      }
+
+      var currentSpeed = player.speed;
+      if (powerup === 'speed') {
+        currentSpeed = player.speed * 1.55;
+        powerupTimer -= dt;
+        if (powerupTimer <= 0) { powerup = null; }
+      }
+
+      var dx = 0, dy = 0;
+      if (keys.up) dy -= 1;
+      if (keys.down) dy += 1;
+      if (keys.left) dx -= 1;
+      if (keys.right) dx += 1;
+      if (dx !== 0 || dy !== 0) {
+        var len = Math.sqrt(dx * dx + dy * dy);
+        dx /= len;
+        dy /= len;
+      }
+      player.x += dx * currentSpeed * dt;
+      player.y += dy * currentSpeed * dt;
+      player.x = Math.max(player.r, Math.min(TW - player.r, player.x));
+      player.y = Math.max(player.r, Math.min(TH - player.r, player.y));
+
+      if (powerup === 'shield') {
+        powerupTimer -= dt;
+        if (powerupTimer <= 0) { powerup = null; }
+      }
+
+      spawnTimerColl += dt;
+      if (spawnTimerColl > 2.2 && collectibles.length < 10) {
+        spawnTimerColl = 0;
+        spawnCollectible();
+      }
+
+      spawnTimerEnemy += dt;
+      if (spawnTimerEnemy > enemySpawnRate) {
+        spawnTimerEnemy = 0;
+        spawnEnemy();
+        if (difficultyLevel > 3) spawnEnemy();
+        if (difficultyLevel > 7) spawnEnemy();
+      }
+
+      for (var i = collectibles.length - 1; i >= 0; i--) {
+        collectibles[i].age += dt;
+        if (dist(player.x, player.y, collectibles[i].x, collectibles[i].y) < player.r + collectibles[i].r) {
+          var c = collectibles[i];
+          if (c.type === 'coffee') {
+            powerup = 'speed';
+            powerupTimer = 3.5;
+            spawnParticles(c.x, c.y, '#F59E0B', 10);
+          } else if (c.type === 'notes') {
+            score += 100;
+            spawnParticles(c.x, c.y, '#60A5FA', 10);
+          } else if (c.type === 'charger') {
+            powerup = 'shield';
+            powerupTimer = 4;
+            spawnParticles(c.x, c.y, '#10B981', 10);
+          }
+          collectibles.splice(i, 1);
+        }
+      }
+
+      for (var e = enemies.length - 1; e >= 0; e--) {
+        var en = enemies[e];
+        var edx = player.x - en.x;
+        var edy = player.y - en.y;
+        var elen = Math.sqrt(edx * edx + edy * edy);
+        if (elen > 0.1) {
+          edx /= elen;
+          edy /= elen;
+        }
+        en.x += edx * en.speed * dt;
+        en.y += edy * en.speed * dt;
+        en.phase += dt * 4;
+
+        if (dist(player.x, player.y, en.x, en.y) < player.r + en.r) {
+          if (powerup === 'shield') {
+            spawnParticles(en.x, en.y, '#10B981', 12);
+            score += 50;
+            enemies.splice(e, 1);
+          } else {
+            gameOver();
+            return;
+          }
+        }
+      }
+
+      score += Math.round(dt * 5);
+
+      for (var p = particles.length - 1; p >= 0; p--) {
+        var pt = particles[p];
+        pt.x += pt.vx * dt;
+        pt.y += pt.vy * dt;
+        pt.life -= dt;
+        if (pt.life <= 0) particles.splice(p, 1);
+      }
+
+      updateHUD();
+    }
+
+    function drawBackground() {
+      ctx.fillStyle = '#0a0e18';
+      ctx.fillRect(0, 0, TW, TH);
+
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.018)';
+      ctx.lineWidth = 1;
+      for (var x = 0; x < TW; x += 40) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, TH);
+        ctx.stroke();
+      }
+      for (var y = 0; y < TH; y += 40) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(TW, y);
+        ctx.stroke();
+      }
+
+      if (!reducedMotion) {
+        var now = Date.now() / 1000;
+        for (var i = 0; i < 6; i++) {
+          var gx = ((i * 173.7 + now * 8) % TW);
+          var gy = ((i * 131.3 + now * 5) % TH);
+          var grad = ctx.createRadialGradient(gx, gy, 0, gx, gy, 60);
+          grad.addColorStop(0, 'rgba(79, 70, 229, 0.02)');
+          grad.addColorStop(1, 'rgba(79, 70, 229, 0)');
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(gx, gy, 60, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    }
+
+    function drawPlayer() {
+      var px = player.x, py = player.y, pr = player.r;
+
+      if (!reducedMotion) {
+        ctx.save();
+        ctx.globalAlpha = 0.15;
+        var pg = ctx.createRadialGradient(px, py, 0, px, py, pr * 3);
+        pg.addColorStop(0, powerup === 'shield' ? 'rgba(16, 185, 129, 0.5)' : powerup === 'speed' ? 'rgba(245, 158, 11, 0.5)' : 'rgba(79, 70, 229, 0.3)');
+        pg.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = pg;
+        ctx.beginPath();
+        ctx.arc(px, py, pr * 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      if (powerup === 'shield') {
+        ctx.save();
+        ctx.strokeStyle = 'rgba(16, 185, 129, 0.6)';
+        ctx.lineWidth = 2.5;
+        ctx.setLineDash([4, 3]);
+        var shieldPulse = reducedMotion ? 1 : 1 + Math.sin(Date.now() / 150) * 0.08;
+        ctx.beginPath();
+        ctx.arc(px, py, pr * 1.8 * shieldPulse, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.restore();
+      }
+
+      ctx.save();
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+      ctx.beginPath();
+      ctx.arc(px + 1.5, py + 2, pr, 0, Math.PI * 2);
+      ctx.fill();
+
+      var bodyColor = powerup === 'speed' ? '#F59E0B' : '#818CF8';
+      ctx.fillStyle = bodyColor;
+      ctx.beginPath();
+      ctx.arc(px, py, pr, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+      ctx.beginPath();
+      ctx.arc(px - pr * 0.2, py - pr * 0.25, pr * 0.55, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.arc(px - 3.5, py - 2, 2.5, 0, Math.PI * 2);
+      ctx.arc(px + 3.5, py - 2, 2.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#1a1a2e';
+      ctx.beginPath();
+      ctx.arc(px - 3, py - 2, 1.2, 0, Math.PI * 2);
+      ctx.arc(px + 4, py - 2, 1.2, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = '#1a1a2e';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.arc(px, py + 3, 4, 0.1 * Math.PI, 0.9 * Math.PI);
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    function drawCollectible(c) {
+      var x = c.x, y = c.y, r = c.r;
+      var pulse = reducedMotion ? 1 : 1 + Math.sin(c.age * 3) * 0.12;
+      var drawR = r * pulse;
+
+      if (!reducedMotion) {
+        ctx.save();
+        ctx.globalAlpha = 0.25;
+        var glow;
+        if (c.type === 'coffee') glow = ctx.createRadialGradient(x, y, 0, x, y, drawR * 2.8);
+        else if (c.type === 'notes') glow = ctx.createRadialGradient(x, y, 0, x, y, drawR * 2.8);
+        else glow = ctx.createRadialGradient(x, y, 0, x, y, drawR * 2.8);
+
+        if (c.type === 'coffee') {
+          glow.addColorStop(0, 'rgba(245, 158, 11, 0.6)');
+          glow.addColorStop(1, 'rgba(245, 158, 11, 0)');
+        } else if (c.type === 'notes') {
+          glow.addColorStop(0, 'rgba(96, 165, 250, 0.6)');
+          glow.addColorStop(1, 'rgba(96, 165, 250, 0)');
+        } else {
+          glow.addColorStop(0, 'rgba(16, 185, 129, 0.6)');
+          glow.addColorStop(1, 'rgba(16, 185, 129, 0)');
+        }
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(x, y, drawR * 2.8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      ctx.save();
+      if (c.type === 'coffee') {
+        ctx.fillStyle = '#F59E0B';
+        ctx.beginPath();
+        ctx.arc(x, y, drawR, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#92400E';
+        ctx.fillRect(x - 3, y - 5, 6, 6);
+        ctx.strokeStyle = '#92400E';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(x + 3, y - 3);
+        ctx.quadraticCurveTo(x + 7, y - 5, x + 5, y - 1);
+        ctx.stroke();
+      } else if (c.type === 'notes') {
+        ctx.fillStyle = '#60A5FA';
+        ctx.beginPath();
+        ctx.arc(x, y, drawR, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#1E3A5F';
+        ctx.fillRect(x - 3.5, y - 5, 7, 9);
+        ctx.strokeStyle = '#1E3A5F';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(x - 3.5, y - 5);
+        ctx.lineTo(x + 3.5, y - 5);
+        ctx.moveTo(x - 3.5, y - 2);
+        ctx.lineTo(x + 3.5, y - 2);
+        ctx.stroke();
+      } else {
+        ctx.fillStyle = '#10B981';
+        ctx.beginPath();
+        ctx.arc(x, y, drawR, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#064E3B';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(x, y - 5);
+        ctx.lineTo(x, y + 4);
+        ctx.moveTo(x - 3, y - 2);
+        ctx.lineTo(x + 3, y - 2);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawEnemy(en) {
+      var x = en.x, y = en.y, r = en.r;
+      var wobble = reducedMotion ? 0 : Math.sin(en.phase) * 2;
+
+      if (!reducedMotion) {
+        ctx.save();
+        ctx.globalAlpha = 0.2 + Math.sin(en.phase * 0.5) * 0.1;
+        var warningGlow = ctx.createRadialGradient(x, y, 0, x, y, r * 3);
+        warningGlow.addColorStop(0, 'rgba(239, 68, 68, 0.4)');
+        warningGlow.addColorStop(1, 'rgba(239, 68, 68, 0)');
+        ctx.fillStyle = warningGlow;
+        ctx.beginPath();
+        ctx.arc(x, y, r * 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      ctx.save();
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+      ctx.beginPath();
+      ctx.arc(x + 1.5, y + 2, r + wobble, 0, Math.PI * 2);
+      ctx.fill();
+
+      var spikes = 7;
+      ctx.fillStyle = '#DC2626';
+      ctx.beginPath();
+      for (var i = 0; i <= spikes * 2; i++) {
+        var angle = (i / (spikes * 2)) * Math.PI * 2;
+        var spikeR = i % 2 === 0 ? r + 4 + wobble : r - 2;
+        var sx = x + Math.cos(angle) * spikeR;
+        var sy = y + Math.sin(angle) * spikeR;
+        if (i === 0) ctx.moveTo(sx, sy);
+        else ctx.lineTo(sx, sy);
+      }
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = '#7F1D1D';
+      ctx.beginPath();
+      ctx.arc(x - 3, y - 1.5, 2, 0, Math.PI * 2);
+      ctx.arc(x + 3, y - 1.5, 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = '#7F1D1D';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(x - 4, y + 4);
+      ctx.lineTo(x + 4, y + 4);
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    function drawParticles() {
+      for (var i = 0; i < particles.length; i++) {
+        var p = particles[i];
+        var alpha = (p.life / p.maxLife) * 0.7;
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = alpha;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.sz * (p.life / p.maxLife), 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    function drawVignette() {
+      var vg = ctx.createRadialGradient(TW / 2, TH / 2, TW * 0.3, TW / 2, TH / 2, TW * 0.6);
+      vg.addColorStop(0, 'rgba(0, 0, 0, 0)');
+      vg.addColorStop(1, 'rgba(0, 0, 0, 0.35)');
+      ctx.fillStyle = vg;
+      ctx.fillRect(0, 0, TW, TH);
+    }
+
+    function drawDifficultyBar() {
+      if (state !== ST.PLAY) return;
+      var barW = 70, barH = 4;
+      var bx = TW - barW - 12, by = TH - 16;
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+      ctx.fillRect(bx, by, barW, barH);
+      var pct = Math.min(1, difficultyLevel / 12);
+      var grad = ctx.createLinearGradient(bx, 0, bx + barW, 0);
+      grad.addColorStop(0, 'rgba(79, 70, 229, 0.7)');
+      grad.addColorStop(0.5, 'rgba(255, 107, 107, 0.7)');
+      grad.addColorStop(1, 'rgba(239, 68, 68, 0.9)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(bx, by, barW * pct, barH);
+
+      ctx.fillStyle = '#64748B';
+      ctx.font = '9px "Fira Code", monospace';
+      ctx.textAlign = 'right';
+      ctx.fillText('Chaos', bx + barW, by - 4);
+      ctx.textAlign = 'left';
+    }
+
+    function render() {
+      drawBackground();
+
+      for (var i = 0; i < collectibles.length; i++) {
+        drawCollectible(collectibles[i]);
+      }
+
+      for (var e = 0; e < enemies.length; e++) {
+        drawEnemy(enemies[e]);
+      }
+
+      drawPlayer();
+      drawParticles();
+      drawDifficultyBar();
+      drawVignette();
+    }
+
+    function loop(ts) {
+      requestAnimationFrame(loop);
+      if (!visible) { lastF = 0; return; }
+      if (lastF === 0) { lastF = ts; }
+      var dt = Math.min((ts - lastF) / 1000, 0.1);
+      lastF = ts;
+
+      if (state === ST.PLAY) {
+        update(dt);
+      }
+
+      render();
+    }
+
+    updateHUD();
+    requestAnimationFrame(loop);
+  })();
+</script>

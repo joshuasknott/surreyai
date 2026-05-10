@@ -1,0 +1,1018 @@
+---
+---
+<section data-poster-studio class="ps-root" aria-label="Student Project: Poster Studio">
+  <div class="ps-inner">
+    <div class="ps-header">
+      <span class="ps-badge">Student Project</span>
+      <h2 class="ps-title">Poster Studio</h2>
+      <p class="ps-subtitle">
+        Instant event poster concepts for societies, workshops, socials, and hackathons. A deterministic frontend prototype.
+      </p>
+    </div>
+
+    <div class="ps-layout">
+      <div class="ps-controls" role="form" aria-label="Poster configuration">
+        <div class="ps-field">
+          <label for="ps-event-name" class="ps-label">Event name</label>
+          <input id="ps-event-name" type="text" class="ps-input" value="Build Night: Ship Your First AI App" maxlength="80" autocomplete="off" />
+        </div>
+
+        <div class="ps-field">
+          <label for="ps-host" class="ps-label">Host / society</label>
+          <input id="ps-host" type="text" class="ps-input" value="Surrey AI Society" maxlength="60" autocomplete="off" />
+        </div>
+
+        <div class="ps-row">
+          <div class="ps-field ps-field--half">
+            <label for="ps-datetime" class="ps-label">Date &amp; time</label>
+            <input id="ps-datetime" type="text" class="ps-input" value="Thursday, 6:30 PM" maxlength="40" autocomplete="off" />
+          </div>
+          <div class="ps-field ps-field--half">
+            <label for="ps-location" class="ps-label">Location</label>
+            <input id="ps-location" type="text" class="ps-input" value="University of Surrey" maxlength="50" autocomplete="off" />
+          </div>
+        </div>
+
+        <div class="ps-field">
+          <label for="ps-description" class="ps-label">Short description</label>
+          <textarea id="ps-description" class="ps-textarea" rows="2" maxlength="140">Bring an idea, form a small team, and leave with a working prototype.</textarea>
+        </div>
+
+        <div class="ps-field">
+          <label for="ps-cta" class="ps-label">Call-to-action text</label>
+          <input id="ps-cta" type="text" class="ps-input" value="Sign up now" maxlength="30" autocomplete="off" />
+        </div>
+
+        <div class="ps-field">
+          <span class="ps-label" id="ps-type-label">Event type</span>
+          <div class="ps-chips" role="radiogroup" aria-labelledby="ps-type-label" data-ps-group="type">
+            <button type="button" class="ps-chip" role="radio" aria-checked="false" data-value="workshop">Workshop</button>
+            <button type="button" class="ps-chip" role="radio" aria-checked="false" data-value="hackathon">Hackathon</button>
+            <button type="button" class="ps-chip" role="radio" aria-checked="true" data-value="speaker">Speaker night</button>
+            <button type="button" class="ps-chip" role="radio" aria-checked="false" data-value="social">Social</button>
+            <button type="button" class="ps-chip" role="radio" aria-checked="false" data-value="careers">Careers event</button>
+            <button type="button" class="ps-chip" role="radio" aria-checked="false" data-value="launch">Launch event</button>
+          </div>
+        </div>
+
+        <div class="ps-field">
+          <span class="ps-label" id="ps-vibe-label">Visual vibe</span>
+          <div class="ps-chips" role="radiogroup" aria-labelledby="ps-vibe-label" data-ps-group="vibe">
+            <button type="button" class="ps-chip ps-chip--active" role="radio" aria-checked="true" data-value="neon-tech">Neon tech</button>
+            <button type="button" class="ps-chip" role="radio" aria-checked="false" data-value="clean-academic">Clean academic</button>
+            <button type="button" class="ps-chip" role="radio" aria-checked="false" data-value="premium-dark">Premium dark</button>
+            <button type="button" class="ps-chip" role="radio" aria-checked="false" data-value="playful">Playful student</button>
+            <button type="button" class="ps-chip" role="radio" aria-checked="false" data-value="minimal">Minimal poster</button>
+            <button type="button" class="ps-chip" role="radio" aria-checked="false" data-value="cyber-arcade">Cyber arcade</button>
+          </div>
+        </div>
+
+        <div class="ps-actions">
+          <button type="button" class="ps-btn ps-btn--primary" id="ps-generate" aria-label="Generate poster concept">Generate</button>
+          <button type="button" class="ps-btn ps-btn--ghost" id="ps-randomise" aria-label="Randomise poster concept">Randomise</button>
+          <button type="button" class="ps-btn ps-btn--ghost" id="ps-reset" aria-label="Reset to defaults">Reset</button>
+          <button type="button" class="ps-btn ps-btn--ghost" id="ps-copy" aria-label="Copy poster text">Copy text</button>
+        </div>
+      </div>
+
+      <div class="ps-preview-col">
+        <div class="ps-poster" id="ps-poster" data-vibe="neon-tech" data-type="speaker" aria-label="Generated poster preview">
+          <div class="ps-poster__bg"></div>
+          <div class="ps-poster__deco ps-poster__deco--grid"></div>
+          <div class="ps-poster__deco ps-poster__deco--blob"></div>
+          <div class="ps-poster__deco ps-poster__deco--ring"></div>
+          <div class="ps-poster__deco ps-poster__deco--beam"></div>
+          <div class="ps-poster__content">
+            <span class="ps-poster__sticker" id="ps-poster-sticker"></span>
+            <span class="ps-poster__type-label" id="ps-poster-type-label"></span>
+            <h3 class="ps-poster__headline" id="ps-poster-headline"></h3>
+            <p class="ps-poster__subtitle" id="ps-poster-subtitle"></p>
+            <div class="ps-poster__divider"></div>
+            <p class="ps-poster__desc" id="ps-poster-desc"></p>
+            <div class="ps-poster__meta">
+              <span class="ps-poster__meta-item" id="ps-poster-host"></span>
+              <span class="ps-poster__meta-sep">&middot;</span>
+              <span class="ps-poster__meta-item" id="ps-poster-datetime"></span>
+              <span class="ps-poster__meta-sep">&middot;</span>
+              <span class="ps-poster__meta-item" id="ps-poster-location"></span>
+            </div>
+            <span class="ps-poster__cta" id="ps-poster-cta"></span>
+          </div>
+        </div>
+
+        <div class="ps-notes" id="ps-notes" aria-label="Poster design notes">
+          <span class="ps-notes__title">Design direction</span>
+          <p class="ps-notes__text" id="ps-notes-text"></p>
+        </div>
+
+        <div class="ps-sr-only" id="ps-sr-text" aria-live="polite" role="status"></div>
+      </div>
+    </div>
+
+    <noscript>
+      <div class="ps-nojs">
+        <p>JavaScript is required to use Poster Studio.</p>
+      </div>
+    </noscript>
+
+    <p class="ps-footnote">
+      A deterministic frontend prototype built for the Student Projects showcase. No AI generation, no API calls, no data stored.
+    </p>
+  </div>
+</section>
+
+<style>
+  .ps-root {
+    border-top: 1px solid var(--ai-border);
+    border-bottom: 1px solid var(--ai-border);
+    background: var(--ai-slate-base);
+    color: #F8FAFC;
+    padding: 4.5rem 1.5rem;
+  }
+
+  .ps-inner {
+    max-width: 72rem;
+    margin: 0 auto;
+  }
+
+  .ps-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .ps-badge {
+    display: inline-block;
+    padding: 0.35rem 1rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    border-radius: 9999px;
+    background: rgba(255, 107, 107, 0.15);
+    color: #FF6B6B;
+    border: 1px solid rgba(255, 107, 107, 0.25);
+    margin-bottom: 1.25rem;
+  }
+
+  .ps-title {
+    font-size: clamp(2.2rem, 5vw, 3.2rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    margin-bottom: 0.75rem;
+    color: #F8FAFC;
+  }
+
+  .ps-subtitle {
+    font-size: 1.05rem;
+    color: #94A3B8;
+    max-width: 38rem;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* ── Split layout ── */
+
+  .ps-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
+    align-items: start;
+  }
+
+  /* ── Controls ── */
+
+  .ps-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .ps-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .ps-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .ps-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #94A3B8;
+  }
+
+  .ps-input,
+  .ps-textarea {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.625rem;
+    padding: 0.65rem 0.85rem;
+    font-size: 0.9rem;
+    color: #F8FAFC;
+    font-family: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+  }
+
+  .ps-input:focus,
+  .ps-textarea:focus {
+    outline: none;
+    border-color: rgba(79, 70, 229, 0.5);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+  }
+
+  .ps-textarea {
+    resize: vertical;
+    min-height: 2.6rem;
+    line-height: 1.5;
+  }
+
+  /* ── Chip selectors ── */
+
+  .ps-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .ps-chip {
+    padding: 0.4rem 0.85rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #94A3B8;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+
+  .ps-chip:hover {
+    color: #F8FAFC;
+    border-color: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .ps-chip:focus-visible {
+    outline: 2px solid #818CF8;
+    outline-offset: 2px;
+  }
+
+  .ps-chip[aria-checked="true"] {
+    color: #fff;
+    background: rgba(79, 70, 229, 0.35);
+    border-color: rgba(79, 70, 229, 0.6);
+    box-shadow: 0 0 12px rgba(79, 70, 229, 0.2);
+  }
+
+  /* ── Buttons ── */
+
+  .ps-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 0.5rem;
+  }
+
+  .ps-btn {
+    padding: 0.6rem 1.3rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s, background-color 0.2s;
+    font-family: inherit;
+    border: none;
+  }
+
+  .ps-btn:focus-visible {
+    outline: 2px solid #818CF8;
+    outline-offset: 3px;
+  }
+
+  .ps-btn--primary {
+    background: #4F46E5;
+    color: #fff;
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.35);
+  }
+
+  .ps-btn--primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(79, 70, 229, 0.45);
+  }
+
+  .ps-btn--ghost {
+    background: rgba(255, 255, 255, 0.06);
+    color: #94A3B8;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .ps-btn--ghost:hover {
+    color: #F8FAFC;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  /* ── Preview column ── */
+
+  .ps-preview-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    position: sticky;
+    top: 1.5rem;
+  }
+
+  /* ── Poster card ── */
+
+  .ps-poster {
+    position: relative;
+    border-radius: 1rem;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    aspect-ratio: 3 / 4;
+    max-height: 560px;
+    box-shadow:
+      0 0 60px rgba(79, 70, 229, 0.08),
+      0 0 120px rgba(255, 107, 107, 0.04),
+      0 2px 24px rgba(0, 0, 0, 0.4);
+    transition: box-shadow 0.4s;
+  }
+
+  .ps-poster__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    transition: background 0.5s;
+  }
+
+  .ps-poster__deco {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    transition: opacity 0.5s;
+  }
+
+  .ps-poster__deco--grid {
+    opacity: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  .ps-poster__deco--blob {
+    opacity: 0;
+  }
+
+  .ps-poster__deco--blob::before,
+  .ps-poster__deco--blob::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(40px);
+    transition: background 0.5s, opacity 0.5s;
+  }
+
+  .ps-poster__deco--blob::before {
+    width: 55%;
+    height: 40%;
+    top: -10%;
+    right: -15%;
+  }
+
+  .ps-poster__deco--blob::after {
+    width: 50%;
+    height: 35%;
+    bottom: -8%;
+    left: -12%;
+  }
+
+  .ps-poster__deco--ring {
+    opacity: 0;
+  }
+
+  .ps-poster__deco--ring::before {
+    content: "";
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    top: 15%;
+    right: -30px;
+    border-radius: 50%;
+    border: 2px solid;
+    opacity: 0.12;
+    transition: border-color 0.5s;
+  }
+
+  .ps-poster__deco--beam {
+    opacity: 0;
+  }
+
+  .ps-poster__deco--beam::before {
+    content: "";
+    position: absolute;
+    width: 200%;
+    height: 60px;
+    top: 35%;
+    left: -50%;
+    transform: rotate(-18deg);
+    transition: background 0.5s;
+  }
+
+  .ps-poster__content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 100%;
+    padding: 2rem 1.75rem;
+    gap: 0.35rem;
+  }
+
+  .ps-poster__sticker {
+    position: absolute;
+    top: 1.25rem;
+    left: 1.5rem;
+    padding: 0.3rem 0.8rem;
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-radius: 0.3rem;
+    transform: rotate(-2deg);
+    transition: background 0.4s, color 0.4s;
+  }
+
+  .ps-poster__type-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    opacity: 0.6;
+    margin-bottom: 0.2rem;
+  }
+
+  .ps-poster__headline {
+    font-size: clamp(1.4rem, 3.5vw, 2rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    margin: 0 0 0.15rem;
+    transition: color 0.4s;
+  }
+
+  .ps-poster__subtitle {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    opacity: 0.7;
+    margin: 0 0 0.4rem;
+  }
+
+  .ps-poster__divider {
+    width: 40px;
+    height: 3px;
+    border-radius: 2px;
+    margin: 0.3rem 0;
+    transition: background 0.4s;
+  }
+
+  .ps-poster__desc {
+    font-size: 0.8rem;
+    line-height: 1.55;
+    opacity: 0.65;
+    margin: 0 0 0.5rem;
+  }
+
+  .ps-poster__meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    font-size: 0.72rem;
+    opacity: 0.55;
+    margin-bottom: 0.6rem;
+  }
+
+  .ps-poster__meta-sep {
+    opacity: 0.4;
+  }
+
+  .ps-poster__cta {
+    display: inline-block;
+    align-self: flex-start;
+    padding: 0.5rem 1.4rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    border-radius: 9999px;
+    transition: background 0.4s, color 0.4s, box-shadow 0.4s;
+  }
+
+  /* ── Vibe: Neon tech ── */
+  .ps-poster[data-vibe="neon-tech"] .ps-poster__bg {
+    background: linear-gradient(145deg, #0a0a1a 0%, #0d1117 40%, #111827 100%);
+  }
+  .ps-poster[data-vibe="neon-tech"] .ps-poster__deco--grid { opacity: 1; }
+  .ps-poster[data-vibe="neon-tech"] .ps-poster__deco--blob { opacity: 1; }
+  .ps-poster[data-vibe="neon-tech"] .ps-poster__deco--blob::before { background: rgba(79, 70, 229, 0.25); }
+  .ps-poster[data-vibe="neon-tech"] .ps-poster__deco--blob::after { background: rgba(139, 92, 246, 0.2); }
+  .ps-poster[data-vibe="neon-tech"] .ps-poster__deco--ring { opacity: 1; }
+  .ps-poster[data-vibe="neon-tech"] .ps-poster__deco--ring::before { border-color: #818CF8; }
+  .ps-poster[data-vibe="neon-tech"] .ps-poster__deco--beam { opacity: 0.5; }
+  .ps-poster[data-vibe="neon-tech"] .ps-poster__deco--beam::before { background: linear-gradient(90deg, transparent, rgba(129, 140, 248, 0.08), transparent); }
+  .ps-poster[data-vibe="neon-tech"] .ps-poster__headline { color: #E0E7FF; }
+  .ps-poster[data-vibe="neon-tech"] .ps-poster__sticker { background: rgba(79, 70, 229, 0.8); color: #fff; }
+  .ps-poster[data-vibe="neon-tech"] .ps-poster__divider { background: #818CF8; }
+  .ps-poster[data-vibe="neon-tech"] .ps-poster__cta { background: rgba(79, 70, 229, 0.3); color: #C7D2FE; box-shadow: 0 0 16px rgba(79, 70, 229, 0.2); }
+  .ps-poster[data-vibe="neon-tech"] { box-shadow: 0 0 80px rgba(79, 70, 229, 0.15), 0 0 120px rgba(139, 92, 246, 0.06), 0 2px 24px rgba(0,0,0,0.5); }
+
+  /* ── Vibe: Clean academic ── */
+  .ps-poster[data-vibe="clean-academic"] .ps-poster__bg {
+    background: linear-gradient(165deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+  }
+  .ps-poster[data-vibe="clean-academic"] .ps-poster__headline { color: #0f172a; }
+  .ps-poster[data-vibe="clean-academic"] .ps-poster__type-label,
+  .ps-poster[data-vibe="clean-academic"] .ps-poster__subtitle,
+  .ps-poster[data-vibe="clean-academic"] .ps-poster__desc,
+  .ps-poster[data-vibe="clean-academic"] .ps-poster__meta { color: #475569; opacity: 1; }
+  .ps-poster[data-vibe="clean-academic"] .ps-poster__sticker { background: #4F46E5; color: #fff; transform: rotate(0deg); }
+  .ps-poster[data-vibe="clean-academic"] .ps-poster__divider { background: #4F46E5; }
+  .ps-poster[data-vibe="clean-academic"] .ps-poster__cta { background: #4F46E5; color: #fff; }
+  .ps-poster[data-vibe="clean-academic"] .ps-poster__content { color: #0f172a; }
+  .ps-poster[data-vibe="clean-academic"] { border-color: rgba(0,0,0,0.08); }
+
+  /* ── Vibe: Premium dark ── */
+  .ps-poster[data-vibe="premium-dark"] .ps-poster__bg {
+    background: linear-gradient(155deg, #0c0c0c 0%, #1a1a1a 50%, #111 100%);
+  }
+  .ps-poster[data-vibe="premium-dark"] .ps-poster__deco--blob { opacity: 1; }
+  .ps-poster[data-vibe="premium-dark"] .ps-poster__deco--blob::before { background: rgba(255, 200, 50, 0.1); }
+  .ps-poster[data-vibe="premium-dark"] .ps-poster__deco--blob::after { background: rgba(255, 107, 107, 0.08); }
+  .ps-poster[data-vibe="premium-dark"] .ps-poster__deco--ring { opacity: 1; }
+  .ps-poster[data-vibe="premium-dark"] .ps-poster__deco--ring::before { border-color: rgba(255, 200, 50, 0.3); }
+  .ps-poster[data-vibe="premium-dark"] .ps-poster__headline { color: #FDE68A; }
+  .ps-poster[data-vibe="premium-dark"] .ps-poster__sticker { background: rgba(255, 200, 50, 0.2); color: #FDE68A; }
+  .ps-poster[data-vibe="premium-dark"] .ps-poster__divider { background: #FDE68A; }
+  .ps-poster[data-vibe="premium-dark"] .ps-poster__cta { background: rgba(255, 200, 50, 0.15); color: #FDE68A; box-shadow: 0 0 16px rgba(255,200,50,0.1); }
+
+  /* ── Vibe: Playful student ── */
+  .ps-poster[data-vibe="playful"] .ps-poster__bg {
+    background: linear-gradient(135deg, #7c3aed 0%, #db2777 50%, #f97316 100%);
+  }
+  .ps-poster[data-vibe="playful"] .ps-poster__deco--blob { opacity: 1; }
+  .ps-poster[data-vibe="playful"] .ps-poster__deco--blob::before { background: rgba(255,255,255,0.15); }
+  .ps-poster[data-vibe="playful"] .ps-poster__deco--blob::after { background: rgba(255,255,255,0.1); }
+  .ps-poster[data-vibe="playful"] .ps-poster__deco--ring { opacity: 1; }
+  .ps-poster[data-vibe="playful"] .ps-poster__deco--ring::before { border-color: rgba(255,255,255,0.3); }
+  .ps-poster[data-vibe="playful"] .ps-poster__headline { color: #fff; }
+  .ps-poster[data-vibe="playful"] .ps-poster__sticker { background: #fbbf24; color: #7c3aed; transform: rotate(-4deg); }
+  .ps-poster[data-vibe="playful"] .ps-poster__divider { background: #fbbf24; }
+  .ps-poster[data-vibe="playful"] .ps-poster__cta { background: rgba(255,255,255,0.25); color: #fff; }
+  .ps-poster[data-vibe="playful"] .ps-poster__content { color: #fff; }
+
+  /* ── Vibe: Minimal poster ── */
+  .ps-poster[data-vibe="minimal"] .ps-poster__bg {
+    background: #fafaf9;
+  }
+  .ps-poster[data-vibe="minimal"] .ps-poster__headline { color: #1c1917; font-weight: 900; }
+  .ps-poster[data-vibe="minimal"] .ps-poster__type-label,
+  .ps-poster[data-vibe="minimal"] .ps-poster__subtitle,
+  .ps-poster[data-vibe="minimal"] .ps-poster__desc,
+  .ps-poster[data-vibe="minimal"] .ps-poster__meta { color: #78716c; opacity: 1; }
+  .ps-poster[data-vibe="minimal"] .ps-poster__sticker { background: #1c1917; color: #fafaf9; transform: rotate(0deg); }
+  .ps-poster[data-vibe="minimal"] .ps-poster__divider { background: #1c1917; }
+  .ps-poster[data-vibe="minimal"] .ps-poster__cta { background: #1c1917; color: #fafaf9; }
+  .ps-poster[data-vibe="minimal"] .ps-poster__content { color: #1c1917; }
+  .ps-poster[data-vibe="minimal"] { border-color: rgba(0,0,0,0.06); }
+
+  /* ── Vibe: Cyber arcade ── */
+  .ps-poster[data-vibe="cyber-arcade"] .ps-poster__bg {
+    background: linear-gradient(160deg, #0a0014 0%, #1a0033 40%, #0d0d2b 100%);
+  }
+  .ps-poster[data-vibe="cyber-arcade"] .ps-poster__deco--grid { opacity: 1; background-image:
+    linear-gradient(rgba(0,255,136,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,136,0.04) 1px, transparent 1px);
+  }
+  .ps-poster[data-vibe="cyber-arcade"] .ps-poster__deco--blob { opacity: 1; }
+  .ps-poster[data-vibe="cyber-arcade"] .ps-poster__deco--blob::before { background: rgba(0, 255, 136, 0.15); }
+  .ps-poster[data-vibe="cyber-arcade"] .ps-poster__deco--blob::after { background: rgba(255, 0, 110, 0.12); }
+  .ps-poster[data-vibe="cyber-arcade"] .ps-poster__deco--beam { opacity: 0.6; }
+  .ps-poster[data-vibe="cyber-arcade"] .ps-poster__deco--beam::before { background: linear-gradient(90deg, transparent, rgba(0,255,136,0.1), transparent); }
+  .ps-poster[data-vibe="cyber-arcade"] .ps-poster__deco--ring { opacity: 1; }
+  .ps-poster[data-vibe="cyber-arcade"] .ps-poster__deco--ring::before { border-color: #00ff88; }
+  .ps-poster[data-vibe="cyber-arcade"] .ps-poster__headline { color: #00ff88; }
+  .ps-poster[data-vibe="cyber-arcade"] .ps-poster__sticker { background: rgba(255, 0, 110, 0.7); color: #fff; transform: rotate(3deg); }
+  .ps-poster[data-vibe="cyber-arcade"] .ps-poster__divider { background: #00ff88; }
+  .ps-poster[data-vibe="cyber-arcade"] .ps-poster__cta { background: rgba(0, 255, 136, 0.15); color: #00ff88; box-shadow: 0 0 20px rgba(0,255,136,0.15); }
+
+  /* ── Design notes ── */
+
+  .ps-notes {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 0.75rem;
+    padding: 1rem 1.25rem;
+  }
+
+  .ps-notes__title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #64748B;
+    display: block;
+    margin-bottom: 0.35rem;
+  }
+
+  .ps-notes__text {
+    font-size: 0.82rem;
+    color: #94A3B8;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* ── Screen-reader text copy ── */
+
+  .ps-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* ── No-JS fallback ── */
+
+  .ps-nojs {
+    text-align: center;
+    padding: 2rem;
+    color: #94A3B8;
+    font-size: 0.85rem;
+  }
+
+  /* ── Footnote ── */
+
+  .ps-footnote {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.8rem;
+    color: #475569;
+  }
+
+  /* ── Mobile ── */
+
+  @media (max-width: 768px) {
+    .ps-root {
+      padding: 2.5rem 0.75rem;
+    }
+
+    .ps-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .ps-preview-col {
+      position: static;
+    }
+
+    .ps-poster {
+      max-height: 480px;
+    }
+
+    .ps-row {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* ── Reduced motion ── */
+
+  @media (prefers-reduced-motion: reduce) {
+    .ps-poster,
+    .ps-poster__bg,
+    .ps-poster__deco,
+    .ps-poster__deco--blob::before,
+    .ps-poster__deco--blob::after,
+    .ps-poster__deco--ring::before,
+    .ps-poster__deco--beam::before,
+    .ps-poster__headline,
+    .ps-poster__sticker,
+    .ps-poster__divider,
+    .ps-poster__cta,
+    .ps-btn,
+    .ps-chip,
+    .ps-input,
+    .ps-textarea {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const root = document.querySelector('[data-poster-studio]');
+  if (!root) throw new Error('Poster Studio root not found');
+
+  const $ = (sel: string) => root.querySelector(sel) as HTMLElement;
+  const $$ = (sel: string) => root.querySelectorAll(sel) as NodeListOf<HTMLElement>;
+
+  const elEventName = $('#ps-event-name') as HTMLInputElement;
+  const elHost = $('#ps-host') as HTMLInputElement;
+  const elDatetime = $('#ps-datetime') as HTMLInputElement;
+  const elLocation = $('#ps-location') as HTMLInputElement;
+  const elDesc = $('#ps-description') as HTMLTextAreaElement;
+  const elCta = $('#ps-cta') as HTMLInputElement;
+  const elPoster = $('#ps-poster')!;
+  const elHeadline = $('#ps-poster-headline')!;
+  const elSubtitle = $('#ps-poster-subtitle')!;
+  const elDescPoster = $('#ps-poster-desc')!;
+  const elHostPoster = $('#ps-poster-host')!;
+  const elDatetimePoster = $('#ps-poster-datetime')!;
+  const elLocationPoster = $('#ps-poster-location')!;
+  const elCtaPoster = $('#ps-poster-cta')!;
+  const elSticker = $('#ps-poster-sticker')!;
+  const elTypeLabel = $('#ps-poster-type-label')!;
+  const elNotesText = $('#ps-notes-text')!;
+  const elSrText = $('#ps-sr-text')!;
+
+  let currentType = 'speaker';
+  let currentVibe = 'neon-tech';
+
+  const typeLabels: Record<string, string> = {
+    workshop: 'Workshop',
+    hackathon: 'Hackathon',
+    speaker: 'Speaker Night',
+    social: 'Social',
+    careers: 'Careers',
+    launch: 'Launch Event',
+  };
+
+  const typeStickers: Record<string, string> = {
+    workshop: 'Hands-On',
+    hackathon: '48hr Build',
+    speaker: 'Talk',
+    social: 'Meetup',
+    careers: 'Opportunity',
+    launch: 'New',
+  };
+
+  const vibeNotes: Record<string, string> = {
+    'neon-tech': 'Indigo and violet glow on deep navy. Subtle grid texture, soft light beam, and a decorative ring give a tech-forward depth. Best for AI, coding, and engineering events.',
+    'clean-academic': 'Light surface with strong dark type. Minimal decoration for a professional, trusted feel. Ideal for academic talks, university events, and formal announcements.',
+    'premium-dark': 'Near-black background with gold accents. Warm blob gradients create a luxury feel. Great for gala dinners, awards, and high-end networking events.',
+    'playful': 'Bold purple-to-orange gradient with white type. Bright, energetic, and student-friendly. Perfect for socials, welcome weeks, and informal meetups.',
+    'minimal': 'Near-white background, black type, no decoration. Ultra-clean Swiss-style layout. Works well for talks, conferences, and brand-forward announcements.',
+    'cyber-arcade': 'Dark with neon green and hot pink. Grid lines and light beams evoke retro-futurism. Ideal for game jams, hackathons, and creative tech events.',
+  };
+
+  const headlines: Record<string, string[]> = {
+    workshop: [
+      'Learn by doing.',
+      'Build something real.',
+      'Level up your skills.',
+      'Hands-on with experts.',
+    ],
+    hackathon: [
+      'Build. Ship. Win.',
+      '48 hours. Unlimited ideas.',
+      'Code meets creativity.',
+      'Dream it, build it.',
+    ],
+    speaker: [
+      'Ideas that matter.',
+      'Hear from the best.',
+      'Insight meets inspiration.',
+      'One stage. Big ideas.',
+    ],
+    social: [
+      'Good vibes only.',
+      'Meet your crew.',
+      'Connect. Chill. Repeat.',
+      'Your new favourite night.',
+    ],
+    careers: [
+      'Your future starts here.',
+      'Opportunities unlocked.',
+      'Meet your next chapter.',
+      'Pathways to what is next.',
+    ],
+    launch: [
+      'Something new is here.',
+      'Be there at the start.',
+      'The next chapter begins.',
+      'Ready. Set. Launch.',
+    ],
+  };
+
+  const subtitles: Record<string, string[]> = {
+    workshop: [
+      'A practical session where you build, break, and learn.',
+      'No experience needed, just curiosity.',
+      'Walk in with questions, walk out with skills.',
+      'Small teams, real tools, guided outcomes.',
+    ],
+    hackathon: [
+      'Form a team, pick a challenge, and ship a prototype.',
+      'All skill levels welcome.',
+      'Mentors, snacks, and a deadline. What could go wrong?',
+      'Compete, collaborate, create.',
+    ],
+    speaker: [
+      'An evening of talks from industry and academia.',
+      'Explore ideas at the cutting edge.',
+      'Network with fellow students and professionals.',
+      'Ask questions. Get answers.',
+    ],
+    social: [
+      'Drinks, music, and zero pressure.',
+      'Bring your friends or make new ones.',
+      'The best ideas start with a conversation.',
+      'Take a break from the library.',
+    ],
+    careers: [
+      'Connect with employers and explore graduate roles.',
+      'Panels, CV workshops, and networking.',
+      'Your career journey, accelerated.',
+      'Discover where your degree can take you.',
+    ],
+    launch: [
+      'The official unveiling of something exciting.',
+      'Be part of the story from day one.',
+      'Opening night energy. You are invited.',
+      'A new chapter for the society.',
+    ],
+  };
+
+  function pick<T>(arr: T[]): T {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  function getValues() {
+    return {
+      eventName: elEventName.value.trim(),
+      host: elHost.value.trim(),
+      datetime: elDatetime.value.trim(),
+      location: elLocation.value.trim(),
+      desc: elDesc.value.trim(),
+      cta: elCta.value.trim(),
+    };
+  }
+
+  function updatePoster() {
+    const v = getValues();
+
+    elHeadline.textContent = v.eventName || 'Your Event Here';
+    elSubtitle.textContent = pick(subtitles[currentType]);
+    elDescPoster.textContent = v.desc;
+    elHostPoster.textContent = v.host;
+    elDatetimePoster.textContent = v.datetime;
+    elLocationPoster.textContent = v.location;
+    elCtaPoster.textContent = v.cta || 'Learn more';
+    elSticker.textContent = typeStickers[currentType];
+    elTypeLabel.textContent = typeLabels[currentType];
+    elNotesText.textContent = vibeNotes[currentVibe];
+
+    elPoster.setAttribute('data-vibe', currentVibe);
+    elPoster.setAttribute('data-type', currentType);
+
+    elSrText.textContent =
+      'Poster concept for ' + (v.eventName || 'untitled event') +
+      '. Hosted by ' + (v.host || 'unknown') +
+      '. ' + (v.datetime || 'No date set') +
+      ' at ' + (v.location || 'No location set') +
+      '. ' + (v.desc || '') +
+      ' Call to action: ' + (v.cta || 'Learn more') +
+      '. Design vibe: ' + currentVibe.replace(/-/g, ' ') +
+      '. Event type: ' + typeLabels[currentType];
+  }
+
+  function setupChips() {
+    $$('[data-ps-group]').forEach(group => {
+      const chips = group.querySelectorAll('[role="radio"]');
+      chips.forEach(chip => {
+        chip.addEventListener('click', () => {
+          chips.forEach(c => {
+            c.setAttribute('aria-checked', 'false');
+            c.classList.remove('ps-chip--active');
+          });
+          chip.setAttribute('aria-checked', 'true');
+          chip.classList.add('ps-chip--active');
+
+          const groupName = group.getAttribute('data-ps-group');
+          const value = chip.getAttribute('data-value') || '';
+          if (groupName === 'type') currentType = value;
+          if (groupName === 'vibe') currentVibe = value;
+
+          updatePoster();
+        });
+
+        chip.addEventListener('keydown', (e: Event) => {
+          const ke = e as KeyboardEvent;
+          const arr = Array.from(chips);
+          const idx = arr.indexOf(chip as HTMLElement);
+          let next = -1;
+          if (ke.key === 'ArrowRight' || ke.key === 'ArrowDown') { ke.preventDefault(); next = (idx + 1) % arr.length; }
+          if (ke.key === 'ArrowLeft' || ke.key === 'ArrowUp') { ke.preventDefault(); next = (idx - 1 + arr.length) % arr.length; }
+          if (next >= 0) { (arr[next] as HTMLElement).focus(); (arr[next] as HTMLElement).click(); }
+        });
+      });
+    });
+  }
+
+  function randomise() {
+    const allTypes = Object.keys(typeLabels);
+    const allVibes = Object.keys(vibeNotes);
+
+    currentType = pick(allTypes);
+    currentVibe = pick(allVibes);
+
+    $$('[data-ps-group="type"] [role="radio"]').forEach(c => {
+      const val = c.getAttribute('data-value');
+      const isActive = val === currentType;
+      c.setAttribute('aria-checked', isActive ? 'true' : 'false');
+      c.classList.toggle('ps-chip--active', isActive);
+    });
+
+    $$('[data-ps-group="vibe"] [role="radio"]').forEach(c => {
+      const val = c.getAttribute('data-value');
+      const isActive = val === currentVibe;
+      c.setAttribute('aria-checked', isActive ? 'true' : 'false');
+      c.classList.toggle('ps-chip--active', isActive);
+    });
+
+    updatePoster();
+  }
+
+  function reset() {
+    elEventName.value = 'Build Night: Ship Your First AI App';
+    elHost.value = 'Surrey AI Society';
+    elDatetime.value = 'Thursday, 6:30 PM';
+    elLocation.value = 'University of Surrey';
+    elDesc.value = 'Bring an idea, form a small team, and leave with a working prototype.';
+    elCta.value = 'Sign up now';
+
+    currentType = 'speaker';
+    currentVibe = 'neon-tech';
+
+    $$('[data-ps-group="type"] [role="radio"]').forEach(c => {
+      const val = c.getAttribute('data-value');
+      const isActive = val === currentType;
+      c.setAttribute('aria-checked', isActive ? 'true' : 'false');
+      c.classList.toggle('ps-chip--active', isActive);
+    });
+
+    $$('[data-ps-group="vibe"] [role="radio"]').forEach(c => {
+      const val = c.getAttribute('data-value');
+      const isActive = val === currentVibe;
+      c.setAttribute('aria-checked', isActive ? 'true' : 'false');
+      c.classList.toggle('ps-chip--active', isActive);
+    });
+
+    updatePoster();
+  }
+
+  function copyText() {
+    const v = getValues();
+    const text = [
+      v.eventName,
+      v.host,
+      v.datetime,
+      v.location,
+      '',
+      v.desc,
+      '',
+      v.cta,
+    ].join('\n');
+
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = $('#ps-copy')!;
+      const orig = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = orig; }, 1500);
+    }).catch(() => {});
+  }
+
+  const inputs = [elEventName, elHost, elDatetime, elLocation, elDesc, elCta];
+  inputs.forEach(el => {
+    el.addEventListener('input', updatePoster);
+  });
+
+  $('#ps-generate')!.addEventListener('click', updatePoster);
+  $('#ps-randomise')!.addEventListener('click', randomise);
+  $('#ps-reset')!.addEventListener('click', reset);
+  $('#ps-copy')!.addEventListener('click', copyText);
+
+  setupChips();
+  updatePoster();
+</script>

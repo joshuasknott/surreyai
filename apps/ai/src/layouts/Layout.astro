@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@surreysocieties/ui/components/BaseLayout';
 import { getSocietyById } from '@surreysocieties/admin/config';
+import JoinCTA from '../components/home/JoinCTA.astro';
 
 interface Props {
   title: string;
@@ -59,17 +60,17 @@ const navLinks = [
 
   <!-- Navigation -->
   <header class="sticky top-0 z-50 bg-ai-bg/90 backdrop-blur-md border-b border-ai-border">
-    <div class="mx-auto max-w-6xl px-6 h-16 flex items-center justify-between">
+    <div class="mx-auto max-w-6xl px-6 h-20 flex items-center justify-between">
       <a href="/" class="flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan rounded-lg">
         <img
           src="/logos/optimized/ai-logo.optimized.png"
           alt="Surrey Artificial Intelligence Society logo"
-          width="36"
-          height="36"
-          class="h-9 w-9 rounded-full"
+          width="40"
+          height="40"
+          class="h-10 w-10 rounded-full"
         />
-        <span class="text-ai-fg font-semibold text-lg tracking-tight hidden sm:block">
-          Surrey <span class="text-ai-cyan">AI</span> Society
+        <span class="text-ai-fg font-semibold text-xl tracking-tight hidden sm:block">
+          Surrey <span class="text-ai-cyan">Artificial Intelligence</span> Society
         </span>
       </a>
 
@@ -83,7 +84,7 @@ const navLinks = [
                 href={link.href}
                 aria-current={isActive ? 'page' : undefined}
                 class:list={[
-                  'px-3.5 py-2 text-sm font-medium rounded-lg border border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan transition-colors',
+                  'px-4 py-2.5 text-base font-medium rounded-lg border border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan transition-colors',
                   isActive
                     ? 'text-ai-cyan bg-ai-cyan/8 border-ai-cyan/15'
                     : 'text-ai-fg-muted hover:text-ai-fg hover:bg-ai-surface',
@@ -136,7 +137,7 @@ const navLinks = [
               href={link.href}
               aria-current={isActive ? 'page' : undefined}
               class:list={[
-                'px-4 py-2.5 text-sm font-medium rounded-lg border border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan transition-colors',
+                'px-4 py-3 text-base font-medium rounded-lg border border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan transition-colors',
                 isActive
                   ? 'text-ai-cyan bg-ai-cyan/8 border-ai-cyan/15'
                   : 'text-ai-fg-muted hover:text-ai-fg hover:bg-ai-bg',
@@ -155,8 +156,11 @@ const navLinks = [
     <slot />
   </main>
 
+  <!-- Global CTA -->
+  <JoinCTA />
+
   <!-- Footer -->
-  <footer class="bg-ai-surface text-ai-fg-muted border-t border-ai-border mt-auto">
+  <footer class="bg-ai-surface text-ai-fg-muted mt-auto">
     <div class="mx-auto max-w-6xl px-6 py-12">
       <div class="grid sm:grid-cols-3 gap-8 mb-8">
         <div>

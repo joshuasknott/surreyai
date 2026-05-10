@@ -1,5 +1,18 @@
 ---
 import StudentProjectSlot from "./StudentProjectSlot.astro";
+import CampusQuest from "./student-projects/CampusQuest.astro";
+import PosterStudio from "./student-projects/PosterStudio.astro";
+import TokenRush from "./student-projects/TokenRush.astro";
+
+const featuredProject = {
+  id: "campus-quest",
+  title: "Cafe Walkthrough",
+  type: "3D sim",
+  status: "Live prototype",
+  description: "Step inside a first-person 3D cafe, walk up to the counter, and collect a fresh coffee.",
+  action: "Enter Café",
+  color: "var(--ai-sage)"
+};
 
 const projects = [
   {
@@ -12,48 +25,21 @@ const projects = [
     color: "var(--ai-azure)"
   },
   {
-    id: "deadline-survival",
-    title: "Deadline Survival",
-    type: "Arcade game",
-    status: "Coming soon",
-    description: "Dodge deadlines, collect coffee, and survive the semester as the chaos ramps up.",
-    action: "Preview",
-    color: "var(--ai-coral)"
-  },
-  {
-    id: "campus-quest",
-    title: "Campus Quest",
-    type: "Story game",
-    status: "Coming soon",
-    description: "A branching campus adventure where every choice sends you somewhere stranger.",
-    action: "Preview",
-    color: "var(--ai-sage)"
-  },
-  {
-    id: "tiny-campus-builder",
-    title: "Tiny Campus Builder",
-    type: "Creative sandbox",
-    status: "Coming soon",
-    description: "Build a miniature Surrey-inspired campus with tiles, decorations, and animated student life.",
-    action: "Preview",
-    color: "var(--ai-azure)"
-  },
-  {
     id: "poster-studio",
     title: "Poster Studio",
     type: "Creative tool",
-    status: "Coming soon",
+    status: "Live prototype",
     description: "Generate slick event poster concepts for societies, workshops, socials, and hackathons.",
-    action: "Preview",
+    action: "Create",
     color: "var(--ai-coral)"
   },
   {
     id: "token-rush",
     title: "Token Rush",
     type: "Reaction game",
-    status: "Coming soon",
+    status: "Live prototype",
     description: "A fast typing/reaction game where you chase prompts, dodge bugs, and keep your streak alive.",
-    action: "Preview",
+    action: "Play",
     color: "var(--ai-sage)"
   }
 ];
@@ -66,88 +52,100 @@ const projects = [
       <p class="projects-subtitle">An interactive gallery of prototypes, games, and tools built by our members.</p>
     </div>
 
-    <div class="projects-grid" role="tablist" aria-label="Student projects list">
-      {projects.map((p, i) => (
-        <button 
-          class:list={["project-card", i === 0 ? "active" : ""]} 
-          data-project-id={p.id}
-          role="tab"
-          aria-selected={i === 0 ? "true" : "false"}
-          aria-controls={`panel-${p.id}`}
-          id={`tab-${p.id}`}
-          style={`--brand-color: ${p.color}`}
-        >
-          <div class="card-glow"></div>
-          <div class="card-content">
-            <div class="card-meta">
-              <span class="card-type">{p.type}</span>
-              <span class:list={["card-status", p.status === "Live prototype" ? "status-live" : "status-soon"]}>
-                {p.status}
-              </span>
-            </div>
-            <h3 class="card-title">{p.title}</h3>
-            <p class="card-description">{p.description}</p>
-            <div class="card-action">
-              <span class="action-text">{p.action}</span>
-              <svg class="action-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
-            </div>
-          </div>
-        </button>
-      ))}
-    </div>
-
-    <div class="projects-display" aria-live="polite">
-      <!-- Surrey Drift Lab -->
-      <div 
-        id={`panel-drift-lab`} 
-        class="project-panel active"
-        role="tabpanel"
-        aria-labelledby={`tab-drift-lab`}
+    <div class="projects-layout">
+      <!-- Top Area: Featured Project -->
+      <button 
+        class="project-card featured-project" 
+        data-project-id={featuredProject.id}
+        aria-label={`View ${featuredProject.title}`}
+        aria-haspopup="dialog"
+        style={`--brand-color: ${featuredProject.color}`}
       >
-        <div class="panel-inner">
-          <StudentProjectSlot />
+        <div class="card-glow"></div>
+        <div class="card-content">
+          <div class="card-meta">
+            <span class="card-type">Featured Project • {featuredProject.type}</span>
+            <span class:list={["card-status", featuredProject.status === "Live prototype" ? "status-live" : "status-soon"]}>
+              {featuredProject.status}
+            </span>
+          </div>
+          <h3 class="card-title">{featuredProject.title}</h3>
+          <p class="card-description">{featuredProject.description}</p>
+          <div class="card-action">
+            <span class="action-text">{featuredProject.action}</span>
+            <svg class="action-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+          </div>
+        </div>
+      </button>
+
+      <!-- Bottom Area: Scrollable List -->
+      <div class="projects-scroll-container">
+        <div class="projects-scroll-row" aria-label="Student projects list">
+          {projects.map((p, i) => (
+            <button 
+              class="project-card scrollable-card" 
+              data-project-id={p.id}
+              aria-label={`View ${p.title}`}
+              aria-haspopup="dialog"
+              style={`--brand-color: ${p.color}`}
+            >
+              <div class="card-glow"></div>
+              <div class="card-content">
+                <div class="card-meta">
+                  <span class="card-type">{p.type}</span>
+                  <span class:list={["card-status", p.status === "Live prototype" ? "status-live" : "status-soon"]}>
+                    {p.status}
+                  </span>
+                </div>
+                <h3 class="card-title">{p.title}</h3>
+                <p class="card-description">{p.description}</p>
+                <div class="card-action">
+                  <span class="action-text">{p.action}</span>
+                  <svg class="action-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                </div>
+              </div>
+            </button>
+          ))}
         </div>
       </div>
+    </div>
 
-      <!-- Placeholders -->
-      {projects.slice(1).map(p => (
-        <div 
-          id={`panel-${p.id}`} 
-          class="project-panel placeholder-panel"
-          role="tabpanel"
-          aria-labelledby={`tab-${p.id}`}
-          hidden
-        >
-          <div class="placeholder-inner" style={`--brand-color: ${p.color}`}>
-            <div class="placeholder-glow"></div>
-            <div class="placeholder-content">
-              <div class="placeholder-icon">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg>
-              </div>
-              <span class="placeholder-badge">Concept Slot</span>
-              <h3 class="placeholder-title">{p.title}</h3>
-              <p class="placeholder-desc">{p.description}</p>
-              
-              <div class="placeholder-details">
-                <div class="detail-row">
-                  <span class="detail-label">Type</span>
-                  <span class="detail-value">{p.type}</span>
-                </div>
-                <div class="detail-row">
-                  <span class="detail-label">Status</span>
-                  <span class="detail-value">{p.status}</span>
-                </div>
-              </div>
-              
-              <p class="placeholder-note">
-                This project is currently in the ideation phase.<br/>
-                Check back later or join the society to help build it!
-              </p>
+    <dialog id="project-modal" class="project-modal" aria-label="Project Interactive View">
+      <div class="modal-wrapper">
+        <button id="close-modal" class="close-modal-btn" aria-label="Close Project">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        <div class="modal-content" aria-live="polite">
+          <!-- Surrey Drift Lab -->
+          <div id="panel-drift-lab" class="project-panel" hidden>
+            <div class="panel-inner">
+              <StudentProjectSlot />
+            </div>
+          </div>
+
+          <!-- Campus Quest -->
+          <div id="panel-campus-quest" class="project-panel" hidden>
+            <div class="panel-inner">
+              <CampusQuest />
+            </div>
+          </div>
+
+          <!-- Poster Studio -->
+          <div id="panel-poster-studio" class="project-panel" hidden>
+            <div class="panel-inner">
+              <PosterStudio />
+            </div>
+          </div>
+
+          <!-- Token Rush -->
+          <div id="panel-token-rush" class="project-panel" hidden>
+            <div class="panel-inner">
+              <TokenRush />
             </div>
           </div>
         </div>
-      ))}
-    </div>
+      </div>
+    </dialog>
   </div>
 </section>
 
@@ -188,11 +186,49 @@ const projects = [
     line-height: 1.7;
   }
 
-  .projects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  .projects-layout {
+    display: flex;
+    flex-direction: column;
     gap: 1.5rem;
     margin-bottom: 3rem;
+  }
+
+  .featured-project {
+    width: 100%;
+    min-height: 320px;
+  }
+  
+  .featured-project .card-title {
+    font-size: clamp(2rem, 4vw, 2.5rem);
+  }
+
+  .projects-scroll-container {
+    width: 100%;
+    overflow-x: auto;
+    /* Hide scrollbar */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE and Edge */
+  }
+
+  .projects-scroll-container::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+  }
+
+  .projects-scroll-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 1.5rem;
+    padding-bottom: 1rem;
+    scroll-snap-type: x mandatory;
+  }
+
+  .scrollable-card {
+    flex: 0 0 auto;
+    width: 100%;
+    min-width: 300px;
+    max-width: 360px;
+    scroll-snap-align: start;
   }
 
   .project-card {
@@ -337,19 +373,79 @@ const projects = [
     color: var(--ai-fg);
   }
 
-  /* ── Display Area ── */
+  /* ── Modal Area ── */
 
-  .projects-display {
-    position: relative;
-    border-radius: 1.5rem;
-    background: var(--ai-slate-base);
-    min-height: 600px;
-    overflow: hidden;
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.1);
+  .project-modal {
+    padding: 0;
+    border: none;
+    background: transparent;
+    max-width: 100vw;
+    max-height: 100vh;
+    width: 100%;
+    height: 100%;
   }
 
-  :root:not([data-theme="dark"]) .projects-display {
+  .project-modal::backdrop {
+    background: rgba(6, 10, 18, 0.85);
+    backdrop-filter: blur(12px);
+  }
+
+  .project-modal[open] {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: modal-fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes modal-fade-in {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .modal-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 960px;
+    margin: 2rem;
+    border-radius: 1.5rem;
+    background: var(--ai-slate-base);
     border: 1px solid var(--ai-border);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+  }
+
+  .close-modal-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 50;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #F8FAFC;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .close-modal-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+  }
+
+  .close-modal-btn:focus-visible {
+    outline: 2px solid var(--ai-azure);
+    outline-offset: 2px;
+  }
+
+  .modal-content {
+    position: relative;
+    width: 100%;
+    min-height: 600px;
   }
 
   .project-panel {
@@ -366,8 +462,11 @@ const projects = [
     height: 100%;
   }
 
-  /* Hide inner redundant headers and backgrounds from StudentProjectSlot to make it fit */
-  .panel-inner :global(.drift-lab-section) {
+  /* Hide inner redundant headers and backgrounds from modules to make them fit */
+  .panel-inner :global(.drift-lab-section),
+  .panel-inner :global(.cq-section),
+  .panel-inner :global(.ps-section),
+  .panel-inner :global(.tr-section) {
     border: none;
     background: transparent;
     padding: 4rem 1.5rem;
@@ -488,14 +587,23 @@ const projects = [
     .student-projects-section {
       padding: 4rem 1rem;
     }
-    .projects-grid {
-      grid-template-columns: 1fr;
+    .projects-scroll-row {
+      gap: 1rem;
     }
-    .projects-display {
+    .scrollable-card {
+      min-width: 280px;
+    }
+    .modal-content {
       min-height: 500px;
     }
-    .panel-inner :global(.drift-lab-section) {
+    .panel-inner :global(.drift-lab-section),
+    .panel-inner :global(.cq-section),
+    .panel-inner :global(.ps-section),
+    .panel-inner :global(.tr-section) {
       padding: 2rem 0.5rem;
+    }
+    .modal-wrapper {
+      margin: 1rem;
     }
   }
 
@@ -513,60 +621,67 @@ const projects = [
 </style>
 
 <script>
-  // Vanilla JS for tab selection
+  // Vanilla JS for Modal Interaction
   document.addEventListener('DOMContentLoaded', () => {
-    const tabs = document.querySelectorAll('.project-card[role="tab"]');
-    const panels = document.querySelectorAll('.project-panel[role="tabpanel"]');
+    const cards = document.querySelectorAll('.project-card');
+    const modal = document.getElementById('project-modal') as HTMLDialogElement;
+    const closeModalBtn = document.getElementById('close-modal');
+    const panels = document.querySelectorAll('.project-panel');
 
-    tabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        const targetId = tab.getAttribute('aria-controls');
-        
-        // Deactivate all
-        tabs.forEach(t => {
-          t.setAttribute('aria-selected', 'false');
-          t.classList.remove('active');
-        });
+    // Open modal when card is clicked
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        const projectId = card.getAttribute('data-project-id');
+        const targetId = `panel-${projectId}`;
+
+        // Hide all panels
         panels.forEach(p => p.setAttribute('hidden', ''));
         
-        // Activate selected
-        tab.setAttribute('aria-selected', 'true');
-        tab.classList.add('active');
-        
+        // Show selected panel
         const targetPanel = document.getElementById(targetId);
         if (targetPanel) {
           targetPanel.removeAttribute('hidden');
-          // Scroll into view gently if on mobile
-          if (window.innerWidth < 768) {
-            targetPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-          }
-        }
-      });
-
-      // Keyboard support
-      tab.addEventListener('keydown', e => {
-        const index = Array.from(tabs).indexOf(tab);
-        let nextIndex = null;
-
-        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-          e.preventDefault();
-          nextIndex = (index + 1) % tabs.length;
-        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-          e.preventDefault();
-          nextIndex = (index - 1 + tabs.length) % tabs.length;
-        } else if (e.key === 'Home') {
-          e.preventDefault();
-          nextIndex = 0;
-        } else if (e.key === 'End') {
-          e.preventDefault();
-          nextIndex = tabs.length - 1;
         }
 
-        if (nextIndex !== null) {
-          tabs[nextIndex].focus();
-          tabs[nextIndex].click();
+        // Show modal
+        if (modal) {
+          modal.showModal();
+          // Prevent scrolling on body
+          document.body.style.overflow = 'hidden';
         }
       });
     });
+
+    // Close modal function
+    const closeModal = () => {
+      if (modal) {
+        modal.close();
+        document.body.style.overflow = '';
+        // Hide all panels to reset state and stop potential media playing if they rely on it
+        panels.forEach(p => p.setAttribute('hidden', ''));
+      }
+    };
+
+    if (closeModalBtn) {
+      closeModalBtn.addEventListener('click', closeModal);
+    }
+
+    // Close on backdrop click
+    if (modal) {
+      modal.addEventListener('click', (e) => {
+        const rect = modal.getBoundingClientRect();
+        const isInDialog = (rect.top <= e.clientY && e.clientY <= rect.top + rect.height &&
+          rect.left <= e.clientX && e.clientX <= rect.left + rect.width);
+        if (!isInDialog) {
+          closeModal();
+        }
+      });
+
+      // Handle Escape key (dialog handles it natively, but we need to reset body overflow)
+      modal.addEventListener('close', () => {
+        document.body.style.overflow = '';
+        panels.forEach(p => p.setAttribute('hidden', ''));
+      });
+    }
   });
 </script>
