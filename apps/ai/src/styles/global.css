@@ -55,6 +55,7 @@
 @layer base {
   /* ── Light theme (default) ── */
   :root {
+    color-scheme: light;
     --ai-bg: #FDFBF7;
     --ai-fg: #0F172A;
     --ai-fg-muted: #475569;
@@ -69,6 +70,7 @@
 
   /* ── Dark theme ── */
   :root[data-theme="dark"] {
+    color-scheme: dark;
     --ai-bg: #0B0F19;
     --ai-fg: #F8FAFC;
     --ai-fg-muted: #94A3B8;

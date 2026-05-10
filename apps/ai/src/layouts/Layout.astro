@@ -219,8 +219,8 @@ const navLinks = [
 
       // Show the icon for the *opposite* mode (the icon represents what
       // clicking will switch to)
-      iconDark?.classList.toggle('hidden', !isDark);
-      iconLight?.classList.toggle('hidden', isDark);
+      iconDark?.classList.toggle('hidden', isDark);
+      iconLight?.classList.toggle('hidden', !isDark);
 
       // Announce the available action, not the current state
       themeBtn?.setAttribute(
