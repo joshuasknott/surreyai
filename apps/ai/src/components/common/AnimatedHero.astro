@@ -1,0 +1,123 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+  centered?: boolean;
+  minHeight?: string;
+}
+
+const { title, description, centered = false, minHeight = "auto" } = Astro.props;
+---
+
+<section class="animated-hero" style={`min-height: ${minHeight};`}>
+  <div class="animated-hero__bg"></div>
+
+  <div class={`animated-hero__inner ${centered ? 'text-center' : ''}`}>
+    <h1 class="animated-hero__title">
+      {title}
+    </h1>
+    {description && (
+      <p class="animated-hero__description">
+        {description}
+      </p>
+    )}
+    <slot />
+  </div>
+</section>
+
+<style>
+  .animated-hero {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: var(--ai-fg);
+    border-bottom: 1px solid var(--ai-border);
+    padding: 6rem 1.5rem 4rem; /* Similar to pt-24 pb-16 */
+  }
+
+  .animated-hero__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: var(--ai-bg);
+    overflow: hidden;
+  }
+  
+  /* Abstract slow-moving color gradient */
+  .animated-hero__bg::before,
+  .animated-hero__bg::after {
+    content: "";
+    position: absolute;
+    width: 60vw;
+    height: 60vw;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.15;
+    animation: float 20s infinite ease-in-out alternate;
+  }
+
+  .animated-hero__bg::before {
+    background: var(--ai-coral);
+    top: -10vw;
+    right: -10vw;
+    animation-delay: -5s;
+  }
+
+  .animated-hero__bg::after {
+    background: var(--ai-azure);
+    bottom: -10vw;
+    left: -10vw;
+  }
+
+  .animated-hero__inner {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 64rem); /* max-w-5xl approx */
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .animated-hero__inner.text-center {
+    text-align: center;
+  }
+
+  .animated-hero__title {
+    margin: 0 0 1.5rem 0;
+    font-size: clamp(3rem, 6vw, 4.5rem);
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+  }
+
+  .animated-hero__description {
+    font-size: clamp(1.125rem, 2vw, 1.25rem);
+    line-height: 1.625;
+    color: var(--ai-fg-muted);
+    max-width: 42rem;
+  }
+
+  .animated-hero__inner.text-center .animated-hero__description {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  @keyframes float {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(5vw, 5vw) scale(1.1); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animated-hero__bg::before,
+    .animated-hero__bg::after {
+      animation: none;
+    }
+  }
+
+  @media (min-width: 640px) {
+    .animated-hero {
+      padding: 8rem 1.5rem 5rem;
+    }
+  }
+</style>

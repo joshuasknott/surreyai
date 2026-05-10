@@ -1,6 +1,7 @@
 ---
 export const prerender = false;
 import Layout from '../layouts/Layout.astro';
+import AnimatedHero from '../components/common/AnimatedHero.astro';
 import { createConvexClient } from '@surreysocieties/admin';
 import '../styles/global.css';
 
@@ -30,22 +31,19 @@ const getInitials = (name?: string, role?: string) => {
 
 <Layout title="Committee" description="Meet the student committee running Surrey Artificial Intelligence Society — the team behind our workshops, events, and community.">
 
-  <section class="bg-ai-bg text-ai-fg border-b border-ai-border">
-    <div class="mx-auto max-w-5xl px-6 pt-16 pb-12 sm:pt-24 sm:pb-16">
-      <h1 class="text-5xl sm:text-7xl font-extrabold tracking-tight leading-[1.1] mb-6">Meet the people running the society.</h1>
-      <p class="text-ai-fg-muted text-lg sm:text-xl leading-relaxed max-w-2xl">
-        Student volunteers who plan and run the society — organising workshops, events, and everything in between.
-      </p>
-    </div>
-  </section>
+  <AnimatedHero 
+    title="Meet the people running the society."
+    description="Student volunteers who plan and run the society — organising workshops, events, and everything in between."
+    centered={true}
+  />
 
   <!-- Committee Grid -->
-  <section class="py-16 sm:py-24 px-6 bg-ai-surface text-ai-fg">
-    <div class="mx-auto max-w-5xl">
+  <section class="py-16 sm:py-24 px-6 bg-ai-bg text-ai-fg relative z-10">
+    <div class="mx-auto max-w-7xl">
       {committee.length === 0 ? (
-        <div class="bg-ai-bg rounded-2xl p-10 text-center shadow-sm">
+        <div class="bg-ai-surface border border-ai-border rounded-[1.5rem] p-10 text-center shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_4px_20px_rgba(0,0,0,0.02)] backdrop-blur-md">
           <h2 class="text-2xl font-bold mb-4 text-ai-fg">Committee details will appear here once confirmed</h2>
-          <p class="text-ai-fg-muted leading-relaxed mb-6 max-w-2xl mx-auto">
+          <p class="text-ai-fg-muted leading-relaxed mb-6 max-w-2xl mx-auto text-lg">
             Our current committee roster will be published once confirmed through the Surrey Students' Union.
           </p>
           <a href="/join" class="btn-primary">
@@ -54,57 +52,69 @@ const getInitials = (name?: string, role?: string) => {
         </div>
       ) : (
         <div>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {committee.map(member => (
-              <article class="bg-ai-bg rounded-2xl p-8 flex flex-col shadow-sm border border-ai-border/50 hover:shadow-md transition-shadow">
-                {member.imageUrl ? (
-                  <img src={member.imageUrl} alt={member.name || member.role} class="w-20 h-20 rounded-full object-cover mb-6" />
-                ) : (
-                  <div class="w-20 h-20 rounded-full bg-ai-surface flex items-center justify-center text-ai-coral font-bold text-xl mb-6 shadow-sm border border-ai-border">
-                    {getInitials(member.name, member.role)}
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {committee.map((member, i) => {
+              const colors = ['var(--ai-coral)', 'var(--ai-azure)', 'var(--ai-sage)'];
+              const glowColor = colors[i % colors.length];
+              return (
+                <article class="relative bg-ai-surface border border-ai-border rounded-[1.5rem] p-8 flex flex-col items-center text-center overflow-hidden group transition-all duration-300 hover:-translate-y-1 hover:border-ai-border-strong shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_4px_20px_rgba(0,0,0,0.02)] backdrop-blur-md">
+                  <div class="absolute inset-0 opacity-0 group-hover:opacity-[0.15] blur-[60px] scale-150 transition-opacity duration-500 pointer-events-none" style={`background-color: ${glowColor};`}></div>
+                  <div class="relative z-10 w-full flex flex-col items-center">
+                    {member.imageUrl ? (
+                      <img src={member.imageUrl} alt={member.name || member.role} class="w-24 h-24 rounded-full object-cover mb-6 border border-ai-border" />
+                    ) : (
+                      <div class="w-24 h-24 rounded-full bg-ai-bg flex items-center justify-center text-ai-coral font-bold text-2xl mb-6 shadow-sm border border-ai-border">
+                        {getInitials(member.name, member.role)}
+                      </div>
+                    )}
+                    <h2 class="font-bold text-xl text-ai-fg mb-1">{member.name || 'Pending Confirmation'}</h2>
+                    <p class="text-ai-fg-muted text-xs font-bold uppercase tracking-widest">{member.role}</p>
                   </div>
-                )}
-                <h2 class="font-bold text-2xl text-ai-fg mb-2">{member.name || 'Pending Confirmation'}</h2>
-                <p class="text-ai-fg-muted text-sm font-semibold uppercase tracking-widest">{member.role}</p>
-              </article>
-            ))}
+                </article>
+              );
+            })}
           </div>
         </div>
       )}
 
-      <div class="mt-20 pt-12 border-t border-ai-border">
-        <div class="mb-10">
-          <h2 class="text-3xl font-extrabold text-ai-fg">Past Committee</h2>
-        </div>
-        {pastCommittee.length === 0 ? (
-          <p class="text-ai-fg-muted text-lg">Past committee details will be published once confirmed.</p>
-        ) : (
-          <div class="space-y-12">
+      {pastCommittee.length > 0 && (
+        <div class="mt-24 pt-16 border-t border-ai-border">
+          <div class="mb-12">
+            <h2 class="text-3xl sm:text-4xl font-extrabold text-ai-fg tracking-tight">Past Committee</h2>
+          </div>
+          <div class="space-y-16">
             {pastCommitteeYears.map(yearLabel => (
               <section>
-                <h3 class="font-bold text-xl text-ai-fg mb-6">{yearLabel}</h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {pastCommittee.filter(member => member.yearLabel === yearLabel).map(member => (
-                    <article class="bg-ai-bg rounded-xl p-6 flex items-start gap-4 shadow-sm border border-ai-border/50">
-                      {member.imageUrl ? (
-                        <img src={member.imageUrl} alt={member.name || member.role} class="w-12 h-12 rounded-full object-cover shrink-0" />
-                      ) : (
-                        <div class="w-12 h-12 rounded-full bg-ai-surface flex items-center justify-center text-ai-azure font-bold text-sm shrink-0 border border-ai-border">
-                          {getInitials(member.name, member.role)}
+                <h3 class="font-bold text-2xl text-ai-fg mb-6">{yearLabel}</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                  {pastCommittee.filter(member => member.yearLabel === yearLabel).map((member, i) => {
+                    const colors = ['var(--ai-sage)', 'var(--ai-coral)', 'var(--ai-azure)'];
+                    const glowColor = colors[i % colors.length];
+                    return (
+                      <article class="relative bg-ai-surface border border-ai-border rounded-[1.25rem] p-6 flex items-center gap-4 overflow-hidden group transition-all duration-300 hover:-translate-y-1 hover:border-ai-border-strong shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_4px_20px_rgba(0,0,0,0.02)] backdrop-blur-md">
+                        <div class="absolute inset-0 opacity-0 group-hover:opacity-[0.10] blur-[40px] scale-150 transition-opacity duration-500 pointer-events-none" style={`background-color: ${glowColor};`}></div>
+                        <div class="relative z-10 flex items-center gap-4 w-full">
+                          {member.imageUrl ? (
+                            <img src={member.imageUrl} alt={member.name || member.role} class="w-12 h-12 rounded-full object-cover shrink-0 border border-ai-border" />
+                          ) : (
+                            <div class="w-12 h-12 rounded-full bg-ai-bg flex items-center justify-center text-ai-azure font-bold text-sm shrink-0 border border-ai-border">
+                              {getInitials(member.name, member.role)}
+                            </div>
+                          )}
+                          <div class="overflow-hidden">
+                            <h4 class="font-semibold text-base text-ai-fg truncate">{member.name || 'Pending Confirmation'}</h4>
+                            <p class="text-ai-fg-muted text-xs uppercase tracking-wider font-bold mt-0.5 truncate">{member.role}</p>
+                          </div>
                         </div>
-                      )}
-                      <div>
-                        <h4 class="font-semibold text-base text-ai-fg">{member.name || 'Pending Confirmation'}</h4>
-                        <p class="text-ai-fg-muted text-xs uppercase tracking-wider font-medium mt-1">{member.role}</p>
-                      </div>
-                    </article>
-                  ))}
+                      </article>
+                    );
+                  })}
                 </div>
               </section>
             ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
     </div>
   </section>

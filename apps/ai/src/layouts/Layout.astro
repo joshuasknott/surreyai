@@ -8,9 +8,11 @@ interface Props {
   description: string;
   /** Absolute URL to OG share image. Defaults to site-wide fallback. */
   ogImage?: string;
+  /** Whether to hide the global Join CTA at the bottom of the page */
+  hideCTA?: boolean;
 }
 
-const { title, description, ogImage } = Astro.props;
+const { title, description, ogImage, hideCTA = false } = Astro.props;
 
 const society = getSocietyById('ai')!;
 const siteName = society.name;
@@ -157,7 +159,7 @@ const navLinks = [
   </main>
 
   <!-- Global CTA -->
-  <JoinCTA />
+  {!hideCTA && <JoinCTA />}
 
   <!-- Footer -->
   <footer class="bg-ai-surface text-ai-fg-muted mt-auto">

@@ -1,26 +1,14 @@
 ---
 import StudentProjectSlot from "./StudentProjectSlot.astro";
-import CampusQuest from "./student-projects/CampusQuest.astro";
 import PosterStudio from "./student-projects/PosterStudio.astro";
 import TokenRush from "./student-projects/TokenRush.astro";
-
-const featuredProject = {
-  id: "campus-quest",
-  title: "Cafe Walkthrough",
-  type: "3D sim",
-  status: "Live prototype",
-  description: "Step inside a first-person 3D cafe, walk up to the counter, and collect a fresh coffee.",
-  action: "Enter Café",
-  color: "var(--ai-sage)"
-};
 
 const projects = [
   {
     id: "drift-lab",
-    title: "Surrey Drift Lab",
+    title: "Racing Simulator",
     type: "Playable game",
-    status: "Live prototype",
-    description: "A tiny top-down browser racing game built for the AI Society student projects showcase.",
+    description: "A third-person browser racing simulator with AI drivers, tire grip, and automatic drift handling.",
     action: "Play",
     color: "var(--ai-azure)"
   },
@@ -28,7 +16,6 @@ const projects = [
     id: "poster-studio",
     title: "Poster Studio",
     type: "Creative tool",
-    status: "Live prototype",
     description: "Generate slick event poster concepts for societies, workshops, socials, and hackathons.",
     action: "Create",
     color: "var(--ai-coral)"
@@ -37,7 +24,6 @@ const projects = [
     id: "token-rush",
     title: "Token Rush",
     type: "Reaction game",
-    status: "Live prototype",
     description: "A fast typing/reaction game where you chase prompts, dodge bugs, and keep your streak alive.",
     action: "Play",
     color: "var(--ai-sage)"
@@ -53,32 +39,7 @@ const projects = [
     </div>
 
     <div class="projects-layout">
-      <!-- Top Area: Featured Project -->
-      <button 
-        class="project-card featured-project" 
-        data-project-id={featuredProject.id}
-        aria-label={`View ${featuredProject.title}`}
-        aria-haspopup="dialog"
-        style={`--brand-color: ${featuredProject.color}`}
-      >
-        <div class="card-glow"></div>
-        <div class="card-content">
-          <div class="card-meta">
-            <span class="card-type">Featured Project • {featuredProject.type}</span>
-            <span class:list={["card-status", featuredProject.status === "Live prototype" ? "status-live" : "status-soon"]}>
-              {featuredProject.status}
-            </span>
-          </div>
-          <h3 class="card-title">{featuredProject.title}</h3>
-          <p class="card-description">{featuredProject.description}</p>
-          <div class="card-action">
-            <span class="action-text">{featuredProject.action}</span>
-            <svg class="action-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
-          </div>
-        </div>
-      </button>
-
-      <!-- Bottom Area: Scrollable List -->
+      <!-- Scrollable List -->
       <div class="projects-scroll-container">
         <div class="projects-scroll-row" aria-label="Student projects list">
           {projects.map((p, i) => (
@@ -93,9 +54,6 @@ const projects = [
               <div class="card-content">
                 <div class="card-meta">
                   <span class="card-type">{p.type}</span>
-                  <span class:list={["card-status", p.status === "Live prototype" ? "status-live" : "status-soon"]}>
-                    {p.status}
-                  </span>
                 </div>
                 <h3 class="card-title">{p.title}</h3>
                 <p class="card-description">{p.description}</p>
@@ -113,20 +71,14 @@ const projects = [
     <dialog id="project-modal" class="project-modal" aria-label="Project Interactive View">
       <div class="modal-wrapper">
         <button id="close-modal" class="close-modal-btn" aria-label="Close Project">
+          <span class="close-text">Close</span>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
         <div class="modal-content" aria-live="polite">
-          <!-- Surrey Drift Lab -->
+          <!-- Racing Simulator -->
           <div id="panel-drift-lab" class="project-panel" hidden>
             <div class="panel-inner">
               <StudentProjectSlot />
-            </div>
-          </div>
-
-          <!-- Campus Quest -->
-          <div id="panel-campus-quest" class="project-panel" hidden>
-            <div class="panel-inner">
-              <CampusQuest />
             </div>
           </div>
 
@@ -159,30 +111,35 @@ const projects = [
   }
 
   .projects-container {
-    max-width: 72rem;
+    max-width: 80rem; /* matches max-w-7xl */
     margin: 0 auto;
+    padding: 0 1.5rem;
     position: relative;
     z-index: 2;
   }
 
   .projects-header {
     margin-bottom: 4rem;
-    text-align: center;
+    text-align: left;
   }
 
   .projects-title {
-    font-size: clamp(2.5rem, 5vw, 3.5rem);
+    font-size: 2.25rem; /* matches text-4xl sm:text-5xl */
     font-weight: 800;
-    letter-spacing: -0.04em;
+    letter-spacing: -0.025em; /* matches tracking-tight */
     color: var(--ai-fg);
     margin-bottom: 1rem;
   }
+  @media (min-width: 640px) {
+    .projects-title {
+      font-size: 3rem;
+    }
+  }
 
   .projects-subtitle {
-    font-size: 1.125rem;
+    font-size: 1.125rem; /* matches text-lg */
     color: var(--ai-fg-muted);
     max-width: 42rem;
-    margin: 0 auto;
     line-height: 1.7;
   }
 
@@ -191,15 +148,6 @@ const projects = [
     flex-direction: column;
     gap: 1.5rem;
     margin-bottom: 3rem;
-  }
-
-  .featured-project {
-    width: 100%;
-    min-height: 320px;
-  }
-  
-  .featured-project .card-title {
-    font-size: clamp(2rem, 4vw, 2.5rem);
   }
 
   .projects-scroll-container {
@@ -236,30 +184,65 @@ const projects = [
     text-align: left;
     background: var(--ai-surface);
     border: 1px solid var(--ai-border);
-    border-radius: 1.25rem;
+    border-radius: 1.5rem; /* matches AreasWeExplore */
     padding: 2rem;
     cursor: pointer;
     overflow: hidden;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s;
     display: flex;
     flex-direction: column;
     min-height: 240px;
     font-family: inherit;
     outline: none;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+    backdrop-filter: blur(12px);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 4px 20px rgba(0, 0, 0, 0.02);
   }
 
   .card-glow {
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at 100% 100%, color-mix(in srgb, var(--brand-color) 8%, transparent), transparent 60%);
-    opacity: 0;
+    background: var(--ai-surface);
+    z-index: 0;
+    overflow: hidden;
     transition: opacity 0.4s ease;
   }
 
-  .project-card:hover .card-glow,
-  .project-card.active .card-glow {
-    opacity: 1;
+  .card-glow::before,
+  .card-glow::after {
+    content: "";
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    filter: blur(40px);
+    opacity: 0.15;
+    animation: float-card 8s infinite ease-in-out alternate;
+    pointer-events: none;
+  }
+
+  .card-glow::before {
+    background: var(--brand-color);
+    top: -50px;
+    right: -50px;
+    animation-delay: -2s;
+  }
+
+  .card-glow::after {
+    background: color-mix(in srgb, var(--brand-color) 60%, white);
+    bottom: -50px;
+    left: -50px;
+  }
+
+  @keyframes float-card {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(20px, 20px) scale(1.2); }
+  }
+
+  .project-card:hover .card-glow::before,
+  .project-card:hover .card-glow::after,
+  .project-card.active .card-glow::before,
+  .project-card.active .card-glow::after {
+    opacity: 0.4;
   }
 
   .project-card:hover {
@@ -298,43 +281,6 @@ const projects = [
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: var(--ai-fg-muted);
-  }
-
-  .card-status {
-    font-size: 0.75rem;
-    font-weight: 600;
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-  }
-
-  .status-live {
-    background: color-mix(in srgb, var(--ai-azure) 12%, transparent);
-    color: var(--ai-azure);
-  }
-
-  .status-live::before {
-    content: '';
-    display: block;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--ai-azure);
-    box-shadow: 0 0 8px var(--ai-azure);
-    animation: pulse 2s infinite;
-  }
-
-  @keyframes pulse {
-    0% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(0.8); }
-    100% { opacity: 1; transform: scale(1); }
-  }
-
-  .status-soon {
-    background: var(--ai-border);
     color: var(--ai-fg-muted);
   }
 
@@ -404,37 +350,43 @@ const projects = [
 
   .modal-wrapper {
     position: relative;
-    width: 100%;
-    max-width: 960px;
-    margin: 2rem;
+    width: 95vw;
+    height: 95vh;
+    max-width: 1600px;
+    margin: 2.5vh;
     border-radius: 1.5rem;
     background: var(--ai-slate-base);
     border: 1px solid var(--ai-border);
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
 
   .close-modal-btn {
     position: absolute;
-    top: 1rem;
-    right: 1rem;
+    top: 1.5rem;
+    right: 1.5rem;
     z-index: 50;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    height: 48px;
+    padding: 0 1.25rem;
+    border-radius: 9999px;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     color: #F8FAFC;
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 0.5rem;
     cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9375rem;
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .close-modal-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: scale(1.05);
+    background: rgba(255, 255, 255, 0.15);
+    transform: scale(1.02);
   }
 
   .close-modal-btn:focus-visible {
@@ -442,10 +394,22 @@ const projects = [
     outline-offset: 2px;
   }
 
+  @media (max-width: 640px) {
+    .close-text {
+      display: none;
+    }
+    .close-modal-btn {
+      padding: 0;
+      width: 48px;
+      justify-content: center;
+    }
+  }
+
   .modal-content {
     position: relative;
     width: 100%;
-    min-height: 600px;
+    height: 100%;
+    overflow: hidden;
   }
 
   .project-panel {
@@ -463,13 +427,14 @@ const projects = [
   }
 
   /* Hide inner redundant headers and backgrounds from modules to make them fit */
-  .panel-inner :global(.drift-lab-section),
-  .panel-inner :global(.cq-section),
-  .panel-inner :global(.ps-section),
-  .panel-inner :global(.tr-section) {
-    border: none;
-    background: transparent;
-    padding: 4rem 1.5rem;
+  .panel-inner :global(section) {
+    border: none !important;
+    background: transparent !important;
+    padding: 2rem 1.5rem !important;
+    height: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
   }
 
   /* ── Placeholder Concept Panels ── */
@@ -597,7 +562,6 @@ const projects = [
       min-height: 500px;
     }
     .panel-inner :global(.drift-lab-section),
-    .panel-inner :global(.cq-section),
     .panel-inner :global(.ps-section),
     .panel-inner :global(.tr-section) {
       padding: 2rem 0.5rem;
@@ -613,9 +577,6 @@ const projects = [
     }
     .card-glow {
       display: none;
-    }
-    .status-live::before {
-      animation: none;
     }
   }
 </style>

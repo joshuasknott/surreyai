@@ -2,114 +2,112 @@
 export const prerender = true;
 import { getSocietyById } from '@surreysocieties/admin/config';
 import Layout from '../layouts/Layout.astro';
+import AnimatedHero from '../components/common/AnimatedHero.astro';
 import '../styles/global.css';
 
 const society = getSocietyById('ai')!;
 ---
 
-<Layout title="Join" description="Join Surrey Artificial Intelligence Society — find out how to become a member, what you'll get, and how to stay connected.">
+<Layout title="Join" description="Join Surrey Artificial Intelligence Society — find out how to become a member, what you'll get, and how to stay connected." hideCTA={true}>
 
-  <section class="bg-ai-bg text-ai-fg border-b border-ai-border min-h-[85vh] flex flex-col justify-center py-20 px-6">
-    <div class="mx-auto max-w-4xl text-center">
-      <h1 class="text-6xl sm:text-8xl font-extrabold tracking-tight leading-[1] mb-10">
-        Become a part of the future.
-      </h1>
-      
-      <div class="max-w-2xl mx-auto">
-        <ul class="text-left text-ai-fg-muted text-xl sm:text-2xl leading-relaxed space-y-6 mb-16 mx-auto inline-block">
-          <li class="flex items-center gap-4">
-            <div class="w-3 h-3 rounded-full bg-ai-coral shrink-0"></div>
-            <span>Access to hands-on workshops.</span>
-          </li>
-          <li class="flex items-center gap-4">
-            <div class="w-3 h-3 rounded-full bg-ai-azure shrink-0"></div>
-            <span>Entry to society hackathons.</span>
-          </li>
-          <li class="flex items-center gap-4">
-            <div class="w-3 h-3 rounded-full bg-ai-sage shrink-0"></div>
-            <span>Networking with industry speakers.</span>
-          </li>
-        </ul>
-      </div>
-
-      <div class="flex flex-col items-center gap-6">
-        <a 
-          href={society.membershipUrl} 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          class="inline-block w-full sm:w-auto px-10 py-5 bg-ai-azure text-white text-xl font-bold rounded-full shadow-xl hover:scale-105 transition-transform"
-        >
-          Join via Students' Union
-        </a>
-        <a 
-          href={society.studentsUnionUrl} 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          class="text-ai-fg-muted hover:text-ai-fg text-sm underline underline-offset-4 transition-colors"
-        >
-          View society SU page
-        </a>
-      </div>
+  <AnimatedHero title="Become a part of the future." centered={true} minHeight="85vh">
+    <div class="max-w-2xl mx-auto mt-6">
+      <ul class="text-left text-ai-fg-muted text-xl sm:text-2xl leading-relaxed space-y-6 mb-16 mx-auto inline-block">
+        <li class="flex items-center gap-4">
+          <div class="w-3 h-3 rounded-full bg-ai-coral shrink-0"></div>
+          <span>Access to hands-on workshops.</span>
+        </li>
+        <li class="flex items-center gap-4">
+          <div class="w-3 h-3 rounded-full bg-ai-azure shrink-0"></div>
+          <span>Entry to society hackathons.</span>
+        </li>
+        <li class="flex items-center gap-4">
+          <div class="w-3 h-3 rounded-full bg-ai-sage shrink-0"></div>
+          <span>Networking with industry speakers.</span>
+        </li>
+      </ul>
     </div>
-  </section>
+
+    <div class="flex flex-col items-center gap-6">
+      <a 
+        href={society.membershipUrl} 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        class="inline-block w-full sm:w-auto px-10 py-5 bg-ai-azure text-white text-xl font-bold rounded-full shadow-xl hover:scale-105 transition-transform"
+      >
+        Join via Students' Union
+      </a>
+      <a 
+        href={society.studentsUnionUrl} 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        class="text-ai-fg-muted hover:text-ai-fg text-sm underline underline-offset-4 transition-colors"
+      >
+        View society SU page
+      </a>
+    </div>
+  </AnimatedHero>
 
   <!-- FAQ & Contact -->
-  <section class="py-16 sm:py-24 px-6 bg-ai-surface text-ai-fg">
-    <div class="mx-auto max-w-5xl">
-      <div class="grid md:grid-cols-2 gap-16 lg:gap-24">
+  <!-- FAQ & Contact -->
+  <section class="py-16 sm:py-24 px-6 bg-ai-bg text-ai-fg relative z-10">
+    <div class="mx-auto max-w-7xl">
+      <div class="grid md:grid-cols-2 gap-8 lg:gap-12">
 
-        <div>
-          <h2 class="text-3xl font-extrabold mb-8 text-ai-fg">FAQ</h2>
-          <dl class="space-y-8">
-            <div>
-              <dt class="font-bold text-lg text-ai-fg mb-2">Do I need to know how to code?</dt>
-              <dd class="text-ai-fg-muted text-base leading-relaxed">No. We run non-technical sessions covering AI ethics, implications, and tooling for students from any background.</dd>
-            </div>
-            <div>
-              <dt class="font-bold text-lg text-ai-fg mb-2">Is there a membership fee?</dt>
-              <dd class="text-ai-fg-muted text-base leading-relaxed">Fees are set by the Surrey Students' Union and will be shown on the SU portal when membership opens.</dd>
-            </div>
-            <div>
-              <dt class="font-bold text-lg text-ai-fg mb-2">I'm a first-year — is this for me?</dt>
-              <dd class="text-ai-fg-muted text-base leading-relaxed">Absolutely. We start from first principles. Many of our longest-serving members joined in their first term.</dd>
-            </div>
-          </dl>
+        <div class="relative bg-ai-surface border border-ai-border rounded-[1.5rem] p-8 sm:p-12 overflow-hidden shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_4px_20px_rgba(0,0,0,0.02)] backdrop-blur-md">
+          <div class="absolute inset-0 bg-[var(--ai-coral)] opacity-[0.03] blur-[80px] scale-150 pointer-events-none"></div>
+          <div class="relative z-10">
+            <h2 class="text-3xl sm:text-4xl font-extrabold mb-8 text-ai-fg tracking-tight">FAQ</h2>
+            <dl class="space-y-8">
+              <div>
+                <dt class="font-bold text-lg text-ai-fg mb-2">Do I need to know how to code?</dt>
+                <dd class="text-ai-fg-muted text-base leading-relaxed">No. We run non-technical sessions covering AI ethics, implications, and tooling for students from any background.</dd>
+              </div>
+              <div>
+                <dt class="font-bold text-lg text-ai-fg mb-2">Is there a membership fee?</dt>
+                <dd class="text-ai-fg-muted text-base leading-relaxed">Fees are set by the Surrey Students' Union and will be shown on the SU portal when membership opens.</dd>
+              </div>
+              <div>
+                <dt class="font-bold text-lg text-ai-fg mb-2">I'm a first-year — is this for me?</dt>
+                <dd class="text-ai-fg-muted text-base leading-relaxed">Absolutely. We start from first principles. Many of our longest-serving members joined in their first term.</dd>
+              </div>
+            </dl>
+          </div>
         </div>
 
-        <div>
-          <h2 class="text-3xl font-extrabold mb-8 text-ai-fg">Contact</h2>
-          <div class="space-y-6">
+        <div class="relative bg-ai-surface border border-ai-border rounded-[1.5rem] p-8 sm:p-12 overflow-hidden shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_4px_20px_rgba(0,0,0,0.02)] backdrop-blur-md">
+          <div class="absolute inset-0 bg-[var(--ai-azure)] opacity-[0.03] blur-[80px] scale-150 pointer-events-none"></div>
+          <div class="relative z-10">
+            <h2 class="text-3xl sm:text-4xl font-extrabold mb-8 text-ai-fg tracking-tight">Contact</h2>
+            <div class="space-y-6">
 
-            <!-- Email -->
-            <div class="bg-ai-bg border border-ai-border rounded-2xl p-6 flex items-center justify-between gap-4 hover:border-ai-azure transition-colors">
-              <div>
-                <h3 class="font-bold text-base text-ai-fg">Email</h3>
-                <p class="text-ai-fg-muted text-sm mt-1">{society.contactEmail}</p>
-              </div>
-              <a
-                href={`mailto:${society.contactEmail}`}
-                class="shrink-0 text-sm font-bold text-ai-azure hover:underline transition-colors"
-              >
-                Email us &rarr;
+              <!-- Email -->
+              <a href={`mailto:${society.contactEmail}`} class="block group/link">
+                <div class="bg-ai-bg border border-ai-border rounded-[1rem] p-6 flex items-center justify-between gap-4 group-hover/link:border-ai-azure transition-colors">
+                  <div>
+                    <h3 class="font-bold text-base text-ai-fg">Email</h3>
+                    <p class="text-ai-fg-muted text-sm mt-1">{society.contactEmail}</p>
+                  </div>
+                  <span class="shrink-0 text-sm font-bold text-ai-azure group-hover/link:translate-x-1 transition-transform">
+                    &rarr;
+                  </span>
+                </div>
               </a>
-            </div>
 
-            <!-- Instagram -->
-            <div class="bg-ai-bg border border-ai-border rounded-2xl p-6 flex items-center justify-between gap-4 hover:border-ai-coral transition-colors">
-              <div>
-                <h3 class="font-bold text-base text-ai-fg">Instagram</h3>
-                <p class="text-ai-fg-muted text-sm mt-1">@surrey.ai.ds</p>
-              </div>
-              <a 
-                href={society.socials.instagram} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                class="shrink-0 text-sm font-bold text-ai-coral hover:underline transition-colors"
-              >
-                Follow &rarr;
+              <!-- Instagram -->
+              <a href={society.socials.instagram} target="_blank" rel="noopener noreferrer" class="block group/link">
+                <div class="bg-ai-bg border border-ai-border rounded-[1rem] p-6 flex items-center justify-between gap-4 group-hover/link:border-ai-coral transition-colors">
+                  <div>
+                    <h3 class="font-bold text-base text-ai-fg">Instagram</h3>
+                    <p class="text-ai-fg-muted text-sm mt-1">@surrey.ai.ds</p>
+                  </div>
+                  <span class="shrink-0 text-sm font-bold text-ai-coral group-hover/link:translate-x-1 transition-transform">
+                    &rarr;
+                  </span>
+                </div>
               </a>
-            </div>
 
+            </div>
           </div>
         </div>
 

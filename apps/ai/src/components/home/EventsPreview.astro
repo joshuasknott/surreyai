@@ -26,11 +26,11 @@ const formatEventDate = (date?: string) => {
 };
 ---
 
-<section id="events" class="bg-ai-surface text-ai-fg py-16 sm:py-24 px-6 border-b border-ai-border">
-  <div class="mx-auto max-w-5xl">
-    <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-12 gap-4">
+<section id="events" class="bg-ai-bg text-ai-fg py-16 sm:py-24 px-6 border-t border-ai-border relative z-10">
+  <div class="mx-auto max-w-7xl">
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-16 gap-4">
       <div>
-        <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight mb-2">
+        <h2 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-2">
           Recent & Upcoming Events
         </h2>
       </div>
@@ -40,7 +40,7 @@ const formatEventDate = (date?: string) => {
     </div>
 
     {events.length === 0 ? (
-      <div class="text-center py-16 bg-ai-bg border border-ai-border rounded-2xl">
+      <div class="text-center py-16 bg-ai-surface border border-ai-border rounded-[1.5rem]">
         <h3 class="font-bold text-2xl tracking-tight mb-3 text-ai-fg">Events being announced soon</h3>
         <p class="text-ai-fg-muted text-base leading-relaxed max-w-xl mx-auto mb-8">
           We're currently planning our next semester of events. Join our community to get notified.
@@ -51,32 +51,85 @@ const formatEventDate = (date?: string) => {
       </div>
     ) : (
       <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {events.slice(0, 3).map((event) => (
-          <article class="bg-ai-bg border border-ai-border rounded-xl p-8 hover:shadow-lg transition-shadow duration-300 flex flex-col">
-            <time class="text-3xl font-extrabold text-ai-fg mb-4 uppercase tracking-tighter">
-              {formatEventDate(event.date)}
-            </time>
-            
-            <h3 class="font-bold text-xl text-ai-fg mb-2">
-              {event.title}
-            </h3>
-            
-            {(event.location || event.startTime) && (
-              <p class="text-sm font-medium text-ai-azure mb-4 uppercase tracking-wide">
-                {[event.location, event.startTime].filter(Boolean).join(" • ")}
-              </p>
-            )}
+        {events.slice(0, 3).map((event, i) => {
+          // Assign alternating colors for the glow
+          const colors = ['var(--ai-coral)', 'var(--ai-azure)', 'var(--ai-sage)'];
+          const glowColor = colors[i % colors.length];
+          return (
+            <article class="event-card group">
+              <div class="card-glow" style={`background-color: ${glowColor};`}></div>
+              <div class="event-content">
+                <time class="text-3xl font-extrabold text-ai-fg mb-4 uppercase tracking-tighter">
+                  {formatEventDate(event.date)}
+                </time>
+                
+                <h3 class="font-bold text-xl text-ai-fg mb-2">
+                  {event.title}
+                </h3>
+                
+                {(event.location || event.startTime) && (
+                  <p class="text-sm font-medium text-ai-azure mb-4 uppercase tracking-wide">
+                    {[event.location, event.startTime].filter(Boolean).join(" • ")}
+                  </p>
+                )}
 
-            {event.description && (
-              <p class="text-ai-fg-muted text-sm leading-relaxed mb-6 flex-grow">{event.description}</p>
-            )}
+                {event.description && (
+                  <p class="text-ai-fg-muted text-sm leading-relaxed mb-6 flex-grow">{event.description}</p>
+                )}
 
-            <a href="/events" class="text-ai-fg font-semibold text-sm hover:text-ai-azure transition-colors mt-auto inline-flex items-center gap-1 group">
-              View details <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
-            </a>
-          </article>
-        ))}
+                <a href="/events" class="text-ai-fg font-semibold text-sm hover:text-ai-azure transition-colors mt-auto inline-flex items-center gap-1 group/link">
+                  View details <span class="group-hover/link:translate-x-1 transition-transform">&rarr;</span>
+                </a>
+              </div>
+            </article>
+          );
+        })}
       </div>
     )}
   </div>
 </section>
+
+<style>
+  .event-card {
+    position: relative;
+    background: var(--ai-surface);
+    border: 1px solid var(--ai-border);
+    border-radius: 1.5rem;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s;
+    backdrop-filter: blur(12px);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 4px 20px rgba(0, 0, 0, 0.02);
+    text-decoration: none;
+  }
+
+  .event-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--ai-border-strong);
+  }
+
+  .card-glow {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    filter: blur(60px);
+    transform: scale(1.5);
+    transition: opacity 0.5s ease;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .event-card:hover .card-glow {
+    opacity: 0.15;
+  }
+
+  .event-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+</style>
