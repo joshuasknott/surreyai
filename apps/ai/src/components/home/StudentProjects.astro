@@ -3,7 +3,6 @@ import StudentProjectSlot from "./StudentProjectSlot.astro";
 import IdeaAnalyser from "./student-projects/IdeaAnalyser.astro";
 import AgenticWorkspace from "./student-projects/AgenticWorkspace.astro";
 import PromptWorkshop from "./student-projects/PromptWorkshop.astro";
-import NeuralPlayground from "./student-projects/NeuralPlayground.astro";
 import StudySprintPlanner from "./student-projects/StudySprintPlanner.astro";
 import EscapeRoom from "./student-projects/EscapeRoom.astro";
 
@@ -39,14 +38,6 @@ const projects = [
     description: "A prompt engineering workbench that turns rough requests into clearer, safer, more specific prompts.",
     action: "Build",
     color: "var(--ai-azure)"
-  },
-  {
-    id: "neural-playground",
-    title: "Neural Playground",
-    type: "Learning simulation",
-    description: "Train a tiny classifier and watch its decision boundary adapt to labelled data in real time.",
-    action: "Train",
-    color: "var(--ai-sage)"
   },
   {
     id: "study-sprint",
@@ -143,12 +134,6 @@ const projects = [
           <div id="panel-prompt-workshop" class="project-panel" hidden>
             <div class="panel-inner">
               <PromptWorkshop />
-            </div>
-          </div>
-
-          <div id="panel-neural-playground" class="project-panel" hidden>
-            <div class="panel-inner">
-              <NeuralPlayground />
             </div>
           </div>
 
