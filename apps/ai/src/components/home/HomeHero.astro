@@ -2,73 +2,398 @@
 ---
 
 <section class="home-hero" aria-labelledby="home-hero-title">
-  <div class="home-hero__bg"></div>
+  <canvas class="home-hero__canvas" id="ai-hero-canvas" aria-hidden="true"></canvas>
+  <div class="home-hero__grid" aria-hidden="true"></div>
+
+  <div class="hero-glow-orb orb-1" aria-hidden="true"></div>
+  <div class="hero-glow-orb orb-2" aria-hidden="true"></div>
+  <div class="hero-glow-orb orb-3" aria-hidden="true"></div>
 
   <div class="home-hero__inner">
     <div class="home-hero__content">
       <h1 id="home-hero-title" class="home-hero__title">
         Surrey Artificial Intelligence Society.
-        <span class="block mt-4 text-ai-fg-muted font-medium text-3xl sm:text-5xl tracking-tight leading-[1.1]">We learn, build, and debate the systems shaping the future.</span>
+        <span>Learn the systems. Build the prototypes. Question the impact.</span>
       </h1>
+      <p class="home-hero__intro">
+        A beginner-friendly technical community for students who want to understand machine learning,
+        generative AI, automation, and responsible deployment through practical sessions and member projects.
+      </p>
       
       <div class="home-hero__actions">
-        <a href="#explore" class="btn-secondary">Explore our focus areas</a>
         <a href="/join" class="btn-primary">Join the Society</a>
+        <a href="#explore" class="btn-secondary">Explore AI tracks</a>
       </div>
     </div>
   </div>
 </section>
 
+<script>
+  const canvas = document.getElementById("ai-hero-canvas") as HTMLCanvasElement | null;
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (canvas) {
+    const context = canvas.getContext("2d");
+    
+    // Mouse state tracking for field distortion
+    const mouse = {
+      x: 0,
+      y: 0,
+      targetX: 0,
+      targetY: 0,
+      active: false,
+      radius: 220,
+    };
+
+    // Flow streamlines configuration
+    const streamlineCount = 18;
+    const streamlines: Array<{
+      yRatio: number;
+      speed: number;
+      amplitude: number;
+      wavelength: number;
+      phase: number;
+      color: string;
+      glowColor: string;
+      isDashed: boolean;
+    }> = [];
+
+    for (let i = 0; i < streamlineCount; i++) {
+      const isAzure = i % 3 === 0;
+      const isCoral = i % 3 === 1;
+      
+      streamlines.push({
+        yRatio: 0.15 + 0.7 * (i / (streamlineCount - 1)),
+        speed: 0.2 + Math.random() * 0.35,
+        amplitude: 15 + Math.random() * 25,
+        wavelength: 220 + Math.random() * 320,
+        phase: Math.random() * Math.PI * 2,
+        color: isAzure ? "rgba(99, 102, 241, 0.18)" : isCoral ? "rgba(244, 63, 94, 0.16)" : "rgba(16, 185, 129, 0.15)",
+        glowColor: isAzure ? "rgba(99, 102, 241, 0.4)" : isCoral ? "rgba(244, 63, 94, 0.4)" : "rgba(16, 185, 129, 0.4)",
+        isDashed: Math.random() > 0.65,
+      });
+    }
+
+    // Cybernetic coordinate hubs in latent space
+    const hubs = [
+      { xRatio: 0.12, yRatio: 0.22, size: 4, label: "TENSOR_IN", color: "var(--ai-azure)" },
+      { xRatio: 0.28, yRatio: 0.78, size: 5, label: "LATENT_EMBED", color: "var(--ai-sage)" },
+      { xRatio: 0.45, yRatio: 0.38, size: 4.5, label: "ATTN_WEIGHTS", color: "var(--ai-coral)" },
+      { xRatio: 0.62, yRatio: 0.68, size: 6, label: "TRANSFORMER_BLOCK_04", color: "var(--ai-azure)" },
+      { xRatio: 0.78, yRatio: 0.26, size: 5, label: "FEED_FORWARD", color: "var(--ai-sage)" },
+      { xRatio: 0.88, yRatio: 0.58, size: 4.5, label: "LOGITS_OUT", color: "var(--ai-coral)" }
+    ];
+
+    // High-tech flow sparks
+    const sparkCount = 40;
+    const sparks: Array<{
+      streamIndex: number;
+      progress: number;
+      speed: number;
+      size: number;
+    }> = [];
+
+    for (let i = 0; i < sparkCount; i++) {
+      sparks.push({
+        streamIndex: Math.floor(Math.random() * streamlineCount),
+        progress: Math.random(),
+        speed: 0.0003 + Math.random() * 0.0009,
+        size: 1.2 + Math.random() * 1.8,
+      });
+    }
+
+    const resize = () => {
+      const ratio = Math.min(window.devicePixelRatio || 1, 2);
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = Math.max(1, Math.floor(rect.width * ratio));
+      canvas.height = Math.max(1, Math.floor(rect.height * ratio));
+      context?.setTransform(ratio, 0, 0, ratio, 0, 0);
+    };
+
+    const draw = (time = 0) => {
+      if (!context) return;
+      const rect = canvas.getBoundingClientRect();
+      context.clearRect(0, 0, rect.width, rect.height);
+
+      // Smoothly interpolate mouse movement
+      if (mouse.active) {
+        mouse.x += (mouse.targetX - mouse.x) * 0.08;
+        mouse.y += (mouse.targetY - mouse.y) * 0.08;
+      }
+
+      // 1. Draw Flow Streamlines
+      streamlines.forEach((line) => {
+        context.beginPath();
+        context.strokeStyle = line.color;
+        context.lineWidth = 1.2;
+        
+        if (line.isDashed) {
+          context.setLineDash([4, 16]);
+        } else {
+          context.setLineDash([]);
+        }
+
+        // Draw streamline across screen segments
+        const segments = 24;
+        for (let j = 0; j <= segments; j++) {
+          const sx = (j / segments) * rect.width;
+          let sy = line.yRatio * rect.height;
+          
+          // Organic sine wave distortion
+          sy += Math.sin(sx / line.wavelength + time * 0.0008 * line.speed + line.phase) * line.amplitude;
+
+          // Mouse warp repulsion field
+          if (mouse.active) {
+            const dx = sx - mouse.x;
+            const dy = sy - mouse.y;
+            const dist = Math.hypot(dx, dy);
+            if (dist < mouse.radius) {
+              const force = (1 - dist / mouse.radius) * 45;
+              // Warp lines vertically and horizontally
+              sy += (dy / (dist || 1)) * force;
+            }
+          }
+
+          if (j === 0) {
+            context.moveTo(sx, sy);
+          } else {
+            context.lineTo(sx, sy);
+          }
+        }
+        context.stroke();
+      });
+      context.setLineDash([]); // Reset line dash
+
+      // 2. Draw Floating Sparks (particles flowing on streamlines)
+      sparks.forEach((spark) => {
+        spark.progress += spark.speed;
+        if (spark.progress > 1) {
+          spark.progress = 0;
+          spark.streamIndex = Math.floor(Math.random() * streamlineCount);
+        }
+
+        const sx = spark.progress * rect.width;
+        const line = streamlines[spark.streamIndex];
+        let sy = line.yRatio * rect.height;
+
+        sy += Math.sin(sx / line.wavelength + time * 0.0008 * line.speed + line.phase) * line.amplitude;
+
+        // Apply mouse warp to particles
+        if (mouse.active) {
+          const dx = sx - mouse.x;
+          const dy = sy - mouse.y;
+          const dist = Math.hypot(dx, dy);
+          if (dist < mouse.radius) {
+            const force = (1 - dist / mouse.radius) * 45;
+            sy += (dy / (dist || 1)) * force;
+          }
+        }
+
+        // Beautiful glowing particle head
+        context.shadowBlur = 8;
+        context.shadowColor = line.glowColor;
+        context.fillStyle = line.glowColor;
+        context.beginPath();
+        context.arc(sx, sy, spark.size, 0, Math.PI * 2);
+        context.fill();
+        context.shadowBlur = 0; // Reset shadow for performance
+      });
+
+      // 3. Draw Cybernetic Latent Hubs
+      hubs.forEach((hub) => {
+        const hx = hub.xRatio * rect.width;
+        const hy = hub.yRatio * rect.height + Math.sin(time * 0.0005 + hx) * 12;
+
+        // Interactive coordinate lines matching our "Create with AI" aesthetic
+        if (mouse.active) {
+          const dist = Math.hypot(hx - mouse.x, hy - mouse.y);
+          if (dist < 240) {
+            // Draw coordinate link lines
+            context.strokeStyle = `rgba(255, 255, 255, ${(1 - dist / 240) * 0.08})`;
+            context.lineWidth = 0.8;
+            context.beginPath();
+            context.moveTo(hx, hy);
+            context.lineTo(mouse.x, mouse.y);
+            context.stroke();
+          }
+        }
+
+        // Draw hub outer pulsing ring
+        const pulse = 1 + Math.sin(time * 0.002 + hub.size) * 0.3;
+        context.strokeStyle = hub.color;
+        context.lineWidth = 1;
+        context.beginPath();
+        context.arc(hx, hy, hub.size * 2.8 * pulse, 0, Math.PI * 2);
+        context.stroke();
+
+        // Inner glowing core
+        context.fillStyle = hub.color;
+        context.beginPath();
+        context.arc(hx, hy, hub.size, 0, Math.PI * 2);
+        context.fill();
+
+        // Tech tick indicators around the hub
+        context.strokeStyle = "rgba(255, 255, 255, 0.2)";
+        context.beginPath();
+        context.moveTo(hx - hub.size * 4, hy);
+        context.lineTo(hx - hub.size * 3, hy);
+        context.moveTo(hx + hub.size * 3, hy);
+        context.lineTo(hx + hub.size * 4, hy);
+        context.stroke();
+
+        // Monospace technical typography labeling
+        context.fillStyle = "rgba(255, 255, 255, 0.28)";
+        context.font = "7.5px monospace";
+        context.letterSpacing = "0.5px";
+        context.fillText(hub.label, hx + hub.size * 4.5, hy + 2.5);
+      });
+
+      // 4. Mouse Interactive Targeting Indicator
+      if (mouse.active) {
+        // Soft outer focus rings
+        context.strokeStyle = "rgba(99, 102, 241, 0.07)";
+        context.lineWidth = 1;
+        context.beginPath();
+        context.arc(mouse.x, mouse.y, 80, 0, Math.PI * 2);
+        context.stroke();
+
+        context.strokeStyle = "rgba(244, 63, 94, 0.05)";
+        context.beginPath();
+        context.arc(mouse.x, mouse.y, 140, 0, Math.PI * 2);
+        context.stroke();
+
+        // Interactive coordinate ticks on the cursor
+        context.strokeStyle = "rgba(99, 102, 241, 0.18)";
+        context.beginPath();
+        context.moveTo(mouse.x - 8, mouse.y);
+        context.lineTo(mouse.x + 8, mouse.y);
+        context.moveTo(mouse.x, mouse.y - 8);
+        context.lineTo(mouse.x, mouse.y + 8);
+        context.stroke();
+      }
+
+      if (!prefersReducedMotion) requestAnimationFrame(draw);
+    };
+
+    resize();
+    draw();
+
+    window.addEventListener("resize", resize);
+
+    // Track mouse coordinates over the hero section
+    const heroSection = document.querySelector(".home-hero");
+    if (heroSection) {
+      heroSection.addEventListener("mousemove", (e: any) => {
+        const rect = canvas.getBoundingClientRect();
+        mouse.targetX = e.clientX - rect.left;
+        mouse.targetY = e.clientY - rect.top;
+        if (!mouse.active) {
+          mouse.x = mouse.targetX;
+          mouse.y = mouse.targetY;
+          mouse.active = true;
+        }
+      });
+
+      heroSection.addEventListener("mouseenter", () => {
+        mouse.active = true;
+      });
+
+      heroSection.addEventListener("mouseleave", () => {
+        mouse.active = false;
+      });
+    }
+  }
+</script>
+
 <style>
   .home-hero {
     position: relative;
     overflow: hidden;
-    min-height: 100svh;
+    min-height: calc(100svh - 5rem);
     display: flex;
     align-items: center;
     color: var(--ai-fg);
+    background:
+      linear-gradient(135deg, color-mix(in srgb, var(--ai-surface) 93%, var(--ai-azure)), var(--ai-bg) 45%, color-mix(in srgb, var(--ai-surface) 90%, var(--ai-coral)));
   }
 
-  .home-hero__bg {
+  .home-hero__canvas {
     position: absolute;
     inset: 0;
-    z-index: 0;
-    background: var(--ai-bg);
-    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    opacity: 0.52;
+    pointer-events: none;
   }
-  
-  /* Abstract slow-moving color gradient */
-  .home-hero__bg::before,
-  .home-hero__bg::after {
-    content: "";
+
+  .home-hero__grid {
     position: absolute;
-    width: 60vw;
-    height: 60vw;
+    inset: 0;
+    background-image:
+      linear-gradient(color-mix(in srgb, var(--ai-border) 48%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in srgb, var(--ai-border) 48%, transparent) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+    opacity: 0.38;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Deep layered premium ambient blurs */
+  .hero-glow-orb {
+    position: absolute;
     border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.15;
-    animation: float 20s infinite ease-in-out alternate;
+    filter: blur(130px);
+    z-index: 0;
+    opacity: 0.12;
+    pointer-events: none;
+    animation: drift 25s infinite alternate ease-in-out;
   }
-
-  .home-hero__bg::before {
-    background: var(--ai-coral);
-    top: -10vw;
-    right: -10vw;
+  .orb-1 {
+    top: -12%;
+    left: 10%;
+    width: 45vw;
+    height: 45vw;
+    background: radial-gradient(circle, var(--ai-azure) 0%, transparent 70%);
+  }
+  .orb-2 {
+    bottom: -15%;
+    right: 5%;
+    width: 48vw;
+    height: 48vw;
+    background: radial-gradient(circle, var(--ai-coral) 0%, transparent 70%);
     animation-delay: -5s;
+    animation-duration: 28s;
+  }
+  .orb-3 {
+    top: 25%;
+    left: 55%;
+    width: 38vw;
+    height: 38vw;
+    background: radial-gradient(circle, var(--ai-sage) 0%, transparent 70%);
+    animation-delay: -10s;
+    animation-duration: 22s;
   }
 
-  .home-hero__bg::after {
-    background: var(--ai-azure);
-    bottom: -10vw;
-    left: -10vw;
+  @keyframes drift {
+    0% {
+      transform: translate(0, 0) scale(1);
+    }
+    50% {
+      transform: translate(4%, 7%) scale(1.12);
+    }
+    100% {
+      transform: translate(-3%, -5%) scale(0.92);
+    }
   }
 
   .home-hero__inner {
     position: relative;
-    z-index: 1;
+    z-index: 2;
     width: min(100%, 86rem);
     margin: 0 auto;
-    padding: 0 2rem;
+    padding: 5rem 2rem;
   }
 
   .home-hero__content {
@@ -77,28 +402,52 @@
 
   .home-hero__title {
     margin: 0;
-    font-size: clamp(3rem, 7vw, 5.5rem);
+    font-size: 5rem;
     line-height: 1;
-    letter-spacing: -0.05em;
+    letter-spacing: 0;
     font-weight: 800;
+  }
+
+  .home-hero__title span {
+    display: block;
+    margin-top: 1rem;
+    color: var(--ai-fg-muted);
+    font-size: 2rem;
+    line-height: 1.18;
+    font-weight: 650;
+  }
+
+  .home-hero__intro {
+    max-width: 45rem;
+    margin: 1.75rem 0 0;
+    color: var(--ai-fg-muted);
+    font-size: 1.14rem;
+    line-height: 1.8;
   }
 
   .home-hero__actions {
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
-    margin-top: 3.5rem;
+    margin-top: 2.25rem;
   }
 
-  @keyframes float {
-    0% { transform: translate(0, 0) scale(1); }
-    100% { transform: translate(5vw, 5vw) scale(1.1); }
-  }
+  @media (max-width: 720px) {
+    .home-hero {
+      min-height: auto;
+    }
 
-  @media (prefers-reduced-motion: reduce) {
-    .home-hero__bg::before,
-    .home-hero__bg::after {
-      animation: none;
+    .home-hero__inner {
+      padding: 4rem 1.25rem;
+      gap: 2.5rem;
+    }
+
+    .home-hero__title {
+      font-size: 3rem;
+    }
+
+    .home-hero__title span {
+      font-size: 1.5rem;
     }
   }
 </style>

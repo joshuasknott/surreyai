@@ -10,7 +10,10 @@ const { title, description, centered = false, minHeight = "auto" } = Astro.props
 ---
 
 <section class="animated-hero" style={`min-height: ${minHeight};`}>
-  <div class="animated-hero__bg"></div>
+  <div class="animated-hero__bg">
+    <canvas class="animated-hero__canvas" aria-hidden="true"></canvas>
+    <div class="animated-hero__grid" aria-hidden="true"></div>
+  </div>
 
   <div class={`animated-hero__inner ${centered ? 'text-center' : ''}`}>
     <h1 class="animated-hero__title">
@@ -24,6 +27,204 @@ const { title, description, centered = false, minHeight = "auto" } = Astro.props
     <slot />
   </div>
 </section>
+
+<script>
+  const heroSections = document.querySelectorAll(".animated-hero");
+
+  heroSections.forEach((hero) => {
+    const canvas = hero.querySelector(".animated-hero__canvas") as HTMLCanvasElement | null;
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (canvas) {
+      const context = canvas.getContext("2d");
+      
+      const mouse = {
+        x: 0,
+        y: 0,
+        targetX: 0,
+        targetY: 0,
+        active: false,
+      };
+
+      // Flow lines configured for secondary subpages
+      const waveCount = 5;
+      const waves: Array<{
+        yRatio: number;
+        speed: number;
+        amplitude: number;
+        wavelength: number;
+        phase: number;
+        color: string;
+      }> = [];
+
+      for (let i = 0; i < waveCount; i++) {
+        waves.push({
+          yRatio: 0.3 + 0.4 * (i / (waveCount - 1 || 1)),
+          speed: 0.12 + Math.random() * 0.18,
+          amplitude: 10 + Math.random() * 15,
+          wavelength: 280 + Math.random() * 200,
+          phase: Math.random() * Math.PI * 2,
+          color: i % 2 === 0 ? "rgba(99, 102, 241, 0.08)" : "rgba(244, 63, 94, 0.06)",
+        });
+      }
+
+      // Micro data packets drifting
+      const sparkCount = 12;
+      const sparks: Array<{
+        waveIndex: number;
+        progress: number;
+        speed: number;
+        size: number;
+      }> = [];
+
+      for (let i = 0; i < sparkCount; i++) {
+        sparks.push({
+          waveIndex: Math.floor(Math.random() * waveCount),
+          progress: Math.random(),
+          speed: 0.0002 + Math.random() * 0.0006,
+          size: 1.0 + Math.random() * 1.5,
+        });
+      }
+
+      const resize = () => {
+        const ratio = Math.min(window.devicePixelRatio || 1, 2);
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = Math.max(1, Math.floor(rect.width * ratio));
+        canvas.height = Math.max(1, Math.floor(rect.height * ratio));
+        context?.setTransform(ratio, 0, 0, ratio, 0, 0);
+      };
+
+      const draw = (time = 0) => {
+        if (!context) return;
+        const rect = canvas.getBoundingClientRect();
+        context.clearRect(0, 0, rect.width, rect.height);
+
+        if (mouse.active) {
+          mouse.x += (mouse.targetX - mouse.x) * 0.08;
+          mouse.y += (mouse.targetY - mouse.y) * 0.08;
+        }
+
+        // Draw structural background crosshair ticks
+        const gridSpacing = 80;
+        context.strokeStyle = "rgba(255, 255, 255, 0.02)";
+        context.lineWidth = 0.8;
+        for (let x = gridSpacing; x < rect.width; x += gridSpacing) {
+          for (let y = gridSpacing; y < rect.height; y += gridSpacing) {
+            context.beginPath();
+            context.moveTo(x - 3, y);
+            context.lineTo(x + 3, y);
+            context.moveTo(x, y - 3);
+            context.lineTo(x, y + 3);
+            context.stroke();
+          }
+        }
+
+        // 1. Draw Flow Waves
+        waves.forEach((wave) => {
+          context.beginPath();
+          context.strokeStyle = wave.color;
+          context.lineWidth = 1.0;
+
+          const segments = 16;
+          for (let j = 0; j <= segments; j++) {
+            const sx = (j / segments) * rect.width;
+            let sy = wave.yRatio * rect.height;
+            sy += Math.sin(sx / wave.wavelength + time * 0.0006 * wave.speed + wave.phase) * wave.amplitude;
+
+            // Soft repulsion field near mouse
+            if (mouse.active) {
+              const dx = sx - mouse.x;
+              const dy = sy - mouse.y;
+              const dist = Math.hypot(dx, dy);
+              if (dist < 180) {
+                const force = (1 - dist / 180) * 25;
+                sy += (dy / (dist || 1)) * force;
+              }
+            }
+
+            if (j === 0) {
+              context.moveTo(sx, sy);
+            } else {
+              context.lineTo(sx, sy);
+            }
+          }
+          context.stroke();
+        });
+
+        // 2. Draw sparks traveling on waves
+        sparks.forEach((spark) => {
+          spark.progress += spark.speed;
+          if (spark.progress > 1) {
+            spark.progress = 0;
+            spark.waveIndex = Math.floor(Math.random() * waveCount);
+          }
+
+          const sx = spark.progress * rect.width;
+          const wave = waves[spark.waveIndex];
+          let sy = wave.yRatio * rect.height;
+          sy += Math.sin(sx / wave.wavelength + time * 0.0006 * wave.speed + wave.phase) * wave.amplitude;
+
+          if (mouse.active) {
+            const dx = sx - mouse.x;
+            const dy = sy - mouse.y;
+            const dist = Math.hypot(dx, dy);
+            if (dist < 180) {
+              const force = (1 - dist / 180) * 25;
+              sy += (dy / (dist || 1)) * force;
+            }
+          }
+
+          context.fillStyle = spark.waveIndex % 2 === 0 ? "rgba(99, 102, 241, 0.25)" : "rgba(244, 63, 94, 0.22)";
+          context.beginPath();
+          context.arc(sx, sy, spark.size, 0, Math.PI * 2);
+          context.fill();
+        });
+
+        // 3. Coordinate Links to Cursor
+        if (mouse.active) {
+          context.strokeStyle = "rgba(99, 102, 241, 0.06)";
+          context.beginPath();
+          context.arc(mouse.x, mouse.y, 45, 0, Math.PI * 2);
+          context.stroke();
+
+          context.strokeStyle = "rgba(99, 102, 241, 0.12)";
+          context.beginPath();
+          context.moveTo(mouse.x - 5, mouse.y);
+          context.lineTo(mouse.x + 5, mouse.y);
+          context.moveTo(mouse.x, mouse.y - 5);
+          context.lineTo(mouse.x, mouse.y + 5);
+          context.stroke();
+        }
+
+        if (!prefersReducedMotion) requestAnimationFrame(draw);
+      };
+
+      resize();
+      draw();
+
+      window.addEventListener("resize", resize);
+
+      hero.addEventListener("mousemove", (e: any) => {
+        const rect = canvas.getBoundingClientRect();
+        mouse.targetX = e.clientX - rect.left;
+        mouse.targetY = e.clientY - rect.top;
+        if (!mouse.active) {
+          mouse.x = mouse.targetX;
+          mouse.y = mouse.targetY;
+          mouse.active = true;
+        }
+      });
+
+      hero.addEventListener("mouseenter", () => {
+        mouse.active = true;
+      });
+
+      hero.addEventListener("mouseleave", () => {
+        mouse.active = false;
+      });
+    }
+  });
+</script>
 
 <style>
   .animated-hero {
@@ -44,36 +245,60 @@ const { title, description, centered = false, minHeight = "auto" } = Astro.props
     background: var(--ai-bg);
     overflow: hidden;
   }
+
+  .animated-hero__canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    opacity: 0.58;
+    pointer-events: none;
+  }
+
+  .animated-hero__grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(color-mix(in srgb, var(--ai-border) 32%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in srgb, var(--ai-border) 32%, transparent) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: radial-gradient(circle at 50% 50%, black 20%, transparent 80%);
+    opacity: 0.28;
+    pointer-events: none;
+    z-index: 0;
+  }
   
   /* Abstract slow-moving color gradient */
   .animated-hero__bg::before,
   .animated-hero__bg::after {
     content: "";
     position: absolute;
-    width: 60vw;
-    height: 60vw;
+    width: 55vw;
+    height: 55vw;
     border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.15;
-    animation: float 20s infinite ease-in-out alternate;
+    filter: blur(95px);
+    opacity: 0.12;
+    animation: float 22s infinite ease-in-out alternate;
+    z-index: 0;
   }
 
   .animated-hero__bg::before {
     background: var(--ai-coral);
-    top: -10vw;
+    top: -12vw;
     right: -10vw;
     animation-delay: -5s;
   }
 
   .animated-hero__bg::after {
     background: var(--ai-azure);
-    bottom: -10vw;
-    left: -10vw;
+    bottom: -15vw;
+    left: -12vw;
   }
 
   .animated-hero__inner {
     position: relative;
-    z-index: 1;
+    z-index: 2;
     width: min(100%, 64rem); /* max-w-5xl approx */
     margin: 0 auto;
     width: 100%;
@@ -85,10 +310,13 @@ const { title, description, centered = false, minHeight = "auto" } = Astro.props
 
   .animated-hero__title {
     margin: 0 0 1.5rem 0;
-    font-size: clamp(3rem, 6vw, 4.5rem);
-    line-height: 1.1;
-    letter-spacing: -0.025em;
-    font-weight: 800;
+    font-size: clamp(2.75rem, 5.5vw, 4.25rem);
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    font-weight: 850;
+    background: linear-gradient(135deg, var(--ai-fg) 35%, color-mix(in srgb, var(--ai-fg) 70%, var(--ai-azure)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 
   .animated-hero__description {
@@ -105,7 +333,7 @@ const { title, description, centered = false, minHeight = "auto" } = Astro.props
 
   @keyframes float {
     0% { transform: translate(0, 0) scale(1); }
-    100% { transform: translate(5vw, 5vw) scale(1.1); }
+    100% { transform: translate(4vw, 4vw) scale(1.08); }
   }
 
   @media (prefers-reduced-motion: reduce) {

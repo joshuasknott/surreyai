@@ -7,12 +7,25 @@ import '../styles/global.css';
 
 <Layout title="About" description="Learn about Surrey Artificial Intelligence Society — our mission, values, and what members can expect from our student-led AI community.">
 
-  <AnimatedHero title="Why we built this society." centered={true} />
+  <AnimatedHero 
+    title="Why we built this society." 
+    description="We are a student-led technical collective at the University of Surrey dedicated to explaining machine learning, generative tools, and responsible engineering."
+    centered={true} 
+  />
 
   <!-- Mission -->
   <section class="py-16 sm:py-24 px-6 bg-ai-bg text-ai-fg relative z-10 border-b border-ai-border">
-    <div class="mx-auto max-w-5xl relative bg-ai-surface border border-ai-border rounded-[1.5rem] p-8 sm:p-16 overflow-hidden shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_4px_20px_rgba(0,0,0,0.02)] backdrop-blur-md">
-      <div class="absolute inset-0 bg-gradient-to-br from-ai-azure/5 to-ai-coral/5 pointer-events-none"></div>
+    <div class="mx-auto max-w-5xl premium-card p-8 sm:p-16" style="--card-brand-color: var(--ai-azure);">
+      <!-- Cybernetic Corner Brackets -->
+      <div class="corner-tick top-left"></div>
+      <div class="corner-tick top-right"></div>
+      <div class="corner-tick bottom-left"></div>
+      <div class="corner-tick bottom-right"></div>
+
+      <!-- Luminescent Glow, Grid, and Sweep Scan -->
+      <div class="premium-glow"></div>
+      <div class="premium-grid opacity-30"></div>
+      <div class="premium-scan"></div>
       
       <div class="relative z-10">
         <div class="mb-10 pb-10 border-b border-ai-border/50">
@@ -41,27 +54,128 @@ import '../styles/global.css';
         <p class="text-ai-fg-muted text-lg leading-relaxed max-w-2xl">The values that shape how we run the society — practically, not just on paper.</p>
       </div>
       <div class="grid md:grid-cols-3 gap-6">
-        <article class="relative bg-ai-surface border border-ai-border rounded-[1.5rem] p-8 overflow-hidden group transition-all duration-300 hover:-translate-y-1 hover:border-ai-border-strong shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_4px_20px_rgba(0,0,0,0.02)] backdrop-blur-md">
-          <div class="absolute inset-0 bg-[var(--ai-coral)] opacity-0 group-hover:opacity-[0.15] blur-[60px] scale-150 transition-opacity duration-500 pointer-events-none"></div>
-          <div class="relative z-10">
-            <h3 class="text-2xl font-bold mb-4 text-ai-fg tracking-tight">Beginner Friendly</h3>
-            <p class="text-ai-fg-muted leading-relaxed text-base">Every event should be approachable. We don't gatekeep knowledge or use unnecessary jargon. If a concept is complex, we break it down. We actively recruit and welcome students from non-STEM backgrounds to ensure diverse perspectives.</p>
+        <article class="premium-card h-full flex flex-col justify-between group" style="--card-brand-color: var(--ai-coral);">
+          <!-- Cybernetic Corner Brackets -->
+          <div class="corner-tick top-left"></div>
+          <div class="corner-tick top-right"></div>
+          <div class="corner-tick bottom-left"></div>
+          <div class="corner-tick bottom-right"></div>
+
+          <!-- Luminescent Glow, Grid, and Sweep Scan -->
+          <div class="premium-glow"></div>
+          <div class="premium-grid opacity-30"></div>
+          <div class="premium-scan"></div>
+
+          <div class="relative z-10 flex flex-col h-full justify-between p-6 sm:p-8">
+            <div>
+              <!-- Micro-Visual: Beginner Friendly Node Bridge -->
+              <div class="about-visual h-40 w-full rounded-xl relative overflow-hidden flex items-center justify-center bg-ai-bg/60 border border-ai-border/80 mb-6 group-hover:border-ai-coral/30 transition-colors">
+                <div class="about-grid"></div>
+                <div class="about-scan"></div>
+                
+                <svg class="w-full h-full max-w-[220px] relative z-10" viewBox="0 0 200 120" fill="none">
+                  <!-- Nodes -->
+                  <circle cx="45" cy="60" r="7" fill="var(--ai-coral)" class="pulse-node" />
+                  <circle cx="155" cy="30" r="5" fill="var(--ai-azure)" />
+                  <circle cx="155" cy="90" r="5" fill="var(--ai-sage)" />
+                  <!-- Connection Lines -->
+                  <path d="M 45,60 L 155,30" stroke="var(--ai-border)" stroke-width="1.5" stroke-dasharray="3,3" />
+                  <path d="M 45,60 L 155,90" stroke="var(--ai-border)" stroke-width="1.5" stroke-dasharray="3,3" />
+                  <!-- Glowing active path arcs -->
+                  <path d="M 45,60 Q 100,20 155,30" stroke="var(--ai-coral)" stroke-width="2" class="opacity-70 flow-arc" />
+                  <path d="M 45,60 Q 100,100 155,90" stroke="var(--ai-coral)" stroke-width="2" class="opacity-70 flow-arc-delayed" />
+                  <!-- Flowing packets -->
+                  <circle cx="100" cy="38" r="3" fill="var(--ai-coral)" class="sparkle-packet" />
+                  <circle cx="100" cy="82" r="3" fill="var(--ai-coral)" class="sparkle-packet-delayed" />
+                </svg>
+              </div>
+
+              <h3 class="text-2xl font-bold mb-4 text-ai-fg tracking-tight group-hover:text-ai-coral transition-colors duration-300">Beginner Friendly</h3>
+              <p class="text-ai-fg-muted leading-relaxed text-sm">Every event should be approachable. We don't gatekeep knowledge or use unnecessary jargon. If a concept is complex, we break it down. We actively recruit and welcome students from non-STEM backgrounds to ensure diverse perspectives.</p>
+            </div>
           </div>
         </article>
         
-        <article class="relative bg-ai-surface border border-ai-border rounded-[1.5rem] p-8 overflow-hidden group transition-all duration-300 hover:-translate-y-1 hover:border-ai-border-strong shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_4px_20px_rgba(0,0,0,0.02)] backdrop-blur-md">
-          <div class="absolute inset-0 bg-[var(--ai-azure)] opacity-0 group-hover:opacity-[0.15] blur-[60px] scale-150 transition-opacity duration-500 pointer-events-none"></div>
-          <div class="relative z-10">
-            <h3 class="text-2xl font-bold mb-4 text-ai-fg tracking-tight">Project Driven</h3>
-            <p class="text-ai-fg-muted leading-relaxed text-base">Theory matters, but building things teaches you faster. We emphasize practical application over purely academic lectures, hosting build nights and workshops designed to give you hands-on experience.</p>
+        <article class="premium-card h-full flex flex-col justify-between group" style="--card-brand-color: var(--ai-azure);">
+          <!-- Cybernetic Corner Brackets -->
+          <div class="corner-tick top-left"></div>
+          <div class="corner-tick top-right"></div>
+          <div class="corner-tick bottom-left"></div>
+          <div class="corner-tick bottom-right"></div>
+
+          <!-- Luminescent Glow, Grid, and Sweep Scan -->
+          <div class="premium-glow"></div>
+          <div class="premium-grid opacity-30"></div>
+          <div class="premium-scan"></div>
+
+          <div class="relative z-10 flex flex-col h-full justify-between p-6 sm:p-8">
+            <div>
+              <!-- Micro-Visual: Project Driven Build Console -->
+              <div class="about-visual h-40 w-full rounded-xl relative overflow-hidden flex items-center justify-center bg-ai-bg/60 border border-ai-border/80 mb-6 group-hover:border-ai-azure/30 transition-colors">
+                <div class="about-grid"></div>
+                <div class="about-scan"></div>
+
+                <svg class="w-full h-full max-w-[220px] relative z-10" viewBox="0 0 200 120" fill="none">
+                  <!-- Main Console Box -->
+                  <rect x="25" y="25" width="150" height="70" rx="6" stroke="var(--ai-border)" stroke-width="1.5" />
+                  <line x1="25" y1="42" x2="175" y2="42" stroke="var(--ai-border)" stroke-width="1" />
+                  <!-- Terminal Dots -->
+                  <circle cx="37" cy="33" r="2.5" fill="var(--ai-coral)" />
+                  <circle cx="47" cy="33" r="2.5" fill="var(--ai-sage)" />
+                  <!-- Code builders -->
+                  <rect x="37" y="52" width="55" height="6" rx="2" fill="var(--ai-azure)" class="pulse-code-1" />
+                  <rect x="37" y="65" width="85" height="6" rx="2" fill="var(--ai-azure)" class="pulse-code-2" />
+                  <rect x="37" y="78" width="40" height="6" rx="2" fill="var(--ai-coral)" class="pulse-code-3" />
+                  <!-- Success Indicator -->
+                  <circle cx="150" cy="65" r="7" fill="var(--ai-sage)" class="ping-success" />
+                  <circle cx="150" cy="65" r="4.5" fill="var(--ai-sage)" />
+                </svg>
+              </div>
+
+              <h3 class="text-2xl font-bold mb-4 text-ai-fg tracking-tight group-hover:text-ai-azure transition-colors duration-300">Project Driven</h3>
+              <p class="text-ai-fg-muted leading-relaxed text-sm">Theory matters, but building things teaches you faster. We emphasize practical application over purely academic lectures, hosting build nights and workshops designed to give you hands-on experience.</p>
+            </div>
           </div>
         </article>
         
-        <article class="relative bg-ai-surface border border-ai-border rounded-[1.5rem] p-8 overflow-hidden group transition-all duration-300 hover:-translate-y-1 hover:border-ai-border-strong shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_4px_20px_rgba(0,0,0,0.02)] backdrop-blur-md">
-          <div class="absolute inset-0 bg-[var(--ai-sage)] opacity-0 group-hover:opacity-[0.15] blur-[60px] scale-150 transition-opacity duration-500 pointer-events-none"></div>
-          <div class="relative z-10">
-            <h3 class="text-2xl font-bold mb-4 text-ai-fg tracking-tight">Ethically Grounded</h3>
-            <p class="text-ai-fg-muted leading-relaxed text-base">We care about how AI is built and deployed, not just what it can do. Safety, bias, and ethics are regular topics of our discussions. We think about the long-term impacts of the systems we build.</p>
+        <article class="premium-card h-full flex flex-col justify-between group" style="--card-brand-color: var(--ai-sage);">
+          <!-- Cybernetic Corner Brackets -->
+          <div class="corner-tick top-left"></div>
+          <div class="corner-tick top-right"></div>
+          <div class="corner-tick bottom-left"></div>
+          <div class="corner-tick bottom-right"></div>
+
+          <!-- Luminescent Glow, Grid, and Sweep Scan -->
+          <div class="premium-glow"></div>
+          <div class="premium-grid opacity-30"></div>
+          <div class="premium-scan"></div>
+
+          <div class="relative z-10 flex flex-col h-full justify-between p-6 sm:p-8">
+            <div>
+              <!-- Micro-Visual: Ethically Grounded Alignment Dial -->
+              <div class="about-visual h-40 w-full rounded-xl relative overflow-hidden flex items-center justify-center bg-ai-bg/60 border border-ai-border/80 mb-6 group-hover:border-ai-sage/30 transition-colors">
+                <div class="about-grid"></div>
+                <div class="about-scan"></div>
+
+                <svg class="w-full h-full max-w-[220px] relative z-10" viewBox="0 0 200 120" fill="none">
+                  <!-- Radar circular markings -->
+                  <circle cx="100" cy="60" r="42" stroke="var(--ai-border)" stroke-width="1.5" stroke-dasharray="4,4" />
+                  <circle cx="100" cy="60" r="26" stroke="var(--ai-border)" stroke-width="1.5" />
+                  <!-- Coordinates ticks -->
+                  <line x1="100" y1="12" x2="100" y2="108" stroke="var(--ai-border)" stroke-width="0.8" opacity="0.4" />
+                  <line x1="52" y1="60" x2="148" y2="60" stroke="var(--ai-border)" stroke-width="0.8" opacity="0.4" />
+                  <!-- Safe Guardrail sweep needle -->
+                  <line x1="100" y1="60" x2="128" y2="32" stroke="var(--ai-sage)" stroke-width="2.5" stroke-linecap="round" class="radar-sweep" />
+                  <circle cx="128" cy="32" r="4.5" fill="var(--ai-sage)" class="pulse-node" />
+                  <!-- Warning target -->
+                  <circle cx="80" cy="80" r="3" fill="var(--ai-coral)" class="opacity-60 animate-ping" />
+                  <circle cx="80" cy="80" r="2" fill="var(--ai-coral)" />
+                </svg>
+              </div>
+
+              <h3 class="text-2xl font-bold mb-4 text-ai-fg tracking-tight group-hover:text-ai-sage transition-colors duration-300">Ethically Grounded</h3>
+              <p class="text-ai-fg-muted leading-relaxed text-sm">We care about how AI is built and deployed, not just what it can do. Safety, bias, and ethics are regular topics of our discussions. We think about the long-term impacts of the systems we build.</p>
+            </div>
           </div>
         </article>
       </div>
@@ -69,3 +183,128 @@ import '../styles/global.css';
   </section>
 
 </Layout>
+
+<style>
+  /* Local styles for technical micro visualizers */
+  .about-visual {
+    position: relative;
+    --about-grid-color: rgba(255, 255, 255, 0.035);
+  }
+  
+  .about-grid {
+    position: absolute;
+    inset: 0;
+    background-size: 16px 16px;
+    background-image: 
+      linear-gradient(to right, var(--about-grid-color) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--about-grid-color) 1px, transparent 1px);
+    opacity: 0.95;
+    z-index: 0;
+  }
+
+  .about-scan {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, 
+      transparent 0%, 
+      rgba(255, 255, 255, 0.0) 30%, 
+      rgba(255, 255, 255, 0.04) 50%, 
+      rgba(255, 255, 255, 0.0) 70%
+    );
+    transform: translateX(-100%);
+    width: 200%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .premium-card:hover .about-scan {
+    animation: scan-swipe 2.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+  }
+
+  @keyframes scan-swipe {
+    to { transform: translateX(50%); }
+  }
+
+  /* SVG Animations */
+  .pulse-node {
+    animation: pulse-glow 2.5s infinite ease-in-out;
+  }
+  
+  @keyframes pulse-glow {
+    0%, 100% { opacity: 0.6; r: 5px; }
+    50% { opacity: 1; r: 7.5px; }
+  }
+
+  .flow-arc {
+    stroke-dasharray: 200;
+    stroke-dashoffset: 200;
+    animation: arc-flow 4s linear infinite;
+  }
+
+  .flow-arc-delayed {
+    stroke-dasharray: 200;
+    stroke-dashoffset: 200;
+    animation: arc-flow 4s linear infinite;
+    animation-delay: 2s;
+  }
+
+  @keyframes arc-flow {
+    to { stroke-dashoffset: 0; }
+  }
+
+  .sparkle-packet {
+    animation: packet-move 4s linear infinite;
+  }
+  .sparkle-packet-delayed {
+    animation: packet-move-delayed 4s linear infinite;
+  }
+
+  @keyframes packet-move {
+    0% { cx: 45; cy: 60; opacity: 0; }
+    10% { opacity: 1; }
+    50% { cx: 100; cy: 38; }
+    90% { opacity: 1; }
+    100% { cx: 155; cy: 30; opacity: 0; }
+  }
+
+  @keyframes packet-move-delayed {
+    0% { cx: 45; cy: 60; opacity: 0; }
+    10% { opacity: 1; }
+    50% { cx: 100; cy: 82; }
+    90% { opacity: 1; }
+    100% { cx: 155; cy: 90; opacity: 0; }
+  }
+
+  /* Terminal code lines pulse */
+  .pulse-code-1 { animation: text-code 3s infinite ease-in-out; }
+  .pulse-code-2 { animation: text-code 3s infinite ease-in-out; animation-delay: 0.5s; }
+  .pulse-code-3 { animation: text-code 3s infinite ease-in-out; animation-delay: 1.0s; }
+
+  @keyframes text-code {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.85; }
+  }
+
+  .ping-success {
+    transform-origin: 150px 65px;
+    animation: ping-ring 2.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+
+  @keyframes ping-ring {
+    0% { transform: scale(1); opacity: 0.8; }
+    80%, 100% { transform: scale(2.2); opacity: 0; }
+  }
+
+  /* Radar Dial animation */
+  .radar-sweep {
+    transform-origin: 100px 60px;
+    animation: radar-spin 8s linear infinite;
+  }
+
+  @keyframes radar-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+</style>
+
+

@@ -66,6 +66,18 @@
     --ai-azure: #4F46E5;
     --ai-sage: #10B981;
     --ai-slate-base: #0F172A;
+
+    /* Bento/Premium Card Variables */
+    --bento-visual-bg: #f8fafc;
+    --bento-visual-border: var(--ai-border);
+    --bento-visual-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.03);
+    --bento-grid-color: rgba(15, 23, 42, 0.02);
+    --bento-wire-color: rgba(15, 23, 42, 0.08);
+    --bento-wire-hover: rgba(15, 23, 42, 0.16);
+    --bento-node-bg: #ffffff;
+    --bento-node-border: rgba(15, 23, 42, 0.08);
+    --bento-text-light: #475569;
+    --bento-canvas-card: #ffffff;
   }
 
   /* ── Dark theme ── */
@@ -81,6 +93,18 @@
     --ai-azure: #4F46E5;
     --ai-sage: #10B981;
     --ai-slate-base: #0B0F19;
+
+    /* Bento/Premium Card Variables */
+    --bento-visual-bg: #060913;
+    --bento-visual-border: rgba(255, 255, 255, 0.04);
+    --bento-visual-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
+    --bento-grid-color: rgba(255, 255, 255, 0.015);
+    --bento-wire-color: rgba(255, 255, 255, 0.05);
+    --bento-wire-hover: rgba(255, 255, 255, 0.08);
+    --bento-node-bg: #090d1a;
+    --bento-node-border: rgba(255, 255, 255, 0.1);
+    --bento-text-light: #94a3b8;
+    --bento-canvas-card: #0b0f19;
   }
 
   /* ── Reduced motion ── */
@@ -236,4 +260,118 @@ img.duotone-tint {
   border-radius: 50%;
   background: var(--ai-azure);
   vertical-align: middle;
+}
+
+/* ── Premium Bento Card System (Inspired by AreasWeExplore) ── */
+.premium-card {
+  position: relative;
+  background: var(--ai-surface);
+  border: 1px solid var(--ai-border);
+  border-radius: 1.5rem;
+  padding: 2.25rem;
+  overflow: hidden;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+              border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(12px);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 
+              0 4px 24px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  z-index: 1;
+}
+
+/* Deep Interactive Hover Lift & Glow */
+.premium-card:hover {
+  transform: translateY(-6px);
+  border-color: color-mix(in srgb, var(--card-brand-color, var(--ai-azure)) 45%, transparent);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.08),
+              0 16px 40px -10px rgba(0, 0, 0, 0.2),
+              0 0 28px color-mix(in srgb, var(--card-brand-color, var(--ai-azure)) 12%, transparent);
+}
+
+/* 4x Corner Brackets (Tech Aesthetics) */
+.corner-tick {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-color: var(--ai-border-strong);
+  opacity: 0.2;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.corner-tick.top-left { top: 12px; left: 12px; border-top: 1.5px solid; border-left: 1.5px solid; }
+.corner-tick.top-right { top: 12px; right: 12px; border-top: 1.5px solid; border-right: 1.5px solid; }
+.corner-tick.bottom-left { bottom: 12px; left: 12px; border-bottom: 1.5px solid; border-left: 1.5px solid; }
+.corner-tick.bottom-right { bottom: 12px; right: 12px; border-bottom: 1.5px solid; border-right: 1.5px solid; }
+
+.premium-card:hover .corner-tick {
+  opacity: 0.9;
+  border-color: var(--card-brand-color, var(--ai-azure));
+  transform: scale(1.1);
+}
+
+/* Luminescent Radial Glow background */
+.premium-glow {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  filter: blur(60px);
+  transform: scale(1.4);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at center, color-mix(in srgb, var(--card-brand-color, var(--ai-azure)) 20%, transparent) 0%, transparent 70%);
+}
+
+.premium-card:hover .premium-glow {
+  opacity: 0.8;
+}
+
+/* Sweeping scanline scanner */
+.premium-scan {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, 
+    transparent 0%, 
+    color-mix(in srgb, var(--card-brand-color, var(--ai-azure)) 0%, transparent) 30%, 
+    color-mix(in srgb, var(--card-brand-color, var(--ai-azure)) 12%, transparent) 50%, 
+    color-mix(in srgb, var(--card-brand-color, var(--ai-azure)) 12%, transparent) 52%,
+    transparent 70%
+  );
+  transform: translateX(-100%);
+  width: 200%;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.premium-card:hover .premium-scan {
+  animation: scan-line-swipe-premium 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+}
+
+@keyframes scan-line-swipe-premium {
+  to { transform: translateX(50%); }
+}
+
+/* Fine Technical Grid background */
+.premium-grid {
+  position: absolute;
+  inset: 0;
+  background-size: 16px 16px;
+  background-image: 
+    linear-gradient(to right, var(--bento-grid-color) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--bento-grid-color) 1px, transparent 1px);
+  opacity: 0.8;
+  z-index: 1;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .premium-card { transition: none; }
+  .premium-card:hover { transform: none; box-shadow: none; }
+  .corner-tick { transition: none; }
+  .premium-scan { display: none; }
+  .premium-glow { display: none; }
 }

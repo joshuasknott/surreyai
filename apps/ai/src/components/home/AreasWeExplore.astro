@@ -4,108 +4,471 @@
 <section id="explore" class="bg-ai-bg text-ai-fg py-24 relative z-10">
   <div class="mx-auto max-w-7xl px-6">
     <div class="mb-16">
-      <h2 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4">Core Focus Areas</h2>
+      <h2 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4 text-gradient">Core Focus Areas</h2>
       <p class="text-lg text-ai-fg-muted max-w-2xl">
-        We explore the technical, ethical, and creative dimensions of artificial intelligence through hands-on projects and deep-dive discussions.
+        We explore the technical, ethical, and creative dimensions of artificial intelligence through clear explanations, practical prototypes, and honest critique.
       </p>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       
       <!-- Build with AI (Span 2) -->
-      <article class="bento-card md:col-span-2 lg:col-span-2 flex flex-col md:flex-row gap-8 group">
+      <article class="bento-card md:col-span-2 lg:col-span-2 flex flex-col md:flex-row gap-8 group ml-card-wrapper" style="--card-brand-color: var(--ai-azure);">
+        <!-- Cybernetic Corner Brackets -->
+        <div class="corner-tick top-left"></div>
+        <div class="corner-tick top-right"></div>
+        <div class="corner-tick bottom-left"></div>
+        <div class="corner-tick bottom-right"></div>
+        
         <div class="bento-glow bg-ai-azure/20"></div>
+        
         <div class="bento-content md:w-1/2 flex flex-col justify-center">
           <h3 class="text-2xl sm:text-3xl font-bold mb-4 tracking-tight">Build with AI</h3>
-          <p class="text-ai-fg-muted text-base sm:text-lg leading-relaxed">
-            Agents, automation, apps, tools
+          <p class="text-ai-fg-muted text-base sm:text-lg leading-relaxed mb-6">
+            Design small agents, automations, apps, and tools that solve defined student problems instead of demonstrating AI for its own sake.
           </p>
         </div>
-        <div class="bento-visual md:w-1/2 min-h-[240px] md:min-h-full bg-ai-bg/50 border border-white/5 rounded-2xl flex items-center justify-center p-6 relative overflow-hidden">
-          <div class="visual-agents w-full scale-90 sm:scale-100">
-            <div class="node node-user"></div>
-            <div class="flow-line"></div>
-            <div class="node node-plan"></div>
-            <div class="flow-line"></div>
-            <div class="node-group">
-              <div class="node node-action"></div>
-              <div class="node node-action"></div>
-              <div class="node node-action"></div>
+        
+        <div class="bento-visual md:w-1/2 min-h-[260px] md:min-h-full rounded-2xl relative overflow-hidden flex items-center justify-center">
+          <!-- Fine Grid System -->
+          <div class="generative-grid"></div>
+          
+          <!-- Cyber Sweep scanner -->
+          <div class="scan-sweep"></div>
+
+          <div class="visual-agents w-full h-full relative flex items-center justify-center p-4">
+            <svg class="agents-svg w-full h-full max-w-[480px] min-h-[180px]" viewBox="0 0 480 180" fill="none">
+              <defs>
+                <linearGradient id="flow-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="var(--ai-coral)" />
+                  <stop offset="50%" stop-color="var(--ai-azure)" />
+                  <stop offset="100%" stop-color="var(--ai-sage)" />
+                </linearGradient>
+              </defs>
+
+              <!-- Connection Paths (Static Base Lines) -->
+              <path d="M 40,90 H 130" class="wire-path"/>
+              <path d="M 170,90 Q 200,45 240,45" class="wire-path"/>
+              <path d="M 170,90 H 240" class="wire-path"/>
+              <path d="M 170,90 Q 200,135 240,135" class="wire-path"/>
+              <path d="M 280,45 Q 320,45 350,90" class="wire-path"/>
+              <path d="M 280,90 H 350" class="wire-path"/>
+              <path d="M 280,135 Q 320,135 350,90" class="wire-path"/>
+              <path d="M 390,90 H 440" class="wire-path"/>
+
+              <!-- Flowing Dash Particles -->
+              <path d="M 40,90 H 130" class="pulse-path" style="animation-delay: 0s;" />
+              <path d="M 170,90 Q 200,45 240,45" class="pulse-path" style="animation-delay: 0.2s;" />
+              <path d="M 170,90 H 240" class="pulse-path" style="animation-delay: 0.4s;" />
+              <path d="M 170,90 Q 200,135 240,135" class="pulse-path" style="animation-delay: 0.6s;" />
+              <path d="M 280,45 Q 320,45 350,90" class="pulse-path" style="animation-delay: 0.8s;" />
+              <path d="M 280,90 H 350" class="pulse-path" style="animation-delay: 1.0s;" />
+              <path d="M 280,135 Q 320,135 350,90" class="pulse-path" style="animation-delay: 1.2s;" />
+              <path d="M 390,90 H 440" class="pulse-path" style="animation-delay: 1.4s;" />
+
+              <!-- Interactive agent sequence cursor -->
+              <g class="agent-cursor">
+                <path d="M 0,0 L 10,3 L 7,6 L 10,9 L 8,11 L 5,8 L 2,9 Z" fill="var(--ai-azure)" stroke="#ffffff" stroke-width="0.8"/>
+              </g>
+            </svg>
+
+            <!-- User Idea Node -->
+            <div class="agent-node user-node" style="left: 8.33%; top: 50%;">
+              <div class="node-icon-wrapper text-ai-coral animate-pulse">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              </div>
+              <span class="node-label">Idea</span>
             </div>
-            <div class="flow-line"></div>
-            <div class="node node-output"></div>
+
+            <!-- Planner Node -->
+            <div class="agent-node plan-node" style="left: 31.25%; top: 50%;">
+              <div class="node-icon-wrapper text-ai-azure">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+              </div>
+              <span class="node-label">Plan</span>
+            </div>
+
+            <!-- Action Nodes (Tools) -->
+            <div class="agent-node tool-node node-t1" style="left: 54.16%; top: 25%;">
+              <div class="node-icon-wrapper text-ai-sage">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              </div>
+              <span class="node-label">Research</span>
+            </div>
+            <div class="agent-node tool-node node-t2" style="left: 54.16%; top: 50%;">
+              <div class="node-icon-wrapper text-ai-sage">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+              </div>
+              <span class="node-label">Write</span>
+            </div>
+            <div class="agent-node tool-node node-t3" style="left: 54.16%; top: 75%;">
+              <div class="node-icon-wrapper text-ai-sage">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+              </div>
+              <span class="node-label">Format</span>
+            </div>
+
+            <!-- Reviewer Node -->
+            <div class="agent-node eval-node" style="left: 77.08%; top: 50%;">
+              <div class="node-icon-wrapper text-ai-azure">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 22 12 12 22 2 12 12 2"></polygon></svg>
+              </div>
+              <span class="node-label">Review</span>
+            </div>
+
+            <!-- Output Node -->
+            <div class="agent-node out-node" style="left: 91.66%; top: 50%;">
+              <div class="node-icon-wrapper text-ai-coral">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              </div>
+              <span class="node-label">Launch</span>
+            </div>
+          </div>
+
+          <!-- Conversational Agent Status Capsule -->
+          <div class="agent-status-bubble">
+            <svg class="w-3.5 h-3.5 text-ai-azure shrink-0 animate-spin" style="animation-duration: 3s;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+            </svg>
+            <span class="agent-status-text"></span>
           </div>
         </div>
       </article>
 
       <!-- Create with AI (Span 1) -->
-      <article class="bento-card col-span-1 flex flex-col gap-6 group">
+      <article class="bento-card col-span-1 flex flex-col gap-6 group" style="--card-brand-color: var(--ai-coral);">
+        <!-- Cybernetic Corner Brackets -->
+        <div class="corner-tick top-left"></div>
+        <div class="corner-tick top-right"></div>
+        <div class="corner-tick bottom-left"></div>
+        <div class="corner-tick bottom-right"></div>
+
         <div class="bento-glow bg-ai-coral/20"></div>
-        <div class="bento-visual h-48 sm:h-56 w-full bg-ai-bg/50 border border-white/5 rounded-2xl relative overflow-hidden">
-          <div class="visual-gen-ai">
-            <div class="sketch"></div>
-            <div class="polished"></div>
+        
+        <div class="bento-visual h-48 sm:h-56 w-full rounded-2xl relative overflow-hidden flex items-center justify-center">
+          <!-- Fine Grid System -->
+          <div class="generative-grid"></div>
+          
+          <!-- Cyber Sweep scanner -->
+          <div class="scan-sweep"></div>
+          
+          <!-- Creative Design Canvas Overlay -->
+          <div class="creative-canvas w-full h-full relative flex items-center justify-center p-4">
+            <svg class="canvas-svg w-full h-full max-w-[240px]" viewBox="0 0 240 160" fill="none">
+              <!-- Browser Window Frame -->
+              <g class="browser-window">
+                <!-- Outer background and border -->
+                <rect x="15" y="10" width="210" height="140" rx="8" class="window-bg" fill="var(--bento-canvas-card)" stroke="var(--bento-wire-color)" stroke-width="1.5"/>
+                <!-- Browser Header Bar -->
+                <rect x="15" y="10" width="210" height="24" rx="8" class="window-header" fill="var(--bento-visual-bg)" stroke="var(--bento-wire-color)" stroke-width="1.5"/>
+                <!-- URL Address Bar -->
+                <rect x="62" y="16" width="116" height="12" rx="4" fill="var(--bento-node-bg)" stroke="var(--bento-node-border)" stroke-width="1"/>
+                <text x="120" y="24" font-family="var(--font-mono)" font-size="5.5" font-weight="bold" fill="var(--bento-text-light)" text-anchor="middle">surreyai.com</text>
+                <!-- Three window dots -->
+                <circle cx="27" cy="22" r="3" fill="#ff5f56"/>
+                <circle cx="37" cy="22" r="3" fill="#ffbd2e"/>
+                <circle cx="47" cy="22" r="3" fill="#27c93f"/>
+              </g>
+
+              <!-- Landing Page Content Viewport (Clipped to browser body) -->
+              <g class="browser-content" clip-path="url(#browser-clip)">
+                <clipPath id="browser-clip">
+                  <rect x="16" y="34.5" width="208" height="114" rx="1"/>
+                </clipPath>
+
+                <!-- NAVBAR -->
+                <g class="ui-navbar">
+                  <!-- Logo tag -->
+                  <rect x="24" y="42" width="22" height="6" rx="1.5" fill="var(--ai-coral)" opacity="0.85"/>
+                  <!-- Navbar links -->
+                  <rect x="135" y="43" width="12" height="3" rx="0.8" fill="var(--bento-text-light)" opacity="0.5"/>
+                  <rect x="153" y="43" width="12" height="3" rx="0.8" fill="var(--bento-text-light)" opacity="0.5"/>
+                  <rect x="171" y="43" width="12" height="3" rx="0.8" fill="var(--bento-text-light)" opacity="0.5"/>
+                  <!-- Action button -->
+                  <rect x="189" y="41" width="23" height="7" rx="2" fill="var(--ai-azure)" opacity="0.85"/>
+                </g>
+
+                <!-- HERO SECTION -->
+                <g class="ui-hero">
+                  <!-- Left Hero Info: Headline and Copy lines -->
+                  <!-- Headline line 1 -->
+                  <rect x="24" y="58" width="70" height="5" rx="1" fill="var(--ai-fg)"/>
+                  <!-- Headline line 2 -->
+                  <rect x="24" y="65" width="50" height="5" rx="1" fill="var(--ai-fg)"/>
+                  <!-- Paragraph block lines -->
+                  <rect x="24" y="74" width="75" height="2" rx="0.5" fill="var(--bento-text-light)" opacity="0.6"/>
+                  <rect x="24" y="78" width="65" height="2" rx="0.5" fill="var(--bento-text-light)" opacity="0.6"/>
+                  <rect x="24" y="82" width="45" height="2" rx="0.5" fill="var(--bento-text-light)" opacity="0.6"/>
+                  <!-- Hero CTA Button -->
+                  <rect x="24" y="88" width="30" height="9" rx="2.5" fill="var(--ai-coral)" class="ui-cta-btn"/>
+                  
+                  <!-- Right Hero Media Panel (Mock Dashboard card) -->
+                  <g class="ui-hero-media">
+                    <rect x="115" y="58" width="97" height="40" rx="4" fill="var(--bento-node-bg)" stroke="var(--bento-node-border)" stroke-width="1.5"/>
+                    <rect x="115" y="58" width="97" height="40" rx="4" fill="none" stroke="var(--bento-wire-color)" stroke-width="1" stroke-dasharray="2,2"/>
+                    <!-- Dashboard charts inside media panel -->
+                    <circle cx="134" cy="78" r="10" fill="var(--ai-azure)" opacity="0.12" class="ui-dash-circle"/>
+                    <path d="M 124,78 A 10,10 0 0,1 144,78" stroke="var(--ai-azure)" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+                    <rect x="152" y="67" width="50" height="4" rx="1" fill="var(--bento-text-light)" opacity="0.5"/>
+                    <rect x="152" y="74" width="40" height="2" rx="0.5" fill="var(--bento-text-light)" opacity="0.3"/>
+                    <rect x="152" y="79" width="45" height="2" rx="0.5" fill="var(--bento-text-light)" opacity="0.3"/>
+                    <rect x="152" y="84" width="30" height="2" rx="0.5" fill="var(--bento-text-light)" opacity="0.3"/>
+                    <!-- Small Sparkle -->
+                    <path d="M 198,64 L 200,67 L 203,68 L 200,69 L 198,72 L 196,69 L 193,68 L 196,67 Z" fill="var(--ai-coral)" opacity="0.8"/>
+                  </g>
+                </g>
+
+                <!-- FEATURES Bento Row -->
+                <g class="ui-features">
+                  <!-- Feature Card 1 -->
+                  <g class="ui-feat-card card-f1">
+                    <rect x="24" y="106" width="54" height="32" rx="4" fill="var(--bento-node-bg)" stroke="var(--bento-node-border)" stroke-width="1"/>
+                    <circle cx="34" cy="116" r="4.5" fill="var(--ai-azure)" opacity="0.15"/>
+                    <rect x="43" y="114" width="28" height="3" rx="0.8" fill="var(--ai-fg)"/>
+                    <rect x="30" y="124" width="42" height="1.5" rx="0.4" fill="var(--bento-text-light)" opacity="0.5"/>
+                    <rect x="30" y="128" width="30" height="1.5" rx="0.4" fill="var(--bento-text-light)" opacity="0.5"/>
+                  </g>
+                  
+                  <!-- Feature Card 2 -->
+                  <g class="ui-feat-card card-f2">
+                    <rect x="85" y="106" width="54" height="32" rx="4" fill="var(--bento-node-bg)" stroke="var(--bento-node-border)" stroke-width="1"/>
+                    <circle cx="95" cy="116" r="4.5" fill="var(--ai-coral)" opacity="0.15"/>
+                    <rect x="104" y="114" width="28" height="3" rx="0.8" fill="var(--ai-fg)"/>
+                    <rect x="91" y="124" width="42" height="1.5" rx="0.4" fill="var(--bento-text-light)" opacity="0.5"/>
+                    <rect x="91" y="128" width="30" height="1.5" rx="0.4" fill="var(--bento-text-light)" opacity="0.5"/>
+                  </g>
+                  
+                  <!-- Feature Card 3 -->
+                  <g class="ui-feat-card card-f3">
+                    <rect x="146" y="106" width="64" height="32" rx="4" fill="var(--bento-node-bg)" stroke="var(--bento-node-border)" stroke-width="1"/>
+                    <circle cx="156" cy="116" r="4.5" fill="var(--ai-sage)" opacity="0.15"/>
+                    <rect x="165" y="114" width="35" height="3" rx="0.8" fill="var(--ai-fg)"/>
+                    <rect x="152" y="124" width="52" height="1.5" rx="0.4" fill="var(--bento-text-light)" opacity="0.5"/>
+                    <rect x="152" y="128" width="38" height="1.5" rx="0.4" fill="var(--bento-text-light)" opacity="0.5"/>
+                  </g>
+                </g>
+
+                <!-- Interactive building cursor -->
+                <g class="ui-cursor">
+                  <path d="M 0,0 L 10,3 L 7,6 L 10,9 L 8,11 L 5,8 L 2,9 Z" fill="var(--ai-coral)" stroke="#ffffff" stroke-width="0.8"/>
+                </g>
+              </g>
+            </svg>
+          </div>
+
+          <!-- Prompt bubble floating overlay -->
+          <div class="prompt-bubble">
+            <svg class="w-3.5 h-3.5 text-ai-coral shrink-0 animate-pulse" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2Z"/>
+            </svg>
+            <span>"Create a landing page for my project"</span>
           </div>
         </div>
+        
         <div class="bento-content mt-auto">
           <h3 class="text-xl sm:text-2xl font-bold mb-3 tracking-tight">Create with AI</h3>
-          <p class="text-ai-fg-muted text-sm sm:text-base leading-relaxed">
-            Generative AI, design, media, content
+          <p class="text-ai-fg-muted text-sm sm:text-base leading-relaxed mb-4">
+            Explore generative AI for design, media, writing, and ideation while learning where human review and attribution matter.
           </p>
         </div>
       </article>
 
       <!-- Understand AI (Span 1) -->
-      <article class="bento-card col-span-1 flex flex-col gap-6 group">
+      <article class="bento-card col-span-1 flex flex-col gap-6 group ml-card" style="--card-brand-color: var(--ai-sage);">
+        <!-- Cybernetic Corner Brackets -->
+        <div class="corner-tick top-left"></div>
+        <div class="corner-tick top-right"></div>
+        <div class="corner-tick bottom-left"></div>
+        <div class="corner-tick bottom-right"></div>
+
         <div class="bento-glow bg-ai-sage/20"></div>
-        <div class="bento-visual h-48 sm:h-56 w-full bg-ai-bg/50 border border-white/5 rounded-2xl relative overflow-hidden flex items-center justify-center">
-          <div class="visual-ml w-full h-full max-w-[200px] max-h-[200px]">
-            <div class="dots-container"></div>
+        
+        <div class="bento-visual h-48 sm:h-56 w-full rounded-2xl relative overflow-hidden flex items-center justify-center">
+          <!-- Fine Grid System -->
+          <div class="generative-grid"></div>
+          
+          <!-- Cyber Sweep scanner -->
+          <div class="scan-sweep"></div>
+          
+          <div class="neural-network w-full h-full max-w-[240px] max-h-[180px] relative flex items-center justify-center">
+            <svg class="nn-svg w-full h-full" viewBox="0 0 240 160" fill="none">
+              <!-- Connections (Background wires) -->
+              <!-- Input (X: 30) to Hidden (X: 120) -->
+              <path d="M 30,40 L 120,30" class="nn-wire"/>
+              <path d="M 30,40 L 120,65" class="nn-wire"/>
+              <path d="M 30,40 L 120,100" class="nn-wire"/>
+              <path d="M 30,40 L 120,130" class="nn-wire"/>
+              
+              <path d="M 30,80 L 120,30" class="nn-wire"/>
+              <path d="M 30,80 L 120,65" class="nn-wire"/>
+              <path d="M 30,80 L 120,100" class="nn-wire"/>
+              <path d="M 30,80 L 120,130" class="nn-wire"/>
+              
+              <path d="M 30,120 L 120,30" class="nn-wire"/>
+              <path d="M 30,120 L 120,65" class="nn-wire"/>
+              <path d="M 30,120 L 120,100" class="nn-wire"/>
+              <path d="M 30,120 L 120,130" class="nn-wire"/>
+
+              <!-- Hidden (X: 120) to Output (X: 210) -->
+              <path d="M 120,30 L 210,55" class="nn-wire"/>
+              <path d="M 120,30 L 210,105" class="nn-wire"/>
+              
+              <path d="M 120,65 L 210,55" class="nn-wire"/>
+              <path d="M 120,65 L 210,105" class="nn-wire"/>
+              
+              <path d="M 120,100 L 210,55" class="nn-wire"/>
+              <path d="M 120,100 L 210,105" class="nn-wire"/>
+              
+              <path d="M 120,130 L 210,55" class="nn-wire"/>
+              <path d="M 120,130 L 210,105" class="nn-wire"/>
+
+              <!-- Flowing pulses traveling along wires -->
+              <path d="M 30,80 L 120,65 L 210,55" class="nn-pulse nn-pulse-1"/>
+              <path d="M 30,40 L 120,30 L 210,105" class="nn-pulse nn-pulse-2" style="animation-delay: 1s;"/>
+              <path d="M 30,120 L 120,100 L 210,55" class="nn-pulse nn-pulse-3" style="animation-delay: 2s;"/>
+              
+              <!-- Nodes -->
+              <!-- Input Nodes (X: 30) -->
+              <circle cx="30" cy="40" r="6" class="nn-node nn-node-in" fill="var(--ai-azure)"/>
+              <circle cx="30" cy="80" r="6" class="nn-node nn-node-in" fill="var(--ai-azure)"/>
+              <circle cx="30" cy="120" r="6" class="nn-node nn-node-in" fill="var(--ai-azure)"/>
+
+              <!-- Hidden Nodes (X: 120) -->
+              <circle cx="120" cy="30" r="5" class="nn-node nn-node-hidden" fill="var(--ai-sage)"/>
+              <circle cx="120" cy="65" r="5" class="nn-node nn-node-hidden" fill="var(--ai-sage)"/>
+              <circle cx="120" cy="100" r="5" class="nn-node nn-node-hidden" fill="var(--ai-sage)"/>
+              <circle cx="120" cy="130" r="5" class="nn-node nn-node-hidden" fill="var(--ai-sage)"/>
+
+              <!-- Output Nodes (X: 210) -->
+              <circle cx="210" cy="55" r="7" class="nn-node nn-node-out nn-node-active" fill="var(--ai-coral)"/>
+              <circle cx="210" cy="105" r="7" class="nn-node nn-node-out" fill="var(--ai-coral)" opacity="0.4"/>
+            </svg>
+            
+            <!-- Dynamic tech badge -->
+            <div class="ml-tech-badge font-mono">MODEL TRAINING: ACTIVE</div>
           </div>
         </div>
+        
         <div class="bento-content mt-auto">
           <h3 class="text-xl sm:text-2xl font-bold mb-3 tracking-tight">Understand AI</h3>
-          <p class="text-ai-fg-muted text-sm sm:text-base leading-relaxed">
-            Machine learning, models, foundations
+          <p class="text-ai-fg-muted text-sm sm:text-base leading-relaxed mb-4">
+            Break down machine learning concepts, model behaviour, evaluation, and data quality with beginner-friendly visual experiments.
           </p>
         </div>
       </article>
 
       <!-- Use AI Responsibly (Span 1) -->
-      <article class="bento-card col-span-1 flex flex-col gap-6 group">
+      <article class="bento-card col-span-1 flex flex-col gap-6 group" style="--card-brand-color: var(--ai-coral);">
+        <!-- Cybernetic Corner Brackets -->
+        <div class="corner-tick top-left"></div>
+        <div class="corner-tick top-right"></div>
+        <div class="corner-tick bottom-left"></div>
+        <div class="corner-tick bottom-right"></div>
+
         <div class="bento-glow bg-ai-coral/20"></div>
-        <div class="bento-visual h-48 sm:h-56 w-full bg-ai-bg/50 border border-white/5 rounded-2xl relative overflow-hidden flex items-center justify-center">
-          <div class="visual-responsible scale-90">
-            <div class="slider-group">
-              <div class="slider-track"><div class="slider-thumb thumb-1"></div></div>
-              <div class="slider-track"><div class="slider-thumb thumb-2"></div></div>
-            </div>
+        
+        <div class="bento-visual h-48 sm:h-56 w-full rounded-2xl relative overflow-hidden flex items-center justify-center">
+          <div class="generative-grid"></div>
+          
+          <!-- Cyber Sweep scanner -->
+          <div class="scan-sweep"></div>
+          
+          <div class="responsible-radar w-full h-full max-w-[240px] max-h-[180px] relative flex items-center justify-center">
+            <svg class="radar-svg w-full h-full" viewBox="0 0 240 160" fill="none">
+              <!-- Grid lines representing pipeline path -->
+              <line x1="20" y1="80" x2="220" y2="80" stroke="var(--bento-wire-color)" stroke-width="1.5" stroke-dasharray="4,4"/>
+              
+              <!-- Filter Gates (Vertical barriers) -->
+              <!-- Gate 1: Privacy Filter -->
+              <line x1="85" y1="30" x2="85" y2="130" stroke="var(--ai-azure)" stroke-width="3" stroke-linecap="round" opacity="0.8" class="safety-gate gate-privacy"/>
+              <rect x="75" y="45" width="20" height="70" rx="4" fill="var(--ai-azure)" opacity="0.1" class="gate-glow-1"/>
+              <text x="85" y="22" font-family="var(--font-mono)" font-size="7" font-weight="bold" fill="var(--ai-azure)" text-anchor="middle">PRIVACY</text>
+              
+              <!-- Gate 2: Fact Check Filter -->
+              <line x1="155" y1="30" x2="155" y2="130" stroke="var(--ai-sage)" stroke-width="3" stroke-linecap="round" opacity="0.8" class="safety-gate gate-fact"/>
+              <rect x="145" y="45" width="20" height="70" rx="4" fill="var(--ai-sage)" opacity="0.1" class="gate-glow-2"/>
+              <text x="155" y="22" font-family="var(--font-mono)" font-size="7" font-weight="bold" fill="var(--ai-sage)" text-anchor="middle">FACT-CHECK</text>
+
+              <!-- Document passing through -->
+              <g class="pipeline-doc">
+                <!-- Outer glow and card -->
+                <rect x="-16" y="-22" width="32" height="44" rx="4" fill="var(--bento-canvas-card)" stroke="var(--bento-wire-color)" stroke-width="1.5" class="doc-body"/>
+                <!-- Simulated lines of text on document -->
+                <line x1="-10" y1="-12" x2="10" y2="-12" stroke="var(--bento-wire-hover)" stroke-width="2" stroke-linecap="round"/>
+                <line x1="-10" y1="-4" x2="5" y2="-4" stroke="var(--bento-wire-hover)" stroke-width="2" stroke-linecap="round"/>
+                <line x1="-10" y1="4" x2="2" y2="4" stroke="var(--bento-wire-hover)" stroke-width="2" stroke-linecap="round"/>
+                <!-- Glowing success checkmark that appears after Gate 2 -->
+                <path d="M -4,12 L -1,15 L 5,9" stroke="var(--ai-sage)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="doc-check" opacity="0"/>
+              </g>
+            </svg>
+
+            <div class="radar-status-badge font-mono">SAFETY AUDIT: SECURE</div>
           </div>
         </div>
+        
         <div class="bento-content mt-auto">
           <h3 class="text-xl sm:text-2xl font-bold mb-3 tracking-tight">Use AI Responsibly</h3>
-          <p class="text-ai-fg-muted text-sm sm:text-base leading-relaxed">
-            Ethics, policy, safety, society
+          <p class="text-ai-fg-muted text-sm sm:text-base leading-relaxed mb-4">
+            Discuss bias, privacy, safety, policy, accessibility, and social impact so members can use AI with better judgement.
           </p>
         </div>
       </article>
 
       <!-- Build Together (Span 1) -->
-      <article class="bento-card col-span-1 flex flex-col gap-6 group md:col-span-2 lg:col-span-1">
+      <article class="bento-card col-span-1 flex flex-col gap-6 group md:col-span-2 lg:col-span-1" style="--card-brand-color: var(--ai-azure);">
+        <!-- Cybernetic Corner Brackets -->
+        <div class="corner-tick top-left"></div>
+        <div class="corner-tick top-right"></div>
+        <div class="corner-tick bottom-left"></div>
+        <div class="corner-tick bottom-right"></div>
+
         <div class="bento-glow bg-ai-azure/20"></div>
-        <div class="bento-visual h-48 sm:h-56 w-full bg-ai-bg/50 border border-white/5 rounded-2xl relative overflow-hidden flex items-center justify-center">
-          <div class="visual-build scale-90 w-full px-6">
-            <div class="build-timeline">
-              <div class="build-block"></div>
-              <div class="build-block"></div>
-              <div class="build-block"></div>
-            </div>
+        
+        <div class="bento-visual h-48 sm:h-56 w-full rounded-2xl relative overflow-hidden flex items-center justify-center">
+          <div class="generative-grid"></div>
+          
+          <!-- Cyber Sweep scanner -->
+          <div class="scan-sweep"></div>
+          
+          <div class="collaborative-git w-full h-full max-w-[280px] max-h-[180px] relative flex items-center justify-center">
+            <svg class="git-svg w-full h-full" viewBox="0 0 240 160" fill="none">
+              <!-- Shared Canvas Board -->
+              <rect x="25" y="25" width="190" height="110" rx="8" fill="var(--bento-canvas-card)" stroke="var(--bento-wire-color)" stroke-width="1.5" class="colab-board"/>
+              
+              <!-- Interactive elements inside canvas -->
+              <rect x="40" y="40" width="70" height="35" rx="6" fill="var(--bento-visual-bg)" stroke="var(--bento-wire-color)" stroke-width="1" class="colab-card-1"/>
+              <rect x="40" y="85" width="70" height="35" rx="6" fill="var(--bento-visual-bg)" stroke="var(--bento-wire-color)" stroke-width="1" class="colab-card-2"/>
+              <rect x="120" y="40" width="80" height="80" rx="6" fill="var(--bento-visual-bg)" stroke="var(--bento-wire-color)" stroke-width="1" class="colab-card-3"/>
+              
+              <!-- Colored cursor cursors collaborating -->
+              <g class="colab-cursor cursor-coder">
+                <path d="M 0,0 L 12,4 L 8,8 L 12,12 L 10,14 L 6,10 L 2,12 Z" fill="var(--ai-azure)"/>
+                <rect x="12" y="14" width="34" height="12" rx="3" fill="var(--ai-azure)" class="cursor-tag-bg"/>
+                <text x="29" y="22" font-family="var(--font-mono)" font-size="6" font-weight="bold" fill="#ffffff" text-anchor="middle">Coder</text>
+              </g>
+
+              <g class="colab-cursor cursor-designer">
+                <path d="M 0,0 L 12,4 L 8,8 L 12,12 L 10,14 L 6,10 L 2,12 Z" fill="var(--ai-coral)"/>
+                <rect x="12" y="14" width="46" height="12" rx="3" fill="var(--ai-coral)" class="cursor-tag-bg"/>
+                <text x="35" y="22" font-family="var(--font-mono)" font-size="6" font-weight="bold" fill="#ffffff" text-anchor="middle">Designer</text>
+              </g>
+
+              <g class="colab-cursor cursor-writer">
+                <path d="M 0,0 L 12,4 L 8,8 L 12,12 L 10,14 L 6,10 L 2,12 Z" fill="var(--ai-sage)"/>
+                <rect x="12" y="14" width="34" height="12" rx="3" fill="var(--ai-sage)" class="cursor-tag-bg"/>
+                <text x="29" y="22" font-family="var(--font-mono)" font-size="6" font-weight="bold" fill="#ffffff" text-anchor="middle">Writer</text>
+              </g>
+            </svg>
+
+            <!-- Animated floating merges -->
+            <div class="git-floating-bubble font-mono">COLLABORATORS: 3 ACTIVE</div>
           </div>
         </div>
+        
         <div class="bento-content mt-auto">
           <h3 class="text-xl sm:text-2xl font-bold mb-3 tracking-tight">Build Together</h3>
-          <p class="text-ai-fg-muted text-sm sm:text-base leading-relaxed">
-            Hackathons, projects, demos, community
+          <p class="text-ai-fg-muted text-sm sm:text-base leading-relaxed mb-4">
+            Bring ideas to hack nights, prototype sessions, demo reviews, and collaborative builds with students from different degrees.
           </p>
         </div>
       </article>
@@ -114,57 +477,85 @@
   </div>
 </section>
 
-<script>
-  // Simple dots clustering for ML section
-  const container = document.querySelector('.dots-container');
-  if (container) {
-    const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    for (let i = 0; i < 40; i++) {
-      const dot = document.createElement('div');
-      dot.className = 'dot';
-      const cluster = i % 3;
-      const targetX = cluster === 0 ? 30 : cluster === 1 ? 70 : 50;
-      const targetY = cluster === 0 ? 70 : cluster === 1 ? 70 : 30;
-      
-      const startX = Math.random() * 100;
-      const startY = Math.random() * 100;
-      
-      dot.style.left = `${isReduced ? targetX : startX}%`;
-      dot.style.top = `${isReduced ? targetY : startY}%`;
-      
-      if (cluster === 0) dot.style.backgroundColor = 'var(--ai-coral)';
-      if (cluster === 1) dot.style.backgroundColor = 'var(--ai-azure)';
-      if (cluster === 2) dot.style.backgroundColor = 'var(--ai-sage)';
-      
-      container.appendChild(dot);
-      
-      if (!isReduced) {
-        setTimeout(() => {
-          dot.style.left = `${targetX + (Math.random() * 25 - 12)}%`;
-          dot.style.top = `${targetY + (Math.random() * 25 - 12)}%`;
-        }, 1000);
-      }
-    }
-  }
-</script>
-
 <style>
-  /* Bento Grid Base Styles */
+  /* Bento Grid Base & Theme-based Design Tokens */
+  :root {
+    --bento-visual-bg: #f8fafc;
+    --bento-visual-border: var(--ai-border);
+    --bento-visual-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.03);
+    --bento-grid-color: rgba(15, 23, 42, 0.02);
+    --bento-wire-color: rgba(15, 23, 42, 0.08);
+    --bento-wire-hover: rgba(15, 23, 42, 0.16);
+    --bento-node-bg: #ffffff;
+    --bento-node-border: rgba(15, 23, 42, 0.08);
+    --bento-text-light: #475569;
+    --bento-canvas-card: #ffffff;
+  }
+
+  :root[data-theme="dark"] {
+    --bento-visual-bg: #060913;
+    --bento-visual-border: rgba(255, 255, 255, 0.04);
+    --bento-visual-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
+    --bento-grid-color: rgba(255, 255, 255, 0.015);
+    --bento-wire-color: rgba(255, 255, 255, 0.05);
+    --bento-wire-hover: rgba(255, 255, 255, 0.08);
+    --bento-node-bg: #090d1a;
+    --bento-node-border: rgba(255, 255, 255, 0.1);
+    --bento-text-light: #94a3b8;
+    --bento-canvas-card: #0b0f19;
+  }
+  
+  /* Text gradient utility */
+  .text-gradient {
+    background: linear-gradient(135deg, var(--ai-fg) 40%, color-mix(in srgb, var(--ai-fg) 70%, var(--ai-azure)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
   .bento-card {
     position: relative;
     background: var(--ai-surface);
     border: 1px solid var(--ai-border);
     border-radius: 1.5rem;
-    padding: 2rem;
+    padding: 2.25rem;
     overflow: hidden;
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+                border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     backdrop-filter: blur(12px);
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 4px 20px rgba(0, 0, 0, 0.02);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 
+                0 4px 24px rgba(0, 0, 0, 0.02);
   }
 
+  /* Deep Interactive Hover Lift & Glow */
   .bento-card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-6px);
+    border-color: color-mix(in srgb, var(--card-brand-color) 45%, transparent);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.08),
+                0 16px 40px -10px rgba(0, 0, 0, 0.2),
+                0 0 28px color-mix(in srgb, var(--card-brand-color) 12%, transparent);
+  }
+
+  /* 4x Corner Brackets (Tech Aesthetics) */
+  .corner-tick {
+    position: absolute;
+    width: 8px;
+    height: 8px;
     border-color: var(--ai-border-strong);
+    opacity: 0.2;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+  }
+  
+  .top-left { top: 12px; left: 12px; border-top: 1.5px solid; border-left: 1.5px solid; }
+  .top-right { top: 12px; right: 12px; border-top: 1.5px solid; border-right: 1.5px solid; }
+  .bottom-left { bottom: 12px; left: 12px; border-bottom: 1.5px solid; border-left: 1.5px solid; }
+  .bottom-right { bottom: 12px; right: 12px; border-bottom: 1.5px solid; border-right: 1.5px solid; }
+
+  .bento-card:hover .corner-tick {
+    opacity: 0.9;
+    border-color: var(--card-brand-color);
+    transform: scale(1.1);
   }
 
   .bento-glow {
@@ -172,14 +563,14 @@
     inset: 0;
     opacity: 0;
     filter: blur(60px);
-    transform: scale(1.5);
-    transition: opacity 0.5s ease;
+    transform: scale(1.4);
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     z-index: 0;
     pointer-events: none;
   }
 
   .bento-card:hover .bento-glow {
-    opacity: 0.15;
+    opacity: 0.12;
   }
 
   .bento-content, .bento-visual {
@@ -187,162 +578,823 @@
     z-index: 1;
   }
 
-  /* Gen AI Visual */
-  .visual-gen-ai {
+  /* All Visualizers adapt dynamically to light/dark modes */
+  .bento-visual {
+    background: var(--bento-visual-bg);
+    border: 1px solid var(--bento-visual-border);
+    box-shadow: var(--bento-visual-shadow);
+    transition: border-color 0.4s, background-color 0.4s;
+  }
+
+  .bento-card:hover .bento-visual {
+    border-color: color-mix(in srgb, var(--card-brand-color) 30%, var(--bento-visual-border));
+  }
+
+  /* Fine Technical Grid */
+  .generative-grid {
     position: absolute;
     inset: 0;
-    width: 100%;
-    height: 100%;
+    background-size: 16px 16px;
+    background-image: 
+      linear-gradient(to right, var(--bento-grid-color) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--bento-grid-color) 1px, transparent 1px);
+    opacity: 0.8;
   }
 
-  .sketch {
-    position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(45deg, transparent, transparent 10px, var(--ai-border) 10px, var(--ai-border) 11px);
-    opacity: 0.5;
-  }
-
-  .polished {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, var(--ai-coral), var(--ai-azure));
-    clip-path: circle(0% at 50% 50%);
-    animation: reveal 5s infinite alternate ease-in-out;
-  }
-
-  @keyframes reveal {
-    to { clip-path: circle(120% at 50% 50%); }
-  }
-
-  /* Agents Visual */
+  /* ──────────────────────────────────────────────────────────
+     VISUAL 1: ACTIVE AGENTS (WIDE CARD - BUILD WITH AI)
+  ────────────────────────────────────────────────────────── */
   .visual-agents {
+    overflow: visible;
+  }
+  
+  .agents-svg {
+    z-index: 1;
+    overflow: visible;
+  }
+
+  .wire-path {
+    stroke: var(--bento-wire-color);
+    stroke-width: 1.5px;
+    transition: stroke 0.4s;
+  }
+
+  .bento-card:hover .wire-path {
+    stroke: var(--bento-wire-hover);
+  }
+
+  .pulse-path {
+    stroke: url(#flow-grad);
+    stroke-width: 2.5px;
+    stroke-linecap: round;
+    stroke-dasharray: 8, 40;
+    stroke-dashoffset: 48;
+    animation: flow-run 6s linear infinite;
+    opacity: 0.5;
+    transition: all 0.4s;
+  }
+
+  .bento-card:hover .pulse-path {
+    animation-duration: 2.2s;
+    stroke-width: 3px;
+    opacity: 1;
+    filter: drop-shadow(0 0 4px var(--ai-azure));
+  }
+
+  @keyframes flow-run {
+    to { stroke-dashoffset: -48; }
+  }
+
+  /* HTML overlay nodes styled like a terminal dashboard */
+  .agent-node {
+    position: absolute;
+    transform: translate(-50%, -50%);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.35rem;
+    z-index: 2;
   }
 
-  .node {
-    width: 3.5rem;
-    height: 3.5rem;
+  .node-icon-wrapper {
+    width: 2rem;
+    height: 2rem;
     border-radius: 50%;
-    background: var(--ai-surface);
-    border: 2px solid var(--ai-border-strong);
-    transition: all 0.3s;
-  }
-
-  .node-group {
+    background: var(--bento-node-bg);
+    border: 1.5px solid var(--bento-node-border);
     display: flex;
-    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
 
-  .node-user { border-color: var(--ai-coral); animation: pulse-node 3s infinite; }
-  .node-plan { border-color: var(--ai-azure); animation: pulse-node 3s infinite 1s; }
-  .node-action { border-color: var(--ai-sage); border-radius: 0.5rem; animation: pulse-node 3s infinite 2s; }
-  .node-output { border-color: var(--ai-coral); animation: pulse-node 3s infinite 3s; }
-
-  .flow-line {
-    width: 2px;
-    height: 1.5rem;
-    background: var(--ai-border-strong);
+  :root[data-theme="dark"] .node-icon-wrapper {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
   }
 
-  @keyframes pulse-node {
-    0%, 100% { box-shadow: 0 0 0 0 transparent; }
-    50% { box-shadow: 0 0 16px currentColor; }
+  .agent-node:hover .node-icon-wrapper,
+  .bento-card:hover .agent-node .node-icon-wrapper {
+    border-color: currentColor;
+    box-shadow: 0 0 12px currentColor;
+    transform: scale(1.1);
   }
 
-  /* ML Visual */
-  .visual-ml {
-    position: relative;
+  /* Node labels */
+  .node-label {
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--ai-fg-muted);
+    text-transform: uppercase;
+    opacity: 0.7;
+    transition: opacity 0.3s, color 0.3s;
+    pointer-events: none;
+  }
+
+  .bento-card:hover .agent-node .node-label {
+    opacity: 1;
+    color: var(--ai-fg);
+  }
+
+  /* Node-specific styles & Sequenced Workflow Animations (Triggered on hover) */
+  .user-node { color: var(--ai-coral); }
+  .plan-node { color: var(--ai-azure); }
+  .tool-node { color: var(--ai-sage); }
+  .eval-node { color: var(--ai-azure); }
+  .out-node { color: var(--ai-coral); }
+
+  .bento-card:hover .user-node {
+    animation: active-user-node 10s ease-in-out infinite;
+  }
+  .bento-card:hover .plan-node {
+    animation: active-plan-node 10s ease-in-out infinite;
+  }
+  .bento-card:hover .node-t1 {
+    animation: active-t1-node 10s ease-in-out infinite;
+  }
+  .bento-card:hover .node-t2 {
+    animation: active-t2-node 10s ease-in-out infinite;
+  }
+  .bento-card:hover .node-t3 {
+    animation: active-t3-node 10s ease-in-out infinite;
+  }
+  .bento-card:hover .eval-node {
+    animation: active-eval-node 10s ease-in-out infinite;
+  }
+  .bento-card:hover .out-node {
+    animation: active-out-node 10s ease-in-out infinite;
+  }
+
+  @keyframes active-user-node {
+    0%, 6% { transform: translate(-50%, -50%) scale(1); }
+    8%, 14% { transform: translate(-50%, -50%) scale(1.22); filter: drop-shadow(0 0 10px var(--ai-coral)); }
+    16%, 100% { transform: translate(-50%, -50%) scale(1); }
+  }
+
+  @keyframes active-plan-node {
+    0%, 18% { transform: translate(-50%, -50%) scale(1); }
+    20%, 30% { transform: translate(-50%, -50%) scale(1.22); filter: drop-shadow(0 0 10px var(--ai-azure)); }
+    32%, 100% { transform: translate(-50%, -50%) scale(1); }
+  }
+
+  @keyframes active-t1-node {
+    0%, 33% { transform: translate(-50%, -50%) scale(1); }
+    35%, 40% { transform: translate(-50%, -50%) scale(1.2) translateY(-2px); filter: drop-shadow(0 0 8px var(--ai-sage)); }
+    42%, 100% { transform: translate(-50%, -50%) scale(1); }
+  }
+
+  @keyframes active-t2-node {
+    0%, 41% { transform: translate(-50%, -50%) scale(1); }
+    43%, 48% { transform: translate(-50%, -50%) scale(1.2) translateY(-2px); filter: drop-shadow(0 0 8px var(--ai-sage)); }
+    50%, 100% { transform: translate(-50%, -50%) scale(1); }
+  }
+
+  @keyframes active-t3-node {
+    0%, 49% { transform: translate(-50%, -50%) scale(1); }
+    51%, 56% { transform: translate(-50%, -50%) scale(1.2) translateY(-2px); filter: drop-shadow(0 0 8px var(--ai-sage)); }
+    58%, 100% { transform: translate(-50%, -50%) scale(1); }
+  }
+
+  @keyframes active-eval-node {
+    0%, 63% { transform: translate(-50%, -50%) scale(1); }
+    65%, 77% { transform: translate(-50%, -50%) scale(1.22); filter: drop-shadow(0 0 10px var(--ai-azure)); }
+    79%, 100% { transform: translate(-50%, -50%) scale(1); }
+  }
+
+  @keyframes active-out-node {
+    0%, 80% { transform: translate(-50%, -50%) scale(1); }
+    82%, 92% { transform: translate(-50%, -50%) scale(1.25); filter: drop-shadow(0 0 12px var(--ai-coral)); }
+    94%, 100% { transform: translate(-50%, -50%) scale(1); }
+  }
+
+  /* Interactive Sequence Cursor in Agent Network */
+  .agent-cursor {
+    opacity: 0;
+    transition: opacity 0.4s;
+    transform: translate(20px, 120px);
+  }
+
+  .bento-card:hover .agent-cursor {
+    opacity: 1;
+    animation: agent-cursor-path 10s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+  }
+
+  @keyframes agent-cursor-path {
+    0% { transform: translate(20px, 120px); opacity: 0; }
+    2% { opacity: 1; }
+    
+    /* Idea Node */
+    8%, 12% { transform: translate(40px, 90px); }
+    
+    /* Plan Node */
+    20%, 28% { transform: translate(150px, 90px); }
+    
+    /* Tool 1 (Research) */
+    35%, 39% { transform: translate(260px, 45px); }
+    
+    /* Tool 2 (Write) */
+    43%, 47% { transform: translate(260px, 90px); }
+    
+    /* Tool 3 (Format) */
+    51%, 55% { transform: translate(260px, 135px); }
+    
+    /* Review Node */
+    65%, 75% { transform: translate(370px, 90px); }
+    
+    /* Output Node */
+    82%, 90% { transform: translate(440px, 90px); }
+    
+    /* Finish workflow */
+    96% { transform: translate(460px, 110px); opacity: 1; }
+    98%, 100% { transform: translate(460px, 110px); opacity: 0; }
+  }
+
+  /* Conversational Progress Status Capsule */
+  .agent-status-bubble {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: var(--bento-text-light);
+    background: var(--bento-node-bg);
+    border: 1px solid var(--bento-node-border);
+    padding: 0.45rem 0.9rem;
+    border-radius: 9999px;
+    position: absolute;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    white-space: nowrap;
+    opacity: 0.7;
+  }
+
+  :root[data-theme="dark"] .agent-status-bubble {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  }
+
+  .bento-card:hover .agent-status-bubble {
+    opacity: 1;
+    color: var(--ai-azure);
+    border-color: color-mix(in srgb, var(--ai-azure) 40%, transparent);
+    background: color-mix(in srgb, var(--ai-azure) 6%, var(--bento-node-bg));
+    box-shadow: 0 6px 16px color-mix(in srgb, var(--ai-azure) 12%, transparent);
+    bottom: 1.15rem;
+  }
+
+  .agent-status-text::after {
+    content: "Agent idle: awaiting user prompt";
+    animation: status-capsule-text-cycle 10s step-end infinite;
+  }
+
+  @keyframes status-capsule-text-cycle {
+    0%, 6% { content: "Agent idle: awaiting user prompt"; }
+    7%, 18% { content: "User prompt received: 'Write a blog post'"; }
+    19%, 32% { content: "Planner: designing research & writing tasks"; }
+    33%, 40% { content: "Running Research Agent tool..."; }
+    41%, 48% { content: "Running Writing Agent tool..."; }
+    49%, 56% { content: "Running Formatting Agent tool..."; }
+    57%, 79% { content: "Reviewer: self-reflecting & refining quality"; }
+    80%, 93% { content: "Workflow complete: Page launched! 🚀"; }
+    94%, 100% { content: "Agent idle: ready for next task"; }
+  }
+
+
+  /* ──────────────────────────────────────────────────────────
+     VISUAL 2: CREATIVE CANVAS (CREATE WITH AI) - LANDING PAGE BUILD
+  ────────────────────────────────────────────────────────── */
+  .creative-canvas {
+    overflow: visible;
+  }
+
+  .canvas-svg {
+    overflow: visible;
+    z-index: 1;
+  }
+
+  .window-bg {
+    transition: fill 0.4s, stroke 0.4s;
+  }
+
+  .window-header {
+    transition: fill 0.4s, stroke 0.4s;
+  }
+
+  /* Browser Content building timeline animations */
+  .ui-navbar {
+    animation: build-navbar 7s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  }
+
+  .ui-hero {
+    animation: build-hero 7s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  }
+
+  .ui-hero-media {
+    animation: build-hero-media 7s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+    transform-origin: 163px 78px;
+  }
+
+  .ui-dash-circle {
+    animation: pulse-dash-widget 3s ease-in-out infinite alternate;
+  }
+
+  .card-f1 {
+    animation: build-f1 7s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+    transform-origin: 51px 122px;
+  }
+
+  .card-f2 {
+    animation: build-f2 7s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+    transform-origin: 112px 122px;
+  }
+
+  .card-f3 {
+    animation: build-f3 7s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+    transform-origin: 178px 122px;
+  }
+
+  .ui-cta-btn {
+    animation: cta-button-click 7s ease-in-out infinite;
+    transform-origin: 39px 92.5px;
+  }
+
+  .ui-cursor {
+    animation: cursor-movement 7s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+  }
+
+  /* Timeline Keyframes */
+  @keyframes build-navbar {
+    0%, 8% { opacity: 0; transform: translateY(-4px); }
+    12%, 92% { opacity: 1; transform: translateY(0); }
+    96%, 100% { opacity: 0; transform: translateY(-4px); }
+  }
+
+  @keyframes build-hero {
+    0%, 15% { opacity: 0; transform: translateY(5px); }
+    22%, 92% { opacity: 1; transform: translateY(0); }
+    96%, 100% { opacity: 0; transform: translateY(5px); }
+  }
+
+  @keyframes build-hero-media {
+    0%, 20% { opacity: 0; transform: scale(0.9); }
+    28%, 92% { opacity: 1; transform: scale(1); }
+    96%, 100% { opacity: 0; transform: scale(0.9); }
+  }
+
+  @keyframes pulse-dash-widget {
+    from { opacity: 0.12; transform: scale(1); transform-origin: 134px 78px; }
+    to { opacity: 0.28; transform: scale(1.08); transform-origin: 134px 78px; }
+  }
+
+  @keyframes build-f1 {
+    0%, 30% { opacity: 0; transform: translateY(5px) scale(0.95); }
+    36%, 92% { opacity: 1; transform: translateY(0) scale(1); }
+    96%, 100% { opacity: 0; transform: translateY(5px) scale(0.95); }
+  }
+
+  @keyframes build-f2 {
+    0%, 38% { opacity: 0; transform: translateY(5px) scale(0.95); }
+    44%, 92% { opacity: 1; transform: translateY(0) scale(1); }
+    96%, 100% { opacity: 0; transform: translateY(5px) scale(0.95); }
+  }
+
+  @keyframes build-f3 {
+    0%, 46% { opacity: 0; transform: translateY(5px) scale(0.95); }
+    52%, 92% { opacity: 1; transform: translateY(0) scale(1); }
+    96%, 100% { opacity: 0; transform: translateY(5px) scale(0.95); }
+  }
+
+  @keyframes cta-button-click {
+    0%, 65% { transform: scale(1); fill: var(--ai-coral); filter: none; }
+    67% { transform: scale(0.92); fill: var(--ai-azure); filter: drop-shadow(0 0 4px var(--ai-azure)); }
+    70%, 92% { transform: scale(1); fill: var(--ai-coral); filter: none; }
+    96%, 100% { transform: scale(1); fill: var(--ai-coral); }
+  }
+
+  @keyframes cursor-movement {
+    0% { transform: translate(220px, 140px); opacity: 0; }
+    3% { opacity: 1; }
+    /* Navbar link click */
+    10%, 11% { transform: translate(29px, 44px); }
+    12% { transform: translate(29px, 44px) scale(0.85); }
+    14% { transform: translate(29px, 44px) scale(1); }
+    /* Right Dashboard Media card build hover */
+    24%, 25% { transform: translate(163px, 78px); }
+    26% { transform: translate(163px, 78px) scale(0.85); }
+    27% { transform: translate(163px, 78px) scale(1); }
+    /* Feature Card 1 build hover */
+    34%, 35% { transform: translate(51px, 122px); }
+    /* Feature Card 2 build hover */
+    42%, 43% { transform: translate(112px, 122px); }
+    /* Feature Card 3 build hover */
+    50%, 51% { transform: translate(178px, 122px); }
+    /* CTA button click */
+    63%, 65% { transform: translate(39px, 92.5px); }
+    67% { transform: translate(39px, 92.5px) scale(0.8); }
+    69% { transform: translate(39px, 92.5px) scale(1); }
+    /* Move off screen */
+    80% { transform: translate(220px, 140px); opacity: 1; }
+    82%, 100% { transform: translate(220px, 140px); opacity: 0; }
   }
   
-  .dots-container {
+  /* Sweeping scanline */
+  .scan-sweep {
     position: absolute;
     inset: 0;
+    background: linear-gradient(to right, 
+      transparent 0%, 
+      rgba(255, 107, 107, 0.0) 30%, 
+      rgba(255, 107, 107, 0.15) 50%, 
+      rgba(79, 70, 229, 0.15) 52%,
+      transparent 70%
+    );
+    transform: translateX(-100%);
+    width: 200%;
+    pointer-events: none;
+    z-index: 3;
   }
 
-  :global(.dot) {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    transition: all 2s cubic-bezier(0.16, 1, 0.3, 1);
+  .bento-card:hover .scan-sweep {
+    animation: scan-line-swipe 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
   }
 
-  /* Responsible AI Visual */
-  .visual-responsible {
-    width: 100%;
-    max-width: 240px;
+  @keyframes scan-line-swipe {
+    to { transform: translateX(50%); }
   }
 
-  .slider-group {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-
-  .slider-track {
-    width: 100%;
-    height: 6px;
-    background: var(--ai-border);
+  /* Floating prompt capsule */
+  .prompt-bubble {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: var(--bento-text-light);
+    background: var(--bento-node-bg);
+    border: 1px solid var(--bento-node-border);
+    padding: 0.45rem 0.9rem;
     border-radius: 9999px;
-    position: relative;
-  }
-
-  .slider-thumb {
     position: absolute;
-    top: 50%;
-    width: 20px;
-    height: 20px;
-    background: var(--ai-sage);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    transition: left 2s ease-in-out;
-  }
-
-  .thumb-1 { left: 20%; animation: slide-1 4s infinite alternate ease-in-out; }
-  .thumb-2 { left: 80%; background: var(--ai-coral); animation: slide-2 4s infinite alternate ease-in-out; }
-
-  @keyframes slide-1 { to { left: 80%; } }
-  @keyframes slide-2 { to { left: 20%; } }
-
-  /* Build Culture Visual */
-  .visual-build {
-    width: 100%;
-    max-width: 280px;
-  }
-
-  .build-timeline {
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
     display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+    align-items: center;
+    gap: 0.45rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    white-space: nowrap;
   }
 
-  .build-block {
-    height: 2.5rem;
-    background: var(--ai-border);
-    border-radius: 0.5rem;
-    width: 0%;
-    animation: build 3s infinite;
+  :root[data-theme="dark"] .prompt-bubble {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   }
 
-  .build-block:nth-child(1) { background: var(--ai-coral); animation-delay: 0s; }
-  .build-block:nth-child(2) { background: var(--ai-azure); animation-delay: 1s; }
-  .build-block:nth-child(3) { background: var(--ai-sage); animation-delay: 2s; }
+  .bento-card:hover .prompt-bubble {
+    color: var(--ai-coral);
+    border-color: color-mix(in srgb, var(--ai-coral) 40%, transparent);
+    background: color-mix(in srgb, var(--ai-coral) 6%, var(--bento-node-bg));
+    box-shadow: 0 6px 16px color-mix(in srgb, var(--ai-coral) 12%, transparent);
+    bottom: 1.15rem;
+  }
 
-  @keyframes build {
-    0% { width: 0%; }
-    50%, 100% { width: 100%; }
+
+  /* ──────────────────────────────────────────────────────────
+     VISUAL 3: NEURAL NETWORK (UNDERSTAND AI)
+  ────────────────────────────────────────────────────────── */
+  .neural-network {
+    overflow: visible;
+  }
+
+  .nn-svg {
+    overflow: visible;
+    z-index: 1;
+  }
+
+  .nn-wire {
+    stroke: var(--bento-wire-color);
+    stroke-width: 1.5px;
+    transition: stroke 0.4s;
+  }
+
+  .bento-card:hover .nn-wire {
+    stroke: var(--bento-wire-hover);
+  }
+
+  /* Floating neural weight pulses */
+  .nn-pulse {
+    stroke-linecap: round;
+    stroke-dasharray: 10, 80;
+    stroke-dashoffset: 90;
+    animation: nn-flow 3s linear infinite;
+    opacity: 0.6;
+    stroke-width: 2.5px;
+  }
+
+  .nn-pulse-1 { stroke: var(--ai-azure); }
+  .nn-pulse-2 { stroke: var(--ai-sage); animation-duration: 2.6s; }
+  .nn-pulse-3 { stroke: var(--ai-coral); animation-duration: 3.4s; }
+
+  @keyframes nn-flow {
+    to { stroke-dashoffset: -90; }
+  }
+
+  /* Interactive neural nodes */
+  .nn-node {
+    transition: transform 0.4s, r 0.4s, filter 0.4s;
+    stroke: var(--bento-node-bg);
+    stroke-width: 1px;
+  }
+
+  .bento-card:hover .nn-node {
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 6px currentColor);
+  }
+
+  .nn-node-active {
+    animation: node-pulse 1.5s ease-in-out infinite alternate;
+  }
+
+  @keyframes node-pulse {
+    from { r: 6px; }
+    to { r: 8px; }
+  }
+
+  .nn-node-in { transform-origin: 30px var(--cy, 40px); }
+  .nn-node-hidden { transform-origin: 120px var(--cy, 30px); }
+  .nn-node-out { transform-origin: 210px var(--cy, 55px); }
+
+  /* High contrast badge sliding in */
+  .ml-tech-badge {
+    font-size: 0.5625rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--ai-sage);
+    background: color-mix(in srgb, var(--ai-sage) 8%, var(--bento-node-bg));
+    border: 1px solid color-mix(in srgb, var(--ai-sage) 20%, var(--bento-node-border));
+    padding: 0.3rem 0.65rem;
+    border-radius: 0.35rem;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 3;
+    pointer-events: none;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+  }
+
+  :root[data-theme="dark"] .ml-tech-badge {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  }
+
+  .bento-card:hover .ml-tech-badge {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+
+  /* ──────────────────────────────────────────────────────────
+     VISUAL 4: PRIVACY & FACT CHECK GATES (USE AI RESPONSIBLY)
+  ────────────────────────────────────────────────────────── */
+  .responsible-radar {
+    overflow: visible;
+  }
+
+  .radar-svg {
+    overflow: visible;
+    z-index: 1;
+  }
+
+  .safety-gate {
+    transition: stroke-width 0.4s, filter 0.4s;
+  }
+
+  .gate-glow-1 { animation: pulse-gate-glow 2.5s ease-in-out infinite alternate; }
+  .gate-glow-2 { animation: pulse-gate-glow 2.5s ease-in-out infinite alternate; animation-delay: 1.25s; }
+
+  @keyframes pulse-gate-glow {
+    from { opacity: 0.05; }
+    to { opacity: 0.18; }
+  }
+
+  .bento-card:hover .gate-privacy { stroke-width: 4.5px; filter: drop-shadow(0 0 5px var(--ai-azure)); }
+  .bento-card:hover .gate-fact { stroke-width: 4.5px; filter: drop-shadow(0 0 5px var(--ai-sage)); }
+
+  /* Flowing document animation */
+  .pipeline-doc {
+    animation: flow-doc 5.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    transform-origin: center;
+  }
+
+  @keyframes flow-doc {
+    0% { transform: translate(15px, 80px) scale(0.9); opacity: 0; }
+    6% { opacity: 1; }
+    90% { opacity: 1; transform: translate(215px, 80px) scale(1); }
+    98%, 100% { opacity: 0; transform: translate(215px, 80px) scale(0.9); }
+  }
+
+  .doc-body {
+    transition: stroke 0.3s, fill 0.3s, border 0.3s;
+  }
+
+  .bento-card:hover .doc-body {
+    stroke: var(--ai-sage);
+  }
+
+  /* Glowing success checkmark toggled inside safe document */
+  .doc-check {
+    animation: show-check 5.5s ease-in-out infinite;
+  }
+
+  @keyframes show-check {
+    0%, 65% { opacity: 0; transform: scale(0.5) translate(0px, 0px); }
+    75%, 90% { opacity: 1; transform: scale(1.1) translate(0px, 0px); }
+    96%, 100% { opacity: 0; }
+  }
+
+  /* Safety lock status badge */
+  .radar-status-badge {
+    font-size: 0.5625rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--bento-text-light);
+    background: var(--bento-node-bg);
+    border: 1px solid var(--bento-node-border);
+    padding: 0.35rem 0.75rem;
+    border-radius: 9999px;
+    position: absolute;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0.6;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 3;
+    pointer-events: none;
+    white-space: nowrap;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+  }
+
+  :root[data-theme="dark"] .radar-status-badge {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  }
+
+  .bento-card:hover .radar-status-badge {
+    opacity: 1;
+    color: var(--ai-sage);
+    border-color: color-mix(in srgb, var(--ai-sage) 40%, transparent);
+    background: color-mix(in srgb, var(--ai-sage) 6%, var(--bento-node-bg));
+    box-shadow: 0 6px 16px color-mix(in srgb, var(--ai-sage) 12%, transparent);
+  }
+
+
+  /* ──────────────────────────────────────────────────────────
+     VISUAL 5: REAL-TIME CO-LAB CANVAS (BUILD TOGETHER)
+  ────────────────────────────────────────────────────────── */
+  .collaborative-git {
+    overflow: visible;
+  }
+
+  .git-svg {
+    overflow: visible;
+    z-index: 1;
+  }
+
+  .colab-board {
+    transition: stroke 0.3s;
+  }
+
+  .bento-card:hover .colab-board {
+    stroke: var(--ai-azure);
+  }
+
+  /* Floating cursor animations */
+  .colab-cursor {
+    position: absolute;
+    pointer-events: none;
+    z-index: 3;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+  }
+
+  .cursor-tag-bg {
+    opacity: 0.9;
+  }
+
+  .cursor-coder {
+    animation: move-coder 8s ease-in-out infinite;
+  }
+  .cursor-designer {
+    animation: move-designer 7s ease-in-out infinite;
+  }
+  .cursor-writer {
+    animation: move-writer 9s ease-in-out infinite;
+  }
+
+  @keyframes move-coder {
+    0% { transform: translate(35px, 50px); }
+    30% { transform: translate(75px, 100px); }
+    65% { transform: translate(150px, 55px); }
+    100% { transform: translate(35px, 50px); }
+  }
+  @keyframes move-designer {
+    0% { transform: translate(160px, 90px); }
+    40% { transform: translate(45px, 100px); }
+    75% { transform: translate(80px, 45px); }
+    100% { transform: translate(160px, 90px); }
+  }
+  @keyframes move-writer {
+    0% { transform: translate(130px, 45px); }
+    35% { transform: translate(185px, 95px); }
+    70% { transform: translate(50px, 50px); }
+    100% { transform: translate(130px, 45px); }
+  }
+
+  /* Interactive wireframe objects reacting on multiplayer cursor overlap */
+  .colab-card-1 { animation: active-card-1 8s ease-in-out infinite; transition: fill 0.3s, stroke 0.3s; }
+  .colab-card-2 { animation: active-card-2 7s ease-in-out infinite; transition: fill 0.3s, stroke 0.3s; }
+  .colab-card-3 { animation: active-card-3 9s ease-in-out infinite; transition: fill 0.3s, stroke 0.3s; }
+
+  @keyframes active-card-1 {
+    0%, 20%, 80%, 100% { fill: var(--bento-visual-bg); stroke: var(--bento-wire-color); }
+    40%, 65% { fill: color-mix(in srgb, var(--ai-azure) 8%, transparent); stroke: var(--ai-azure); }
+  }
+  @keyframes active-card-2 {
+    0%, 10%, 90%, 100% { fill: var(--bento-visual-bg); stroke: var(--bento-wire-color); }
+    30%, 55% { fill: color-mix(in srgb, var(--ai-coral) 8%, transparent); stroke: var(--ai-coral); }
+  }
+  @keyframes active-card-3 {
+    0%, 30%, 95%, 100% { fill: var(--bento-visual-bg); stroke: var(--bento-wire-color); }
+    50%, 85% { fill: color-mix(in srgb, var(--ai-sage) 8%, transparent); stroke: var(--ai-sage); }
+  }
+
+  .bento-card:hover .colab-card-1 { stroke-width: 1.5px; }
+  .bento-card:hover .colab-card-2 { stroke-width: 1.5px; }
+  .bento-card:hover .colab-card-3 { stroke-width: 1.5px; }
+
+  /* Git popup status bubble */
+  .git-floating-bubble {
+    font-size: 0.5625rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    color: var(--bento-text-light);
+    background: var(--bento-node-bg);
+    border: 1px solid var(--bento-node-border);
+    padding: 0.35rem 0.75rem;
+    border-radius: 9999px;
+    position: absolute;
+    top: 1.25rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    opacity: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    white-space: nowrap;
+    z-index: 3;
+  }
+
+  :root[data-theme="dark"] .git-floating-bubble {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  }
+
+  .bento-card:hover .git-floating-bubble {
+    opacity: 1;
+    color: var(--ai-azure);
+    border-color: color-mix(in srgb, var(--ai-azure) 40%, transparent);
+    background: color-mix(in srgb, var(--ai-azure) 6%, var(--bento-node-bg));
+    box-shadow: 0 6px 16px color-mix(in srgb, var(--ai-azure) 12%, transparent);
+    transform: translateX(-50%) translateY(0);
+  }
+
+
+  /* ──────────────────────────────────────────────────────────
+     RESPONSIVE STYLES & INTERACTION LIMITATIONS
+  ────────────────────────────────────────────────────────── */
+  @media (max-width: 768px) {
+    .bento-card {
+      padding: 1.75rem;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .bento-card { transition: none; }
-    .bento-glow { display: none; }
-    .polished { animation: none; clip-path: circle(120% at 50% 50%); }
-    .node-user, .node-plan, .node-action, .node-output { animation: none; }
-    .thumb-1 { animation: none; left: 50%; }
-    .thumb-2 { animation: none; left: 50%; }
-    .build-block { animation: none; width: 100%; }
+    .bento-card:hover { transform: none; box-shadow: none; }
+    .corner-tick { transition: none; }
+    .pulse-path { animation: none; opacity: 0.6; }
+    .scan-sweep { display: none; }
+    .canvas-draw-path { animation: none; stroke-dashoffset: 0; }
+    .canvas-pen { display: none; }
+    .canvas-element-1, .canvas-element-2, .canvas-element-3 { animation: none; opacity: 0.15; }
+    .nn-pulse { animation: none; opacity: 0.4; }
+    .nn-node-active { animation: none; }
+    .pipeline-doc { animation: none; transform: translate(120px, 80px); }
+    .doc-check { animation: none; opacity: 1; }
+    .colab-cursor { display: none; }
+    .colab-card-1, .colab-card-2, .colab-card-3 { animation: none; }
   }
 </style>

@@ -37,13 +37,40 @@ const formatEventDay = (date?: string) => {
   <section class="py-16 sm:py-24 px-6 bg-ai-bg text-ai-fg relative z-10">
     <div class="mx-auto max-w-7xl">
       {events.length === 0 ? (
-        <div class="text-center py-16 bg-ai-surface border border-ai-border rounded-[1.5rem] shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_4px_20px_rgba(0,0,0,0.02)] backdrop-blur-md">
-          <p class="text-ai-fg-muted text-lg leading-relaxed max-w-xl mx-auto mb-8">
-            We're currently planning our next semester of events. Join our community to get notified.
-          </p>
-          <a href="/join" class="btn-primary">
-            Become a member
-          </a>
+        <div class="premium-card py-16 text-center max-w-4xl mx-auto" style="--card-brand-color: var(--ai-azure);">
+          <!-- Cybernetic Corner Brackets -->
+          <div class="corner-tick top-left"></div>
+          <div class="corner-tick top-right"></div>
+          <div class="corner-tick bottom-left"></div>
+          <div class="corner-tick bottom-right"></div>
+
+          <!-- Luminescent Glow, Grid, and Sweep Scan -->
+          <div class="premium-glow"></div>
+          <div class="premium-grid opacity-30"></div>
+          <div class="premium-scan"></div>
+
+          <div class="relative z-10 px-6">
+            <!-- Micro-Visual: Technical Loading console -->
+            <div class="mx-auto max-w-[280px] bg-ai-bg/60 border border-ai-border rounded-xl p-4 mb-8 text-left font-mono-tech text-[10px] text-ai-fg-muted space-y-2 relative overflow-hidden">
+              <div class="flex items-center justify-between text-ai-azure border-b border-ai-border/40 pb-2">
+                <span>SYSTEM STATUS // STANDBY</span>
+                <span class="w-2 h-2 rounded-full bg-ai-sage animate-pulse"></span>
+              </div>
+              <div class="space-y-1">
+                <p class="text-ai-fg">> FETCHING SEMESTER_SCHEDULE...</p>
+                <p class="text-ai-coral">> [WARN] QUEUE BUFFER EMPTY</p>
+                <p>> SYNAPSE SCHEDULER IDLE (0ms)</p>
+                <p class="text-ai-azure">> LISTENING FOR SU RULINGS...</p>
+              </div>
+            </div>
+            
+            <p class="text-ai-fg-muted text-lg leading-relaxed max-w-xl mx-auto mb-8">
+              We're currently planning our next semester of events. Join our community to get notified.
+            </p>
+            <a href="/join" class="btn-primary">
+              Become a member
+            </a>
+          </div>
         </div>
       ) : (
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -51,23 +78,42 @@ const formatEventDay = (date?: string) => {
             const colors = ['var(--ai-coral)', 'var(--ai-azure)', 'var(--ai-sage)'];
             const glowColor = colors[i % colors.length];
             return (
-              <article class="relative bg-ai-surface border border-ai-border rounded-[1.5rem] p-8 flex flex-col overflow-hidden group transition-all duration-300 hover:-translate-y-1 hover:border-ai-border-strong shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_4px_20px_rgba(0,0,0,0.02)] backdrop-blur-md">
-                <div class="absolute inset-0 opacity-0 group-hover:opacity-[0.15] blur-[60px] scale-150 transition-opacity duration-500 pointer-events-none" style={`background-color: ${glowColor};`}></div>
-                
-                <div class="relative z-10 flex flex-col h-full">
-                  <div class="mb-6 self-start text-center bg-ai-bg border border-ai-border px-4 py-3 rounded-[1rem] min-w-[5rem] shadow-sm">
-                    <span class="block text-ai-coral font-bold text-xs tracking-widest uppercase mb-1">{formatEventMonth(event.date)}</span>
-                    <span class="block text-ai-fg font-extrabold text-3xl leading-none">{formatEventDay(event.date)}</span>
-                  </div>
+              <article class="premium-card group p-6 sm:p-8" style={`--card-brand-color: ${glowColor};`}>
+                <!-- Cybernetic Corner Brackets -->
+                <div class="corner-tick top-left"></div>
+                <div class="corner-tick top-right"></div>
+                <div class="corner-tick bottom-left"></div>
+                <div class="corner-tick bottom-right"></div>
 
-                  <div class="flex-grow flex flex-col">
-                    <h2 class="font-bold text-2xl text-ai-fg mb-3 tracking-tight">{event.title}</h2>
-                    <div class="flex flex-wrap gap-x-4 gap-y-2 mb-4 text-sm font-medium text-ai-azure tracking-wide uppercase">
+                <!-- Luminescent Glow, Grid, and Sweep Scan -->
+                <div class="premium-glow"></div>
+                <div class="premium-grid opacity-25"></div>
+                <div class="premium-scan"></div>
+                
+                <div class="relative z-10 flex flex-col h-full justify-between">
+                  <div>
+                    <!-- Technical Header -->
+                    <div class="flex items-center justify-between mb-5 text-[10px] font-mono-tech tracking-wider uppercase text-ai-fg-muted border-b border-ai-border/30 pb-3">
+                      <span class="text-[var(--card-brand-color)] font-bold">// EVENT MODULE</span>
+                      <span>ID: EV-{(event.title || '').slice(0, 3).toUpperCase()}</span>
+                    </div>
+
+                    <!-- Glowing Calendar date badge wrapper -->
+                    <div class="relative mb-6 self-start inline-block">
+                      <div class="absolute -inset-0.5 rounded-[1rem] bg-gradient-to-br from-ai-border to-[var(--card-brand-color)]/30 opacity-40 blur-xs"></div>
+                      <div class="relative z-10 text-center bg-ai-bg/90 border border-ai-border/80 px-4 py-3 rounded-[1rem] min-w-[5rem] shadow-md">
+                        <span class="block text-ai-coral font-bold text-xs tracking-widest uppercase mb-1">{formatEventMonth(event.date)}</span>
+                        <span class="block text-ai-fg font-extrabold text-3xl leading-none">{formatEventDay(event.date)}</span>
+                      </div>
+                    </div>
+
+                    <h2 class="font-bold text-2xl text-ai-fg mb-3 tracking-tight group-hover:text-[var(--card-brand-color)] transition-colors duration-300 line-clamp-2">{event.title}</h2>
+                    <div class="flex flex-wrap gap-x-4 gap-y-2 mb-4 text-xs font-semibold text-ai-azure tracking-wide uppercase">
                       {event.startTime && <span>{event.startTime}{event.endTime ? ` - ${event.endTime}` : ''}</span>}
                       {event.location && <span>{event.location}</span>}
                       {event.category && <span class="text-ai-fg-muted border border-ai-border px-2 py-0.5 rounded-md">{event.category}</span>}
                     </div>
-                    <p class="text-ai-fg-muted leading-relaxed text-base">{event.description || 'Details to be announced.'}</p>
+                    <p class="text-ai-fg-muted leading-relaxed text-base line-clamp-4">{event.description || 'Details to be announced.'}</p>
                   </div>
                 </div>
               </article>
@@ -79,3 +125,4 @@ const formatEventDay = (date?: string) => {
   </section>
 
 </Layout>
+
