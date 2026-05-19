@@ -1,0 +1,372 @@
+---
+---
+
+<section data-prompt-workshop class="pw-root" aria-label="Student Project: Prompt Workshop">
+  <div class="pw-shell">
+    <header class="pw-header">
+      <span class="pw-badge">Prompt engineering tool</span>
+      <h2>Prompt Workshop</h2>
+      <p>Turn rough requests into clearer prompts with role, context, constraints, examples, and evaluation checks.</p>
+    </header>
+
+    <div class="pw-board">
+      <form class="pw-panel pw-form">
+        <label>
+          <span>Goal</span>
+          <textarea id="pw-goal" maxlength="520">Help first-year computer science students understand recursion using a practical campus example.</textarea>
+        </label>
+
+        <div class="pw-grid">
+          <label>
+            <span>Audience</span>
+            <select id="pw-audience">
+              <option>new university students</option>
+              <option>society committee members</option>
+              <option>technical beginners</option>
+              <option>busy event organisers</option>
+            </select>
+          </label>
+          <label>
+            <span>Output</span>
+            <select id="pw-output">
+              <option>lesson plan</option>
+              <option>checklist</option>
+              <option>decision memo</option>
+              <option>debugging guide</option>
+            </select>
+          </label>
+        </div>
+
+        <div>
+          <span class="pw-label">Constraints</span>
+          <div class="pw-chips" role="group" aria-label="Prompt constraints">
+            <button type="button" class="pw-chip" data-chip="Ask clarifying questions first" aria-pressed="true">Clarify</button>
+            <button type="button" class="pw-chip" data-chip="Use step-by-step reasoning internally" aria-pressed="true">Reason</button>
+            <button type="button" class="pw-chip" data-chip="Include one concrete example" aria-pressed="true">Example</button>
+            <button type="button" class="pw-chip" data-chip="Flag uncertainty and assumptions" aria-pressed="false">Assumptions</button>
+            <button type="button" class="pw-chip" data-chip="Keep the answer concise" aria-pressed="false">Concise</button>
+          </div>
+        </div>
+
+        <div class="pw-actions">
+          <button id="pw-build" type="button">Build prompt</button>
+          <button id="pw-reset" type="button">Reset</button>
+        </div>
+      </form>
+
+      <aside class="pw-panel pw-output">
+        <div class="pw-score-row" aria-label="Prompt quality scores">
+          <div><strong id="pw-clarity">82</strong><span>Clarity</span></div>
+          <div><strong id="pw-specificity">76</strong><span>Specificity</span></div>
+          <div><strong id="pw-safety">88</strong><span>Safety</span></div>
+        </div>
+        <label>
+          <span>Generated prompt</span>
+          <textarea id="pw-result" readonly></textarea>
+        </label>
+        <div class="pw-checks">
+          <div><span></span>Role and task are explicit</div>
+          <div><span></span>Success criteria included</div>
+          <div><span></span>Boundaries are visible</div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<style>
+  .pw-root {
+    height: 100%;
+    overflow: hidden;
+    color: var(--ai-fg);
+  }
+
+  .pw-shell {
+    width: min(100%, 78rem);
+    height: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .pw-header {
+    max-width: 54rem;
+    padding-right: 5.5rem;
+  }
+
+  .pw-badge,
+  .pw-label,
+  .pw-form label span,
+  .pw-output label span {
+    color: var(--ai-azure);
+    font-size: 0.75rem;
+    font-weight: 850;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+  }
+
+  .pw-header h2 {
+    margin: 0.35rem 0 0;
+    font-size: clamp(2.1rem, 4vw, 3.7rem);
+    line-height: 0.95;
+    font-weight: 850;
+    letter-spacing: -0.04em;
+  }
+
+  .pw-header p {
+    max-width: 44rem;
+    margin: 0.7rem 0 0;
+    color: var(--ai-fg-muted);
+    line-height: 1.5;
+  }
+
+  .pw-board {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 1rem;
+  }
+
+  .pw-panel {
+    min-height: 0;
+    border: 1px solid var(--ai-border);
+    border-radius: 1rem;
+    background: color-mix(in srgb, var(--ai-surface) 92%, transparent);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.16);
+  }
+
+  .pw-form,
+  .pw-output {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .pw-form label,
+  .pw-output label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .pw-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .pw-form textarea,
+  .pw-output textarea,
+  .pw-form select {
+    width: 100%;
+    border: 1px solid var(--ai-border);
+    border-radius: 0.75rem;
+    background: color-mix(in srgb, var(--ai-bg) 74%, transparent);
+    color: var(--ai-fg);
+    font: inherit;
+    outline: none;
+  }
+
+  .pw-form textarea,
+  .pw-output textarea {
+    min-height: 9rem;
+    padding: 0.85rem;
+    resize: none;
+    line-height: 1.5;
+  }
+
+  .pw-output textarea {
+    flex: 1;
+    min-height: 16rem;
+    font-family: var(--font-mono);
+    font-size: 0.88rem;
+  }
+
+  .pw-form select {
+    padding: 0.78rem 0.8rem;
+  }
+
+  .pw-form textarea:focus,
+  .pw-output textarea:focus,
+  .pw-form select:focus {
+    border-color: var(--ai-azure);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--ai-azure) 14%, transparent);
+  }
+
+  .pw-chips,
+  .pw-actions,
+  .pw-checks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+  }
+
+  .pw-chip,
+  .pw-actions button {
+    min-height: 2.45rem;
+    border: 1px solid var(--ai-border);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ai-fg);
+    padding: 0.55rem 0.85rem;
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .pw-chip[aria-pressed="true"] {
+    border-color: color-mix(in srgb, var(--ai-azure) 55%, white);
+    background: color-mix(in srgb, var(--ai-azure) 14%, transparent);
+  }
+
+  #pw-build {
+    background: var(--ai-azure);
+    border-color: var(--ai-azure);
+    color: white;
+  }
+
+  .pw-score-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.65rem;
+  }
+
+  .pw-score-row div,
+  .pw-checks div {
+    border: 1px solid var(--ai-border);
+    border-radius: 0.85rem;
+    background: color-mix(in srgb, var(--ai-bg) 64%, transparent);
+    padding: 0.8rem;
+  }
+
+  .pw-score-row strong {
+    display: block;
+    font-size: clamp(1.45rem, 3vw, 2.2rem);
+    line-height: 1;
+  }
+
+  .pw-score-row span,
+  .pw-checks {
+    color: var(--ai-fg-muted);
+    font-size: 0.82rem;
+    font-weight: 750;
+  }
+
+  .pw-checks div {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  .pw-checks span {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 999px;
+    background: var(--ai-sage);
+  }
+
+  @media (max-width: 760px) {
+    .pw-header { padding-right: 3.5rem; }
+    .pw-header p { display: none; }
+    .pw-board { grid-template-columns: 1fr; grid-template-rows: 0.95fr 1.05fr; }
+    .pw-grid { grid-template-columns: 1fr; }
+    .pw-form textarea { min-height: 5.5rem; }
+    .pw-score-row { grid-template-columns: repeat(3, 1fr); }
+    .pw-checks { display: none; }
+  }
+</style>
+
+<script>
+  const promptWorkshopRoot = document.querySelector('[data-prompt-workshop]');
+
+  if (promptWorkshopRoot) {
+    const goal = promptWorkshopRoot.querySelector('#pw-goal');
+    const audience = promptWorkshopRoot.querySelector('#pw-audience');
+    const output = promptWorkshopRoot.querySelector('#pw-output');
+    const result = promptWorkshopRoot.querySelector('#pw-result');
+    const chips = [...promptWorkshopRoot.querySelectorAll('.pw-chip')];
+    const clarity = promptWorkshopRoot.querySelector('#pw-clarity');
+    const specificity = promptWorkshopRoot.querySelector('#pw-specificity');
+    const safety = promptWorkshopRoot.querySelector('#pw-safety');
+
+    const defaults = {
+      goal: goal?.value || '',
+      audience: audience?.value || '',
+      output: output?.value || '',
+    };
+
+    const selectedConstraints = () => chips
+      .filter((chip) => chip.getAttribute('aria-pressed') === 'true')
+      .map((chip) => chip.getAttribute('data-chip'))
+      .filter(Boolean);
+
+    const scorePrompt = (text, constraints) => {
+      const words = text.trim().split(/\s+/).filter(Boolean).length;
+      const hasExample = constraints.some((item) => /example/i.test(item));
+      const hasClarify = constraints.some((item) => /clarifying/i.test(item));
+      const hasAssumptions = constraints.some((item) => /assumptions/i.test(item));
+      const specificityScore = Math.min(96, 50 + constraints.length * 7 + Math.floor(words / 14));
+      const clarityScore = Math.min(97, 58 + (words > 18 ? 14 : 4) + (hasExample ? 8 : 0) + (hasClarify ? 7 : 0));
+      const safetyScore = Math.min(98, 70 + (hasAssumptions ? 12 : 0) + (hasClarify ? 7 : 0) + (constraints.length > 2 ? 5 : 0));
+      return { clarityScore, specificityScore, safetyScore };
+    };
+
+    const buildPrompt = () => {
+      const constraints = selectedConstraints();
+      const userGoal = String(goal?.value || '').trim();
+      const audienceText = String(audience?.value || '').trim();
+      const outputText = String(output?.value || '').trim();
+      const checks = [
+        'Check whether the answer would be understandable to the target audience.',
+        'Prefer practical examples over abstract definitions.',
+        'End with a short self-review against the requested output.',
+      ];
+
+      if (result) {
+        result.value = [
+          `You are a helpful AI tutor and project coach for Surrey AI Society.`,
+          ``,
+          `Task: ${userGoal || defaults.goal}`,
+          `Audience: ${audienceText || defaults.audience}`,
+          `Required output: ${outputText || defaults.output}`,
+          ``,
+          `Constraints:`,
+          ...constraints.map((item) => `- ${item}.`),
+          ``,
+          `Evaluation checks:`,
+          ...checks.map((item) => `- ${item}`),
+          ``,
+          `If important context is missing, ask up to three focused questions before giving the final answer.`,
+        ].join('\n');
+      }
+
+      const scores = scorePrompt(userGoal, constraints);
+      if (clarity) clarity.textContent = String(scores.clarityScore);
+      if (specificity) specificity.textContent = String(scores.specificityScore);
+      if (safety) safety.textContent = String(scores.safetyScore);
+    };
+
+    chips.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        chip.setAttribute('aria-pressed', chip.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+        buildPrompt();
+      });
+    });
+
+    promptWorkshopRoot.querySelector('#pw-build')?.addEventListener('click', buildPrompt);
+    promptWorkshopRoot.querySelector('#pw-reset')?.addEventListener('click', () => {
+      if (goal) goal.value = defaults.goal;
+      if (audience) audience.value = defaults.audience;
+      if (output) output.value = defaults.output;
+      chips.forEach((chip, index) => chip.setAttribute('aria-pressed', index < 3 ? 'true' : 'false'));
+      buildPrompt();
+    });
+    goal?.addEventListener('input', buildPrompt);
+    audience?.addEventListener('change', buildPrompt);
+    output?.addEventListener('change', buildPrompt);
+    buildPrompt();
+  }
+</script>

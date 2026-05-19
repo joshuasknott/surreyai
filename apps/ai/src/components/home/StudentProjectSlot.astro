@@ -606,6 +606,7 @@
   let engineGain = null;
   let engineOsc2 = null;
   let engineGain2 = null;
+  let transientAudioNodes = [];
   let soundOn = true;
   let bumpFlash = 0;
   let screenSegments = new Map();
@@ -808,7 +809,7 @@
   }
 
   function playTone(freq, dur, vol, type) {
-    if (!audioCtx || !soundOn) return;
+    if (!audioCtx || !soundOn || !visible || (state !== ST.PLAY && state !== ST.DONE)) return;
     try {
       const o = audioCtx.createOscillator();
       const g = audioCtx.createGain();
@@ -820,6 +821,14 @@
       g.connect(audioCtx.destination);
       o.start();
       o.stop(audioCtx.currentTime + dur);
+      transientAudioNodes.push({ oscillator: o, gain: g });
+      o.addEventListener('ended', () => {
+        transientAudioNodes = transientAudioNodes.filter((node) => node.oscillator !== o);
+        try {
+          o.disconnect();
+          g.disconnect();
+        } catch {}
+      }, { once: true });
     } catch {}
   }
 
@@ -844,6 +853,9 @@
 
   function startGame() {
     initAudio();
+    if (audioCtx && audioCtx.state === 'suspended' && soundOn) {
+      audioCtx.resume().catch(() => {});
+    }
     resetRace();
     state = ST.PLAY;
     startEl.setAttribute('hidden', '');
@@ -854,15 +866,49 @@
   function toMenu() {
     state = ST.MENU;
     clearKeys();
+    silenceAudio();
     startEl.removeAttribute('hidden');
     doneEl.setAttribute('hidden', '');
     hudEl.setAttribute('hidden', '');
+  }
+
+  function silenceAudio() {
+    if (!audioCtx) return;
+    try {
+      const now = audioCtx.currentTime;
+      if (engineGain) {
+        engineGain.gain.cancelScheduledValues(now);
+        engineGain.gain.setValueAtTime(0, now);
+      }
+      if (engineGain2) {
+        engineGain2.gain.cancelScheduledValues(now);
+        engineGain2.gain.setValueAtTime(0, now);
+      }
+      transientAudioNodes.forEach(({ oscillator, gain }) => {
+        try { oscillator.stop(now); } catch {}
+        try { oscillator.disconnect(); } catch {}
+        try { gain.disconnect(); } catch {}
+      });
+      transientAudioNodes = [];
+    } catch {}
+  }
+
+  function stopForProjectClose() {
+    state = ST.MENU;
+    visible = false;
+    lastF = 0;
+    clearKeys();
+    silenceAudio();
+    if (audioCtx && audioCtx.state === 'running') {
+      audioCtx.suspend().catch(() => {});
+    }
   }
 
   function toggleSound() {
     soundOn = !soundOn;
     soundBtn.textContent = 'Sound: ' + (soundOn ? 'On' : 'Off');
     soundBtn.setAttribute('aria-label', soundOn ? 'Sound is on, click to mute' : 'Sound is off, click to unmute');
+    if (!soundOn) silenceAudio();
   }
 
   function racePosition() {
@@ -965,6 +1011,7 @@
   restartBtn.addEventListener('click', resetRace);
   againBtn.addEventListener('click', startGame);
   soundBtn.addEventListener('click', toggleSound);
+  window.addEventListener('surrey-ai-project-modal-close', stopForProjectClose);
 
   const obs = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; }, { threshold: 0 });
   obs.observe(gameEl);

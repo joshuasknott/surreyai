@@ -1,0 +1,149 @@
+---
+---
+
+<section data-event-optimizer class="eo-root" aria-label="Student Project: Event Optimizer">
+  <div class="eo-shell">
+    <header class="eo-header">
+      <span class="eo-badge">Committee planning tool</span>
+      <h2>Event Optimizer</h2>
+      <p>Prototype an AI society event plan with budget splits, timeline, staffing, and risk checks.</p>
+    </header>
+
+    <div class="eo-stage">
+      <form class="eo-panel eo-form">
+        <label><span>Event format</span><select id="eo-format"><option>Workshop</option><option>Hack night</option><option>Guest talk</option><option>Project showcase</option></select></label>
+        <label><span>Audience</span><input id="eo-audience" type="range" min="20" max="180" value="70" /></label>
+        <label><span>Budget</span><input id="eo-budget" type="range" min="50" max="900" value="260" /></label>
+        <label><span>Goal</span><select id="eo-goal"><option>Teach practical skills</option><option>Build community</option><option>Ship a prototype</option><option>Connect with employers</option></select></label>
+        <div class="eo-actions"><button id="eo-build" type="button">Optimize plan</button></div>
+      </form>
+
+      <aside class="eo-panel eo-output">
+        <div class="eo-metrics">
+          <div><strong id="eo-score">0</strong><span>Fit score</span></div>
+          <div><strong id="eo-staff">0</strong><span>Helpers</span></div>
+          <div><strong id="eo-cost">£0</strong><span>Spend</span></div>
+        </div>
+        <div class="eo-columns">
+          <section><h3>Schedule</h3><ul id="eo-schedule"></ul></section>
+          <section><h3>Budget</h3><ul id="eo-budget-list"></ul></section>
+          <section><h3>Risks</h3><ul id="eo-risks"></ul></section>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<style>
+  .eo-root { height: 100%; overflow: hidden; color: var(--ai-fg); }
+  .eo-shell { width: min(100%, 78rem); height: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem; }
+  .eo-header { max-width: 54rem; padding-right: 5.5rem; }
+  .eo-badge, .eo-form label span, .eo-metrics span {
+    color: var(--ai-coral);
+    font-size: 0.75rem;
+    font-weight: 850;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+  }
+  .eo-header h2 { margin: 0.35rem 0 0; font-size: clamp(2.1rem, 4vw, 3.7rem); line-height: 0.95; font-weight: 850; letter-spacing: -0.04em; }
+  .eo-header p { max-width: 44rem; margin: 0.7rem 0 0; color: var(--ai-fg-muted); line-height: 1.5; }
+  .eo-stage { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(17rem, 0.33fr) minmax(0, 1fr); gap: 1rem; }
+  .eo-panel { min-height: 0; border: 1px solid var(--ai-border); border-radius: 1rem; background: color-mix(in srgb, var(--ai-surface) 92%, transparent); box-shadow: 0 20px 60px rgba(0, 0, 0, 0.16); }
+  .eo-form, .eo-output { display: flex; flex-direction: column; gap: 1rem; padding: 1rem; overflow: hidden; }
+  .eo-form label { display: grid; gap: 0.55rem; }
+  .eo-form select {
+    width: 100%;
+    min-height: 2.65rem;
+    border: 1px solid var(--ai-border);
+    border-radius: 0.75rem;
+    background: color-mix(in srgb, var(--ai-bg) 74%, transparent);
+    color: var(--ai-fg);
+    padding: 0 0.8rem;
+    font: inherit;
+  }
+  .eo-form input { accent-color: var(--ai-coral); }
+  .eo-actions button {
+    width: 100%;
+    min-height: 2.65rem;
+    border: 1px solid var(--ai-coral);
+    border-radius: 999px;
+    background: var(--ai-coral);
+    color: white;
+    font: inherit;
+    font-weight: 850;
+    cursor: pointer;
+  }
+  .eo-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.65rem; }
+  .eo-metrics div, .eo-columns section { border: 1px solid var(--ai-border); border-radius: 0.85rem; padding: 0.85rem; background: color-mix(in srgb, var(--ai-bg) 64%, transparent); }
+  .eo-metrics strong { display: block; font-size: clamp(1.35rem, 3vw, 2.1rem); line-height: 1; margin-bottom: 0.35rem; }
+  .eo-columns { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem; }
+  .eo-columns section { overflow-y: auto; }
+  .eo-columns h3 { margin: 0 0 0.65rem; font-size: 1rem; }
+  .eo-columns ul { display: grid; gap: 0.55rem; margin: 0; padding: 0; list-style: none; }
+  .eo-columns li { color: var(--ai-fg-muted); line-height: 1.38; font-size: 0.9rem; }
+  .eo-columns li::before { content: ""; display: inline-block; width: 0.45rem; height: 0.45rem; margin-right: 0.5rem; border-radius: 999px; background: var(--ai-coral); }
+  @media (max-width: 760px) {
+    .eo-header { padding-right: 3.5rem; }
+    .eo-header p { display: none; }
+    .eo-stage { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr); }
+    .eo-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .eo-columns { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script>
+  const eventRoot = document.querySelector('[data-event-optimizer]');
+  if (eventRoot) {
+    const formatEl = eventRoot.querySelector('#eo-format');
+    const audienceEl = eventRoot.querySelector('#eo-audience');
+    const budgetEl = eventRoot.querySelector('#eo-budget');
+    const goalEl = eventRoot.querySelector('#eo-goal');
+    const setList = (id, items) => {
+      const list = eventRoot.querySelector(id);
+      if (!list) return;
+      list.textContent = '';
+      items.forEach((item) => {
+        const li = document.createElement('li');
+        li.textContent = item;
+        list.appendChild(li);
+      });
+    };
+
+    function optimize() {
+      const format = formatEl?.value || 'Workshop';
+      const audience = Number(audienceEl?.value || 70);
+      const budget = Number(budgetEl?.value || 260);
+      const goal = goalEl?.value || 'Teach practical skills';
+      const staff = Math.max(3, Math.ceil(audience / 24) + (format === 'Hack night' ? 2 : 0));
+      const spend = Math.min(budget, Math.round(audience * (format === 'Guest talk' ? 2.1 : 3.2) + staff * 12));
+      const fit = Math.max(52, Math.min(96, Math.round(68 + budget / 45 - audience / 18 + staff * 2)));
+      eventRoot.querySelector('#eo-score').textContent = String(fit);
+      eventRoot.querySelector('#eo-staff').textContent = String(staff);
+      eventRoot.querySelector('#eo-cost').textContent = `£${spend}`;
+      setList('#eo-schedule', [
+        `T-14 days: confirm ${format.toLowerCase()} room, lead, and backup plan.`,
+        `T-7 days: publish signup page with capacity ${audience}.`,
+        `T-2 days: send prep pack aligned to "${goal}".`,
+        `Event day: 10 min welcome, 70 min main activity, 20 min sharing.`,
+        `T+1 day: collect feedback and publish resources.`,
+      ]);
+      setList('#eo-budget-list', [
+        `Refreshments: £${Math.round(spend * 0.34)}`,
+        `Materials and prizes: £${Math.round(spend * 0.26)}`,
+        `Speaker or facilitator support: £${Math.round(spend * 0.24)}`,
+        `Contingency: £${Math.max(12, Math.round(spend * 0.16))}`,
+      ]);
+      const risks = [
+        audience > 120 ? 'Split into stations so support does not bottleneck.' : 'Keep two helpers free for late arrivals and setup issues.',
+        budget < audience * 2 ? 'Reduce catering promises and prioritise reusable resources.' : 'Lock supplier costs before promotion scales.',
+        format === 'Hack night' ? 'Prepare starter repos and fallback datasets.' : 'Prepare a backup interactive segment if questions run short.',
+        'Assign one committee member to accessibility, safeguarding, and room logistics.',
+      ];
+      setList('#eo-risks', risks);
+    }
+
+    eventRoot.querySelector('#eo-build')?.addEventListener('click', optimize);
+    [formatEl, audienceEl, budgetEl, goalEl].forEach((el) => el?.addEventListener('input', optimize));
+    optimize();
+  }
+</script>

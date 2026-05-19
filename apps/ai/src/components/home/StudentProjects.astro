@@ -2,6 +2,10 @@
 import StudentProjectSlot from "./StudentProjectSlot.astro";
 import IdeaAnalyser from "./student-projects/IdeaAnalyser.astro";
 import AgenticWorkspace from "./student-projects/AgenticWorkspace.astro";
+import PromptWorkshop from "./student-projects/PromptWorkshop.astro";
+import NeuralPlayground from "./student-projects/NeuralPlayground.astro";
+import StudySprintPlanner from "./student-projects/StudySprintPlanner.astro";
+import EscapeRoom from "./student-projects/EscapeRoom.astro";
 
 const projects = [
   {
@@ -27,6 +31,38 @@ const projects = [
     description: "A visual prototype of agents planning, building, reviewing, and handing off work inside a shared workspace.",
     action: "Launch",
     color: "var(--ai-sage)"
+  },
+  {
+    id: "prompt-workshop",
+    title: "Prompt Workshop",
+    type: "Useful tool",
+    description: "A prompt engineering workbench that turns rough requests into clearer, safer, more specific prompts.",
+    action: "Build",
+    color: "var(--ai-azure)"
+  },
+  {
+    id: "neural-playground",
+    title: "Neural Playground",
+    type: "Learning simulation",
+    description: "Train a tiny classifier and watch its decision boundary adapt to labelled data in real time.",
+    action: "Train",
+    color: "var(--ai-sage)"
+  },
+  {
+    id: "study-sprint",
+    title: "Study Sprint Planner",
+    type: "Student tool",
+    description: "Convert revision tasks, deadlines, and difficulty into a focused sprint schedule.",
+    action: "Plan",
+    color: "var(--ai-azure)"
+  },
+  {
+    id: "escape-room",
+    title: "Logic Escape Room",
+    type: "Puzzle game",
+    description: "Solve AI, logic, and safety puzzles to unlock a three-digit lab door code.",
+    action: "Unlock",
+    color: "var(--ai-azure)"
   }
 ];
 ---
@@ -39,27 +75,38 @@ const projects = [
     </div>
 
     <div class="projects-layout">
-      <!-- Scrollable List -->
       <div class="projects-scroll-container">
         <div class="projects-scroll-row" aria-label="Student projects list">
           {projects.map((p) => (
             <button 
-              class="project-card scrollable-card" 
+              class="premium-card project-card scrollable-card text-left group" 
               data-project-id={p.id}
               aria-label={`View ${p.title}`}
               aria-haspopup="dialog"
-              style={`--brand-color: ${p.color}`}
+              style={`--card-brand-color: ${p.color}; --brand-color: ${p.color};`}
             >
-              <div class="card-glow"></div>
-              <div class="card-content">
-                <div class="card-meta">
-                  <span class="card-type">{p.type}</span>
+              <!-- Cybernetic Corner Brackets -->
+              <div class="corner-tick top-left"></div>
+              <div class="corner-tick top-right"></div>
+              <div class="corner-tick bottom-left"></div>
+              <div class="corner-tick bottom-right"></div>
+
+              <!-- Luminescent Glow, Grid, and Sweep Scan -->
+              <div class="premium-glow"></div>
+              <div class="premium-grid opacity-25"></div>
+              <div class="premium-scan"></div>
+
+              <div class="card-content relative z-10 flex-grow flex flex-col justify-between h-full w-full">
+                <div>
+                  <div class="card-meta flex justify-between items-center mb-6">
+                    <span class="card-type text-[10px] font-semibold uppercase tracking-wider text-ai-azure">{p.type}</span>
+                  </div>
+                  <h3 class="card-title font-extrabold text-2xl text-ai-fg mb-3 tracking-tight group-hover:text-[var(--card-brand-color)] transition-colors duration-300">{p.title}</h3>
+                  <p class="card-description text-ai-fg-muted leading-relaxed text-sm mb-6 flex-grow">{p.description}</p>
                 </div>
-                <h3 class="card-title">{p.title}</h3>
-                <p class="card-description">{p.description}</p>
-                <div class="card-action">
+                <div class="card-action flex items-center gap-2 text-sm font-bold text-[var(--card-brand-color)] mt-auto transition-all duration-300 group-hover:translate-x-1">
                   <span class="action-text">{p.action}</span>
-                  <svg class="action-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                  <svg class="action-icon w-4 h-4" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
                 </div>
               </div>
             </button>
@@ -90,6 +137,30 @@ const projects = [
           <div id="panel-agentic-workspace" class="project-panel" hidden>
             <div class="panel-inner">
               <AgenticWorkspace />
+            </div>
+          </div>
+
+          <div id="panel-prompt-workshop" class="project-panel" hidden>
+            <div class="panel-inner">
+              <PromptWorkshop />
+            </div>
+          </div>
+
+          <div id="panel-neural-playground" class="project-panel" hidden>
+            <div class="panel-inner">
+              <NeuralPlayground />
+            </div>
+          </div>
+
+          <div id="panel-study-sprint" class="project-panel" hidden>
+            <div class="panel-inner">
+              <StudySprintPlanner />
+            </div>
+          </div>
+
+          <div id="panel-escape-room" class="project-panel" hidden>
+            <div class="panel-inner">
+              <EscapeRoom />
             </div>
           </div>
         </div>
@@ -149,103 +220,26 @@ const projects = [
 
   .projects-scroll-container {
     width: 100%;
-    overflow-x: auto;
-    /* Hide scrollbar */
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none;  /* IE and Edge */
-  }
-
-  .projects-scroll-container::-webkit-scrollbar {
-    display: none; /* Chrome, Safari and Opera */
+    overflow: visible;
   }
 
   .projects-scroll-row {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
     gap: 1.5rem;
-    padding-bottom: 1rem;
-    scroll-snap-type: x mandatory;
+    align-items: stretch;
   }
 
   .scrollable-card {
-    flex: 0 0 auto;
     width: 100%;
-    min-width: 300px;
-    max-width: 360px;
-    scroll-snap-align: start;
+    min-width: 0;
   }
 
   .project-card {
-    position: relative;
-    text-align: left;
-    background: var(--ai-surface);
-    border: 1px solid var(--ai-border);
-    border-radius: 1.5rem; /* matches AreasWeExplore */
-    padding: 2rem;
-    cursor: pointer;
-    overflow: hidden;
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s;
-    display: flex;
-    flex-direction: column;
-    min-height: 240px;
+    min-height: 260px;
     font-family: inherit;
     outline: none;
-    backdrop-filter: blur(12px);
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 4px 20px rgba(0, 0, 0, 0.02);
-  }
-
-  .card-glow {
-    position: absolute;
-    inset: 0;
-    background: var(--ai-surface);
-    z-index: 0;
-    overflow: hidden;
-    transition: opacity 0.4s ease;
-  }
-
-  .card-glow::before,
-  .card-glow::after {
-    content: "";
-    position: absolute;
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    filter: blur(40px);
-    opacity: 0.15;
-    animation: float-card 8s infinite ease-in-out alternate;
-    pointer-events: none;
-  }
-
-  .card-glow::before {
-    background: var(--brand-color);
-    top: -50px;
-    right: -50px;
-    animation-delay: -2s;
-  }
-
-  .card-glow::after {
-    background: color-mix(in srgb, var(--brand-color) 60%, white);
-    bottom: -50px;
-    left: -50px;
-  }
-
-  @keyframes float-card {
-    0% { transform: translate(0, 0) scale(1); }
-    100% { transform: translate(20px, 20px) scale(1.2); }
-  }
-
-  .project-card:hover .card-glow::before,
-  .project-card:hover .card-glow::after,
-  .project-card.active .card-glow::before,
-  .project-card.active .card-glow::after {
-    opacity: 0.4;
-  }
-
-  .project-card:hover {
-    transform: translateY(-4px);
-    border-color: color-mix(in srgb, var(--brand-color) 40%, var(--ai-border));
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06);
+    border-radius: 1.5rem;
   }
 
   .project-card:focus-visible {
@@ -255,7 +249,7 @@ const projects = [
 
   .project-card.active {
     border-color: var(--brand-color);
-    box-shadow: 0 0 0 1px var(--brand-color), 0 12px 32px color-mix(in srgb, var(--brand-color) 15%, transparent);
+    box-shadow: 0 0 0 2px var(--brand-color), 0 12px 32px color-mix(in srgb, var(--brand-color) 20%, transparent);
   }
 
   .card-content {
@@ -442,9 +436,6 @@ const projects = [
     .projects-scroll-row {
       gap: 1rem;
     }
-    .scrollable-card {
-      min-width: 280px;
-    }
     .modal-content {
       min-height: 500px;
     }
@@ -474,6 +465,12 @@ const projects = [
     const closeModalBtn = document.getElementById('close-modal');
     const panels = document.querySelectorAll('.project-panel');
 
+    const resetActiveProject = () => {
+      window.dispatchEvent(new CustomEvent('surrey-ai-project-modal-close'));
+      panels.forEach(p => p.setAttribute('hidden', ''));
+      document.body.style.overflow = '';
+    };
+
     // Open modal when card is clicked
     cards.forEach(card => {
       card.addEventListener('click', () => {
@@ -500,11 +497,8 @@ const projects = [
 
     // Close modal function
     const closeModal = () => {
-      if (modal) {
+      if (modal?.open) {
         modal.close();
-        document.body.style.overflow = '';
-        // Hide all panels to reset state and stop potential media playing if they rely on it
-        panels.forEach(p => p.setAttribute('hidden', ''));
       }
     };
 
@@ -525,8 +519,7 @@ const projects = [
 
       // Handle Escape key (dialog handles it natively, but we need to reset body overflow)
       modal.addEventListener('close', () => {
-        document.body.style.overflow = '';
-        panels.forEach(p => p.setAttribute('hidden', ''));
+        resetActiveProject();
       });
     }
   });
