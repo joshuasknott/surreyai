@@ -1,0 +1,14 @@
+{
+  "name": "@surreysocieties/assistant",
+  "private": true,
+  "type": "module",
+  "version": "0.0.1",
+  "exports": {
+    "./server": "./src/server.ts"
+  },
+  "dependencies": {
+    "@google/genai": "^1.0.0",
+    "@surreysocieties/admin": "*",
+    "convex": "^1.37.0"
+  }
+}

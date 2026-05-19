@@ -1,5 +1,7 @@
 ---
 import BaseLayout from '@surreysocieties/ui/components/BaseLayout';
+import AssistantWidget from '@surreysocieties/ui/components/AssistantWidget';
+import { ASSISTANT_CONFIGS } from '@surreysocieties/ui';
 import { getSocietyById } from '@surreysocieties/admin/config';
 import JoinCTA from '../components/home/JoinCTA.astro';
 
@@ -15,6 +17,7 @@ interface Props {
 const { title, description, ogImage, hideCTA = false } = Astro.props;
 
 const society = getSocietyById('ai')!;
+const assistantConfig = ASSISTANT_CONFIGS.ai;
 const siteName = society.name;
 const fullTitle = `${title} — ${siteName}`;
 
@@ -205,6 +208,8 @@ const navLinks = [
       </div>
     </div>
   </footer>
+
+  <AssistantWidget config={assistantConfig} endpoint="/api/assistant/chat" />
 
   <script>
     // ── Theme toggle ──

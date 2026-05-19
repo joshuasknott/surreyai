@@ -13,3 +13,9 @@ export const SOCIETY_DOMAINS = {
 } as const;
 
 export type SocietyKey = keyof typeof SOCIETY_NAMES;
+
+export {
+  ASSISTANT_CONFIGS,
+  type AssistantSocietyConfig,
+  type AssistantSocietyKey,
+} from './assistant.js';

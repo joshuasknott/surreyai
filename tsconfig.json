@@ -11,6 +11,7 @@
     { "path": "./apps/ai" },
     { "path": "./apps/business" },
     { "path": "./apps/neurotech" },
+    { "path": "./packages/assistant" },
     { "path": "./packages/ui" },
     { "path": "./packages/admin" }
   ],

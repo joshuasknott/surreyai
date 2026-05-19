@@ -1,0 +1,537 @@
+---
+import type { AssistantSocietyConfig } from '../assistant';
+
+interface Props {
+  config: AssistantSocietyConfig;
+  endpoint?: string;
+}
+
+const { config, endpoint = '/api/assistant/chat' } = Astro.props;
+const widgetId = `society-assistant-${config.societyKey}`;
+const starterPrompts = JSON.stringify(config.starterPrompts);
+const fallbackLinks = JSON.stringify(config.fallbackLinks);
+const styleVars = [
+  `--assistant-accent:${config.brand.accent}`,
+  `--assistant-accent-text:${config.brand.accentText}`,
+  `--assistant-surface:${config.brand.surface}`,
+  `--assistant-text:${config.brand.text}`,
+  `--assistant-muted:${config.brand.mutedText}`,
+  `--assistant-border:${config.brand.border}`,
+].join(';');
+---
+
+<div
+  id={widgetId}
+  class="society-assistant"
+  data-assistant-widget
+  data-endpoint={endpoint}
+  data-society-name={config.societyName}
+  data-short-name={config.shortName}
+  data-description={config.shortDescription}
+  data-starter-prompts={starterPrompts}
+  data-fallback-links={fallbackLinks}
+  style={styleVars}
+>
+  <button
+    type="button"
+    class="assistant-toggle"
+    aria-label={`Open ${config.shortName} assistant`}
+    aria-expanded="false"
+    aria-controls={`${widgetId}-panel`}
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4.75 5.75A3.25 3.25 0 0 1 8 2.5h8A3.25 3.25 0 0 1 19.25 5.75v6.5A3.25 3.25 0 0 1 16 15.5H9.2l-3.45 3.08a.75.75 0 0 1-1.25-.56V15.2a3.25 3.25 0 0 1-2-2.95v-6.5Z" fill="currentColor"></path>
+      <path d="M8 8h8M8 11.25h5.5" fill="none" stroke="var(--assistant-accent-text)" stroke-linecap="round" stroke-width="1.5"></path>
+    </svg>
+  </button>
+
+  <section
+    id={`${widgetId}-panel`}
+    class="assistant-panel"
+    role="dialog"
+    aria-modal="false"
+    aria-labelledby={`${widgetId}-title`}
+    hidden
+  >
+    <header class="assistant-header">
+      <div>
+        <p class="assistant-eyebrow">{config.shortName}</p>
+        <h2 id={`${widgetId}-title`}>Website assistant</h2>
+      </div>
+      <div class="assistant-header-actions">
+        <button type="button" class="assistant-reset" aria-label="Reset assistant conversation">Reset</button>
+        <button type="button" class="assistant-close" aria-label={`Close ${config.shortName} assistant`}>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="assistant-body">
+      <div class="assistant-intro">
+        <p>{config.shortDescription}</p>
+      </div>
+      <div class="assistant-starters" aria-label="Suggested questions"></div>
+      <div class="assistant-messages" aria-live="polite" aria-relevant="additions"></div>
+    </div>
+
+    <form class="assistant-form">
+      <label class="sr-only" for={`${widgetId}-input`}>Ask {config.shortName}</label>
+      <textarea
+        id={`${widgetId}-input`}
+        class="assistant-input"
+        name="message"
+        rows="1"
+        maxlength="900"
+        placeholder="Ask a quick question..."
+      ></textarea>
+      <button type="submit" class="assistant-send">Send</button>
+    </form>
+  </section>
+</div>
+
+<style>
+  .society-assistant {
+    position: fixed;
+    right: 1.25rem;
+    bottom: 1.25rem;
+    z-index: 90;
+    color: var(--assistant-text);
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  }
+
+  .assistant-toggle {
+    width: 3.5rem;
+    height: 3.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid color-mix(in srgb, var(--assistant-accent) 54%, transparent);
+    border-radius: 999px;
+    background: var(--assistant-accent);
+    color: var(--assistant-accent-text);
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.22);
+    cursor: pointer;
+    transition: transform 160ms ease, box-shadow 160ms ease;
+  }
+
+  .assistant-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 22px 52px rgba(15, 23, 42, 0.26);
+  }
+
+  .assistant-toggle:focus-visible,
+  .assistant-close:focus-visible,
+  .assistant-reset:focus-visible,
+  .assistant-send:focus-visible,
+  .assistant-input:focus-visible,
+  .assistant-starter:focus-visible {
+    outline: 2px solid var(--assistant-accent);
+    outline-offset: 3px;
+  }
+
+  .assistant-toggle svg {
+    width: 1.55rem;
+    height: 1.55rem;
+  }
+
+  .assistant-panel {
+    position: fixed;
+    right: 1.25rem;
+    bottom: 5.4rem;
+    width: min(25.5rem, calc(100vw - 2.5rem));
+    height: min(40rem, calc(100vh - 7rem));
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--assistant-border);
+    border-radius: 1rem;
+    background: var(--assistant-surface);
+    box-shadow: 0 24px 70px rgba(15, 23, 42, 0.24);
+  }
+
+  .assistant-panel[hidden] {
+    display: none;
+  }
+
+  .assistant-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid var(--assistant-border);
+    background: color-mix(in srgb, var(--assistant-surface) 92%, var(--assistant-accent) 8%);
+  }
+
+  .assistant-eyebrow {
+    margin: 0 0 0.2rem;
+    color: var(--assistant-muted);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .assistant-header h2 {
+    margin: 0;
+    color: var(--assistant-text);
+    font-size: 1rem;
+    line-height: 1.2;
+    font-weight: 800;
+    letter-spacing: 0;
+  }
+
+  .assistant-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .assistant-reset,
+  .assistant-close {
+    border: 1px solid var(--assistant-border);
+    background: var(--assistant-surface);
+    color: var(--assistant-text);
+    cursor: pointer;
+  }
+
+  .assistant-reset {
+    min-height: 2rem;
+    padding: 0 0.7rem;
+    border-radius: 999px;
+    font-size: 0.76rem;
+    font-weight: 700;
+  }
+
+  .assistant-close {
+    width: 2rem;
+    height: 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+  }
+
+  .assistant-close svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .assistant-body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 1rem;
+  }
+
+  .assistant-intro {
+    margin-bottom: 0.85rem;
+    padding: 0.85rem;
+    border: 1px solid var(--assistant-border);
+    border-radius: 0.8rem;
+    background: color-mix(in srgb, var(--assistant-surface) 88%, var(--assistant-accent) 12%);
+  }
+
+  .assistant-intro p {
+    margin: 0;
+    color: var(--assistant-muted);
+    font-size: 0.88rem;
+    line-height: 1.45;
+  }
+
+  .assistant-starters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .assistant-starter {
+    max-width: 100%;
+    padding: 0.55rem 0.7rem;
+    border: 1px solid var(--assistant-border);
+    border-radius: 999px;
+    background: var(--assistant-surface);
+    color: var(--assistant-text);
+    font-size: 0.78rem;
+    line-height: 1.25;
+    cursor: pointer;
+  }
+
+  .assistant-starter:hover {
+    border-color: color-mix(in srgb, var(--assistant-accent) 65%, var(--assistant-border));
+  }
+
+  .assistant-messages {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+
+  .assistant-message {
+    max-width: 88%;
+    padding: 0.75rem 0.85rem;
+    border-radius: 0.9rem;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .assistant-message.user {
+    align-self: flex-end;
+    background: var(--assistant-accent);
+    color: var(--assistant-accent-text);
+    border-bottom-right-radius: 0.25rem;
+  }
+
+  .assistant-message.assistant,
+  .assistant-message.loading,
+  .assistant-message.error {
+    align-self: flex-start;
+    border: 1px solid var(--assistant-border);
+    background: color-mix(in srgb, var(--assistant-surface) 92%, #f8fafc 8%);
+    color: var(--assistant-text);
+    border-bottom-left-radius: 0.25rem;
+  }
+
+  .assistant-message.error {
+    color: #991b1b;
+    border-color: #fecaca;
+    background: #fef2f2;
+  }
+
+  .assistant-form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.6rem;
+    padding: 0.85rem;
+    border-top: 1px solid var(--assistant-border);
+    background: var(--assistant-surface);
+  }
+
+  .assistant-input {
+    min-height: 2.55rem;
+    max-height: 7rem;
+    resize: none;
+    border: 1px solid var(--assistant-border);
+    border-radius: 0.8rem;
+    padding: 0.7rem 0.8rem;
+    color: var(--assistant-text);
+    background: var(--assistant-surface);
+    font: inherit;
+    font-size: 0.9rem;
+    line-height: 1.25;
+  }
+
+  .assistant-send {
+    align-self: end;
+    min-height: 2.55rem;
+    padding: 0 0.95rem;
+    border: 1px solid var(--assistant-accent);
+    border-radius: 0.8rem;
+    background: var(--assistant-accent);
+    color: var(--assistant-accent-text);
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .assistant-send:disabled,
+  .assistant-input:disabled,
+  .assistant-starter:disabled {
+    opacity: 0.62;
+    cursor: not-allowed;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  @media (max-width: 640px) {
+    .society-assistant {
+      right: 1rem;
+      bottom: 1rem;
+    }
+
+    .assistant-panel {
+      right: 0.75rem;
+      left: 0.75rem;
+      bottom: 5.1rem;
+      width: auto;
+      height: min(38rem, calc(100vh - 6.25rem));
+      border-radius: 1rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .assistant-toggle {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  function initSocietyAssistant(root) {
+    if (!root || root.dataset.initialized === 'true') return;
+    root.dataset.initialized = 'true';
+
+    const endpoint = root.dataset.endpoint || '/api/assistant/chat';
+    const societyName = root.dataset.societyName || 'the society';
+    const shortName = root.dataset.shortName || societyName;
+    const starters = readJsonArray(root.dataset.starterPrompts);
+    const toggle = root.querySelector('.assistant-toggle');
+    const panel = root.querySelector('.assistant-panel');
+    const closeButton = root.querySelector('.assistant-close');
+    const resetButton = root.querySelector('.assistant-reset');
+    const form = root.querySelector('.assistant-form');
+    const input = root.querySelector('.assistant-input');
+    const sendButton = root.querySelector('.assistant-send');
+    const messagesEl = root.querySelector('.assistant-messages');
+    const startersEl = root.querySelector('.assistant-starters');
+    const messages = [];
+    let lastFocus = null;
+    let isSending = false;
+
+    starters.forEach((prompt) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'assistant-starter';
+      button.textContent = prompt;
+      button.addEventListener('click', () => submitMessage(prompt));
+      startersEl?.appendChild(button);
+    });
+
+    toggle?.addEventListener('click', () => {
+      if (panel?.hidden) openPanel();
+      else closePanel();
+    });
+
+    closeButton?.addEventListener('click', closePanel);
+    resetButton?.addEventListener('click', resetConversation);
+
+    form?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      submitMessage(input?.value || '');
+    });
+
+    input?.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        submitMessage(input.value || '');
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !panel?.hidden) {
+        closePanel();
+      }
+    });
+
+    function openPanel() {
+      lastFocus = document.activeElement;
+      if (panel) panel.hidden = false;
+      toggle?.setAttribute('aria-expanded', 'true');
+      toggle?.setAttribute('aria-label', `Close ${shortName} assistant`);
+      window.setTimeout(() => input?.focus(), 0);
+    }
+
+    function closePanel() {
+      if (panel) panel.hidden = true;
+      toggle?.setAttribute('aria-expanded', 'false');
+      toggle?.setAttribute('aria-label', `Open ${shortName} assistant`);
+      if (lastFocus && typeof lastFocus.focus === 'function') {
+        lastFocus.focus();
+      } else {
+        toggle?.focus();
+      }
+    }
+
+    function resetConversation() {
+      messages.splice(0, messages.length);
+      if (messagesEl) messagesEl.textContent = '';
+      if (input) input.value = '';
+      startersEl?.removeAttribute('hidden');
+      input?.focus();
+    }
+
+    async function submitMessage(rawText) {
+      const text = String(rawText || '').replace(/\s+/g, ' ').trim();
+      if (!text || isSending) return;
+
+      if (panel?.hidden) openPanel();
+      isSending = true;
+      setDisabled(true);
+      if (input) input.value = '';
+
+      appendMessage('user', text);
+      messages.push({ role: 'user', content: text });
+      startersEl?.setAttribute('hidden', '');
+      const loading = appendMessage('loading', `${shortName} assistant is thinking...`);
+
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages }),
+        });
+        const data = await response.json().catch(() => ({}));
+
+        loading?.remove();
+
+        if (!response.ok || typeof data.message !== 'string') {
+          throw new Error('Assistant request failed');
+        }
+
+        const reply = data.message.trim();
+        appendMessage('assistant', reply || `I could not answer that from the ${societyName} context right now.`);
+        messages.push({ role: 'assistant', content: reply });
+      } catch {
+        loading?.remove();
+        appendMessage('error', 'The assistant is unavailable right now. Please try again shortly or use the site links.');
+      } finally {
+        isSending = false;
+        setDisabled(false);
+        input?.focus();
+      }
+    }
+
+    function appendMessage(role, text) {
+      if (!messagesEl) return null;
+      const item = document.createElement('div');
+      item.className = `assistant-message ${role}`;
+      item.textContent = text;
+      messagesEl.appendChild(item);
+      item.scrollIntoView({ block: 'end', behavior: 'smooth' });
+      return item;
+    }
+
+    function setDisabled(disabled) {
+      if (input) input.disabled = disabled;
+      if (sendButton) sendButton.disabled = disabled;
+      root.querySelectorAll('.assistant-starter').forEach((button) => {
+        button.disabled = disabled;
+      });
+    }
+  }
+
+  function readJsonArray(value) {
+    try {
+      const parsed = JSON.parse(value || '[]');
+      return Array.isArray(parsed) ? parsed.filter((item) => typeof item === 'string') : [];
+    } catch {
+      return [];
+    }
+  }
+
+  document.querySelectorAll('[data-assistant-widget]').forEach(initSocietyAssistant);
+</script>
