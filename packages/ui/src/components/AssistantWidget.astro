@@ -83,7 +83,7 @@ const styleVars = [
         class="assistant-input"
         name="message"
         rows="1"
-        maxlength="900"
+        maxlength="1200"
         placeholder="Ask a quick question..."
       ></textarea>
       <button type="submit" class="assistant-send">Send</button>
@@ -431,6 +431,16 @@ const styleVars = [
       }
     });
 
+    input?.addEventListener('input', () => {
+      autoResizeInput();
+    });
+
+    function autoResizeInput() {
+      if (!input) return;
+      input.style.height = 'auto';
+      input.style.height = Math.min(input.scrollHeight, 112) + 'px';
+    }
+
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape' && !panel?.hidden) {
         closePanel();
@@ -459,7 +469,10 @@ const styleVars = [
     function resetConversation() {
       messages.splice(0, messages.length);
       if (messagesEl) messagesEl.textContent = '';
-      if (input) input.value = '';
+      if (input) {
+        input.value = '';
+        input.style.height = 'auto';
+      }
       startersEl?.removeAttribute('hidden');
       input?.focus();
     }
@@ -471,7 +484,10 @@ const styleVars = [
       if (panel?.hidden) openPanel();
       isSending = true;
       setDisabled(true);
-      if (input) input.value = '';
+      if (input) {
+        input.value = '';
+        input.style.height = 'auto';
+      }
 
       appendMessage('user', text);
       messages.push({ role: 'user', content: text });

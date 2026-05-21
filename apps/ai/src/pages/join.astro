@@ -41,19 +41,10 @@ const society = getSocietyById('ai')!;
         </div>
       </div>
 
-      <!-- Right Column: Membership Pass Card -->
+      <!-- Right Column: Membership Pass Card (Frosted Glass Digital Pass) -->
       <div class="lg:col-span-5 w-full">
         <div class="premium-card p-8 sm:p-10 relative overflow-hidden membership-tilt-card cursor-pointer" style="--card-brand-color: var(--ai-azure);">
-          <!-- Cybernetic Corner Brackets -->
-          <div class="corner-tick top-left"></div>
-          <div class="corner-tick top-right"></div>
-          <div class="corner-tick bottom-left"></div>
-          <div class="corner-tick bottom-right"></div>
-
-          <!-- Luminescent Glow, Grid, and Sweep Scan -->
-          <div class="premium-glow"></div>
-          <div class="premium-grid opacity-30"></div>
-          <div class="premium-scan"></div>
+          <div class="premium-glow opacity-80"></div>
 
           <div class="relative z-10 flex flex-col h-full justify-between pointer-events-none">
             <!-- Card Header -->
@@ -68,10 +59,10 @@ const society = getSocietyById('ai')!;
                 />
                 <div>
                   <h3 class="font-bold text-sm tracking-tight text-ai-fg">Surrey AI Society</h3>
-                  <p class="font-mono-tech text-[9px] uppercase tracking-wider text-ai-azure font-bold">MEMBERSHIP CREDENTIAL</p>
+                  <p class="text-[9px] uppercase tracking-wider text-ai-azure font-bold font-sans">MEMBERSHIP CREDENTIAL</p>
                 </div>
               </div>
-              <div class="px-3 py-1 bg-ai-azure/10 text-ai-azure border border-ai-azure/20 rounded-md font-mono-tech text-[9px] font-bold uppercase tracking-wider">
+              <div class="px-3 py-1 bg-ai-azure/10 text-ai-azure border border-ai-azure/20 rounded-md text-[9px] font-bold uppercase tracking-wider font-sans">
                 ACTIVE
               </div>
             </div>
@@ -116,7 +107,7 @@ const society = getSocietyById('ai')!;
             </div>
 
             <!-- Card Footer -->
-            <div class="flex items-center justify-between border-t border-ai-border/40 pt-5 mt-1 font-mono-tech text-[9px] text-ai-fg-muted uppercase tracking-wider">
+            <div class="flex items-center justify-between border-t border-ai-border/40 pt-5 mt-1 text-[9px] text-ai-fg-muted uppercase tracking-wider font-sans font-semibold">
               <div>VAL: 2026 / 2027</div>
               <div>NO. SU-AI-2026</div>
             </div>
@@ -134,16 +125,7 @@ const society = getSocietyById('ai')!;
 
         <!-- FAQ Card -->
         <div class="premium-card p-8 sm:p-12 relative overflow-hidden" style="--card-brand-color: var(--ai-coral);">
-          <!-- Cybernetic Corner Brackets -->
-          <div class="corner-tick top-left"></div>
-          <div class="corner-tick top-right"></div>
-          <div class="corner-tick bottom-left"></div>
-          <div class="corner-tick bottom-right"></div>
-
-          <!-- Luminescent Glow, Grid, and Sweep Scan -->
           <div class="premium-glow"></div>
-          <div class="premium-grid opacity-30"></div>
-          <div class="premium-scan"></div>
 
           <div class="relative z-10 flex flex-col h-full justify-between">
             <div>
@@ -196,16 +178,7 @@ const society = getSocietyById('ai')!;
 
         <!-- Contact Card -->
         <div class="premium-card p-8 sm:p-12 relative overflow-hidden" style="--card-brand-color: var(--ai-azure);">
-          <!-- Cybernetic Corner Brackets -->
-          <div class="corner-tick top-left"></div>
-          <div class="corner-tick top-right"></div>
-          <div class="corner-tick bottom-left"></div>
-          <div class="corner-tick bottom-right"></div>
-
-          <!-- Luminescent Glow, Grid, and Sweep Scan -->
           <div class="premium-glow"></div>
-          <div class="premium-grid opacity-30"></div>
-          <div class="premium-scan"></div>
 
           <div class="relative z-10 flex flex-col h-full justify-between">
             <div>
@@ -213,11 +186,11 @@ const society = getSocietyById('ai')!;
               <div class="space-y-6">
 
                 <!-- Email Link -->
-                <a href={`mailto:${society.contactEmail}`} class="block group/link focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-azure rounded-[1rem]">
-                  <div class="bg-ai-bg/60 border border-ai-border rounded-[1rem] p-6 flex items-center justify-between gap-4 group-hover/link:border-ai-azure group-hover/link:bg-ai-surface transition-all duration-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]">
+                <a href={`mailto:${society.contactEmail}`} class="block group/link focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-azure rounded-[2rem]">
+                  <div class="bg-ai-bg/60 border border-ai-border rounded-[2rem] p-6 flex items-center justify-between gap-4 group-hover/link:border-ai-azure group-hover/link:bg-ai-surface transition-all duration-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]">
                     <div>
                       <h3 class="font-bold text-base text-ai-fg">Email</h3>
-                      <p class="text-ai-fg-muted text-sm mt-1">{society.contactEmail}</p>
+                      <p class="text-ai-fg-muted text-sm mt-1 font-sans">{society.contactEmail}</p>
                     </div>
                     <span class="shrink-0 text-sm font-bold text-ai-azure group-hover/link:translate-x-1.5 transition-transform duration-300">
                       &rarr;
@@ -226,11 +199,11 @@ const society = getSocietyById('ai')!;
                 </a>
 
                 <!-- Instagram Link -->
-                <a href={society.socials.instagram} target="_blank" rel="noopener noreferrer" class="block group/link focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-coral rounded-[1rem]">
-                  <div class="bg-ai-bg/60 border border-ai-border rounded-[1rem] p-6 flex items-center justify-between gap-4 group-hover/link:border-ai-coral group-hover/link:bg-ai-surface transition-all duration-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]">
+                <a href={society.socials.instagram} target="_blank" rel="noopener noreferrer" class="block group/link focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-coral rounded-[2rem]">
+                  <div class="bg-ai-bg/60 border border-ai-border rounded-[2rem] p-6 flex items-center justify-between gap-4 group-hover/link:border-ai-coral group-hover/link:bg-ai-surface transition-all duration-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]">
                     <div>
                       <h3 class="font-bold text-base text-ai-fg">Instagram</h3>
-                      <p class="text-ai-fg-muted text-sm mt-1">@surrey.ai.ds</p>
+                      <p class="text-ai-fg-muted text-sm mt-1 font-sans">@surrey.ai.ds</p>
                     </div>
                     <span class="shrink-0 text-sm font-bold text-ai-coral group-hover/link:translate-x-1.5 transition-transform duration-300">
                       &rarr;
@@ -277,7 +250,7 @@ const society = getSocietyById('ai')!;
     });
   }
 
-  // High-Tech Disclosure FAQ Accordions
+  // FAQ Accordions
   const faqItems = document.querySelectorAll(".faq-item");
   faqItems.forEach((item) => {
     const button = item.querySelector("button");
@@ -307,4 +280,3 @@ const society = getSocietyById('ai')!;
     backface-visibility: hidden;
   }
 </style>
-

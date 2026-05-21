@@ -2,9 +2,6 @@
 import StudentProjectSlot from "./StudentProjectSlot.astro";
 import IdeaAnalyser from "./student-projects/IdeaAnalyser.astro";
 import AgenticWorkspace from "./student-projects/AgenticWorkspace.astro";
-import PromptWorkshop from "./student-projects/PromptWorkshop.astro";
-import StudySprintPlanner from "./student-projects/StudySprintPlanner.astro";
-import EscapeRoom from "./student-projects/EscapeRoom.astro";
 
 const projects = [
   {
@@ -30,30 +27,6 @@ const projects = [
     description: "A visual prototype of agents planning, building, reviewing, and handing off work inside a shared workspace.",
     action: "Launch",
     color: "var(--ai-sage)"
-  },
-  {
-    id: "prompt-workshop",
-    title: "Prompt Workshop",
-    type: "Useful tool",
-    description: "A prompt engineering workbench that turns rough requests into clearer, safer, more specific prompts.",
-    action: "Build",
-    color: "var(--ai-azure)"
-  },
-  {
-    id: "study-sprint",
-    title: "Study Sprint Planner",
-    type: "Student tool",
-    description: "Convert revision tasks, deadlines, and difficulty into a focused sprint schedule.",
-    action: "Plan",
-    color: "var(--ai-azure)"
-  },
-  {
-    id: "escape-room",
-    title: "Logic Escape Room",
-    type: "Puzzle game",
-    description: "Solve AI, logic, and safety puzzles to unlock a three-digit lab door code.",
-    action: "Unlock",
-    color: "var(--ai-azure)"
   }
 ];
 ---
@@ -128,24 +101,6 @@ const projects = [
           <div id="panel-agentic-workspace" class="project-panel" hidden>
             <div class="panel-inner">
               <AgenticWorkspace />
-            </div>
-          </div>
-
-          <div id="panel-prompt-workshop" class="project-panel" hidden>
-            <div class="panel-inner">
-              <PromptWorkshop />
-            </div>
-          </div>
-
-          <div id="panel-study-sprint" class="project-panel" hidden>
-            <div class="panel-inner">
-              <StudySprintPlanner />
-            </div>
-          </div>
-
-          <div id="panel-escape-room" class="project-panel" hidden>
-            <div class="panel-inner">
-              <EscapeRoom />
             </div>
           </div>
         </div>

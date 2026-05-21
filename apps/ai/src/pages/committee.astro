@@ -41,19 +41,12 @@ const getInitials = (name?: string, role?: string) => {
   <section class="py-16 sm:py-24 px-6 bg-ai-bg text-ai-fg relative z-10">
     <div class="mx-auto max-w-7xl">
       {committee.length === 0 ? (
-        <div class="premium-card p-10 text-center" style="--card-brand-color: var(--ai-azure);">
-          <!-- Cybernetic Corner Brackets -->
-          <div class="corner-tick top-left"></div>
-          <div class="corner-tick top-right"></div>
-          <div class="corner-tick bottom-left"></div>
-          <div class="corner-tick bottom-right"></div>
+        <div class="premium-card p-12 text-center" style="--card-brand-color: var(--ai-azure);">
           <div class="premium-glow"></div>
-          <div class="premium-grid opacity-30"></div>
-          <div class="premium-scan"></div>
 
           <div class="relative z-10">
-            <h2 class="text-2xl font-bold mb-4 text-ai-fg">Committee details will appear here once confirmed</h2>
-            <p class="text-ai-fg-muted leading-relaxed mb-6 max-w-2xl mx-auto text-lg">
+            <h2 class="text-2xl sm:text-3xl font-extrabold mb-4 text-ai-fg tracking-tight">Committee details will appear here once confirmed</h2>
+            <p class="text-ai-fg-muted leading-relaxed mb-8 max-w-2xl mx-auto text-lg">
               Our current committee roster will be published once confirmed through the Surrey Students' Union.
             </p>
             <a href="/join" class="btn-primary">
@@ -68,33 +61,22 @@ const getInitials = (name?: string, role?: string) => {
               const colors = ['var(--ai-coral)', 'var(--ai-azure)', 'var(--ai-sage)'];
               const glowColor = colors[i % colors.length];
               return (
-                <article class="premium-card items-center text-center p-6 group" style={`--card-brand-color: ${glowColor};`}>
-                  <!-- Cybernetic Corner Brackets -->
-                  <div class="corner-tick top-left"></div>
-                  <div class="corner-tick top-right"></div>
-                  <div class="corner-tick bottom-left"></div>
-                  <div class="corner-tick bottom-right"></div>
-
-                  <!-- Luminescent Glow, Grid, and Sweep Scan -->
+                <article class="premium-card items-center text-center p-7 group" style={`--card-brand-color: ${glowColor};`}>
                   <div class="premium-glow"></div>
-                  <div class="premium-grid opacity-20"></div>
-                  <div class="premium-scan"></div>
 
                   <div class="relative z-10 w-full flex flex-col items-center h-full justify-between">
                     
                     <div class="flex flex-col items-center w-full">
-                      <!-- Cyber Profile Photo Frame -->
+                      <!-- Sleek Profile Photo Frame -->
                       <div class="relative w-28 h-28 mb-6 group/photo">
-                        <!-- Cybernetic decorative rings -->
-                        <div class="absolute inset-0 rounded-full border border-dashed border-ai-border/80 group-hover:border-[var(--card-brand-color)]/50 group-hover:rotate-90 transition-all duration-1000 ease-out"></div>
-                        <div class="absolute -inset-1 rounded-full border border-ai-border/30 group-hover:border-[var(--card-brand-color)]/30 group-hover:scale-105 transition-all duration-300"></div>
-                        <!-- Status indicator dot -->
-                        <div class="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-[var(--card-brand-color)] shadow-[0_0_8px_var(--card-brand-color)] border-2 border-ai-bg z-20 animate-pulse"></div>
+                        <!-- Premium gradient ring -->
+                        <div class="absolute -inset-1.5 rounded-full bg-gradient-to-tr from-[var(--card-brand-color)]/25 to-transparent p-0.5 opacity-60 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div class="absolute inset-0 rounded-full border border-ai-border/40 bg-ai-bg"></div>
 
                         <!-- Main profile image mask -->
-                        <div class="absolute inset-2 rounded-full overflow-hidden border border-ai-border/80 bg-ai-surface relative z-10 group-hover/photo:scale-[1.02] transition-transform duration-300">
+                        <div class="absolute inset-1.5 rounded-full overflow-hidden border border-ai-border/70 bg-ai-surface relative z-10 group-hover/photo:scale-[1.03] transition-transform duration-300">
                           {member.imageUrl ? (
-                            <img src={member.imageUrl} alt={member.name || member.role} class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                            <img src={member.imageUrl} alt={member.name || member.role} class="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500" />
                           ) : (
                             <div class="w-full h-full flex items-center justify-center text-[var(--card-brand-color)] font-bold text-2xl">
                               {getInitials(member.name, member.role)}
@@ -103,14 +85,17 @@ const getInitials = (name?: string, role?: string) => {
                         </div>
                       </div>
 
-                      <h2 class="font-bold text-xl text-ai-fg mb-1 group-hover:text-[var(--card-brand-color)] transition-colors duration-300 line-clamp-1">{member.name || 'Pending Confirmation'}</h2>
-                      <p class="text-ai-fg-muted text-[11px] font-bold uppercase tracking-widest">{member.role}</p>
+                      <h2 class="font-bold text-xl text-ai-fg mb-1 group-hover:text-[var(--card-brand-color)] transition-colors duration-300 line-clamp-1 tracking-tight">{member.name || 'Pending Confirmation'}</h2>
+                      <p class="text-ai-fg-muted text-[11px] font-bold uppercase tracking-wider">{member.role}</p>
                     </div>
 
-                    <!-- Cyber Monospace Signature metadata -->
-                    <div class="mt-6 pt-4 border-t border-ai-border/30 w-full flex items-center justify-between text-[10px] font-mono-tech text-ai-fg-muted uppercase tracking-wider">
-                      <span>SEC // AI-2026</span>
-                      <span class="text-[var(--card-brand-color)] font-bold">CONFIRMED</span>
+                    <!-- Clean Active Team metadata -->
+                    <div class="mt-6 pt-4 border-t border-ai-border/30 w-full flex items-center justify-between text-[11px] font-medium text-ai-fg-muted tracking-wide">
+                      <span class="flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[var(--card-brand-color)] opacity-60"></span>
+                        Active Team
+                      </span>
+                      <span class="text-[var(--card-brand-color)] font-semibold">Active</span>
                     </div>
 
                   </div>
@@ -122,36 +107,28 @@ const getInitials = (name?: string, role?: string) => {
       )}
 
       {pastCommittee.length > 0 && (
-        <div class="mt-24 pt-16 border-t border-ai-border">
+        <div class="mt-24 pt-16 border-t border-ai-border/40">
           <div class="mb-12">
             <h2 class="text-3xl sm:text-4xl font-extrabold text-ai-fg tracking-tight">Past Committee</h2>
           </div>
           <div class="space-y-16">
             {pastCommitteeYears.map(yearLabel => (
               <section>
-                <h3 class="font-bold text-2xl text-ai-fg mb-6">{yearLabel}</h3>
+                <h3 class="font-bold text-2xl text-ai-fg mb-6 tracking-tight">{yearLabel}</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                   {pastCommittee.filter(member => member.yearLabel === yearLabel).map((member, i) => {
                     const colors = ['var(--ai-sage)', 'var(--ai-coral)', 'var(--ai-azure)'];
                     const glowColor = colors[i % colors.length];
                     return (
                       <article class="premium-card p-4 flex flex-row items-center gap-4 group" style={`--card-brand-color: ${glowColor};`}>
-                        <!-- Cybernetic Corner Brackets -->
-                        <div class="corner-tick top-left"></div>
-                        <div class="corner-tick top-right"></div>
-                        <div class="corner-tick bottom-left"></div>
-                        <div class="corner-tick bottom-right"></div>
-
-                        <!-- Luminescent Glow and Grid -->
                         <div class="premium-glow"></div>
-                        <div class="premium-grid opacity-15"></div>
 
                         <div class="relative z-10 flex flex-row items-center gap-4 w-full">
                           
-                          <!-- Cyber mini frame -->
+                          <!-- Clean mini photo frame -->
                           <div class="relative w-12 h-12 shrink-0">
-                            <div class="absolute inset-0 rounded-full border border-dashed border-ai-border/60 group-hover:rotate-45 transition-transform duration-700"></div>
-                            <div class="absolute inset-1 rounded-full overflow-hidden border border-ai-border/80 bg-ai-surface z-10">
+                            <div class="absolute -inset-1 rounded-full bg-gradient-to-tr from-[var(--card-brand-color)]/20 to-transparent opacity-60"></div>
+                            <div class="absolute inset-0.5 rounded-full overflow-hidden border border-ai-border/80 bg-ai-surface z-10">
                               {member.imageUrl ? (
                                 <img src={member.imageUrl} alt={member.name || member.role} class="w-full h-full object-cover" />
                               ) : (
@@ -163,7 +140,7 @@ const getInitials = (name?: string, role?: string) => {
                           </div>
 
                           <div class="overflow-hidden">
-                            <h4 class="font-semibold text-base text-ai-fg truncate group-hover:text-[var(--card-brand-color)] transition-colors duration-300">{member.name || 'Pending Confirmation'}</h4>
+                            <h4 class="font-semibold text-base text-ai-fg truncate group-hover:text-[var(--card-brand-color)] transition-colors duration-300 tracking-tight">{member.name || 'Pending Confirmation'}</h4>
                             <p class="text-ai-fg-muted text-[10px] uppercase tracking-wider font-bold mt-0.5 truncate">{member.role}</p>
                           </div>
                         </div>
