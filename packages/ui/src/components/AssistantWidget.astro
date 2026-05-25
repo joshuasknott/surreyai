@@ -142,6 +142,7 @@ const styleVars = [
     bottom: 5.4rem;
     width: min(25.5rem, calc(100vw - 2.5rem));
     height: min(40rem, calc(100vh - 7rem));
+    max-height: calc(100dvh - 7rem);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -369,6 +370,7 @@ const styleVars = [
       bottom: 5.1rem;
       width: auto;
       height: min(38rem, calc(100vh - 6.25rem));
+      max-height: calc(100dvh - 6.25rem);
       border-radius: 1rem;
     }
   }
@@ -504,13 +506,14 @@ const styleVars = [
 
         loading?.remove();
 
-        if (!response.ok || typeof data.message !== 'string') {
-          throw new Error('Assistant request failed');
+        if (typeof data.message === 'string') {
+          const reply = data.message.trim();
+          appendMessage('assistant', reply || `I could not answer that from the ${societyName} context right now.`);
+          messages.push({ role: 'assistant', content: reply });
+          return;
         }
 
-        const reply = data.message.trim();
-        appendMessage('assistant', reply || `I could not answer that from the ${societyName} context right now.`);
-        messages.push({ role: 'assistant', content: reply });
+        throw new Error('Assistant request failed');
       } catch {
         loading?.remove();
         appendMessage('error', 'The assistant is unavailable right now. Please try again shortly or use the site links.');

@@ -55,6 +55,7 @@ type GeminiClient = {
 
 type JsonObject = Record<string, unknown>;
 type AssistantResponseSource = "ai" | "fallback";
+type SocietyLinkFacts = PublicAssistantContext["society"];
 
 const JSON_HEADERS = { "Content-Type": "application/json" };
 const DEFAULT_MAX_MESSAGES = 12;
@@ -63,6 +64,17 @@ const MAX_TOTAL_USER_CHARS = 6000;
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_REQUESTS = 24;
 const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
+
+const GUARDED_TOPIC_TERMS = {
+  event: ["event", "workshop", "session", "meetup", "talks", "calendar", "upcoming"],
+  committee: ["committee", "team", "president", "treasurer", "secretary", "who runs", "who leads"],
+  speaker: ["speaker", "guest", "panelist", "panellist", "presenter", "keynote"],
+  sponsorPartner: ["sponsor", "sponsorship", "partner", "partnership", "collaborator"],
+  access: ["equipment", "lab", "laboratory", "research access", "dataset", "hardware", "eeg", "bci"],
+  outcome: ["outcome", "guarantee", "certificate", "certification", "internship", "placement", "job", "funding"],
+  socials: ["instagram", "linkedin", "social media", "socials", "contact", "email", "reach"],
+  membership: ["join", "member", "membership", "sign up", "students' union", "student union", "surrey union", "ussu"],
+};
 
 const STATIC_CONTEXT: Record<SocietyKey, {
   shortDescription: string;
@@ -179,21 +191,30 @@ export async function handleAssistantChatRequest(
 
   const staticContext = STATIC_CONTEXT[societyKey];
   const publicContext = await getPublicContext(societyKey);
+  const verifiedContext = buildVerifiedContext(societyKey, publicContext);
+  const guardedFallback = buildGuardedFallback(societyKey, messages, verifiedContext, staticContext);
+
+  if (guardedFallback) {
+    return jsonResponse({
+      source: "fallback",
+      message: guardedFallback,
+    });
+  }
 
   if (!isAIEnabled()) {
     return jsonResponse({
       source: "fallback",
-      message: buildFlexibleFallback(societyKey, messages, publicContext, staticContext),
+      message: buildFlexibleFallback(societyKey, messages, verifiedContext, staticContext),
     });
   }
 
-  const prompt = buildPrompt(societyKey, staticContext, publicContext, messages);
+  const prompt = buildPrompt(societyKey, staticContext, verifiedContext, messages);
   const aiText = await generateGeminiContent(prompt);
 
   if (!aiText) {
     return jsonResponse({
-      source: "ai",
-      message: buildFlexibleFallback(societyKey, messages, publicContext, staticContext),
+      source: "fallback",
+      message: buildFlexibleFallback(societyKey, messages, verifiedContext, staticContext),
     });
   }
 
@@ -269,6 +290,37 @@ async function getPublicContext(societyKey: SocietyKey): Promise<PublicAssistant
 
 function isPublicAssistantContext(value: unknown): value is PublicAssistantContext {
   return isRecord(value) && isRecord(value.society) && Array.isArray(value.events) && Array.isArray(value.committee);
+}
+
+function buildVerifiedContext(
+  societyKey: SocietyKey,
+  publicContext: PublicAssistantContext | null
+): PublicAssistantContext {
+  const societyConfig = getSocietyById(societyKey);
+  const publicSociety = publicContext?.society;
+  const configSocials = societyConfig?.socials;
+
+  const society: SocietyLinkFacts = {
+    name: societyConfig?.name || publicSociety?.name || societyKey,
+    shortName: societyConfig?.shortName || publicSociety?.shortName || societyKey,
+    slug: societyConfig?.slug || publicSociety?.slug || societyKey,
+    domain: societyConfig?.domain || publicSociety?.domain || "",
+    establishedYear: societyConfig?.establishedYear ?? publicSociety?.establishedYear ?? null,
+    contactEmail: societyConfig?.contactEmail || publicSociety?.contactEmail || null,
+    membershipUrl: societyConfig?.membershipUrl || publicSociety?.membershipUrl || null,
+    studentsUnionUrl: societyConfig?.studentsUnionUrl || publicSociety?.studentsUnionUrl || null,
+    socials: {
+      instagram: configSocials?.instagram || publicSociety?.socials?.instagram || null,
+      linkedin: societyKey === "ai" ? null : configSocials?.linkedin || publicSociety?.socials?.linkedin || null,
+      email: configSocials?.email || publicSociety?.socials?.email || societyConfig?.contactEmail || null,
+    },
+  };
+
+  return {
+    society,
+    events: publicContext?.events ?? [],
+    committee: publicContext?.committee ?? [],
+  };
 }
 
 async function generateGeminiContent(prompt: string): Promise<string | null> {
@@ -348,30 +400,29 @@ async function withTimeout<T>(task: () => Promise<T>, timeoutMs: number): Promis
 function buildPrompt(
   societyKey: SocietyKey,
   staticContext: (typeof STATIC_CONTEXT)[SocietyKey],
-  publicContext: PublicAssistantContext | null,
+  publicContext: PublicAssistantContext,
   messages: AssistantMessage[]
 ): string {
-  const society = publicContext?.society;
-  const societyConfig = getSocietyById(societyKey);
-  const societyName = society?.name || societyConfig?.name || societyKey;
+  const society = publicContext.society;
+  const societyName = society.name;
   const contextPayload = JSON.stringify(
     {
       society: {
         name: societyName,
-        shortName: society?.shortName || societyConfig?.shortName || societyName,
+        shortName: society.shortName,
         description: staticContext.shortDescription,
-        domain: society?.domain || societyConfig?.domain || null,
-        establishedYear: society?.establishedYear ?? societyConfig?.establishedYear ?? null,
-        contactEmail: society?.contactEmail || societyConfig?.contactEmail || null,
-        membershipUrl: society?.membershipUrl || societyConfig?.membershipUrl || null,
-        studentsUnionUrl: society?.studentsUnionUrl || societyConfig?.studentsUnionUrl || null,
-        socials: society?.socials || societyConfig?.socials || null,
+        domain: society.domain || null,
+        establishedYear: society.establishedYear,
+        contactEmail: society.contactEmail,
+        membershipUrl: society.membershipUrl,
+        studentsUnionUrl: society.studentsUnionUrl,
+        socials: society.socials,
       },
       primaryCategories: staticContext.primaryCategories,
       allowedTopics: staticContext.allowedTopics,
       fallbackLinks: staticContext.fallbackLinks,
-      publishedEvents: publicContext?.events ?? [],
-      activeCommittee: publicContext?.committee ?? [],
+      publishedEvents: publicContext.events,
+      activeCommittee: publicContext.committee,
     },
     null,
     2
@@ -388,8 +439,12 @@ Your tone is ${staticContext.tone}.
 Guidelines:
 - Keep answers extremely concise, direct, and conversational (1-3 sentences). Avoid paragraphs or lists unless explicitly requested.
 - Get straight to the point. Do not repeat the user's question or repeat information you have already mentioned in the conversation.
-- Use the provided context to answer questions accurately. Only reference events, people, or links that explicitly appear in the publishedEvents and activeCommittee lists below. Do not invent specific details.
-- If you do not know the answer, state that briefly and suggest a single contact or page link from the context.
+- Treat the Public context JSON as the complete verified source of truth. Do not use outside knowledge, assumptions, or likely society activities.
+- Only reference events, committee members, sponsors, partners, speakers, equipment access, lab access, research access, outcomes, or links when they explicitly appear in Public context. Do not invent or infer any of them.
+- The categories and description are themes only; they are not proof that a programme, project, lab, research opportunity, equipment access, sponsor, partner, speaker, certificate, internship, funding, or outcome exists.
+- If the verified context does not answer the question, say there are no verified public details available and suggest one relevant verified contact or page link.
+- For AI Society, LinkedIn is unavailable unless Public context has a non-null LinkedIn URL. Never create or guess one.
+- For Business Society and Neurotech Society, do not imply public AI features beyond this website assistant unless Public context explicitly says so.
 - Never reveal private admin data, secrets, or implementation details.
 
 Public context:
@@ -401,22 +456,143 @@ ${conversation}
 Respond as the ${societyName} assistant. Return only your reply as plain text.`;
 }
 
+function buildGuardedFallback(
+  societyKey: SocietyKey,
+  messages: AssistantMessage[],
+  publicContext: PublicAssistantContext,
+  staticContext: (typeof STATIC_CONTEXT)[SocietyKey]
+): string | null {
+  const latest = getLatestUserText(messages);
+  if (!latest) return null;
+
+  if (hasAnyTerm(latest, GUARDED_TOPIC_TERMS.socials)) {
+    return buildSocialFallback(societyKey, publicContext.society);
+  }
+
+  if (hasAnyTerm(latest, GUARDED_TOPIC_TERMS.speaker)) {
+    return buildNoVerifiedDetailsFallback(publicContext.society, "speaker details", "Events");
+  }
+
+  if (hasAnyTerm(latest, GUARDED_TOPIC_TERMS.sponsorPartner)) {
+    return buildNoVerifiedDetailsFallback(publicContext.society, "sponsor or partner details", "contact");
+  }
+
+  if (hasAnyTerm(latest, GUARDED_TOPIC_TERMS.access)) {
+    return buildNoVerifiedDetailsFallback(publicContext.society, "equipment, lab, or research access", "contact");
+  }
+
+  if (hasAnyTerm(latest, GUARDED_TOPIC_TERMS.outcome)) {
+    return buildNoVerifiedDetailsFallback(publicContext.society, "guaranteed outcomes", "contact");
+  }
+
+  if (hasAnyTerm(latest, GUARDED_TOPIC_TERMS.membership)) {
+    return buildMembershipFallback(publicContext.society);
+  }
+
+  if (hasAnyTerm(latest, GUARDED_TOPIC_TERMS.event)) {
+    return buildEventsFallback(publicContext);
+  }
+
+  if (hasAnyTerm(latest, GUARDED_TOPIC_TERMS.committee)) {
+    return buildCommitteeFallback(publicContext);
+  }
+
+  if (latest.includes("about") || latest.includes("what is") || latest.includes("what do")) {
+    return `${publicContext.society.name}: ${staticContext.shortDescription} For verified details, use the Join, Events, Committee, or Students' Union links.`;
+  }
+
+  return null;
+}
+
+function buildEventsFallback(publicContext: PublicAssistantContext): string {
+  const events = publicContext.events;
+  if (events.length === 0) {
+    return `There are no published events for ${publicContext.society.name} right now. Check the Events page or ${contactText(publicContext.society)} for verified updates.`;
+  }
+
+  const summary = events
+    .slice(0, 4)
+    .map((event) => {
+      const when = event.date ? ` on ${event.date}` : "";
+      const where = event.location ? ` at ${event.location}` : "";
+      return `${event.title}${when}${where}`;
+    })
+    .join("; ");
+  return `Published events I can verify: ${summary}. Check the Events page for the latest details and registration links.`;
+}
+
+function buildCommitteeFallback(publicContext: PublicAssistantContext): string {
+  const committee = publicContext.committee;
+  if (committee.length === 0) {
+    return `I do not have verified public committee details for ${publicContext.society.name} right now. Check the Committee page or ${contactText(publicContext.society)}.`;
+  }
+
+  const summary = committee
+    .slice(0, 6)
+    .map((member) => `${member.name} (${member.role})`)
+    .join(", ");
+  return `Verified committee members include ${summary}. Check the Committee page for the full public list.`;
+}
+
+function buildMembershipFallback(society: SocietyLinkFacts): string {
+  const parts = [
+    society.membershipUrl ? `join at ${society.membershipUrl}` : "use the Join page",
+    society.studentsUnionUrl ? `Students' Union page: ${society.studentsUnionUrl}` : null,
+  ].filter(Boolean);
+  return `Membership for ${society.name} is handled through Surrey Students' Union. You can ${parts.join("; ")}.`;
+}
+
+function buildSocialFallback(societyKey: SocietyKey, society: SocietyLinkFacts): string {
+  const links = [
+    society.contactEmail ? `email: ${society.contactEmail}` : null,
+    society.socials.instagram ? `Instagram: ${society.socials.instagram}` : null,
+    society.socials.linkedin ? `LinkedIn: ${society.socials.linkedin}` : null,
+    society.studentsUnionUrl ? `Students' Union: ${society.studentsUnionUrl}` : null,
+  ].filter(Boolean);
+  const linkedinNote = societyKey === "ai" && !society.socials.linkedin ? " LinkedIn is not currently listed for AI Society." : "";
+  return `${society.name} verified contacts: ${links.join("; ") || contactText(society)}.${linkedinNote}`;
+}
+
+function buildNoVerifiedDetailsFallback(
+  society: SocietyLinkFacts,
+  topic: string,
+  destination: "contact" | "Events"
+): string {
+  const nextStep = destination === "Events" ? "check the Events page" : contactText(society);
+  return `I do not have verified public ${topic} for ${society.name} right now. Please ${nextStep} for confirmation.`;
+}
+
+function contactText(society: SocietyLinkFacts): string {
+  if (society.contactEmail) return `contact ${society.contactEmail}`;
+  if (society.socials.email) return `contact ${society.socials.email}`;
+  if (society.studentsUnionUrl) return `check ${society.studentsUnionUrl}`;
+  return "check the website";
+}
+
+function getLatestUserText(messages: AssistantMessage[]): string {
+  return messages.filter((message) => message.role === "user").at(-1)?.content.toLowerCase() || "";
+}
+
+function hasAnyTerm(value: string, terms: string[]): boolean {
+  return terms.some((term) => value.includes(term));
+}
+
 function buildFlexibleFallback(
   societyKey: SocietyKey,
   messages: AssistantMessage[],
-  publicContext: PublicAssistantContext | null,
+  publicContext: PublicAssistantContext,
   staticContext: (typeof STATIC_CONTEXT)[SocietyKey]
 ): string {
-  const latest = messages.filter((message) => message.role === "user").at(-1)?.content.toLowerCase() || "";
-  const society = publicContext?.society || getSocietyById(societyKey);
-  const societyName = society?.name || societyKey;
-  const events = publicContext?.events ?? [];
-  const committee = publicContext?.committee ?? [];
+  const latest = getLatestUserText(messages);
+  const society = publicContext.society;
+  const societyName = society.name;
+  const events = publicContext.events;
+  const committee = publicContext.committee;
   const links = staticContext.fallbackLinks.map((l) => l.label).join(", ");
 
   if (latest.includes("event")) {
     if (events.length === 0) {
-      return `There are no published events for ${societyName} right now, but new ones are added regularly. Keep an eye on the Events page or follow us on social media for updates!`;
+      return buildEventsFallback(publicContext);
     }
     const summary = events
       .slice(0, 4)
@@ -426,45 +602,37 @@ function buildFlexibleFallback(
         return `${event.title}${when}${where}`;
       })
       .join("; ");
-    return `Here are some upcoming events: ${summary}. Check the Events page for the latest details and registration links!`;
+    return `Published events I can verify: ${summary}. Check the Events page for the latest details and registration links.`;
   }
 
   if (latest.includes("committee") || latest.includes("who runs") || latest.includes("team") || latest.includes("who")) {
     if (committee.length === 0) {
-      return `Committee details for ${societyName} are on the Committee page. Feel free to reach out via our socials if you have questions!`;
+      return buildCommitteeFallback(publicContext);
     }
     const summary = committee
       .slice(0, 6)
       .map((member) => `${member.name} (${member.role})`)
       .join(", ");
-    return `The current committee includes ${summary}. Check the Committee page for the full list and bios!`;
+    return `Verified committee members include ${summary}. Check the Committee page for the full public list.`;
   }
 
   if (latest.includes("join") || latest.includes("involved") || latest.includes("member") || latest.includes("sign up")) {
-    const membershipUrl = society?.membershipUrl;
-    if (membershipUrl) {
-      return `Great to hear you want to join ${societyName}! You can sign up via our Join page or directly at ${membershipUrl}. We'd love to have you!`;
-    }
-    return `We'd love to have you join ${societyName}! Head to the Join page to get started, and feel free to come along to any of our events.`;
+    return buildMembershipFallback(society);
   }
 
   if (latest.includes("contact") || latest.includes("email") || latest.includes("reach")) {
-    const email = society?.contactEmail || society?.socials?.email;
-    if (email) {
-      return `You can reach ${societyName} at ${email}. You can also find us on social media or check the website for more contact details.`;
-    }
-    return `You can reach out to ${societyName} through our social media channels or the contact details on the website.`;
+    return buildSocialFallback(societyKey, society);
   }
 
   if (latest.includes("hello") || latest.includes("hi") || latest.includes("hey")) {
-    return `Hey there! I'm the ${societyName} assistant. ${staticContext.shortDescription} How can I help you today? You can ask about events, the committee, how to join, or anything else about the society!`;
+    return `Hey there! I'm the ${societyName} assistant. I can answer from verified public website context about events, committee, membership, and contact links.`;
   }
 
   if (latest.includes("about") || latest.includes("what is") || latest.includes("what do")) {
-    return `${societyName}: ${staticContext.shortDescription} We cover areas like ${staticContext.primaryCategories.slice(0, 4).join(", ")}. Check out the ${links} pages to learn more!`;
+    return `${societyName}: ${staticContext.shortDescription} I can only confirm details from verified public pages like ${links} and Students' Union links.`;
   }
 
-  return `I'm the ${societyName} assistant! ${staticContext.shortDescription} Feel free to ask about our events, committee, how to join, or anything related to ${staticContext.primaryCategories.slice(0, 3).join(", ")}.`;
+  return `I'm the ${societyName} assistant. Ask me about verified public events, committee, membership, or contact links.`;
 }
 
 function readRateLimitKey(request: Request, societyKey: SocietyKey): string {
