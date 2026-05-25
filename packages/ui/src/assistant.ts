@@ -100,12 +100,12 @@ export const ASSISTANT_CONFIGS: Record<AssistantSocietyKey, AssistantSocietyConf
       { label: "Committee", href: "/committee" },
     ],
     brand: {
-      accent: "#C9A84C",
-      accentText: "#0A0F14",
-      surface: "#FAFAFA",
-      text: "#0A0F14",
-      mutedText: "#475569",
-      border: "#E2E8F0",
+      accent: "#E5C158",
+      accentText: "#040A18",
+      surface: "#0A142C",
+      text: "#FAFAFA",
+      mutedText: "#94A3B8",
+      border: "#1E2E4E",
     },
   },
 };
