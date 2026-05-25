@@ -3,9 +3,11 @@ export const prerender = false;
 import Layout from '../layouts/Layout.astro';
 import AnimatedHero from '../components/common/AnimatedHero.astro';
 import { createConvexClient } from '@surreysocieties/admin';
+import { getSocietyById } from '@surreysocieties/admin/config';
 import '../styles/global.css';
 
 const SOCIETY_ID = 'ai';
+const society = getSocietyById(SOCIETY_ID)!;
 const client = createConvexClient();
 const events: any[] = (await client.query("events:listPublished", { societySlug: SOCIETY_ID }))
   .filter((event: any) => event.status === 'published');
@@ -53,7 +55,7 @@ const formatEventDay = (date?: string) => {
             </div>
             
             <p class="text-ai-fg-muted text-lg leading-relaxed max-w-xl mx-auto mb-8">
-              We're currently planning our next semester of events. Join our community to get notified, or follow us on socials.
+              We&apos;re currently planning our next semester of events. Join our community to get notified, or follow us on socials.
             </p>
             <div class="flex flex-col sm:flex-row gap-3 justify-center items-center">
               <a href="/join" class="btn-primary">
@@ -61,7 +63,7 @@ const formatEventDay = (date?: string) => {
               </a>
             </div>
             <p class="text-ai-fg-muted text-sm mt-6">
-              Follow us on <a href="https://www.instagram.com/surreyaisociety/" target="_blank" rel="noopener noreferrer" class="text-ai-azure hover:underline font-semibold">Instagram</a> · <a href="https://www.linkedin.com/company/surreyaisociety/" target="_blank" rel="noopener noreferrer" class="text-ai-azure hover:underline font-semibold">LinkedIn</a> · <a href="https://surreyunion.org" target="_blank" rel="noopener noreferrer" class="text-ai-azure hover:underline font-semibold">Students' Union</a>
+              Follow us on <a href={society.socials.instagram} target="_blank" rel="noopener noreferrer" class="text-ai-azure hover:underline font-semibold">Instagram</a> · <a href={society.studentsUnionUrl} target="_blank" rel="noopener noreferrer" class="text-ai-azure hover:underline font-semibold">Students&apos; Union</a>
             </p>
           </div>
         </div>

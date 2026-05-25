@@ -358,3 +358,94 @@ img.duotone-tint {
 .ml-card-wrapper {
   border-radius: 2rem !important;
 }
+
+/* ── Interactive Assistant Widget Theme Integration ── */
+[data-assistant-widget] {
+  --assistant-accent: var(--ai-azure) !important;
+  --assistant-accent-text: #ffffff !important;
+  --assistant-surface: var(--ai-surface) !important;
+  --assistant-text: var(--ai-fg) !important;
+  --assistant-muted: var(--ai-fg-muted) !important;
+  --assistant-border: var(--ai-border) !important;
+  z-index: 100 !important;
+}
+
+[data-assistant-widget] .assistant-panel {
+  border-radius: 1.5rem !important;
+  border-color: var(--ai-border-strong) !important;
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.3),
+              0 0 30px color-mix(in srgb, var(--ai-azure) 5%, transparent) !important;
+  backdrop-filter: blur(24px) !important;
+  background: color-mix(in srgb, var(--ai-surface) 96%, transparent) !important;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease !important;
+}
+
+[data-assistant-widget] .assistant-header {
+  border-bottom: 1px solid var(--ai-border) !important;
+  background: color-mix(in srgb, var(--ai-surface) 93%, var(--ai-azure) 7%) !important;
+}
+
+[data-assistant-widget] .assistant-intro {
+  border-radius: 1rem !important;
+  border-color: var(--ai-border) !important;
+  background: color-mix(in srgb, var(--ai-surface) 88%, var(--ai-azure) 12%) !important;
+}
+
+[data-assistant-widget] .assistant-message.user {
+  border-radius: 1rem !important;
+  border-bottom-right-radius: 0.25rem !important;
+  background: var(--ai-azure) !important;
+  color: #ffffff !important;
+}
+
+[data-assistant-widget] .assistant-message.assistant,
+[data-assistant-widget] .assistant-message.loading {
+  border-radius: 1rem !important;
+  border-bottom-left-radius: 0.25rem !important;
+  border-color: var(--ai-border) !important;
+  background: var(--ai-bg) !important;
+  color: var(--ai-fg) !important;
+}
+
+[data-assistant-widget] .assistant-input {
+  border-radius: 1rem !important;
+  background: var(--ai-bg) !important;
+  border-color: var(--ai-border-strong) !important;
+  color: var(--ai-fg) !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02) !important;
+}
+
+[data-assistant-widget] .assistant-send {
+  border-radius: 1rem !important;
+  background: var(--ai-azure) !important;
+  color: #ffffff !important;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+[data-assistant-widget] .assistant-send:hover {
+  transform: scale(1.03) !important;
+}
+
+[data-assistant-widget] .assistant-toggle {
+  background: var(--ai-azure) !important;
+  color: #ffffff !important;
+  box-shadow: 0 12px 28px color-mix(in srgb, var(--ai-azure) 25%, transparent),
+              0 0 0 1px color-mix(in srgb, var(--ai-azure) 35%, transparent) !important;
+  border: none !important;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+[data-assistant-widget] .assistant-toggle:hover {
+  transform: translateY(-3px) scale(1.05) !important;
+  box-shadow: 0 16px 36px color-mix(in srgb, var(--ai-azure) 35%, transparent),
+              0 0 15px color-mix(in srgb, var(--ai-azure) 15%, transparent) !important;
+}
+
+/* Ensure the assistant toggle sits comfortably on mobile and doesn't overlap key CTAs */
+@media (max-width: 640px) {
+  [data-assistant-widget] {
+    right: 1rem !important;
+    bottom: 1rem !important;
+  }
+}
+

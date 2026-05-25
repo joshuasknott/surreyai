@@ -3,9 +3,11 @@ export const prerender = false;
 import Layout from '../layouts/Layout.astro';
 import AnimatedHero from '../components/common/AnimatedHero.astro';
 import { createConvexClient } from '@surreysocieties/admin';
+import { getSocietyById } from '@surreysocieties/admin/config';
 import '../styles/global.css';
 
 const SOCIETY_ID = 'ai';
+const society = getSocietyById(SOCIETY_ID)!;
 const client = createConvexClient();
 const committee: any[] = (await client.query("committee:listActive", { societySlug: SOCIETY_ID }))
   .sort((a: any, b: any) =>
@@ -47,13 +49,13 @@ const getInitials = (name?: string, role?: string) => {
           <div class="relative z-10">
             <h2 class="text-2xl sm:text-3xl font-extrabold mb-4 text-ai-fg tracking-tight">Committee details will appear here once confirmed</h2>
             <p class="text-ai-fg-muted leading-relaxed mb-8 max-w-2xl mx-auto text-lg">
-              Our current committee roster will be published once confirmed through the Surrey Students' Union. In the meantime, get in touch via our socials.
+              Our current committee roster will be published once confirmed through the Surrey Students&apos; Union. In the meantime, get in touch via our socials.
             </p>
             <a href="/join" class="btn-primary">
               Learn about joining the society
             </a>
             <p class="text-ai-fg-muted text-sm mt-6">
-              Follow us on <a href="https://www.instagram.com/surreyaisociety/" target="_blank" rel="noopener noreferrer" class="text-ai-azure hover:underline font-semibold">Instagram</a> · <a href="https://www.linkedin.com/company/surreyaisociety/" target="_blank" rel="noopener noreferrer" class="text-ai-azure hover:underline font-semibold">LinkedIn</a> · <a href="https://surreyunion.org" target="_blank" rel="noopener noreferrer" class="text-ai-azure hover:underline font-semibold">Students' Union</a>
+              Follow us on <a href={society.socials.instagram} target="_blank" rel="noopener noreferrer" class="text-ai-azure hover:underline font-semibold">Instagram</a> · <a href={society.studentsUnionUrl} target="_blank" rel="noopener noreferrer" class="text-ai-azure hover:underline font-semibold">Students&apos; Union</a>
             </p>
           </div>
         </div>
