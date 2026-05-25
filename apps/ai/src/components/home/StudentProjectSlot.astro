@@ -976,6 +976,15 @@
   }
 
   document.addEventListener('keydown', e => {
+    const target = e.target;
+    if (
+      target instanceof HTMLInputElement ||
+      target instanceof HTMLTextAreaElement ||
+      (target instanceof HTMLElement && target.isContentEditable)
+    ) {
+      return;
+    }
+
     if (state === ST.PLAY && gk.has(e.code)) e.preventDefault();
     if (kmap[e.code]) keys[kmap[e.code]] = true;
     if (e.code === 'Space') {
@@ -988,6 +997,15 @@
   });
 
   document.addEventListener('keyup', e => {
+    const target = e.target;
+    if (
+      target instanceof HTMLInputElement ||
+      target instanceof HTMLTextAreaElement ||
+      (target instanceof HTMLElement && target.isContentEditable)
+    ) {
+      return;
+    }
+
     if (kmap[e.code]) keys[kmap[e.code]] = false;
   });
 
