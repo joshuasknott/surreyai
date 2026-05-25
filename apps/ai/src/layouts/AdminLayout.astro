@@ -67,6 +67,7 @@ function isActive(href: string): boolean {
 
       <div class="admin-main">
         <header class="admin-topbar">
+          <button id="admin-menu-toggle" class="admin-menu-toggle" type="button" aria-controls="admin-sidebar" aria-expanded="false">Menu</button>
           <div class="admin-topbar-user">
             <span>{user?.name || 'Admin'}</span>
             <span style="color: var(--color-admin-text-muted);">({user?.role})</span>
@@ -77,8 +78,27 @@ function isActive(href: string): boolean {
           <slot />
         </div>
       </div>
+      <div id="admin-sidebar-backdrop" class="admin-sidebar-backdrop" hidden></div>
     </div>
     <script is:inline>
+      const sidebar = document.getElementById('admin-sidebar');
+      const menuToggle = document.getElementById('admin-menu-toggle');
+      const backdrop = document.getElementById('admin-sidebar-backdrop');
+
+      function setMenuOpen(isOpen) {
+        sidebar?.classList.toggle('open', isOpen);
+        menuToggle?.setAttribute('aria-expanded', String(isOpen));
+        if (backdrop) backdrop.hidden = !isOpen;
+      }
+
+      menuToggle?.addEventListener('click', function() {
+        setMenuOpen(!sidebar?.classList.contains('open'));
+      });
+      backdrop?.addEventListener('click', function() { setMenuOpen(false); });
+      sidebar?.querySelectorAll('a').forEach(function(link) {
+        link.addEventListener('click', function() { setMenuOpen(false); });
+      });
+
       document.getElementById('sign-out-btn')?.addEventListener('click', async function() {
         if (window.Clerk) {
           await window.Clerk.signOut({ redirectUrl: '/admin/login' });

@@ -1,16 +1,130 @@
 ---
 export const prerender = false;
 import AdminLayout from '../../layouts/AdminLayout.astro';
+import { generateCsrfToken, validateSocietySettingsInput, verifyCsrfToken } from '@surreysocieties/admin';
 
 const SOCIETY_ID = 'ai';
 const user = Astro.locals.user!;
+const client = Astro.locals.convexClient;
+const csrfToken = generateCsrfToken(user._id);
+const isAdminRole = ['owner', 'protectedAdmin', 'admin'].includes(user.role);
+let errors: Record<string, string> = {};
+let success = Astro.url.searchParams.get('saved') === '1';
+
+const settingsData = await client.query('settings:getSettings', { societySlug: SOCIETY_ID });
+const society = settingsData?.society;
+let values = {
+  contactEmail: society?.contactEmail || '',
+  instagram: society?.socials?.instagram || '',
+  linkedin: society?.socials?.linkedin || '',
+  membershipUrl: society?.membershipUrl || '',
+  studentsUnionUrl: society?.studentsUnionUrl || '',
+  logo: society?.logo || '',
+  establishedYear: society?.establishedYear?.toString() || '',
+};
+
+if (Astro.request.method === 'POST') {
+  success = false;
+  const formData = await Astro.request.formData();
+  values = {
+    contactEmail: formData.get('contactEmail')?.toString().trim() || '',
+    instagram: formData.get('instagram')?.toString().trim() || '',
+    linkedin: formData.get('linkedin')?.toString().trim() || '',
+    membershipUrl: formData.get('membershipUrl')?.toString().trim() || '',
+    studentsUnionUrl: formData.get('studentsUnionUrl')?.toString().trim() || '',
+    logo: formData.get('logo')?.toString().trim() || '',
+    establishedYear: formData.get('establishedYear')?.toString().trim() || '',
+  };
+
+  if (!verifyCsrfToken(formData.get('_csrf')?.toString(), user._id)) {
+    errors._csrf = 'Invalid or expired form submission. Please try again.';
+  } else if (!isAdminRole) {
+    errors._form = 'Admin role required to update society settings.';
+  } else {
+    const input = {
+      ...values,
+      establishedYear: values.establishedYear ? Number(values.establishedYear) : undefined,
+    };
+    const validation = validateSocietySettingsInput(input);
+    if (validation.valid) {
+      await client.mutation('settings:updateSettings', {
+        societySlug: SOCIETY_ID,
+        updates: {
+          contactEmail: values.contactEmail,
+          establishedYear: input.establishedYear,
+          membershipUrl: values.membershipUrl,
+          studentsUnionUrl: values.studentsUnionUrl,
+          logo: values.logo,
+          socials: {
+            instagram: values.instagram,
+            linkedin: values.linkedin,
+            email: values.contactEmail,
+          },
+        },
+      });
+      return Astro.redirect('/admin/settings?saved=1');
+    }
+    errors = validation.errors;
+  }
+}
 ---
 <AdminLayout title="Settings" societyId={SOCIETY_ID} currentPath="/admin/settings">
   <div class="admin-page-header">
     <div>
       <h1 class="admin-page-title">Settings</h1>
-      <p style="color: var(--color-admin-text-muted); margin-top: 0.5rem;">Manage your admin account and password.</p>
+      <p style="color: var(--color-admin-text-muted); margin-top: 0.5rem;">Manage society metadata and your admin account.</p>
     </div>
+  </div>
+
+  {success && <div class="alert alert-success">Settings saved.</div>}
+  {(errors._csrf || errors._form) && <div class="alert alert-error">{errors._csrf || errors._form}</div>}
+
+  <div class="form-card" style="max-width: 760px; margin-bottom: 1rem;">
+    <h2 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem;">Society metadata</h2>
+    {!isAdminRole && <p style="color: var(--color-admin-text-muted); margin-bottom: 1rem;">Your role can view settings, but only admin-level roles can update society metadata.</p>}
+    <form method="POST">
+      <input type="hidden" name="_csrf" value={csrfToken} />
+      <div class="form-group">
+        <label for="contactEmail" class="form-label">Contact email</label>
+        <input type="email" id="contactEmail" name="contactEmail" class="form-input" value={values.contactEmail} disabled={!isAdminRole} />
+        {errors.contactEmail && <div class="form-error">{errors.contactEmail}</div>}
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="form-group">
+          <label for="instagram" class="form-label">Instagram URL</label>
+          <input type="url" id="instagram" name="instagram" class="form-input" value={values.instagram} placeholder="https://" disabled={!isAdminRole} />
+          {errors.instagram && <div class="form-error">{errors.instagram}</div>}
+        </div>
+        <div class="form-group">
+          <label for="linkedin" class="form-label">LinkedIn URL</label>
+          <input type="url" id="linkedin" name="linkedin" class="form-input" value={values.linkedin} placeholder="https://" disabled={!isAdminRole} />
+          {errors.linkedin && <div class="form-error">{errors.linkedin}</div>}
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="membershipUrl" class="form-label">Membership URL</label>
+        <input type="url" id="membershipUrl" name="membershipUrl" class="form-input" value={values.membershipUrl} placeholder="https://" disabled={!isAdminRole} />
+        {errors.membershipUrl && <div class="form-error">{errors.membershipUrl}</div>}
+      </div>
+      <div class="form-group">
+        <label for="studentsUnionUrl" class="form-label">Students' Union URL</label>
+        <input type="url" id="studentsUnionUrl" name="studentsUnionUrl" class="form-input" value={values.studentsUnionUrl} placeholder="https://" disabled={!isAdminRole} />
+        {errors.studentsUnionUrl && <div class="form-error">{errors.studentsUnionUrl}</div>}
+      </div>
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
+        <div class="form-group">
+          <label for="logo" class="form-label">Logo path</label>
+          <input type="text" id="logo" name="logo" class="form-input" value={values.logo} placeholder="/logos/example.png" disabled={!isAdminRole} />
+          {errors.logo && <div class="form-error">{errors.logo}</div>}
+        </div>
+        <div class="form-group">
+          <label for="establishedYear" class="form-label">Established year</label>
+          <input type="number" id="establishedYear" name="establishedYear" class="form-input" value={values.establishedYear} min="1800" max={new Date().getFullYear() + 1} disabled={!isAdminRole} />
+          {errors.establishedYear && <div class="form-error">{errors.establishedYear}</div>}
+        </div>
+      </div>
+      {isAdminRole && <button type="submit" class="btn btn-primary">Save Settings</button>}
+    </form>
   </div>
 
   <div class="admin-card" style="max-width: 680px;">

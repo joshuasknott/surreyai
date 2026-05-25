@@ -1,6 +1,6 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
-import { requireContentEditor, logAction } from "./permissions";
+import { requireAdmin, logAction } from "./permissions";
 
 export const getSettings = query({
   args: { societySlug: v.string() },
@@ -71,7 +71,7 @@ export const updateSettings = mutation({
       .first();
     if (!society) throw new Error("Society not found");
 
-    const { user } = await requireContentEditor(ctx, society._id);
+    const { user } = await requireAdmin(ctx, society._id);
 
     if (
       updates.establishedYear !== undefined &&
@@ -108,7 +108,7 @@ export const updateSettings = mutation({
       societyUpdates.studentsUnionUrl = updates.studentsUnionUrl;
     if (updates.logo !== undefined) societyUpdates.logo = updates.logo;
     if (updates.socials !== undefined)
-      societyUpdates.socials = updates.socials;
+      societyUpdates.socials = { ...society.socials, ...updates.socials };
 
     if (Object.keys(societyUpdates).length > 0) {
       await ctx.db.patch(society._id, societyUpdates);
@@ -140,7 +140,7 @@ export const setCustomSetting = mutation({
       .first();
     if (!society) throw new Error("Society not found");
 
-    const { user } = await requireContentEditor(ctx, society._id);
+    const { user } = await requireAdmin(ctx, society._id);
 
     const existing = await ctx.db
       .query("siteSettings")

@@ -127,6 +127,18 @@ body.admin-body {
   z-index: 30;
 }
 
+.admin-menu-toggle {
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-admin-border);
+  border-radius: 0.5rem;
+  background: white;
+  color: var(--color-admin-text);
+  font-weight: 700;
+}
+
 .admin-topbar-user {
   display: flex;
   align-items: center;
@@ -140,6 +152,13 @@ body.admin-body {
   padding: 2rem 2rem;
   max-width: 1200px;
   width: 100%;
+}
+
+.admin-card {
+  background: var(--color-admin-card);
+  border: 1px solid var(--color-admin-border);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
 }
 
 .admin-page-header {
@@ -192,7 +211,8 @@ body.admin-body {
   background: var(--color-admin-card);
   border: 1px solid var(--color-admin-border);
   border-radius: 0.75rem;
-  overflow: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .admin-table {
@@ -454,6 +474,9 @@ body.admin-body {
 
 /* Responsive */
 @media (max-width: 1024px) {
+  .admin-layout {
+    display: block;
+  }
   .admin-sidebar {
     transform: translateX(-100%);
     transition: transform 0.2s;
@@ -463,5 +486,60 @@ body.admin-body {
   }
   .admin-main {
     margin-left: 0;
+  }
+  .admin-topbar {
+    justify-content: space-between;
+  }
+  .admin-menu-toggle {
+    display: inline-flex;
+  }
+  .admin-sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 35;
+    background: rgba(15, 23, 42, 0.45);
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-content {
+    padding: 1rem;
+  }
+  .admin-topbar {
+    height: auto;
+    min-height: 3.5rem;
+    padding: 0.75rem 1rem;
+  }
+  .admin-topbar-user {
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+  .admin-page-header {
+    align-items: stretch;
+    margin-bottom: 1rem;
+  }
+  .admin-page-header .btn,
+  .quick-actions .btn,
+  .form-card .btn,
+  .admin-card .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .stat-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-card,
+  .admin-card,
+  .stat-card {
+    padding: 1rem;
+  }
+  .form-card [style*="grid-template-columns"] {
+    grid-template-columns: 1fr !important;
+  }
+  .admin-table {
+    min-width: 680px;
+  }
+  .table-actions {
+    flex-wrap: wrap;
   }
 }

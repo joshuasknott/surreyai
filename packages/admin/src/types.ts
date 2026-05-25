@@ -81,6 +81,16 @@ export interface InviteAdminInput {
   role: 'admin' | 'member';
 }
 
+export interface SocietySettingsInput {
+  contactEmail?: string;
+  instagram?: string;
+  linkedin?: string;
+  membershipUrl?: string;
+  studentsUnionUrl?: string;
+  logo?: string;
+  establishedYear?: number;
+}
+
 export interface ValidationResult {
   valid: boolean;
   errors: Record<string, string>;

@@ -1,0 +1,97 @@
+---
+export const prerender = false;
+import { SignIn } from '@clerk/astro/components';
+import { createConvexClient, getSocietyById } from '@surreysocieties/admin';
+import '../../../styles/admin.css';
+
+const SOCIETY_ID = 'ai';
+const society = getSocietyById(SOCIETY_ID);
+const token = Astro.url.searchParams.get('token')?.trim() || '';
+const { userId } = Astro.locals.auth();
+
+type InviteState = 'login' | 'success' | 'expired' | 'revoked' | 'accepted' | 'invalid' | 'mismatch' | 'error';
+let state: InviteState = token ? 'login' : 'invalid';
+let title = 'Accept invitation';
+let message = 'Sign in with the invited Clerk account to accept this admin invitation.';
+
+function classifyInviteError(error: unknown): InviteState {
+  const text = String(error instanceof Error ? error.message : error).toLowerCase();
+  if (text.includes('expired')) return 'expired';
+  if (text.includes('revoked')) return 'revoked';
+  if (text.includes('already') || text.includes('accepted')) return 'accepted';
+  if (text.includes('email') && text.includes('match')) return 'mismatch';
+  if (text.includes('invalid') || text.includes('not found')) return 'invalid';
+  return 'error';
+}
+
+if (token && userId) {
+  try {
+    const authToken = await Astro.locals.auth().getToken({ template: 'convex' });
+    if (!authToken) throw new Error('Authentication configuration error: missing Convex Clerk token.');
+    const client = createConvexClient(authToken);
+    await client.mutation('memberships:acceptInvitation', { token, societySlug: SOCIETY_ID });
+    state = 'success';
+    title = 'Invitation accepted';
+    message = 'Your admin access is ready. Redirecting you to the dashboard.';
+  } catch (error) {
+    state = classifyInviteError(error);
+  }
+}
+
+const stateCopy: Record<InviteState, { title: string; message: string; alert: string }> = {
+  login: { title, message, alert: 'alert' },
+  success: { title, message, alert: 'alert alert-success' },
+  expired: { title: 'Invitation expired', message: 'This invitation has expired. Ask an existing admin to send a new invite.', alert: 'alert alert-error' },
+  revoked: { title: 'Invitation revoked', message: 'This invitation has been revoked and can no longer be accepted.', alert: 'alert alert-error' },
+  accepted: { title: 'Invitation already accepted', message: 'This invitation has already been used. If you have access, go to the admin dashboard.', alert: 'alert alert-success' },
+  invalid: { title: 'Invalid invitation', message: 'The invite token is missing, invalid, or does not belong to this society.', alert: 'alert alert-error' },
+  mismatch: { title: 'Email mismatch', message: 'You are signed in with a different email address than the one that was invited.', alert: 'alert alert-error' },
+  error: { title: 'Could not accept invitation', message: 'Something went wrong while accepting the invitation. Please try again or ask an admin for a new invite.', alert: 'alert alert-error' },
+};
+
+const copy = stateCopy[state];
+const fallbackRedirectUrl = `/admin/invite/accept?token=${encodeURIComponent(token)}`;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <title>{copy.title} — {society?.name || 'Admin'}</title>
+  </head>
+  <body class="admin-body">
+    <div class="login-container">
+      <div style="display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 440px; gap: 1rem;">
+        <div class="login-logo" style="margin-bottom: 0;">
+          <img src={society?.logo || '/favicon.svg'} alt="" />
+          <h1>{society?.shortName || 'Admin'}</h1>
+          <p>Admin Invitation</p>
+        </div>
+        <div class={copy.alert} style="width: 100%; margin-bottom: 0;">
+          <strong>{copy.title}</strong><br />
+          {copy.message}
+        </div>
+        {state === 'login' && <SignIn fallbackRedirectUrl={fallbackRedirectUrl} />}
+        {state === 'success' && <a href="/admin" class="btn btn-primary">Go to Admin</a>}
+        {state === 'accepted' && <a href="/admin" class="btn btn-primary">Go to Admin</a>}
+        {state === 'mismatch' && <button id="sign-out-btn" class="btn btn-outline">Sign out and use invited email</button>}
+        <p style="margin-top: 0.5rem; text-align: center;">
+          <a href="/" style="color: var(--color-admin-primary); text-decoration: none; font-size: 0.875rem;">Back to public site</a>
+        </p>
+      </div>
+    </div>
+    {state === 'success' && <script is:inline>setTimeout(function() { window.location.href = '/admin'; }, 1200);</script>}
+    <script is:inline>
+      document.getElementById('sign-out-btn')?.addEventListener('click', async function() {
+        if (window.Clerk) {
+          await window.Clerk.signOut({ redirectUrl: window.location.href });
+        }
+      });
+    </script>
+  </body>
+</html>

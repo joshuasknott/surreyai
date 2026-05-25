@@ -5,6 +5,7 @@ export { validateEventInput } from './validation/events.js';
 export { validateCommitteeInput, validatePastCommitteeInput } from './validation/committee.js';
 export { validateInviteInput } from './validation/admins.js';
 export { validateImageFile } from './validation/storage.js';
+export { validateSocietySettingsInput } from './validation/settings.js';
 export { generateCsrfToken, verifyCsrfToken } from './csrf.js';
 export { requireAdmin, requireAdminRole } from './actionGuard.js';
 export type { AdminActionContext, AdminGuardResult } from './actionGuard.js';

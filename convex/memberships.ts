@@ -187,8 +187,8 @@ export const revokeInvitation = mutation({
 });
 
 export const acceptInvitation = mutation({
-  args: { token: v.string() },
-  handler: async (ctx, { token }) => {
+  args: { token: v.string(), societySlug: v.optional(v.string()) },
+  handler: async (ctx, { token, societySlug }) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
 
@@ -196,11 +196,26 @@ export const acceptInvitation = mutation({
       .query("invitations")
       .withIndex("by_token", (q) => q.eq("token", token))
       .first();
-    if (!invitation) throw new Error("Invitation not found");
-    if (invitation.status !== "pending")
-      throw new Error("Invitation is no longer pending");
-    if (invitation.expiresAt < Date.now())
+    if (!invitation) throw new Error("Invalid invitation token");
+
+    const society = await ctx.db.get(invitation.societyId);
+    if (!society || (societySlug && society.slug !== societySlug)) {
+      throw new Error("Invalid invitation token");
+    }
+
+    if (invitation.status === "accepted") {
+      throw new Error("Invitation has already been accepted");
+    }
+    if (invitation.status === "revoked") {
+      throw new Error("Invitation has been revoked");
+    }
+    if (invitation.status === "expired") {
       throw new Error("Invitation has expired");
+    }
+    if (invitation.expiresAt < Date.now()) {
+      await ctx.db.patch(invitation._id, { status: "expired" });
+      throw new Error("Invitation has expired");
+    }
 
     const authedEmail = identity.email?.toLowerCase().trim();
     if (!authedEmail || authedEmail !== invitation.email.toLowerCase()) {
@@ -244,7 +259,7 @@ export const acceptInvitation = mutation({
       `${user.email} accepted invitation as ${invitation.role}`
     );
 
-    return { success: true, societyId: invitation.societyId };
+    return { success: true, societyId: invitation.societyId, societySlug: society.slug };
   },
 });
 
