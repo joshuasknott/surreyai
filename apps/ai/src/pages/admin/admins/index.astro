@@ -18,6 +18,11 @@ const invited = Astro.url.searchParams.get('invited');
 const removeResult = Astro.getActionResult(actions.admin.removeAdmin);
 const revokeResult = Astro.getActionResult(actions.admin.revokeInvite);
 const actionSuccess = (removeResult && !removeResult.error) || (revokeResult && !revokeResult.error);
+
+function formatRole(role: string): string {
+  if (role === 'protectedAdmin') return 'Protected Admin';
+  return role.charAt(0).toUpperCase() + role.slice(1);
+}
 ---
 <AdminLayout title="Admin Users" societyId={SOCIETY_ID} currentPath="/admin/admins">
 
@@ -29,7 +34,7 @@ const actionSuccess = (removeResult && !removeResult.error) || (revokeResult && 
   {(success || actionSuccess) && <div class="alert alert-success">Admin action completed.</div>}
   {invited && <div class="alert alert-success">Invitation sent.</div>}
 
-  <div class="admin-table-wrapper" style="margin-bottom: 2rem;">
+  <div class="admin-table-wrapper" style="margin-bottom: 2.5rem;">
     <table class="admin-table">
       <thead>
         <tr>
@@ -44,7 +49,7 @@ const actionSuccess = (removeResult && !removeResult.error) || (revokeResult && 
           <tr>
             <td style="font-weight: 600;">{member.user?.name || 'Unknown'}</td>
             <td>{member.user?.email || '—'}</td>
-            <td><span class={`pill pill-${member.role}`}>{member.role}</span></td>
+            <td><span class={`pill pill-${member.role}`}>{formatRole(member.role)}</span></td>
             {isManager && (
               <td>
                 {member.role !== 'owner' && (user.role === 'owner' || member.role !== 'protectedAdmin') && member.user?._id !== user._id && (
@@ -63,7 +68,12 @@ const actionSuccess = (removeResult && !removeResult.error) || (revokeResult && 
 
   {pendingInvitations.length > 0 && (
     <>
-      <h2 style="font-size: 1.125rem; font-weight: 700; margin-bottom: 1rem;">Pending Invitations</h2>
+      <h2 style="font-size: 1.125rem; font-weight: 700; margin-bottom: 1rem; color: var(--color-admin-text);">Pending Invitations</h2>
+      
+      <div style="background: var(--color-admin-bg); border: 1px dashed var(--color-admin-accent); padding: 1rem 1.25rem; border-radius: 0.5rem; margin-bottom: 1.5rem; font-size: 0.875rem; color: var(--color-admin-text-secondary); line-height: 1.5;">
+        <strong>💡 Manual Sharing Instructions:</strong> Email notifications are not active. Copy the <em>Invite Link</em> below and send it to the invitee manually (e.g. via WhatsApp, Slack, or email). The link expires in 7 days.
+      </div>
+
       <div class="admin-table-wrapper">
         <table class="admin-table">
           <thead>
@@ -76,30 +86,66 @@ const actionSuccess = (removeResult && !removeResult.error) || (revokeResult && 
             </tr>
           </thead>
           <tbody>
-            {pendingInvitations.map(inv => (
-              <tr>
-                <td>{inv.email}</td>
-                <td><span class={`pill pill-${inv.role}`}>{inv.role}</span></td>
-                <td>{new Date(inv.expiresAt).toLocaleDateString()}</td>
-                <td>
-                  <code style="font-size: 0.7rem; background: #f1f5f9; padding: 0.125rem 0.5rem; border-radius: 0.25rem; word-break: break-all;">
-                    /admin/invite/accept?token={inv.token}
-                  </code>
-                </td>
-                {isManager && (
-                  <td>
-                    <form method="POST" action={actions.admin.revokeInvite} style="display:inline;">
-                      <input type="hidden" name="invitationId" value={inv._id} />
-                      <button type="submit" class="btn btn-ghost btn-sm" style="color: var(--color-admin-danger);">Revoke</button>
-                    </form>
+            {pendingInvitations.map(inv => {
+              const fullAcceptUrl = new URL(`/admin/invite/accept?token=${inv.token}`, Astro.url).href;
+              return (
+                <tr>
+                  <td>{inv.email}</td>
+                  <td><span class={`pill pill-${inv.role}`}>{formatRole(inv.role)}</span></td>
+                  <td>{new Date(inv.expiresAt).toLocaleDateString()}</td>
+                  <td style="min-width: 320px;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                      <input 
+                        type="text" 
+                        readonly 
+                        value={fullAcceptUrl} 
+                        class="form-input" 
+                        style="font-size: 0.75rem; padding: 0.25rem 0.5rem; width: 100%; max-width: 240px; font-family: monospace; background: var(--color-admin-bg);"
+                        onclick="this.select();" 
+                      />
+                      <button 
+                        class="btn btn-outline btn-sm copy-btn" 
+                        data-clipboard-text={fullAcceptUrl} 
+                        type="button"
+                        style="flex-shrink: 0;"
+                      >
+                        Copy
+                      </button>
+                    </div>
                   </td>
-                )}
-              </tr>
-            ))}
+                  {isManager && (
+                    <td>
+                      <form method="POST" action={actions.admin.revokeInvite} style="display:inline;">
+                        <input type="hidden" name="invitationId" value={inv._id} />
+                        <button type="submit" class="btn btn-ghost btn-sm" style="color: var(--color-admin-danger);">Revoke</button>
+                      </form>
+                    </td>
+                  )}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
     </>
   )}
+
+  <script is:inline>
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const text = btn.getAttribute('data-clipboard-text');
+        if (!text) return;
+        navigator.clipboard.writeText(text).then(() => {
+          const originalText = btn.textContent;
+          btn.textContent = 'Copied!';
+          btn.classList.add('btn-success');
+          setTimeout(() => {
+            btn.textContent = originalText;
+            btn.classList.remove('btn-success');
+          }, 2000);
+        });
+      });
+    });
+  </script>
 
 </AdminLayout>
