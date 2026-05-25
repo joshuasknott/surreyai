@@ -67,11 +67,24 @@ A monorepo containing three University of Surrey society websites, built with As
 
 6. **Set environment variables** (in each app or root `.env`):
 
-   ```
+   ```bash
    CONVEX_URL=https://your-project.convex.cloud
    PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
    CLERK_SECRET_KEY=sk_test_...
+   CLERK_JWT_ISSUER_DOMAIN=https://your-clerk-domain.clerk.accounts.dev
+   CSRF_SECRET=replace-with-a-stable-random-secret
    ```
+
+   Optional AI assistant variables:
+
+   ```bash
+   GEMINI_API_KEY=...
+   AI_FEATURES_ENABLED=true
+   AI_MODEL=gemini-3.1-flash-lite-preview
+   AI_FALLBACK_MODEL=gemini-3-flash-preview
+   ```
+
+   `GEMINI_API_KEY` and `CLERK_SECRET_KEY` must stay server-side only. If `GEMINI_API_KEY` is missing, the assistant falls back to non-generative responses.
 
 ### Development
 
@@ -89,6 +102,22 @@ npm run build:business
 npm run build:neurotech
 npm run build:all
 ```
+
+### E2E
+
+```bash
+npm run test:e2e
+```
+
+Playwright starts the three dev servers on ports 4321, 4322, and 4323. The E2E suite checks public routes, mobile navigation, membership links, assistant placement, 404 states, and blocked admin access.
+
+## Deployment
+
+- Deploy each Astro app as a Node SSR app using its workspace build output in `apps/<site>/dist`.
+- Configure the production domains listed above to route to the matching app and keep each app's environment variables in its deployment environment.
+- Deploy Convex functions with the same Convex project referenced by `CONVEX_URL`.
+- Configure Clerk's Convex JWT template named `convex` with audience `convex`; `npm run provision:admins` creates or updates that template when run with `CLERK_SECRET_KEY`.
+- Keep `CSRF_SECRET` stable between deploys so existing admin form tokens remain valid during a rollout.
 
 ## Project Structure
 
@@ -126,6 +155,31 @@ These are the society signatory emails with permanent `protectedAdmin` access:
 | AI Society | ussu.aianddatascience@surrey.ac.uk |
 | Business Society | ussu.bizsoc@surrey.ac.uk |
 | Neurotech Society | ussu.neurotechsoc@surrey.ac.uk |
+
+### Admin Provisioning
+
+```bash
+npm run provision:admins
+```
+
+This script requires `CLERK_SECRET_KEY` plus `OWNER_ADMIN_INITIAL_PASSWORD`, `AI_ADMIN_INITIAL_PASSWORD`, `BUSINESS_ADMIN_INITIAL_PASSWORD`, and `NEUROTECH_ADMIN_INITIAL_PASSWORD`. It creates the protected Clerk accounts if they do not already exist and updates the Clerk JWT template used by Convex.
+
+### Invite Flow
+
+1. A `protectedAdmin` or `admin` signs in at `/admin` and opens `/admin/admins`.
+2. Use `Invite Admin` to invite the new committee member by email and role.
+3. Email delivery is not configured in the app, so copy the generated invite link from `/admin/admins` and share it manually with the invitee.
+4. The invitee opens `/admin/invite/accept?token=...` and signs in with the same email address that was invited.
+5. Invitations expire after 7 days and can be revoked from `/admin/admins` while pending.
+
+### Annual Committee Handover
+
+1. Confirm the protected society inbox account still works before outgoing admins leave.
+2. Invite incoming admins from `/admin/admins`, then ask them to accept before removing outgoing non-protected admins.
+3. Update current committee records in `/admin/committee` and archive previous years in `/admin/past-committee` only with verified names, roles, years, and images.
+4. Review `/admin/events` and remove, update, or archive stale event information.
+5. Check `/admin/settings` for society contact, socials, and membership links before the new academic year.
+6. Run `npm run build:all` and `npm run test:e2e` after handover edits.
 
 ### Society Isolation
 
