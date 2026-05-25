@@ -1,682 +1,568 @@
 ---
 ---
 
-<section data-agentic-workspace class="aw-root" aria-label="Student Project: Agentic Workspace visual simulation">
-  <div class="aw-shell">
-    <div class="aw-orb aw-orb--sage"></div>
-    <div class="aw-orb aw-orb--azure"></div>
-    <div class="aw-orb aw-orb--coral"></div>
-
-    <header class="aw-header">
-      <span class="aw-badge">Frontend visual simulation</span>
-      <h2 class="aw-title">Agentic Workspace</h2>
-      <p class="aw-subtitle">
-        A cinematic mock workspace showing planner, researcher, builder, and reviewer agents passing tasks through a shared project canvas.
+<section data-agentic-workspace class="aw-root bg-transparent text-ai-fg" aria-label="Student Project: Agentic Builder live pipeline">
+  <div class="max-w-[76rem] mx-auto py-6 px-4 sm:px-6 w-full h-full flex flex-col justify-start">
+    
+    <!-- Mini Header -->
+    <header class="text-center mb-6">
+      <span class="inline-flex px-3 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-ai-sage bg-ai-sage/10 rounded-full mb-1">Student Project</span>
+      <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-ai-fg mb-1">Agentic Builder</h2>
+      <p class="text-xs sm:text-sm text-ai-fg-muted max-w-xl mx-auto leading-relaxed">
+        Autonomous IDE. Define a web app or task, and watch our multi-agent chain plan, research, build, and review a live-rendered application in real-time.
       </p>
-      <p class="aw-disclaimer">Purely visual prototype. No live agents, no API calls, no autonomous execution.</p>
     </header>
 
-    <div class="aw-stage" aria-label="Animated agent flowchart">
-      <div class="aw-grid-bg" aria-hidden="true"></div>
-      <svg class="aw-lines" viewBox="0 0 1200 620" role="presentation" aria-hidden="true">
-        <defs>
-          <linearGradient id="aw-line-main" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="var(--ai-sage)" />
-            <stop offset="52%" stop-color="var(--ai-azure)" />
-            <stop offset="100%" stop-color="var(--ai-coral)" />
-          </linearGradient>
-          <filter id="aw-line-glow" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="5" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-        </defs>
-        <path class="aw-path aw-path--one" d="M178 178 C 330 82, 486 82, 604 210" />
-        <path class="aw-path aw-path--two" d="M604 210 C 744 78, 920 88, 1022 178" />
-        <path class="aw-path aw-path--three" d="M1022 178 C 930 364, 748 408, 604 332" />
-        <path class="aw-path aw-path--four" d="M604 332 C 456 454, 282 422, 178 338" />
-        <path class="aw-path aw-path--five" d="M178 338 C 322 568, 842 568, 1022 338" />
-      </svg>
+    <!-- Two-Column Layout -->
+    <div class="flex flex-col md:flex-row gap-5 items-stretch w-full min-h-[500px]">
+      
+      <!-- LEFT COLUMN: Inputs & Stepper (40%) -->
+      <div class="w-full md:w-[38%] flex flex-col gap-4">
+        
+        <!-- Form Input -->
+        <div class="premium-card p-5 flex flex-col justify-between" style="--card-brand-color: var(--ai-sage);">
+          <form id="aw-form" class="space-y-4" novalidate>
+            <div class="flex flex-col gap-1.5">
+              <div class="flex justify-between items-center">
+                <label for="aw-task" class="text-[10px] font-extrabold uppercase tracking-wider text-ai-fg">Define App / Task</label>
+                <button id="aw-example" class="text-[10px] font-bold text-ai-sage hover:underline cursor-pointer" type="button">Use example</button>
+              </div>
+              
+              <textarea
+                id="aw-task"
+                name="task"
+                maxlength="500"
+                rows="2"
+                class="w-full bg-ai-bg text-ai-fg border border-ai-border rounded-xl p-2.5 text-xs focus:outline-none focus:border-ai-sage focus:ring-1 focus:ring-ai-sage/30 resize-none transition-colors"
+                placeholder="Example: Build a beautiful responsive counter app with glowing incremental buttons..."
+                required
+              ></textarea>
+              
+              <div class="flex justify-between items-center text-[10px] text-ai-fg-muted opacity-80">
+                <span>Min 10 characters</span>
+                <span id="aw-count">0/500</span>
+              </div>
+            </div>
 
-      <div class="aw-hub" aria-label="Shared workspace canvas">
-        <div class="aw-hub-ring"></div>
-        <div class="aw-hub-core">
-          <span>Shared Canvas</span>
-          <strong>Project State</strong>
-          <small>brief -> tasks -> draft -> review</small>
+            <div class="flex justify-between items-center pt-1">
+              <p id="aw-status" class="text-[10px] text-ai-fg-muted truncate max-w-[60%]" aria-live="polite"></p>
+              <button id="aw-submit" type="submit" class="btn-primary py-2 px-5 text-xs" style="--ai-azure: var(--ai-sage); cursor: pointer;">
+                <span>Launch Workspace</span>
+              </button>
+            </div>
+          </form>
         </div>
-        <div class="aw-mini-card aw-mini-card--brief">Mission brief</div>
-        <div class="aw-mini-card aw-mini-card--tasks">Task board</div>
-        <div class="aw-mini-card aw-mini-card--risk">Risk note</div>
+
+        <!-- Pipeline Stepper -->
+        <div class="premium-card p-5 flex-1" style="--card-brand-color: var(--ai-sage);">
+          <div class="flex items-center justify-between mb-4 border-b border-ai-border pb-2">
+            <h3 class="text-xs font-extrabold uppercase tracking-wider text-ai-fg">Execution Pipeline</h3>
+            <span class="text-[9px] px-2 py-0.5 rounded-full bg-ai-bg border border-ai-border font-bold text-ai-fg-muted">Sequential</span>
+          </div>
+
+          <div class="flex flex-col relative space-y-4">
+            <!-- Stepper Connecting Line -->
+            <div class="absolute left-[9px] top-3 bottom-3 w-[2px] bg-ai-border transition-colors duration-500" id="aw-connector-line"></div>
+            
+            <!-- Planner Step (Button) -->
+            <button type="button" id="btn-step-planner" class="flex items-center gap-3 w-full text-left outline-none group cursor-pointer aw-step-btn" data-step="planner" disabled>
+              <div class="w-[20px] h-[20px] rounded-full border-2 border-ai-border bg-ai-surface flex items-center justify-center transition-all duration-300 aw-indicator">
+                <div class="w-1.5 h-1.5 rounded-full bg-transparent transition-all duration-300 aw-dot"></div>
+                <svg class="hidden w-[10px] h-[10px] text-white aw-check animate-scale-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+              <div class="flex-1 flex justify-between items-center">
+                <span class="text-xs font-bold text-ai-fg group-hover:text-ai-sage transition-colors">Planner Agent</span>
+                <span class="text-[9px] font-extrabold uppercase tracking-wider text-ai-fg-muted aw-status-text">Pending</span>
+              </div>
+            </button>
+
+            <!-- Researcher Step (Button) -->
+            <button type="button" id="btn-step-researcher" class="flex items-center gap-3 w-full text-left outline-none group cursor-pointer aw-step-btn" data-step="researcher" disabled>
+              <div class="w-[20px] h-[20px] rounded-full border-2 border-ai-border bg-ai-surface flex items-center justify-center transition-all duration-300 aw-indicator">
+                <div class="w-1.5 h-1.5 rounded-full bg-transparent transition-all duration-300 aw-dot"></div>
+                <svg class="hidden w-[10px] h-[10px] text-white aw-check animate-scale-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+              <div class="flex-1 flex justify-between items-center">
+                <span class="text-xs font-bold text-ai-fg group-hover:text-ai-sage transition-colors">Researcher Agent</span>
+                <span class="text-[9px] font-extrabold uppercase tracking-wider text-ai-fg-muted aw-status-text">Pending</span>
+              </div>
+            </button>
+
+            <!-- Builder Step (Button) -->
+            <button type="button" id="btn-step-builder" class="flex items-center gap-3 w-full text-left outline-none group cursor-pointer aw-step-btn" data-step="builder" disabled>
+              <div class="w-[20px] h-[20px] rounded-full border-2 border-ai-border bg-ai-surface flex items-center justify-center transition-all duration-300 aw-indicator">
+                <div class="w-1.5 h-1.5 rounded-full bg-transparent transition-all duration-300 aw-dot"></div>
+                <svg class="hidden w-[10px] h-[10px] text-white aw-check animate-scale-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+              <div class="flex-1 flex justify-between items-center">
+                <span class="text-xs font-bold text-ai-fg group-hover:text-ai-sage transition-colors">Builder Agent</span>
+                <span class="text-[9px] font-extrabold uppercase tracking-wider text-ai-fg-muted aw-status-text">Pending</span>
+              </div>
+            </button>
+
+            <!-- Reviewer Step (Button) -->
+            <button type="button" id="btn-step-reviewer" class="flex items-center gap-3 w-full text-left outline-none group cursor-pointer aw-step-btn" data-step="reviewer" disabled>
+              <div class="w-[20px] h-[20px] rounded-full border-2 border-ai-border bg-ai-surface flex items-center justify-center transition-all duration-300 aw-indicator">
+                <div class="w-1.5 h-1.5 rounded-full bg-transparent transition-all duration-300 aw-dot"></div>
+                <svg class="hidden w-[10px] h-[10px] text-white aw-check animate-scale-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+              <div class="flex-1 flex justify-between items-center">
+                <span class="text-xs font-bold text-ai-fg group-hover:text-ai-sage transition-colors">Reviewer Agent</span>
+                <span class="text-[9px] font-extrabold uppercase tracking-wider text-ai-fg-muted aw-status-text">Pending</span>
+              </div>
+            </button>
+          </div>
+        </div>
       </div>
 
-      <article class="aw-agent aw-agent--planner">
-        <span class="aw-agent-kicker">01</span>
-        <h3>Planner Agent</h3>
-        <p>Decomposes the goal into milestones, owners, and handoff points.</p>
-      </article>
+      <!-- RIGHT COLUMN: Interactive IDE Viewport (60%) -->
+      <div class="w-full md:w-[62%] flex flex-col">
+        <div class="premium-card p-5 h-full flex flex-col justify-between" style="--card-brand-color: var(--ai-sage);">
+          
+          <!-- Workspace Header & Tabs -->
+          <div class="flex items-center justify-between border-b border-ai-border pb-3 mb-4">
+            <div class="flex items-center gap-2">
+              <div class="w-2.5 h-2.5 rounded-full bg-ai-sage animate-pulse"></div>
+              <h3 class="text-xs font-extrabold uppercase tracking-wider text-ai-fg" id="aw-inspector-title">Agent IDE</h3>
+            </div>
+            
+            <div class="flex gap-1">
+              <button type="button" id="tab-preview" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-ai-bg text-ai-fg-muted border border-ai-border cursor-pointer hover:border-ai-sage transition-colors aw-tab" data-tab="preview">
+                🌐 Live Preview
+              </button>
+              <button type="button" id="tab-code" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-ai-bg text-ai-fg-muted border border-ai-border cursor-pointer hover:border-ai-sage transition-colors aw-tab" data-tab="code">
+                💻 Code View
+              </button>
+              <button type="button" id="tab-log" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-ai-bg text-ai-fg-muted border border-ai-border cursor-pointer hover:border-ai-sage transition-colors aw-tab" data-tab="log">
+                🧠 Thinking Log
+              </button>
+            </div>
+          </div>
 
-      <article class="aw-agent aw-agent--researcher">
-        <span class="aw-agent-kicker">02</span>
-        <h3>Researcher Agent</h3>
-        <p>Surfaces constraints, assumptions, context, and missing evidence.</p>
-      </article>
+          <!-- Sandbox Area -->
+          <div class="flex-1 min-h-[340px] bg-ai-bg border border-ai-border rounded-xl overflow-hidden relative">
+            
+            <!-- Tab contents -->
+            
+            <!-- Tab 1: Live Preview -->
+            <div id="content-preview" class="w-full h-full aw-content">
+              <div class="absolute inset-0 flex flex-col items-center justify-center p-4 text-center" id="aw-preview-placeholder">
+                <svg class="w-10 h-10 text-ai-fg-muted/40 mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-.778.099-1.533.284-2.253m0 0h17.432"></path>
+                </svg>
+                <h4 class="text-xs font-bold text-ai-fg mb-1">Live Sandbox Preview</h4>
+                <p class="text-[10px] text-ai-fg-muted max-w-[240px]">Once the Builder and Reviewer compile your application, it will render here interactively.</p>
+              </div>
+              <iframe id="aw-preview-iframe" class="w-full h-full border-none bg-white hidden" title="Agent Sandbox Execution View"></iframe>
+            </div>
 
-      <article class="aw-agent aw-agent--builder">
-        <span class="aw-agent-kicker">03</span>
-        <h3>Builder Agent</h3>
-        <p>Turns the plan into draft artifacts, checklists, and working notes.</p>
-      </article>
+            <!-- Tab 2: Code View -->
+            <div id="content-code" class="w-full h-full p-4 overflow-y-auto hidden aw-content">
+              <div class="absolute inset-0 flex flex-col items-center justify-center p-4 text-center" id="aw-code-placeholder">
+                <h4 class="text-xs font-bold text-ai-fg mb-1">Source Code Inspector</h4>
+                <p class="text-[10px] text-ai-fg-muted max-w-[240px]">Select any active step on the left to inspect its custom compiled code or raw artifact output.</p>
+              </div>
+              <pre id="aw-code-output" class="text-[11px] font-mono text-ai-fg leading-relaxed whitespace-pre hidden"></pre>
+            </div>
 
-      <article class="aw-agent aw-agent--reviewer">
-        <span class="aw-agent-kicker">04</span>
-        <h3>Reviewer Agent</h3>
-        <p>Flags risks, checks quality, and prepares a human handoff.</p>
-      </article>
+            <!-- Tab 3: Agent Thinking Log -->
+            <div id="content-log" class="w-full h-full p-4 overflow-y-auto hidden aw-content space-y-4">
+              <div class="absolute inset-0 flex flex-col items-center justify-center p-4 text-center" id="aw-log-placeholder">
+                <h4 class="text-xs font-bold text-ai-fg mb-1">Thinking Log Terminal</h4>
+                <p class="text-[10px] text-ai-fg-muted max-w-[240px]">Streaming logs from our agentic chain will appear here as they execute.</p>
+              </div>
+              
+              <div id="aw-log-container" class="space-y-4 hidden text-[11px] leading-relaxed">
+                <!-- Log steps will append here -->
+              </div>
+            </div>
 
-      <div class="aw-packet aw-packet--one">Planner decomposed goal</div>
-      <div class="aw-packet aw-packet--two">Researcher found constraints</div>
-      <div class="aw-packet aw-packet--three">Builder drafted artifact</div>
-      <div class="aw-packet aw-packet--four">Reviewer flagged risk</div>
-      <div class="aw-packet aw-packet--five">Human handoff ready</div>
+          </div>
 
-      <div class="aw-event aw-event--one">
-        <span></span>
-        Goal split into tasks
+        </div>
       </div>
-      <div class="aw-event aw-event--two">
-        <span></span>
-        Evidence attached
-      </div>
-      <div class="aw-event aw-event--three">
-        <span></span>
-        Draft created
-      </div>
-      <div class="aw-event aw-event--four">
-        <span></span>
-        Review queued
-      </div>
+
     </div>
   </div>
 </section>
 
 <style>
   .aw-root {
-    --aw-panel: color-mix(in srgb, var(--ai-surface) 90%, transparent);
-    --aw-panel-soft: color-mix(in srgb, var(--ai-surface) 76%, transparent);
-    --aw-text: var(--ai-fg);
-    --aw-muted: var(--ai-fg-muted);
-    --aw-line: var(--ai-border);
     height: 100%;
-    overflow: hidden;
-    color: var(--aw-text);
+    overflow-y: auto !important;
+    padding-bottom: 2rem;
   }
 
-  :global(:root[data-theme="dark"]) .aw-root {
-    --aw-panel: rgba(19, 26, 43, 0.78);
-    --aw-panel-soft: rgba(15, 23, 42, 0.58);
-    --aw-text: #F8FAFC;
-    --aw-muted: #CBD5E1;
-    --aw-line: rgba(226, 232, 240, 0.13);
-  }
-
-  .aw-shell {
-    position: relative;
-    width: min(100%, 78rem);
-    height: 100%;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    isolation: isolate;
-    overflow: hidden;
-  }
-
-  .aw-shell::before {
-    content: "";
-    position: absolute;
-    inset: -2rem -1.5rem;
-    border-radius: 1.5rem;
-    background:
-      radial-gradient(circle at 18% 12%, color-mix(in srgb, var(--ai-sage) 12%, transparent), transparent 30%),
-      radial-gradient(circle at 82% 8%, color-mix(in srgb, var(--ai-azure) 12%, transparent), transparent 28%),
-      var(--ai-bg);
-    z-index: -3;
-  }
-
-  .aw-orb {
-    position: absolute;
-    border-radius: 999px;
-    filter: blur(90px);
-    opacity: 0.18;
-    pointer-events: none;
-    z-index: -2;
-  }
-
-  .aw-orb--sage {
-    width: 30rem;
-    height: 30rem;
-    top: 8rem;
-    left: -10rem;
+  /* Connector line styles */
+  .aw-step-btn[data-state="completed"]::before {
     background: var(--ai-sage);
   }
 
-  .aw-orb--azure {
-    width: 28rem;
-    height: 28rem;
-    right: -8rem;
-    top: -6rem;
-    background: var(--ai-azure);
+  /* Button Indicator States */
+  .aw-step-btn[data-state="running"] .aw-indicator {
+    border-color: var(--ai-sage);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--ai-sage) 40%, transparent);
   }
-
-  .aw-orb--coral {
-    width: 22rem;
-    height: 22rem;
-    right: 15%;
-    bottom: -8rem;
-    background: var(--ai-coral);
+  
+  .aw-step-btn[data-state="running"] .aw-dot {
+    background: var(--ai-sage);
+    animation: aw-pulse-dot 1.2s infinite;
   }
-
-  .aw-header {
-    max-width: 54rem;
-    padding-right: 5.5rem;
-    margin-bottom: 0;
-  }
-
-  .aw-badge {
-    display: inline-flex;
-    margin-bottom: 0.75rem;
+  
+  .aw-step-btn[data-state="running"] .aw-status-text {
     color: var(--ai-sage);
-    font-size: 0.75rem;
-    font-weight: 850;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
   }
 
-  .aw-title {
-    margin: 0;
-    color: var(--aw-text);
-    font-size: clamp(2.1rem, 4vw, 3.75rem);
-    font-weight: 850;
-    line-height: 0.94;
-    letter-spacing: -0.06em;
-  }
-
-  .aw-subtitle {
-    margin: 0.7rem 0 0;
-    color: var(--aw-muted);
-    font-size: clamp(0.95rem, 1.6vw, 1.05rem);
-    line-height: 1.45;
-  }
-
-  .aw-disclaimer {
-    display: inline-flex;
-    margin: 0.7rem 0 0;
-    padding: 0.52rem 0.75rem;
-    border: 1px solid color-mix(in srgb, var(--ai-coral) 28%, var(--aw-line));
-    border-radius: 999px;
-    background: color-mix(in srgb, var(--ai-coral) 8%, var(--aw-panel-soft));
-    color: var(--aw-muted);
-    font-size: 0.82rem;
-    font-weight: 750;
-  }
-
-  .aw-stage {
-    position: relative;
-    flex: 1;
-    min-height: 0;
-    overflow: hidden;
-    border: 1px solid var(--aw-line);
-    border-radius: 2rem;
-    background:
-      linear-gradient(145deg, var(--aw-panel), var(--aw-panel-soft)),
-      radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--ai-sage) 10%, transparent), transparent 42%);
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.08), 0 26px 80px rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(18px);
-  }
-
-  .aw-grid-bg {
-    position: absolute;
-    inset: 0;
-    opacity: 0.42;
-    background-image:
-      linear-gradient(var(--aw-line) 1px, transparent 1px),
-      linear-gradient(90deg, var(--aw-line) 1px, transparent 1px);
-    background-size: 44px 44px;
-    mask-image: radial-gradient(circle at 50% 48%, black, transparent 78%);
-  }
-
-  .aw-lines {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-  }
-
-  .aw-path {
-    fill: none;
-    stroke: url(#aw-line-main);
-    stroke-width: 2.4;
-    stroke-linecap: round;
-    stroke-dasharray: 10 14;
-    opacity: 0.64;
-    filter: url(#aw-line-glow);
-    animation: aw-drift-lines 8s linear infinite;
-  }
-
-  .aw-path--two { animation-delay: -1.4s; }
-  .aw-path--three { animation-delay: -2.8s; }
-  .aw-path--four { animation-delay: -4.2s; }
-  .aw-path--five { animation-delay: -5.6s; opacity: 0.42; }
-
-  .aw-hub {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: min(23rem, 34vw);
-    aspect-ratio: 1;
-    transform: translate(-50%, -50%);
-  }
-
-  .aw-hub-ring {
-    position: absolute;
-    inset: 0;
-    border: 1px solid color-mix(in srgb, var(--ai-sage) 36%, var(--aw-line));
-    border-radius: 999px;
-    background:
-      radial-gradient(circle, color-mix(in srgb, var(--ai-sage) 10%, transparent), transparent 62%),
-      conic-gradient(from 90deg, color-mix(in srgb, var(--ai-sage) 35%, transparent), color-mix(in srgb, var(--ai-azure) 30%, transparent), color-mix(in srgb, var(--ai-coral) 28%, transparent), color-mix(in srgb, var(--ai-sage) 35%, transparent));
-    opacity: 0.48;
-    animation: aw-rotate 24s linear infinite;
-  }
-
-  .aw-hub-core {
-    position: absolute;
-    inset: 18%;
-    display: grid;
-    place-items: center;
-    align-content: center;
-    gap: 0.35rem;
-    border: 1px solid var(--aw-line);
-    border-radius: 999px;
-    background: color-mix(in srgb, var(--ai-bg) 76%, transparent);
-    box-shadow: 0 18px 60px rgba(0, 0, 0, 0.18);
-    text-align: center;
-  }
-
-  .aw-hub-core span,
-  .aw-mini-card,
-  .aw-agent-kicker {
-    color: var(--ai-sage);
-    font-size: 0.72rem;
-    font-weight: 850;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-
-  .aw-hub-core strong {
-    color: var(--aw-text);
-    font-size: clamp(1.35rem, 2vw, 1.85rem);
-    line-height: 1;
-    letter-spacing: -0.04em;
-  }
-
-  .aw-hub-core small {
-    max-width: 11rem;
-    color: var(--aw-muted);
-    font-size: 0.8rem;
-    line-height: 1.35;
-  }
-
-  .aw-mini-card {
-    position: absolute;
-    padding: 0.62rem 0.78rem;
-    border: 1px solid var(--aw-line);
-    border-radius: 0.9rem;
-    background: var(--aw-panel);
-    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.13);
-    animation: aw-pop-card 7.5s ease-in-out infinite;
-  }
-
-  .aw-mini-card--brief {
-    left: -1.5rem;
-    top: 22%;
-  }
-
-  .aw-mini-card--tasks {
-    right: -1.8rem;
-    top: 44%;
-    color: var(--ai-azure);
-    animation-delay: -2.4s;
-  }
-
-  .aw-mini-card--risk {
-    left: 26%;
-    bottom: -0.8rem;
-    color: var(--ai-coral);
-    animation-delay: -4.8s;
-  }
-
-  .aw-agent {
-    position: absolute;
-    width: min(18rem, 25vw);
-    min-height: 9.5rem;
-    padding: 1.1rem;
-    overflow: hidden;
-    border: 1px solid var(--aw-line);
-    border-radius: 1.4rem;
-    background: linear-gradient(145deg, var(--aw-panel), color-mix(in srgb, var(--aw-panel-soft) 88%, transparent));
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.08), 0 18px 55px rgba(0, 0, 0, 0.15);
-    animation: aw-agent-breathe 7s ease-in-out infinite;
-  }
-
-  .aw-agent::after {
-    content: "";
-    position: absolute;
-    width: 8rem;
-    height: 8rem;
-    right: -3rem;
-    bottom: -3.5rem;
-    border-radius: 999px;
-    background: var(--agent-color, var(--ai-sage));
-    filter: blur(32px);
-    opacity: 0.16;
-  }
-
-  .aw-agent--planner {
-    --agent-color: var(--ai-sage);
-    left: 4%;
-    top: 9%;
-  }
-
-  .aw-agent--researcher {
-    --agent-color: var(--ai-azure);
-    right: 4%;
-    top: 9%;
-    animation-delay: -1.75s;
-  }
-
-  .aw-agent--builder {
-    --agent-color: var(--ai-coral);
-    right: 4%;
-    bottom: 9%;
-    animation-delay: -3.5s;
-  }
-
-  .aw-agent--reviewer {
-    --agent-color: var(--ai-sage);
-    left: 4%;
-    bottom: 9%;
-    animation-delay: -5.25s;
-  }
-
-  .aw-agent-kicker {
-    color: var(--agent-color, var(--ai-sage));
-  }
-
-  .aw-agent h3 {
-    margin: 0.45rem 0;
-    color: var(--aw-text);
-    font-size: 1.15rem;
-    font-weight: 850;
-    letter-spacing: -0.03em;
-  }
-
-  .aw-agent p {
-    margin: 0;
-    color: var(--aw-muted);
-    font-size: 0.92rem;
-    line-height: 1.45;
-  }
-
-  .aw-packet {
-    position: absolute;
-    z-index: 5;
-    max-width: 15rem;
-    padding: 0.58rem 0.72rem;
-    border: 1px solid color-mix(in srgb, var(--packet-color, var(--ai-sage)) 36%, var(--aw-line));
-    border-radius: 999px;
-    background: color-mix(in srgb, var(--aw-panel) 92%, transparent);
-    color: var(--aw-text);
-    box-shadow: 0 14px 34px color-mix(in srgb, var(--packet-color, var(--ai-sage)) 13%, transparent);
-    font-size: 0.8rem;
-    font-weight: 800;
-    opacity: 0;
-    transform: translate3d(0, 0, 0) scale(0.92);
-    animation: aw-task-pulse 10s ease-in-out infinite;
-  }
-
-  .aw-packet::before {
-    content: "";
-    display: inline-block;
-    width: 0.5rem;
-    height: 0.5rem;
-    margin-right: 0.5rem;
-    border-radius: 999px;
-    background: var(--packet-color, var(--ai-sage));
-    box-shadow: 0 0 16px var(--packet-color, var(--ai-sage));
-  }
-
-  .aw-packet--one {
-    --packet-color: var(--ai-sage);
-    left: 25%;
-    top: 18%;
-    animation-delay: 0s;
-  }
-
-  .aw-packet--two {
-    --packet-color: var(--ai-azure);
-    right: 25%;
-    top: 18%;
-    animation-delay: -8s;
-  }
-
-  .aw-packet--three {
-    --packet-color: var(--ai-coral);
-    right: 23%;
-    bottom: 22%;
-    animation-delay: -6s;
-  }
-
-  .aw-packet--four {
-    --packet-color: var(--ai-sage);
-    left: 24%;
-    bottom: 22%;
-    animation-delay: -4s;
-  }
-
-  .aw-packet--five {
-    --packet-color: var(--ai-azure);
-    left: 50%;
-    bottom: 7%;
-    transform-origin: center;
-    animation-delay: -2s;
-  }
-
-  .aw-event {
-    position: absolute;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 0.65rem;
-    border: 1px solid var(--aw-line);
-    border-radius: 0.85rem;
-    background: color-mix(in srgb, var(--ai-bg) 62%, transparent);
-    color: var(--aw-muted);
-    font-size: 0.78rem;
-    font-weight: 800;
-    opacity: 0;
-    animation: aw-event-pop 8s ease-in-out infinite;
-  }
-
-  .aw-event span {
-    width: 0.45rem;
-    height: 0.45rem;
-    border-radius: 999px;
+  .aw-step-btn[data-state="completed"] .aw-indicator {
+    border-color: var(--ai-sage);
     background: var(--ai-sage);
   }
-
-  .aw-event--one {
-    left: 16%;
-    top: 39%;
+  
+  .aw-step-btn[data-state="completed"] .aw-dot {
+    display: none;
+  }
+  
+  .aw-step-btn[data-state="completed"] .aw-check {
+    display: block !important;
+  }
+  
+  .aw-step-btn[data-state="completed"] .aw-status-text {
+    color: var(--ai-sage);
   }
 
-  .aw-event--two {
-    right: 15%;
-    top: 40%;
-    animation-delay: -6s;
+  .aw-step-btn:disabled {
+    cursor: default;
+    opacity: 0.65;
   }
 
-  .aw-event--three {
-    right: 26%;
-    bottom: 39%;
-    animation-delay: -4s;
+  @keyframes aw-pulse-dot {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.5; }
+    100% { transform: scale(1); opacity: 1; }
   }
 
-  .aw-event--four {
-    left: 26%;
-    bottom: 39%;
-    animation-delay: -2s;
+  /* Active tabs and navigation */
+  .aw-tab.active-tab {
+    border-color: var(--ai-sage) !important;
+    background: var(--ai-surface) !important;
+    color: var(--ai-fg) !important;
+    box-shadow: 0 0 8px color-mix(in srgb, var(--ai-sage) 12%, transparent);
   }
 
-  @keyframes aw-drift-lines {
-    to { stroke-dashoffset: -96; }
+  .aw-step-btn.active-step .aw-indicator {
+    border-color: var(--ai-sage) !important;
+    box-shadow: 0 0 10px color-mix(in srgb, var(--ai-sage) 40%, transparent);
   }
 
-  @keyframes aw-rotate {
-    to { transform: rotate(360deg); }
+  .aw-step-btn.active-step {
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--ai-sage) 5%, transparent);
   }
 
-  @keyframes aw-agent-breathe {
-    0%, 100% { transform: translateY(0); border-color: var(--aw-line); }
-    50% { transform: translateY(-5px); border-color: color-mix(in srgb, var(--agent-color, var(--ai-sage)) 42%, var(--aw-line)); }
+  /* Animation for check scale up */
+  .animate-scale-up {
+    animation: scaleUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   }
 
-  @keyframes aw-task-pulse {
-    0%, 8% { opacity: 0; transform: translateY(10px) scale(0.92); }
-    14%, 34% { opacity: 1; transform: translateY(0) scale(1); }
-    42%, 100% { opacity: 0; transform: translateY(-12px) scale(0.96); }
-  }
-
-  @keyframes aw-event-pop {
-    0%, 18% { opacity: 0; transform: translateY(8px) scale(0.94); }
-    24%, 42% { opacity: 1; transform: translateY(0) scale(1); }
-    52%, 100% { opacity: 0; transform: translateY(-8px) scale(0.96); }
-  }
-
-  @keyframes aw-pop-card {
-    0%, 100% { transform: translateY(0); opacity: 0.74; }
-    50% { transform: translateY(-6px); opacity: 1; }
-  }
-
-  @media (max-width: 980px) {
-    .aw-hub {
-      width: min(19rem, 34vw);
-    }
-
-    .aw-agent {
-      width: min(17rem, 36vw);
-      min-height: 8.5rem;
-      padding: 0.95rem;
-    }
-
-    .aw-agent--planner { left: 5%; top: 5%; }
-    .aw-agent--researcher { right: 5%; top: 5%; }
-    .aw-agent--builder { right: 5%; bottom: 5%; }
-    .aw-agent--reviewer { left: 5%; bottom: 5%; }
-
-    .aw-packet--one { left: 12%; top: 29%; }
-    .aw-packet--two { right: 12%; top: 29%; }
-    .aw-packet--three { right: 10%; bottom: 29%; }
-    .aw-packet--four { left: 10%; bottom: 29%; }
-  }
-
-  @media (max-width: 680px) {
-    .aw-header {
-      padding-right: 3.8rem;
-    }
-
-    .aw-subtitle,
-    .aw-disclaimer {
-      display: none;
-    }
-
-    .aw-stage {
-      border-radius: 1.35rem;
-    }
-
-    .aw-lines {
-      opacity: 0.42;
-    }
-
-    .aw-hub {
-      top: 50%;
-      width: min(13rem, 52vw);
-    }
-
-    .aw-agent {
-      left: auto;
-      right: auto;
-      width: min(10.5rem, 40vw);
-      min-height: 7.3rem;
-      padding: 0.72rem;
-      transform: none;
-    }
-
-    .aw-agent h3 {
-      font-size: 0.95rem;
-    }
-
-    .aw-agent p {
-      font-size: 0.74rem;
-      line-height: 1.28;
-    }
-
-    .aw-agent--planner { left: 0.75rem; top: 0.75rem; }
-    .aw-agent--researcher { right: 0.75rem; top: 0.75rem; }
-    .aw-agent--builder { right: 0.75rem; bottom: 0.75rem; }
-    .aw-agent--reviewer { left: 0.75rem; bottom: 0.75rem; }
-
-    .aw-packet,
-    .aw-event {
-      max-width: calc(100% - 2rem);
-      font-size: 0.7rem;
-    }
-
-    .aw-packet--one { left: 28%; top: 30%; }
-    .aw-packet--two { right: 20%; top: 36%; }
-    .aw-packet--three { right: 18%; bottom: 34%; }
-    .aw-packet--four { left: 18%; bottom: 30%; }
-    .aw-packet--five { left: 36%; bottom: 17%; }
-
-    .aw-event--one { left: 8%; top: 45%; }
-    .aw-event--two { right: 7%; top: 45%; }
-    .aw-event--three { right: 10%; bottom: 45%; }
-    .aw-event--four { left: 10%; bottom: 45%; }
-
-    @keyframes aw-agent-breathe {
-      0%, 100% { transform: translateY(0); border-color: var(--aw-line); }
-      50% { transform: translateY(-3px); border-color: color-mix(in srgb, var(--agent-color, var(--ai-sage)) 42%, var(--aw-line)); }
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .aw-path,
-    .aw-hub-ring,
-    .aw-agent,
-    .aw-packet,
-    .aw-event,
-    .aw-mini-card {
-      animation: none;
-    }
-
-    .aw-packet,
-    .aw-event {
-      opacity: 1;
-      transform: none;
-    }
+  @keyframes scaleUp {
+    from { transform: scale(0.6); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
   }
 </style>
+
+<script>
+  const root = document.querySelector('[data-agentic-workspace]');
+
+  if (root) {
+    const form = root.querySelector('#aw-form');
+    const textarea = root.querySelector('#aw-task') as HTMLTextAreaElement;
+    const count = root.querySelector('#aw-count');
+    const submit = root.querySelector('#aw-submit') as HTMLButtonElement;
+    const example = root.querySelector('#aw-example');
+    const status = root.querySelector('#aw-status');
+    const connectorLine = root.querySelector('#aw-connector-line') as HTMLElement;
+    const stepButtons = root.querySelectorAll('.aw-step-btn');
+    
+    // Viewport Elements
+    const tabs = root.querySelectorAll('.aw-tab');
+    const tabContents = root.querySelectorAll('.aw-content');
+    
+    // Previews
+    const previewIframe = root.querySelector('#aw-preview-iframe') as HTMLIFrameElement;
+    const previewPlaceholder = root.querySelector('#aw-preview-placeholder') as HTMLElement;
+    
+    // Code View
+    const codeOutput = root.querySelector('#aw-code-output') as HTMLElement;
+    const codePlaceholder = root.querySelector('#aw-code-placeholder') as HTMLElement;
+    
+    // Log View
+    const logContainer = root.querySelector('#aw-log-container') as HTMLElement;
+    const logPlaceholder = root.querySelector('#aw-log-placeholder') as HTMLElement;
+    
+    const inspectorTitle = root.querySelector('#aw-inspector-title') as HTMLElement;
+
+    const exampleTask = 'Create a simple fully functional neon-styled calculator web app.';
+
+    let workflowData: any = null;
+    let currentActiveStep = 'planner';
+
+    const setStatus = (message: string, tone = '') => {
+      if (!status) return;
+      status.textContent = message;
+      if (tone) {
+        status.setAttribute('data-tone', tone);
+      } else {
+        status.removeAttribute('data-tone');
+      }
+    };
+
+    const updateCount = () => {
+      if (!textarea || !count) return;
+      count.textContent = `${textarea.value.length}/500`;
+    };
+
+    const setLoading = (loading: boolean) => {
+      if (!submit) return;
+      submit.disabled = loading;
+      const span = submit.querySelector('span');
+      if (span) span.textContent = loading ? 'Orchestrating...' : 'Launch Workspace';
+    };
+
+    const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+    // Tab Navigation
+    const switchTab = (tabName: string) => {
+      tabs.forEach(t => {
+        if (t.getAttribute('data-tab') === tabName) {
+          t.classList.add('active-tab');
+        } else {
+          t.classList.remove('active-tab');
+        }
+      });
+
+      tabContents.forEach(c => {
+        if (c.id === `content-${tabName}`) {
+          c.classList.remove('hidden');
+        } else {
+          c.classList.add('hidden');
+        }
+      });
+    };
+
+    tabs.forEach(t => {
+      t.addEventListener('click', () => {
+        const tabName = t.getAttribute('data-tab');
+        if (tabName) switchTab(tabName);
+      });
+    });
+
+    const resetSteps = () => {
+      stepButtons.forEach(btn => {
+        btn.setAttribute('data-state', 'pending');
+        btn.setAttribute('disabled', 'true');
+        btn.classList.remove('active-step');
+        const title = btn.querySelector('.aw-status-text');
+        if (title) title.textContent = 'Pending';
+      });
+      
+      if (connectorLine) {
+        connectorLine.style.background = '';
+      }
+
+      // Reset logs
+      if (logContainer) {
+        logContainer.textContent = '';
+        logContainer.classList.add('hidden');
+      }
+      if (logPlaceholder) logPlaceholder.classList.remove('hidden');
+
+      // Reset Code
+      if (codeOutput) {
+        codeOutput.textContent = '';
+        codeOutput.classList.add('hidden');
+      }
+      if (codePlaceholder) codePlaceholder.classList.remove('hidden');
+
+      // Reset Preview
+      if (previewIframe) {
+        previewIframe.srcdoc = '';
+        previewIframe.classList.add('hidden');
+      }
+      if (previewPlaceholder) previewPlaceholder.classList.remove('hidden');
+      
+      workflowData = null;
+    };
+
+    // Load selected step data into Code and Log tabs
+    const selectStep = (stepName: string) => {
+      if (!workflowData || !workflowData[stepName]) return;
+      currentActiveStep = stepName;
+
+      stepButtons.forEach(btn => {
+        if (btn.getAttribute('data-step') === stepName) {
+          btn.classList.add('active-step');
+        } else {
+          btn.classList.remove('active-step');
+        }
+      });
+
+      if (inspectorTitle) {
+        inspectorTitle.textContent = `${stepName.charAt(0).toUpperCase() + stepName.slice(1)} Agent View`;
+      }
+
+      // Populate Code/Output
+      if (codeOutput) {
+        codeOutput.textContent = workflowData[stepName].output || '';
+        codeOutput.classList.remove('hidden');
+      }
+      if (codePlaceholder) codePlaceholder.classList.add('hidden');
+    };
+
+    stepButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const step = btn.getAttribute('data-step');
+        if (step) {
+          selectStep(step);
+          switchTab('code');
+        }
+      });
+    });
+
+    const appendLog = (role: string, thinking: string) => {
+      if (!logContainer) return;
+      logContainer.classList.remove('hidden');
+      if (logPlaceholder) logPlaceholder.classList.add('hidden');
+
+      const logBlock = document.createElement('div');
+      logBlock.className = 'border-l-2 border-ai-sage/40 pl-3.5 space-y-1';
+      
+      const header = document.createElement('span');
+      header.className = 'block font-extrabold uppercase text-[10px] tracking-wider text-ai-sage';
+      header.textContent = `${role.toUpperCase()} AGENT LOG`;
+
+      const body = document.createElement('p');
+      body.className = 'italic text-ai-fg-muted font-serif';
+      body.textContent = thinking;
+
+      logBlock.appendChild(header);
+      logBlock.appendChild(body);
+      logContainer.appendChild(logBlock);
+      
+      // scroll to bottom
+      logContainer.parentElement?.scrollTo({ top: logContainer.scrollHeight, behavior: 'smooth' });
+    };
+
+    const runAgentStep = async (role: string, data: any, progressPct: number) => {
+      const btn = root.querySelector(`#btn-step-${role}`) as HTMLButtonElement;
+      if (!btn) return;
+
+      btn.removeAttribute('disabled');
+      btn.setAttribute('data-state', 'running');
+      const statusText = btn.querySelector('.aw-status-text');
+      if (statusText) statusText.textContent = 'Executing...';
+
+      // Stream thinking log
+      appendLog(role, data.thinking || '');
+      
+      // Auto display in log tab or code tab
+      selectStep(role);
+      if (role === 'planner') {
+        switchTab('log');
+      } else {
+        switchTab('code');
+      }
+
+      await delay(2500);
+
+      btn.setAttribute('data-state', 'completed');
+      if (statusText) statusText.textContent = 'Completed';
+
+      if (connectorLine) {
+        connectorLine.style.background = `linear-gradient(to bottom, var(--ai-sage) ${progressPct}%, var(--ai-border) ${progressPct}%)`;
+      }
+    };
+
+    textarea?.addEventListener('input', updateCount);
+
+    example?.addEventListener('click', () => {
+      if (!textarea) return;
+      textarea.value = exampleTask;
+      updateCount();
+      textarea.focus();
+      setStatus('Example added. Click Launch when ready.');
+    });
+
+    form?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!textarea) return;
+
+      const task = textarea.value.trim();
+      if (task.length < 10) {
+        setStatus('Add a little more detail before launching the workspace.', 'error');
+        textarea.focus();
+        return;
+      }
+
+      setLoading(true);
+      resetSteps();
+      switchTab('log');
+      setStatus('Initializing virtual nodes...');
+
+      try {
+        const response = await fetch('/api/ai/agent-workflow', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ task }),
+        });
+
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          setStatus(data.error || 'Agentic Builder is unavailable right now.', 'error');
+          return;
+        }
+
+        setStatus('Autonomous container compiled. Launching...', 'success');
+        workflowData = data.output;
+
+        // Run sequential orchestrations
+        await runAgentStep('planner', workflowData.planner, 25);
+        await runAgentStep('researcher', workflowData.researcher, 50);
+        await runAgentStep('builder', workflowData.builder, 75);
+        await runAgentStep('reviewer', workflowData.reviewer, 100);
+
+        // Load into live preview if reviewer or builder returns HTML code
+        const finalCode = workflowData.reviewer.output || workflowData.builder.output || '';
+        const isHtml = /<!DOCTYPE html>|<html|<body>|<script>/i.test(finalCode);
+
+        if (isHtml) {
+          if (previewIframe && previewPlaceholder) {
+            previewIframe.srcdoc = finalCode;
+            previewIframe.classList.remove('hidden');
+            previewPlaceholder.classList.add('hidden');
+            switchTab('preview');
+          }
+          setStatus('Autonomous compile complete! Live rendering view.', 'success');
+        } else {
+          switchTab('code');
+          setStatus('Workflow complete. Code generated.', 'success');
+        }
+
+      } catch {
+        setStatus('Network error. Check connection and try again.', 'error');
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    updateCount();
+  }
+</script>
