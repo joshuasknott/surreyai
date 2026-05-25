@@ -1,6 +1,7 @@
 export * from './types.js';
 export * from './config.js';
 export { createConvexClient } from './convex/client.js';
+export { queryPublicConvex } from './convex/public.js';
 export { validateEventInput } from './validation/events.js';
 export { validateCommitteeInput, validatePastCommitteeInput } from './validation/committee.js';
 export { validateInviteInput } from './validation/admins.js';

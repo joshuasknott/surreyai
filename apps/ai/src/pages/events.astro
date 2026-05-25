@@ -2,14 +2,13 @@
 export const prerender = false;
 import Layout from '../layouts/Layout.astro';
 import AnimatedHero from '../components/common/AnimatedHero.astro';
-import { createConvexClient } from '@surreysocieties/admin';
+import { queryPublicConvex } from '@surreysocieties/admin';
 import { getSocietyById } from '@surreysocieties/admin/config';
 import '../styles/global.css';
 
 const SOCIETY_ID = 'ai';
 const society = getSocietyById(SOCIETY_ID)!;
-const client = createConvexClient();
-const events: any[] = (await client.query("events:listPublished", { societySlug: SOCIETY_ID }))
+const events: any[] = (await queryPublicConvex<any[]>("events:listPublished", { societySlug: SOCIETY_ID }, []))
   .filter((event: any) => event.status === 'published');
 
 const formatEventMonth = (date?: string) => {

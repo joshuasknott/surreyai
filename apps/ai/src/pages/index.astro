@@ -1,7 +1,7 @@
 ---
 export const prerender = false;
 import Layout from "../layouts/Layout.astro";
-import { createConvexClient } from "@surreysocieties/admin";
+import { queryPublicConvex } from "@surreysocieties/admin";
 import "../styles/global.css";
 
 import HomeHero from "../components/home/HomeHero.astro";
@@ -10,10 +10,9 @@ import StudentProjects from "../components/home/StudentProjects.astro";
 import EventsPreview from "../components/home/EventsPreview.astro";
 
 const SOCIETY_ID = "ai";
-const client = createConvexClient();
 
 const events: any[] = (
-  await client.query("events:listPublished", { societySlug: SOCIETY_ID })
+  await queryPublicConvex<any[]>("events:listPublished", { societySlug: SOCIETY_ID }, [])
 ).filter((event: any) => event.status === "published");
 ---
 
