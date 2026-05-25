@@ -47,11 +47,14 @@ const getInitials = (name?: string, role?: string) => {
           <div class="relative z-10">
             <h2 class="text-2xl sm:text-3xl font-extrabold mb-4 text-ai-fg tracking-tight">Committee details will appear here once confirmed</h2>
             <p class="text-ai-fg-muted leading-relaxed mb-8 max-w-2xl mx-auto text-lg">
-              Our current committee roster will be published once confirmed through the Surrey Students' Union.
+              Our current committee roster will be published once confirmed through the Surrey Students' Union. In the meantime, get in touch via our socials.
             </p>
             <a href="/join" class="btn-primary">
               Learn about joining the society
             </a>
+            <p class="text-ai-fg-muted text-sm mt-6">
+              Follow us on <a href="https://www.instagram.com/surreyaisociety/" target="_blank" rel="noopener noreferrer" class="text-ai-azure hover:underline font-semibold">Instagram</a> · <a href="https://www.linkedin.com/company/surreyaisociety/" target="_blank" rel="noopener noreferrer" class="text-ai-azure hover:underline font-semibold">LinkedIn</a> · <a href="https://surreyunion.org" target="_blank" rel="noopener noreferrer" class="text-ai-azure hover:underline font-semibold">Students' Union</a>
+            </p>
           </div>
         </div>
       ) : (
@@ -89,13 +92,13 @@ const getInitials = (name?: string, role?: string) => {
                       <p class="text-ai-fg-muted text-[11px] font-bold uppercase tracking-wider">{member.role}</p>
                     </div>
 
-                    <!-- Clean Active Team metadata -->
+                    <!-- Committee year metadata -->
                     <div class="mt-6 pt-4 border-t border-ai-border/30 w-full flex items-center justify-between text-[11px] font-medium text-ai-fg-muted tracking-wide">
                       <span class="flex items-center gap-1.5">
                         <span class="w-1.5 h-1.5 rounded-full bg-[var(--card-brand-color)] opacity-60"></span>
-                        Active Team
+                        Current Committee
                       </span>
-                      <span class="text-[var(--card-brand-color)] font-semibold">Active</span>
+                      <span class="text-[var(--card-brand-color)] font-semibold">2025–26</span>
                     </div>
 
                   </div>

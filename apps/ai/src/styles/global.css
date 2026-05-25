@@ -289,10 +289,6 @@ img.duotone-tint {
               0 0 40px color-mix(in srgb, var(--card-brand-color, var(--ai-azure)) 8%, transparent);
 }
 
-/* 4x Corner Brackets (Tech Aesthetics) - DISABLED FOR GOOGLE ANTIGRAVITY AESTHETICS */
-.corner-tick {
-  display: none !important;
-}
 
 /* Luminescent Radial Glow background */
 .premium-glow {
@@ -311,21 +307,10 @@ img.duotone-tint {
   opacity: 1;
 }
 
-/* Sweeping scanline scanner - DISABLED FOR GOOGLE AESTHETICS */
-.premium-scan {
-  display: none !important;
-}
-
-/* Fine Technical Grid background - DISABLED FOR GOOGLE AESTHETICS */
-.premium-grid {
-  display: none !important;
-}
 
 @media (prefers-reduced-motion: reduce) {
   .premium-card { transition: none; }
   .premium-card:hover { transform: none; box-shadow: none; }
-  .corner-tick { display: none !important; }
-  .premium-scan { display: none !important; }
   .premium-glow { display: none !important; }
 }
 
@@ -368,13 +353,7 @@ img.duotone-tint {
   opacity: 0.8 !important;
 }
 
-.generative-grid {
-  display: none !important;
-}
 
-.scan-sweep {
-  display: none !important;
-}
 
 .ml-card-wrapper {
   border-radius: 2rem !important;

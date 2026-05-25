@@ -53,11 +53,16 @@ const formatEventDay = (date?: string) => {
             </div>
             
             <p class="text-ai-fg-muted text-lg leading-relaxed max-w-xl mx-auto mb-8">
-              We're currently planning our next semester of events. Join our community to get notified.
+              We're currently planning our next semester of events. Join our community to get notified, or follow us on socials.
             </p>
-            <a href="/join" class="btn-primary">
-              Become a member
-            </a>
+            <div class="flex flex-col sm:flex-row gap-3 justify-center items-center">
+              <a href="/join" class="btn-primary">
+                Become a member
+              </a>
+            </div>
+            <p class="text-ai-fg-muted text-sm mt-6">
+              Follow us on <a href="https://www.instagram.com/surreyaisociety/" target="_blank" rel="noopener noreferrer" class="text-ai-azure hover:underline font-semibold">Instagram</a> · <a href="https://www.linkedin.com/company/surreyaisociety/" target="_blank" rel="noopener noreferrer" class="text-ai-azure hover:underline font-semibold">LinkedIn</a> · <a href="https://surreyunion.org" target="_blank" rel="noopener noreferrer" class="text-ai-azure hover:underline font-semibold">Students' Union</a>
+            </p>
           </div>
         </div>
       ) : (
@@ -74,7 +79,7 @@ const formatEventDay = (date?: string) => {
                     <!-- Premium Header -->
                     <div class="flex items-center justify-between mb-5 text-[11px] font-semibold tracking-wider uppercase text-ai-fg-muted border-b border-ai-border/30 pb-3">
                       <span class="text-[var(--card-brand-color)]">Upcoming Session</span>
-                      <span class="opacity-60">Verified Event</span>
+                      <span class="opacity-60">Confirmed</span>
                     </div>
 
                     <!-- Glowing Calendar date badge wrapper -->
