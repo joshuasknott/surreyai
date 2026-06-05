@@ -5,31 +5,38 @@ import "../styles/global.css";
 ---
 
 <Layout
-  title="404 — Page Not Found"
-  description="The page you're looking for doesn't exist on the Surrey Artificial Intelligence Society website."
+  title="404 - Page Not Found"
+  description="The page you're looking for does not exist on the Surrey Artificial Intelligence and Data Science Society website."
 >
-  <section class="bg-ai-bg text-ai-fg relative overflow-hidden flex items-center justify-center py-16 sm:py-20 border-b border-ai-border">
-    <div class="mx-auto max-w-3xl px-6 text-center relative z-10">
-      <span class="text-ai-cyan text-xs font-semibold mb-4 block tracking-widest uppercase">
-        Page Not Found
-      </span>
-
-      <h1 class="text-6xl sm:text-8xl font-black tracking-tight leading-none mb-4">
-        <span class="text-transparent bg-clip-text bg-gradient-to-r from-ai-cyan to-ai-purple">404</span>
-      </h1>
-
-      <p class="text-ai-fg-muted text-sm sm:text-base leading-relaxed max-w-xl mx-auto mb-8">
-        Sorry, we couldn&apos;t find the page you&apos;re looking for. It might have been moved or the link could be broken.
-      </p>
-
-      <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <a href="/" class="btn-primary text-center">
-          Return Home
-        </a>
-        <a href="/events" class="btn-secondary text-center">
-          View Events
-        </a>
-      </div>
+  <section class="page-hero page-hero--center">
+    <h1>404</h1>
+    <p>
+      This link does not point to a current AI and Data Science Society page. Try the homepage, events, or joining route instead.
+    </p>
+    <div class="not-found-actions">
+      <a href="/" class="btn-primary">Return home</a>
+      <a href="/events" class="btn-secondary">View events</a>
     </div>
   </section>
 </Layout>
+
+<style>
+  .page-hero--center {
+    min-height: 62vh;
+    text-align: center;
+  }
+
+  .page-hero--center h1 {
+    color: var(--ai-azure);
+    font-size: clamp(6rem, 18vw, 14rem);
+    line-height: 0.85;
+  }
+
+  .not-found-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+</style>

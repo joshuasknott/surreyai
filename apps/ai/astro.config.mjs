@@ -5,6 +5,7 @@ import node from '@astrojs/node';
 import clerk from '@clerk/astro';
 
 export default defineConfig({
+  compressHTML: true,
   site: 'https://surreyaisociety.org',
   output: 'server',
   adapter: node({ mode: 'standalone' }),

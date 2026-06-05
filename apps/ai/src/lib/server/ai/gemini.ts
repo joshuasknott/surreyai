@@ -32,7 +32,15 @@ export function isAIEnabled(): boolean {
 }
 
 function getModel(): string {
-  return env("AI_MODEL") || "gemini-2.0-flash-lite";
+  return env("AI_MODEL") || "gemini-3.1-flash-lite-preview";
+}
+
+function getFallbackModel(): string {
+  return env("AI_FALLBACK_MODEL") || "gemini-3-flash-preview";
+}
+
+function getThinkingLevel(): string {
+  return env("AI_THINKING_LEVEL") || "minimal";
 }
 
 function getMaxTokens(): number {
@@ -90,12 +98,16 @@ export async function generateContent(
 
   const apiKey = env("GEMINI_API_KEY")!;
   const model = getModel();
+  const fallbackModel = getFallbackModel();
   const maxTokens = options.maxOutputTokens ?? getMaxTokens();
   const timeoutMs = options.timeoutMs ?? getTimeoutMs();
   const startedAt = Date.now();
 
   const config: Record<string, unknown> = {
     maxOutputTokens: maxTokens,
+    thinkingConfig: {
+      thinkingLevel: getThinkingLevel(),
+    },
   };
 
   if (options.responseMimeType) {
@@ -106,35 +118,52 @@ export async function generateContent(
     config.responseSchema = options.responseSchema;
   }
 
-  const params: Record<string, unknown> = {
-    model,
-    contents: prompt,
-    config,
+  const ai = new GoogleGenAI({ apiKey }) as unknown as GeminiClient;
+  const models = fallbackModel === model ? [model] : [model, fallbackModel];
+
+  for (const candidate of models) {
+    const primary = await safeRequestContent(
+      ai,
+      { model: candidate, contents: prompt, config },
+      timeoutMs
+    );
+    if (primary) return primary;
+  }
+
+  if (!options.responseSchema) return null;
+
+  const elapsedMs = Date.now() - startedAt;
+  const remainingMs = timeoutMs - elapsedMs;
+  if (remainingMs < 1000) return null;
+
+  const relaxedConfig = {
+    maxOutputTokens: maxTokens,
+    thinkingConfig: {
+      thinkingLevel: getThinkingLevel(),
+    },
   };
 
+  for (const candidate of models) {
+    const relaxed = await safeRequestContent(
+      ai,
+      { model: candidate, contents: prompt, config: relaxedConfig },
+      remainingMs
+    );
+    if (relaxed) return relaxed;
+  }
+
+  return null;
+}
+
+async function safeRequestContent(
+  client: GeminiClient,
+  params: Record<string, unknown>,
+  timeoutMs: number
+): Promise<string | null> {
   try {
-    const ai = new GoogleGenAI({ apiKey }) as unknown as GeminiClient;
-    return await requestContent(ai, params, timeoutMs);
+    return await requestContent(client, params, timeoutMs);
   } catch (error) {
-    if (!options.responseSchema || isTimeoutError(error)) return null;
-
-    const elapsedMs = Date.now() - startedAt;
-    const remainingMs = timeoutMs - elapsedMs;
-    if (remainingMs < 1000) return null;
-
-    try {
-      const ai = new GoogleGenAI({ apiKey }) as unknown as GeminiClient;
-      return await requestContent(
-        ai,
-        {
-          model,
-          contents: prompt,
-          config: { maxOutputTokens: maxTokens },
-        },
-        remainingMs
-      );
-    } catch {
-      return null;
-    }
+    if (isTimeoutError(error)) return null;
+    return null;
   }
 }

@@ -16,7 +16,7 @@ if (userId) return Astro.redirect('/admin');
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex, nofollow" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/logos/ai-logo.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -26,7 +26,7 @@ if (userId) return Astro.redirect('/admin');
     <div class="login-container">
       <div style="display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 400px; gap: 1rem;">
         <div class="login-logo" style="margin-bottom: 0;">
-          <img src={society?.logo || '/favicon.svg'} alt="" />
+          <img src={society?.logo || '/logos/ai-logo.png'} alt="" />
           <h1>{society?.shortName || 'Admin'}</h1>
           <p>Admin Dashboard</p>
         </div>

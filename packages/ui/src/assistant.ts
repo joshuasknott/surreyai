@@ -23,13 +23,13 @@ export type AssistantSocietyConfig = {
 export const ASSISTANT_CONFIGS: Record<AssistantSocietyKey, AssistantSocietyConfig> = {
   ai: {
     societyKey: "ai",
-    societyName: "Surrey Artificial Intelligence Society",
-    shortName: "AI Society",
+    societyName: "Surrey Artificial Intelligence and Data Science Society",
+    shortName: "Surrey AI and DS",
     shortDescription:
-      "A student-led community for learning, building, and discussing artificial intelligence at the University of Surrey.",
+      "A student-led community for learning, building, and discussing artificial intelligence and data science at the University of Surrey.",
     tone: "clear, practical, beginner-friendly, responsible, and curious",
     starterPrompts: [
-      "What is Surrey AI Society about?",
+      "What is Surrey AI and DS about?",
       "What events are coming up?",
       "I am new to AI. Where should I start?",
       "How can I get involved in projects?",

@@ -40,7 +40,7 @@ const canonicalSocietyData: CanonicalSocietyData[] = [
     logo: "/logos/optimized/ai-logo.optimized.png",
     contactEmail: PROTECTED_ADMIN_EMAILS.ai,
     socials: {
-      instagram: "https://www.instagram.com/surrey.ai.ds/",
+      instagram: "https://www.instagram.com/surreyaisociety/",
       email: PROTECTED_ADMIN_EMAILS.ai,
     },
     membershipUrl:

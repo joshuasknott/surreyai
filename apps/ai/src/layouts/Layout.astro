@@ -4,6 +4,7 @@ import AssistantWidget from '@surreysocieties/ui/components/AssistantWidget';
 import { ASSISTANT_CONFIGS } from '@surreysocieties/ui';
 import { getSocietyById } from '@surreysocieties/admin/config';
 import JoinCTA from '../components/home/JoinCTA.astro';
+import BrandMark from '../components/common/BrandMark.astro';
 
 interface Props {
   title: string;
@@ -33,6 +34,9 @@ const navLinks = [
   { href: '/events', label: 'Events' },
   { href: '/join', label: 'Join' },
 ];
+
+const displayName = 'Surrey AI and Data Science Society';
+const footerName = 'Surrey Artificial Intelligence and Data Science Society';
 ---
 
 <BaseLayout
@@ -46,6 +50,10 @@ const navLinks = [
     'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
   ]}
 >
+  <Fragment slot="head">
+    <link rel="icon" type="image/png" href="/logos/ai-logo.png" />
+  </Fragment>
+
   <!-- Theme Init Script — runs before paint to prevent FOUC -->
   <script is:inline>
     const getTheme = () => {
@@ -65,17 +73,14 @@ const navLinks = [
 
   <!-- Navigation -->
   <header class="sticky top-0 z-50 bg-ai-bg/90 backdrop-blur-md border-b border-ai-border">
-    <div class="mx-auto max-w-6xl px-6 h-20 flex items-center justify-between">
-      <a href="/" class="flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan rounded-lg">
-        <img
-          src="/logos/optimized/ai-logo.optimized.png"
-          alt="Surrey Artificial Intelligence Society logo"
-          width="40"
-          height="40"
-          class="h-10 w-10 rounded-full"
-        />
-        <span class="text-ai-fg font-semibold text-xl tracking-tight hidden sm:block">
-          Surrey <span class="text-ai-cyan">Artificial Intelligence</span> Society
+    <div class="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-6">
+      <a href="/" class="flex min-w-0 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan">
+        <BrandMark />
+        <span class="hidden min-w-0 text-base font-semibold tracking-tight text-ai-fg sm:block lg:text-lg">
+          {displayName}
+        </span>
+        <span class="block text-base font-semibold tracking-tight text-ai-fg sm:hidden">
+          Surrey AI and DS
         </span>
       </a>
 
@@ -89,9 +94,9 @@ const navLinks = [
                 href={link.href}
                 aria-current={isActive ? 'page' : undefined}
                 class:list={[
-                  'px-4 py-2.5 text-base font-medium rounded-lg border border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan transition-colors',
-                  isActive
-                    ? 'text-ai-cyan bg-ai-cyan/8 border-ai-cyan/15'
+                'px-3.5 py-2 text-sm font-semibold rounded-full border border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan transition-colors',
+                isActive
+                    ? 'text-ai-azure bg-ai-azure/10 border-ai-azure/15'
                     : 'text-ai-fg-muted hover:text-ai-fg hover:bg-ai-surface',
                 ]}
               >
@@ -106,7 +111,7 @@ const navLinks = [
           type="button"
           id="theme-toggle"
           aria-label="Switch to dark mode"
-          class="text-ai-fg-muted hover:text-ai-fg hover:bg-ai-surface p-2 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan"
+          class="text-ai-fg-muted hover:text-ai-fg hover:bg-ai-surface p-2 rounded-full border border-ai-border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan"
         >
           <svg id="theme-icon-dark" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
@@ -123,7 +128,7 @@ const navLinks = [
           aria-label="Open navigation menu"
           aria-expanded="false"
           aria-controls="ai-mobile-menu"
-          class="md:hidden text-ai-fg p-2 hover:bg-ai-surface rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan"
+          class="md:hidden text-ai-fg p-2 hover:bg-ai-surface rounded-full border border-ai-border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path id="ai-menu-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -142,9 +147,9 @@ const navLinks = [
               href={link.href}
               aria-current={isActive ? 'page' : undefined}
               class:list={[
-                'px-4 py-3 text-base font-medium rounded-lg border border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan transition-colors',
+                'px-4 py-3 text-base font-semibold rounded-xl border border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan transition-colors',
                 isActive
-                  ? 'text-ai-cyan bg-ai-cyan/8 border-ai-cyan/15'
+                  ? 'text-ai-azure bg-ai-azure/10 border-ai-azure/15'
                   : 'text-ai-fg-muted hover:text-ai-fg hover:bg-ai-bg',
               ]}
             >
@@ -165,22 +170,16 @@ const navLinks = [
   {!hideCTA && <JoinCTA />}
 
   <!-- Footer -->
-  <footer class="bg-ai-surface text-ai-fg-muted mt-auto">
-    <div class="mx-auto max-w-6xl px-6 py-12">
+  <footer class="bg-ai-surface text-ai-fg-muted mt-auto border-t border-ai-border">
+    <div class="mx-auto max-w-7xl px-6 py-12">
       <div class="grid sm:grid-cols-3 gap-8 mb-8">
         <div>
           <div class="flex items-center gap-3 mb-4">
-            <img
-              src="/logos/optimized/ai-logo.optimized.png"
-              alt=""
-              width="32"
-              height="32"
-              class="h-8 w-8 rounded-full"
-            />
-            <span class="text-ai-fg font-semibold tracking-tight">Surrey AI Society</span>
+            <BrandMark size="small" />
+            <span class="text-ai-fg font-semibold tracking-tight">{displayName}</span>
           </div>
           <p class="text-sm leading-relaxed max-w-xs">
-            A student-led society under Surrey Students&apos; Union. Exploring AI through learning, building, and open discussion.
+            A student-led society under Surrey Students&apos; Union. Exploring AI and data science through community, projects, and responsible discussion.
           </p>
           <p class="mt-3 text-xs font-semibold uppercase tracking-widest text-ai-cyan">Established {society.establishedYear}</p>
         </div>
@@ -203,7 +202,7 @@ const navLinks = [
         </div>
       </div>
       <div class="border-t border-ai-border pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
-        <p>&copy; {new Date().getFullYear()} Surrey Artificial Intelligence Society.</p>
+        <p>&copy; {new Date().getFullYear()} {footerName}.</p>
         <p class="text-ai-fg-muted">{society.domain}</p>
       </div>
     </div>

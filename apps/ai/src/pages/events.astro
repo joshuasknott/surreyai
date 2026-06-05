@@ -1,112 +1,316 @@
 ---
 export const prerender = false;
-import Layout from '../layouts/Layout.astro';
-import AnimatedHero from '../components/common/AnimatedHero.astro';
-import { queryPublicConvex } from '@surreysocieties/admin';
-import { getSocietyById } from '@surreysocieties/admin/config';
-import '../styles/global.css';
+import Layout from "../layouts/Layout.astro";
+import { queryPublicConvex } from "@surreysocieties/admin";
+import { getSocietyById } from "@surreysocieties/admin/config";
+import CutoutVisual from "../components/common/CutoutVisual.astro";
+import eventsWorkshopCutout from "../assets/generated/ai-events-workshop-cutout.png";
+import "../styles/global.css";
 
-const SOCIETY_ID = 'ai';
+const SOCIETY_ID = "ai";
 const society = getSocietyById(SOCIETY_ID)!;
 const events: any[] = (await queryPublicConvex<any[]>("events:listPublished", { societySlug: SOCIETY_ID }, []))
-  .filter((event: any) => event.status === 'published');
+  .filter((event: any) => event.status === "published");
 
-const formatEventMonth = (date?: string) => {
-  if (!date) return 'TBC';
+const formatEventDate = (date?: string) => {
+  if (!date) return "Date TBC";
   const parsed = new Date(`${date}T00:00:00`);
-  if (Number.isNaN(parsed.getTime())) return 'TBC';
-  return parsed.toLocaleDateString('en-GB', { month: 'short' }).toUpperCase();
+  if (Number.isNaN(parsed.getTime())) return "Date TBC";
+  return parsed.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 };
 
-const formatEventDay = (date?: string) => {
-  if (!date) return '-';
-  const parsed = new Date(`${date}T00:00:00`);
-  if (Number.isNaN(parsed.getTime())) return '-';
-  return parsed.toLocaleDateString('en-GB', { day: '2-digit' });
-};
+const programmeFormats = [
+  {
+    title: "Build sessions",
+    text: "Hands-on evenings for small tools, model experiments, data notebooks, and member demos.",
+  },
+  {
+    title: "AI literacy workshops",
+    text: "Beginner-friendly sessions on prompts, datasets, evaluation, model limits, and everyday AI use.",
+  },
+  {
+    title: "Impact discussions",
+    text: "Structured conversations about bias, reliability, labour, accessibility, privacy, and creative practice.",
+  },
+];
 ---
 
-<Layout title="Events" description="Upcoming and planned events from Surrey Artificial Intelligence Society — workshops, build nights, discussions, and careers events.">
+<Layout
+  title="Events"
+  description="Upcoming and planned events from Surrey Artificial Intelligence and Data Science Society."
+>
+  <section class="events-hero">
+    <div class="events-hero__copy">
+      <h1>Workshops, discussions, and project sessions for AI curious students.</h1>
+      <p>
+        Confirmed sessions appear from the society admin system. The programme is designed around learning by seeing, building, testing, and debating real AI and data workflows.
+      </p>
+    </div>
+    <CutoutVisual
+      compact
+      image={eventsWorkshopCutout}
+      alt="AI workshop kit with projector, laptop, sticky notes, blank event cards, coffee, and cable"
+      title="Events are built around things students can try."
+      body="Workshops, clinics, and discussions stay practical without becoming a technical wall."
+      loading="eager"
+    />
+  </section>
 
-  <AnimatedHero 
-    title="What's happening next."
-    description="Technical deep-dives, hands-on build nights, and industry speakers. Open to all Surrey students."
-    centered={true}
-  />
+  <section class="ai-section ai-section--tinted" aria-labelledby="formats-title">
+    <div class="ai-section__inner">
+      <div class="ai-section__header ai-section__header--split">
+        <h2 id="formats-title" class="section-title">Programme formats.</h2>
+        <p class="section-intro">
+          The calendar can shift each semester, but these are the recurring types of activities members should expect.
+        </p>
+      </div>
 
-  <!-- Events List -->
-  <section class="py-16 sm:py-24 px-6 bg-ai-bg text-ai-fg relative z-10">
-    <div class="mx-auto max-w-7xl">
+      <div class="format-list">
+        {programmeFormats.map((format, index) => (
+          <article>
+            <span>{String(index + 1).padStart(2, "0")}</span>
+            <div>
+              <h3>{format.title}</h3>
+              <p>{format.text}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="ai-section" aria-labelledby="events-title">
+    <div class="ai-section__inner">
+      <div class="ai-section__header ai-section__header--split">
+        <div>
+          <h2 id="events-title" class="section-title">Confirmed events</h2>
+        </div>
+        <a href={society.socials.instagram} target="_blank" rel="noopener noreferrer" class="text-link">
+          Follow updates on Instagram ->
+        </a>
+      </div>
+
       {events.length === 0 ? (
-        <div class="premium-card py-16 text-center max-w-4xl mx-auto" style="--card-brand-color: var(--ai-azure);">
-          <div class="premium-glow"></div>
-
-          <div class="relative z-10 px-6">
-            <!-- Premium Google-style Calendar Pending Visual -->
-            <div class="mx-auto max-w-[280px] bg-ai-surface border border-ai-border rounded-2xl p-6 mb-8 flex flex-col items-center shadow-sm">
-              <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-ai-azure/20 to-ai-coral/20 flex items-center justify-center mb-4">
-                <svg class="w-6 h-6 text-ai-azure" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <span class="text-xs font-semibold text-ai-azure tracking-widest uppercase">Next Semester</span>
-              <span class="text-sm font-bold text-ai-fg mt-1">Calendar Pending</span>
-            </div>
-            
-            <p class="text-ai-fg-muted text-lg leading-relaxed max-w-xl mx-auto mb-8">
-              We&apos;re currently planning our next semester of events. Join our community to get notified, or follow us on socials.
+        <div class="calendar-empty">
+          <div class="calendar-empty__copy">
+            <h3>Next events will appear here once confirmed.</h3>
+            <p>
+              This page stays honest until the next committee or signatories publish the calendar. Join the society or follow the socials for updates.
             </p>
-            <div class="flex flex-col sm:flex-row gap-3 justify-center items-center">
-              <a href="/join" class="btn-primary">
-                Become a member
-              </a>
+            <div class="calendar-empty__actions">
+              <a href="/join" class="btn-primary">Join the Society</a>
+              <a href={society.studentsUnionUrl} target="_blank" rel="noopener noreferrer" class="btn-secondary">Students' Union page</a>
             </div>
-            <p class="text-ai-fg-muted text-sm mt-6">
-              Follow us on <a href={society.socials.instagram} target="_blank" rel="noopener noreferrer" class="text-ai-azure hover:underline font-semibold">Instagram</a> · <a href={society.studentsUnionUrl} target="_blank" rel="noopener noreferrer" class="text-ai-azure hover:underline font-semibold">Students&apos; Union</a>
-            </p>
+          </div>
+          <div class="calendar-empty__board" aria-label="Planned event formats">
+            <span>Build sessions</span>
+            <span>AI literacy workshops</span>
+            <span>Impact discussions</span>
           </div>
         </div>
       ) : (
-        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {events.map((event, i) => {
-            const colors = ['var(--ai-coral)', 'var(--ai-azure)', 'var(--ai-sage)'];
-            const glowColor = colors[i % colors.length];
-            return (
-              <article class="premium-card group p-6 sm:p-8 flex flex-col justify-between" style={`--card-brand-color: ${glowColor};`}>
-                <div class="premium-glow"></div>
-                
-                <div class="relative z-10 flex flex-col h-full justify-between">
-                  <div>
-                    <!-- Premium Header -->
-                    <div class="flex items-center justify-between mb-5 text-[11px] font-semibold tracking-wider uppercase text-ai-fg-muted border-b border-ai-border/30 pb-3">
-                      <span class="text-[var(--card-brand-color)]">Upcoming Session</span>
-                      <span class="opacity-60">Confirmed</span>
-                    </div>
-
-                    <!-- Glowing Calendar date badge wrapper -->
-                    <div class="relative mb-6 self-start inline-block">
-                      <div class="absolute -inset-0.5 rounded-[1rem] bg-gradient-to-br from-ai-border to-[var(--card-brand-color)]/30 opacity-40 blur-xs"></div>
-                      <div class="relative z-10 text-center bg-ai-bg/90 border border-ai-border/85 px-4 py-3 rounded-[1rem] min-w-[5rem] shadow-sm">
-                        <span class="block text-ai-coral font-bold text-xs tracking-widest uppercase mb-1">{formatEventMonth(event.date)}</span>
-                        <span class="block text-ai-fg font-extrabold text-3xl leading-none tracking-tight">{formatEventDay(event.date)}</span>
-                      </div>
-                    </div>
-
-                    <h2 class="font-bold text-2xl text-ai-fg mb-3 tracking-tight group-hover:text-[var(--card-brand-color)] transition-colors duration-300 line-clamp-2">{event.title}</h2>
-                    <div class="flex flex-wrap gap-x-4 gap-y-2 mb-4 text-xs font-semibold text-ai-azure tracking-wide uppercase">
-                      {event.startTime && <span>{event.startTime}{event.endTime ? ` - ${event.endTime}` : ''}</span>}
-                      {event.location && <span>{event.location}</span>}
-                      {event.category && <span class="text-ai-fg-muted border border-ai-border px-2 py-0.5 rounded-md">{event.category}</span>}
-                    </div>
-                    <p class="text-ai-fg-muted leading-relaxed text-base line-clamp-4">{event.description || 'Details to be announced.'}</p>
-                  </div>
-                </div>
-              </article>
-            );
-          })}
+        <div class="event-directory">
+          {events.map((event) => (
+            <article class="event-entry">
+              <time>{formatEventDate(event.date)}</time>
+              <div class="event-entry__body">
+                <p class="event-entry__meta">
+                  {[event.startTime, event.endTime, event.location, event.category].filter(Boolean).join(" / ") || "Details to be announced"}
+                </p>
+                <h2>{event.title}</h2>
+                <p>{event.description || "Details to be announced."}</p>
+                {event.registrationUrl && (
+                  <a href={event.registrationUrl} target="_blank" rel="noopener noreferrer" class="text-link">Register -></a>
+                )}
+              </div>
+              {event.imageUrl && (
+                <img src={event.imageUrl} alt="" loading="lazy" />
+              )}
+            </article>
+          ))}
         </div>
       )}
     </div>
   </section>
-
 </Layout>
+
+<style>
+  .events-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 0.86fr) minmax(22rem, 1fr);
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: center;
+    max-width: 82rem;
+    margin: 0 auto;
+    padding: clamp(5rem, 9vw, 8rem) 1.25rem clamp(3rem, 6vw, 5rem);
+  }
+
+  .events-hero__copy h1 {
+    margin: 0;
+    color: var(--ai-fg);
+    font-size: clamp(2.55rem, 4.6vw, 4.65rem);
+    font-weight: 850;
+    letter-spacing: 0;
+    line-height: 1;
+  }
+
+  .events-hero__copy p {
+    max-width: 42rem;
+    margin: 1.3rem 0 0;
+    color: var(--ai-fg-muted);
+    font-size: 1.12rem;
+    line-height: 1.65;
+  }
+
+  .format-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(1.25rem, 3vw, 2rem);
+  }
+
+  .format-list article {
+    border-top: 3px solid var(--ai-azure);
+    padding-top: 1.25rem;
+  }
+
+  .format-list article:nth-child(2) {
+    border-top-color: var(--ai-sage);
+  }
+
+  .format-list article:nth-child(3) {
+    border-top-color: var(--ai-coral);
+  }
+
+  .format-list span {
+    color: var(--ai-azure);
+    font-weight: 850;
+  }
+
+  .format-list h3 {
+    margin: 0.75rem 0 0.45rem;
+    color: var(--ai-fg);
+    font-size: 1.2rem;
+    letter-spacing: 0;
+  }
+
+  .format-list p {
+    margin: 0;
+    color: var(--ai-fg-muted);
+    line-height: 1.6;
+  }
+
+  .calendar-empty {
+    display: grid;
+    grid-template-columns: minmax(0, 0.88fr) minmax(20rem, 0.82fr);
+    gap: clamp(1.5rem, 4vw, 3rem);
+    align-items: center;
+  }
+
+  .calendar-empty h3 {
+    margin: 0 0 0.85rem;
+    color: var(--ai-fg);
+    font-size: clamp(1.9rem, 3.6vw, 3rem);
+    letter-spacing: 0;
+    line-height: 1.08;
+  }
+
+  .calendar-empty p {
+    max-width: 42rem;
+    color: var(--ai-fg-muted);
+    line-height: 1.65;
+  }
+
+  .calendar-empty__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1.8rem;
+  }
+
+  .calendar-empty__board {
+    display: grid;
+    gap: 0.9rem;
+    padding: clamp(1.2rem, 3vw, 1.8rem);
+    border: 1px solid var(--ai-border);
+    border-radius: 1.2rem;
+    background:
+      radial-gradient(circle at 88% 10%, color-mix(in srgb, var(--ai-azure) 14%, transparent), transparent 11rem),
+      var(--ai-surface);
+  }
+
+  .calendar-empty__board span {
+    display: block;
+    padding: 1rem;
+    border: 1px solid var(--ai-border);
+    border-radius: 0.9rem;
+    background: color-mix(in srgb, var(--ai-bg) 74%, var(--ai-surface));
+    color: var(--ai-fg);
+    font-weight: 850;
+  }
+
+  .calendar-empty__board span:nth-child(2) {
+    transform: translateX(1rem);
+  }
+
+  .calendar-empty__board span:nth-child(3) {
+    transform: translateX(2rem);
+  }
+
+  .event-directory {
+    border-top: 1px solid var(--ai-border);
+  }
+
+  .event-entry {
+    display: grid;
+    grid-template-columns: 13rem 1fr minmax(9rem, 14rem);
+    gap: 2rem;
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+    border-bottom: 1px solid var(--ai-border);
+  }
+
+  .event-entry time {
+    color: var(--ai-azure);
+    font-weight: 850;
+  }
+
+  .event-entry__meta {
+    color: var(--ai-fg-muted);
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin: 0 0 0.55rem;
+  }
+
+  .event-entry h2 {
+    margin: 0 0 0.65rem;
+    color: var(--ai-fg);
+    font-size: clamp(1.45rem, 3vw, 2rem);
+    letter-spacing: 0;
+  }
+
+  .event-entry p {
+    color: var(--ai-fg-muted);
+    line-height: 1.65;
+  }
+
+  .event-entry img {
+    width: 100%;
+    min-height: 8rem;
+    border-radius: 1rem;
+    object-fit: cover;
+  }
+
+  @media (max-width: 900px) {
+    .events-hero,
+    .format-list,
+    .calendar-empty {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .event-entry {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+  }
+</style>

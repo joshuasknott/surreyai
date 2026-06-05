@@ -3,14 +3,14 @@ import type { Society } from './types.js';
 export const SOCIETIES: Record<string, Society> = {
   ai: {
     id: 'ai',
-    name: 'Surrey Artificial Intelligence Society',
-    shortName: 'AI Society',
+    name: 'Surrey Artificial Intelligence and Data Science Society',
+    shortName: 'Surrey AI and DS',
     slug: 'ai',
     adminBasePath: '/admin',
     publicBasePath: '/',
     domain: 'surreyaisociety.org',
     establishedYear: 2025,
-    logo: '/logos/optimized/ai-logo.optimized.png',
+    logo: '/logos/ai-logo.png',
     contactEmail: 'ussu.aianddatascience@surrey.ac.uk',
     socials: {
       instagram: 'https://www.instagram.com/surrey.ai.ds/',

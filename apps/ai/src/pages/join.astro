@@ -1,282 +1,345 @@
 ---
 export const prerender = true;
-import { getSocietyById } from '@surreysocieties/admin/config';
-import Layout from '../layouts/Layout.astro';
-import AnimatedHero from '../components/common/AnimatedHero.astro';
-import '../styles/global.css';
+import { getSocietyById } from "@surreysocieties/admin/config";
+import Layout from "../layouts/Layout.astro";
+import CutoutVisual from "../components/common/CutoutVisual.astro";
+import joinKitCutout from "../assets/generated/ai-join-kit-cutout.png";
+import "../styles/global.css";
 
-const society = getSocietyById('ai')!;
+const society = getSocietyById("ai")!;
+
+const faqs = [
+  {
+    question: "Do I need to know how to code?",
+    answer: "No. Some members will want technical projects, but the society also covers AI tools, data literacy, ethics, creative uses, and real-world impact.",
+  },
+  {
+    question: "Where is membership handled?",
+    answer: "Membership is handled through Surrey Students' Union. Use the official membership link on this page so your membership is recorded properly.",
+  },
+  {
+    question: "Can I join before events are listed?",
+    answer: "Yes. Events and committee records will appear when signatories add them, but the official membership and contact links are already available.",
+  },
+];
+
+const membershipSteps = [
+  {
+    title: "Join through the Students' Union",
+    text: "Use the official SU membership flow so your membership is recorded correctly.",
+  },
+  {
+    title: "Follow the society channels",
+    text: "Instagram and email are the confirmed routes for updates while the next programme is prepared.",
+  },
+  {
+    title: "Bring a question or project",
+    text: "You can arrive as a beginner, builder, researcher, designer, or impact thinker.",
+  },
+];
 ---
 
-<Layout title="Join" description="Join Surrey Artificial Intelligence Society — find out how to become a member, what you'll get, and how to stay connected." hideCTA={true}>
-
-  <AnimatedHero title="Become a part of the future." centered={false} minHeight="75vh">
-    <div class="grid lg:grid-cols-12 gap-12 items-center max-w-6xl mx-auto mt-6 text-left relative z-10 w-full">
-      
-      <!-- Left Column: Vision & Benefits text -->
-      <div class="lg:col-span-7 flex flex-col justify-center">
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight mb-6 leading-tight">
-          Join a community of <span class="text-transparent bg-clip-text bg-gradient-to-r from-ai-azure to-ai-coral">builders, researchers, and thinkers</span>.
-        </h2>
-        <p class="text-lg sm:text-xl text-ai-fg-muted leading-relaxed mb-8 max-w-2xl">
-          Whether you want to write your first neural network, debate the safety of large models, or design beautiful interfaces with generative tools — there is a place for you here. No prior technical background required.
-        </p>
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-6">
-          <a 
-            href={society.membershipUrl} 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            class="btn-primary text-center px-8 py-4 text-base font-bold shadow-lg hover:scale-105 transition-transform"
-          >
-            Join via Students' Union
-          </a>
-          <a 
-            href={society.studentsUnionUrl} 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            class="text-ai-fg-muted hover:text-ai-fg text-center text-sm font-semibold underline underline-offset-4 transition-colors py-2"
-          >
-            View society SU page
-          </a>
-        </div>
+<Layout
+  title="Join"
+  description="Join Surrey Artificial Intelligence and Data Science Society through Surrey Students' Union."
+  hideCTA={true}
+>
+  <section class="join-hero">
+    <div class="join-hero__copy">
+      <h1>Join a student community exploring AI and data science from the ground up.</h1>
+      <p>
+        Membership is managed by Surrey Students' Union. Join there, then follow the society channels for event and project updates as the next programme is confirmed.
+      </p>
+      <div class="join-hero__actions">
+        <a href={society.membershipUrl} target="_blank" rel="noopener noreferrer" class="btn-primary">Join via Students' Union</a>
+        <a href={society.socials.instagram} target="_blank" rel="noopener noreferrer" class="btn-secondary">Follow updates</a>
       </div>
-
-      <!-- Right Column: Membership Pass Card (Frosted Glass Digital Pass) -->
-      <div class="lg:col-span-5 w-full">
-        <div class="premium-card p-8 sm:p-10 relative overflow-hidden membership-tilt-card cursor-pointer" style="--card-brand-color: var(--ai-azure);">
-          <div class="premium-glow opacity-80"></div>
-
-          <div class="relative z-10 flex flex-col h-full justify-between pointer-events-none">
-            <!-- Card Header -->
-            <div class="flex items-center justify-between border-b border-ai-border/40 pb-6 mb-6">
-              <div class="flex items-center gap-3">
-                <img
-                  src="/logos/optimized/ai-logo.optimized.png"
-                  alt="Surrey AI Logo"
-                  width="36"
-                  height="36"
-                  class="h-9 w-9 rounded-full ring-2 ring-ai-azure/20"
-                />
-                <div>
-                  <h3 class="font-bold text-sm tracking-tight text-ai-fg">Surrey AI Society</h3>
-                  <p class="text-[9px] uppercase tracking-wider text-ai-azure font-bold font-sans">MEMBERSHIP CREDENTIAL</p>
-                </div>
-              </div>
-              <div class="px-3 py-1 bg-ai-azure/10 text-ai-azure border border-ai-azure/20 rounded-md text-[9px] font-bold uppercase tracking-wider font-sans">
-                ACTIVE
-              </div>
-            </div>
-
-            <!-- Card Body: Benefits -->
-            <div class="space-y-5 mb-6">
-              <div class="flex items-start gap-4">
-                <div class="w-6 h-6 rounded-full bg-ai-coral/10 border border-ai-coral/20 flex items-center justify-center shrink-0 mt-0.5">
-                  <svg class="w-3.5 h-3.5 text-ai-coral" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <div>
-                  <h4 class="font-bold text-sm sm:text-base text-ai-fg">Practical Workshops</h4>
-                  <p class="text-xs sm:text-sm text-ai-fg-muted mt-0.5">Build agents, fine-tune models, and design systems from scratch.</p>
-                </div>
-              </div>
-
-              <div class="flex items-start gap-4">
-                <div class="w-6 h-6 rounded-full bg-ai-azure/10 border border-ai-azure/20 flex items-center justify-center shrink-0 mt-0.5">
-                  <svg class="w-3.5 h-3.5 text-ai-azure" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <div>
-                  <h4 class="font-bold text-sm sm:text-base text-ai-fg">Society Hackathons</h4>
-                  <p class="text-xs sm:text-sm text-ai-fg-muted mt-0.5">Team up to build innovative systems in our semester build nights.</p>
-                </div>
-              </div>
-
-              <div class="flex items-start gap-4">
-                <div class="w-6 h-6 rounded-full bg-ai-sage/10 border border-ai-sage/20 flex items-center justify-center shrink-0 mt-0.5">
-                  <svg class="w-3.5 h-3.5 text-ai-sage" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <div>
-                  <h4 class="font-bold text-sm sm:text-base text-ai-fg">Industry Networking</h4>
-                  <p class="text-xs sm:text-sm text-ai-fg-muted mt-0.5">Access exclusive career talks and network with industry experts.</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Card Footer -->
-            <div class="flex items-center justify-between border-t border-ai-border/40 pt-5 mt-1 text-[9px] text-ai-fg-muted uppercase tracking-wider font-sans font-semibold">
-              <div>VAL: 2026 / 2027</div>
-              <div>NO. SU-AI-2026</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
     </div>
-  </AnimatedHero>
+    <CutoutVisual
+      image={joinKitCutout}
+      alt="Membership kit with tote bag, lanyard, blank badge, laptop, notebook, and abstract stickers"
+      title="Membership starts with curiosity, not prerequisites."
+      body="Join through the official route, then bring a question, idea, or project."
+      align="right"
+      compact
+      loading="eager"
+    />
+  </section>
 
-  <!-- FAQ & Contact -->
-  <section class="py-16 sm:py-24 px-6 bg-ai-bg text-ai-fg relative z-10">
-    <div class="mx-auto max-w-7xl">
-      <div class="grid md:grid-cols-2 gap-8 lg:gap-12">
-
-        <!-- FAQ Card -->
-        <div class="premium-card p-8 sm:p-12 relative overflow-hidden" style="--card-brand-color: var(--ai-coral);">
-          <div class="premium-glow"></div>
-
-          <div class="relative z-10 flex flex-col h-full justify-between">
-            <div>
-              <h2 class="text-3xl sm:text-4xl font-extrabold mb-8 text-ai-fg tracking-tight">FAQ</h2>
-              <div class="space-y-1">
-                
-                <!-- FAQ Item 1 -->
-                <div class="faq-item border-b border-ai-border/40 py-5 group/faq cursor-pointer">
-                  <button class="w-full flex items-center justify-between text-left focus:outline-none" aria-expanded="false">
-                    <span class="font-bold text-lg text-ai-fg group-hover/faq:text-ai-coral transition-colors duration-300">Do I need to know how to code?</span>
-                    <span class="faq-icon text-ai-coral shrink-0 ml-4 transition-transform duration-300 font-bold text-sm">+</span>
-                  </button>
-                  <div class="faq-content max-h-0 overflow-hidden transition-all duration-300 ease-in-out">
-                    <p class="text-ai-fg-muted text-base leading-relaxed mt-3">
-                      No. We run non-technical sessions covering AI ethics, implications, and tooling for students from any background.
-                    </p>
-                  </div>
-                </div>
-
-                <!-- FAQ Item 2 -->
-                <div class="faq-item border-b border-ai-border/40 py-5 group/faq cursor-pointer">
-                  <button class="w-full flex items-center justify-between text-left focus:outline-none" aria-expanded="false">
-                    <span class="font-bold text-lg text-ai-fg group-hover/faq:text-ai-coral transition-colors duration-300">Is there a membership fee?</span>
-                    <span class="faq-icon text-ai-coral shrink-0 ml-4 transition-transform duration-300 font-bold text-sm">+</span>
-                  </button>
-                  <div class="faq-content max-h-0 overflow-hidden transition-all duration-300 ease-in-out">
-                    <p class="text-ai-fg-muted text-base leading-relaxed mt-3">
-                      Fees are set by the Surrey Students&apos; Union and will be shown on the SU portal when membership opens.
-                    </p>
-                  </div>
-                </div>
-
-                <!-- FAQ Item 3 -->
-                <div class="faq-item border-b border-ai-border/40 py-5 group/faq cursor-pointer">
-                  <button class="w-full flex items-center justify-between text-left focus:outline-none" aria-expanded="false">
-                    <span class="font-bold text-lg text-ai-fg group-hover/faq:text-ai-coral transition-colors duration-300">I&apos;m a first-year — is this for me?</span>
-                    <span class="faq-icon text-ai-coral shrink-0 ml-4 transition-transform duration-300 font-bold text-sm">+</span>
-                  </button>
-                  <div class="faq-content max-h-0 overflow-hidden transition-all duration-300 ease-in-out">
-                    <p class="text-ai-fg-muted text-base leading-relaxed mt-3">
-                      Absolutely. We start from first principles. Many of our longest-serving members joined in their first term.
-                    </p>
-                  </div>
-                </div>
-
+  <section class="ai-section" aria-labelledby="join-title">
+    <div class="ai-section__inner join-layout">
+      <div class="join-main">
+        <h2 id="join-title">Use the official Students' Union flow.</h2>
+        <p>
+          The society is for students who want to understand AI and data science, build useful prototypes, discuss impact, and meet people thinking about similar questions.
+        </p>
+        <div class="join-path">
+          {membershipSteps.map((step, index) => (
+            <article>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <div>
+                <h3>{step.title}</h3>
+                <p>{step.text}</p>
               </div>
-            </div>
-          </div>
+            </article>
+          ))}
         </div>
+      </div>
 
-        <!-- Contact Card -->
-        <div class="premium-card p-8 sm:p-12 relative overflow-hidden" style="--card-brand-color: var(--ai-azure);">
-          <div class="premium-glow"></div>
+      <aside class="join-aside" aria-label="Society contact details">
+        <h2>Official contact routes.</h2>
+        <p>Use these routes when you need verified society details or membership support.</p>
+        <a href={`mailto:${society.contactEmail}`}>{society.contactEmail}</a>
+        <a href={society.socials.instagram} target="_blank" rel="noopener noreferrer">@surrey.ai.ds</a>
+        <a href={society.studentsUnionUrl} target="_blank" rel="noopener noreferrer">Students' Union listing</a>
+      </aside>
+    </div>
+  </section>
 
-          <div class="relative z-10 flex flex-col h-full justify-between">
-            <div>
-              <h2 class="text-3xl sm:text-4xl font-extrabold mb-8 text-ai-fg tracking-tight">Contact</h2>
-              <div class="space-y-6">
-
-                <!-- Email Link -->
-                <a href={`mailto:${society.contactEmail}`} class="block group/link focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-azure rounded-[2rem]">
-                  <div class="bg-ai-bg/60 border border-ai-border rounded-[2rem] p-6 flex items-center justify-between gap-4 group-hover/link:border-ai-azure group-hover/link:bg-ai-surface transition-all duration-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]">
-                    <div>
-                      <h3 class="font-bold text-base text-ai-fg">Email</h3>
-                      <p class="text-ai-fg-muted text-sm mt-1 font-sans">{society.contactEmail}</p>
-                    </div>
-                    <span class="shrink-0 text-sm font-bold text-ai-azure group-hover/link:translate-x-1.5 transition-transform duration-300">
-                      &rarr;
-                    </span>
-                  </div>
-                </a>
-
-                <!-- Instagram Link -->
-                <a href={society.socials.instagram} target="_blank" rel="noopener noreferrer" class="block group/link focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-coral rounded-[2rem]">
-                  <div class="bg-ai-bg/60 border border-ai-border rounded-[2rem] p-6 flex items-center justify-between gap-4 group-hover/link:border-ai-coral group-hover/link:bg-ai-surface transition-all duration-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]">
-                    <div>
-                      <h3 class="font-bold text-base text-ai-fg">Instagram</h3>
-                      <p class="text-ai-fg-muted text-sm mt-1 font-sans">@surrey.ai.ds</p>
-                    </div>
-                    <span class="shrink-0 text-sm font-bold text-ai-coral group-hover/link:translate-x-1.5 transition-transform duration-300">
-                      &rarr;
-                    </span>
-                  </div>
-                </a>
-
-              </div>
-            </div>
-          </div>
-        </div>
-
+  <section class="ai-section ai-section--tinted join-signal" aria-labelledby="join-signal-title">
+    <div class="ai-section__inner join-signal__inner">
+      <div>
+        <h2 id="join-signal-title" class="section-title">Come for the tools. Stay for the judgement.</h2>
+        <p class="section-intro">
+          The best members do not need to arrive expert. They arrive curious enough to ask how the data was made, how the model behaves, and what the output changes.
+        </p>
+      </div>
+      <div class="join-judgement" aria-label="Questions members learn to ask">
+        <span>Where did the data come from?</span>
+        <span>Who benefits from the output?</span>
+        <span>What should stay human?</span>
       </div>
     </div>
   </section>
 
+  <section class="ai-section ai-section--tinted" aria-labelledby="faq-title">
+    <div class="ai-section__inner">
+      <div class="ai-section__header">
+        <h2 id="faq-title" class="section-title">Before you join</h2>
+      </div>
+
+      <div class="faq-list">
+        {faqs.map((faq) => (
+          <details>
+            <summary>{faq.question}</summary>
+            <p>{faq.answer}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
 </Layout>
 
-<script>
-  // 3D Card Hover Tilt Effect for Membership Card
-  const memberCard = document.querySelector(".membership-tilt-card") as HTMLDivElement | null;
-  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  if (memberCard && !prefersReducedMotion) {
-    memberCard.addEventListener("mousemove", (e: MouseEvent) => {
-      const rect = memberCard.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const xc = rect.width / 2;
-      const yc = rect.height / 2;
-      const dx = x - xc;
-      const dy = y - yc;
-      
-      const tiltX = (dy / yc) * -10;
-      const tiltY = (dx / xc) * 10;
-      
-      memberCard.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale3d(1.02, 1.02, 1.02)`;
-    });
-    
-    memberCard.style.transition = "transform 0.15s ease-out, box-shadow 0.3s ease";
-    
-    memberCard.addEventListener("mouseleave", () => {
-      memberCard.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)";
-    });
+<style>
+  .join-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 0.86fr) minmax(22rem, 1fr);
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: center;
+    max-width: 82rem;
+    margin: 0 auto;
+    padding: clamp(5rem, 9vw, 8rem) 1.25rem clamp(3rem, 6vw, 5rem);
   }
 
-  // FAQ Accordions
-  const faqItems = document.querySelectorAll(".faq-item");
-  faqItems.forEach((item) => {
-    const button = item.querySelector("button");
-    const content = item.querySelector(".faq-content") as HTMLElement | null;
-    const icon = item.querySelector(".faq-icon");
+  .join-hero__copy h1 {
+    margin: 0;
+    color: var(--ai-fg);
+    font-size: clamp(2.55rem, 4.6vw, 4.65rem);
+    font-weight: 850;
+    letter-spacing: 0;
+    line-height: 1;
+  }
 
-    if (button && content) {
-      item.addEventListener("click", () => {
-        const isExpanded = button.getAttribute("aria-expanded") === "true";
-        button.setAttribute("aria-expanded", isExpanded ? "false" : "true");
-        
-        if (isExpanded) {
-          content.style.maxHeight = "0px";
-          if (icon) icon.textContent = "+";
-        } else {
-          content.style.maxHeight = content.scrollHeight + "px";
-          if (icon) icon.textContent = "−";
-        }
-      });
+  .join-hero__copy p {
+    max-width: 42rem;
+    margin: 1.3rem 0 0;
+    color: var(--ai-fg-muted);
+    font-size: 1.12rem;
+    line-height: 1.65;
+  }
+
+  .join-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .join-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 24rem);
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: stretch;
+  }
+
+  .join-main {
+    max-width: 54rem;
+  }
+
+  .join-main h2 {
+    margin: 0 0 1rem;
+    color: var(--ai-fg);
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    letter-spacing: 0;
+    line-height: 1.05;
+  }
+
+  .join-main > p {
+    max-width: 42rem;
+    margin: 0;
+  }
+
+  .join-main p,
+  .join-aside p {
+    color: var(--ai-fg-muted);
+    line-height: 1.65;
+  }
+
+  .join-path {
+    display: grid;
+    gap: 1.35rem;
+    margin-top: 2.2rem;
+    border-top: 1px solid var(--ai-border);
+  }
+
+  .join-path article {
+    display: grid;
+    grid-template-columns: 3rem 1fr;
+    gap: 1rem;
+    padding-top: 1.35rem;
+  }
+
+  .join-path span {
+    color: var(--ai-azure);
+    font-weight: 850;
+  }
+
+  .join-path h3 {
+    margin: 0 0 0.35rem;
+    color: var(--ai-fg);
+    font-size: 1.15rem;
+    letter-spacing: 0;
+  }
+
+  .join-path p {
+    margin: 0;
+  }
+
+  .join-aside {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    border-left: 1px solid var(--ai-border);
+    padding-left: clamp(1.5rem, 4vw, 2.2rem);
+  }
+
+  .join-aside h2 {
+    margin: 0;
+    color: var(--ai-fg);
+    font-size: 1.6rem;
+    letter-spacing: 0;
+  }
+
+  .join-aside a {
+    color: var(--ai-azure);
+    font-weight: 800;
+    text-decoration: none;
+    word-break: break-word;
+  }
+
+  .join-signal__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 0.78fr) minmax(22rem, 1fr);
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: center;
+  }
+
+  .join-judgement {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .join-judgement span {
+    display: block;
+    padding: clamp(1.1rem, 3vw, 1.45rem);
+    border: 1px solid var(--ai-border);
+    border-radius: 1rem;
+    background:
+      linear-gradient(90deg, color-mix(in srgb, var(--ai-azure) 8%, transparent), transparent 46%),
+      var(--ai-bg);
+    color: var(--ai-fg);
+    font-weight: 850;
+    line-height: 1.35;
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.22s ease;
+  }
+
+  .join-judgement span:nth-child(2) {
+    background:
+      linear-gradient(90deg, color-mix(in srgb, var(--ai-sage) 8%, transparent), transparent 46%),
+      var(--ai-bg);
+    transform: translateX(1.2rem);
+  }
+
+  .join-judgement span:nth-child(3) {
+    background:
+      linear-gradient(90deg, color-mix(in srgb, var(--ai-coral) 8%, transparent), transparent 46%),
+      var(--ai-bg);
+    transform: translateX(2.4rem);
+  }
+
+  .join-judgement:hover span {
+    border-color: var(--ai-border-strong);
+  }
+
+  .join-judgement:hover span:nth-child(2),
+  .join-judgement:hover span:nth-child(3) {
+    transform: translateX(0);
+  }
+
+  .faq-list {
+    border-top: 1px solid var(--ai-border);
+  }
+
+  .faq-list details + details {
+    border-top: 1px solid var(--ai-border);
+  }
+
+  .faq-list summary {
+    color: var(--ai-fg);
+    cursor: pointer;
+    font-weight: 850;
+    list-style: none;
+    padding: 1.35rem 0;
+  }
+
+  .faq-list summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq-list p {
+    margin: 0;
+    color: var(--ai-fg-muted);
+    line-height: 1.65;
+    padding: 0 0 1.35rem;
+  }
+
+  @media (max-width: 820px) {
+    .join-hero,
+    .join-layout,
+    .join-signal__inner {
+      grid-template-columns: 1fr;
     }
-  });
-</script>
 
-<style>
-  .membership-tilt-card {
-    transform-style: preserve-3d;
-    backface-visibility: hidden;
+    .join-aside {
+      border-left: 0;
+      border-top: 1px solid var(--ai-border);
+      padding-left: 0;
+      padding-top: 1.5rem;
+    }
+
+    .join-judgement span:nth-child(2),
+    .join-judgement span:nth-child(3) {
+      transform: none;
+    }
   }
 </style>

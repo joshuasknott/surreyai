@@ -15,6 +15,8 @@ interface Props {
 
 const { events } = Astro.props;
 
+const plannedFormats = ["Prompt labs", "Data clinics", "Responsible AI debates"];
+
 const formatEventDate = (date?: string) => {
   if (!date) return "Date TBC";
   const parsed = new Date(`${date}T00:00:00`);
@@ -26,110 +28,267 @@ const formatEventDate = (date?: string) => {
 };
 ---
 
-<section id="events" class="bg-ai-bg text-ai-fg py-16 sm:py-24 px-6 border-t border-ai-border relative z-10">
-  <div class="mx-auto max-w-7xl">
-    <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-16 gap-4">
+<section id="events" class="ai-section ai-section--tinted" aria-labelledby="events-preview-title">
+  <div class="ai-section__inner">
+    <div class="ai-section__header ai-section__header--split">
       <div>
-        <h2 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-2">
-          Recent & Upcoming Events
-        </h2>
+        <h2 id="events-preview-title" class="section-title">Join when the next session lands.</h2>
       </div>
-      <a href="/events" class="text-ai-azure hover:underline text-sm font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ai-azure rounded-sm">
-        View all events &rarr;
-      </a>
+      <a href="/events" class="text-link">View all events -></a>
     </div>
 
-    {events.length === 0 ? (
-      <div class="text-center py-16 bg-ai-surface border border-ai-border rounded-[1.5rem]">
-        <h3 class="font-bold text-2xl tracking-tight mb-3 text-ai-fg">Events being announced soon</h3>
-        <p class="text-ai-fg-muted text-base leading-relaxed max-w-xl mx-auto mb-8">
-          We're currently planning our next semester of events. Join our community to get notified.
-        </p>
-        <a href="/join" class="btn-primary">
-          Become a member
-        </a>
-      </div>
-    ) : (
-      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {events.slice(0, 3).map((event, i) => {
-          // Assign alternating colors for the glow
-          const colors = ['var(--ai-coral)', 'var(--ai-azure)', 'var(--ai-sage)'];
-          const glowColor = colors[i % colors.length];
-          return (
-            <article class="event-card group">
-              <div class="card-glow" style={`background-color: ${glowColor};`}></div>
-              <div class="event-content">
-                <time class="text-3xl font-extrabold text-ai-fg mb-4 uppercase tracking-tighter">
-                  {formatEventDate(event.date)}
-                </time>
-                
-                <h3 class="font-bold text-xl text-ai-fg mb-2">
-                  {event.title}
-                </h3>
-                
-                {(event.location || event.startTime) && (
-                  <p class="text-sm font-medium text-ai-azure mb-4 uppercase tracking-wide">
-                    {[event.location, event.startTime].filter(Boolean).join(" • ")}
-                  </p>
-                )}
-
-                {event.description && (
-                  <p class="text-ai-fg-muted text-sm leading-relaxed mb-6 flex-grow">{event.description}</p>
-                )}
-
-                <a href="/events" class="text-ai-fg font-semibold text-sm hover:text-ai-azure transition-colors mt-auto inline-flex items-center gap-1 group/link">
-                  View details <span class="group-hover/link:translate-x-1 transition-transform">&rarr;</span>
-                </a>
+    <div class="events-preview-grid">
+      {events.length === 0 ? (
+        <div class="event-empty">
+          <h3>Next events will appear here once confirmed.</h3>
+          <p>
+            The calendar is managed by society signatories. While the live list is pending, the programme direction is already clear: practical workshops, project sessions, and careful discussions about AI in use.
+          </p>
+          <div class="event-formats" aria-label="Likely event formats">
+            {plannedFormats.map((format) => <span>{format}</span>)}
+          </div>
+          <div class="event-empty__actions">
+            <a href="/join" class="btn-primary">Become a member</a>
+            <a href="/events" class="btn-secondary">Events page</a>
+          </div>
+        </div>
+      ) : (
+        <div class="event-list">
+          {events.slice(0, 3).map((event) => (
+            <article class="event-row">
+              <time>{formatEventDate(event.date)}</time>
+              <div>
+                <h3>{event.title}</h3>
+                <p>
+                  {[event.startTime, event.location, event.category].filter(Boolean).join(" / ") || "Details to be announced"}
+                </p>
               </div>
+              <a href="/events">Details -></a>
             </article>
-          );
-        })}
-      </div>
-    )}
+          ))}
+        </div>
+      )}
+      <aside class="event-visual" aria-label="AI event planning visual">
+        <div class="event-visual__board">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <svg viewBox="0 0 600 420" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M0 310 C92 242 168 336 254 268 S416 182 600 248" />
+          <path d="M72 372 C156 292 236 350 310 288 S460 206 572 272" />
+        </svg>
+      </aside>
+    </div>
   </div>
 </section>
 
 <style>
-  .event-card {
-    position: relative;
-    background: var(--ai-surface);
-    border: 1px solid var(--ai-border);
-    border-radius: 1.5rem;
-    padding: 2rem;
+  .events-preview-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(20rem, 0.72fr);
+    gap: clamp(1.4rem, 4vw, 2.5rem);
+    align-items: stretch;
+  }
+
+  .event-empty {
+    align-self: center;
+    max-width: 44rem;
+  }
+
+  .event-empty h3 {
+    margin: 0 0 0.85rem;
+    color: var(--ai-fg);
+    font-size: clamp(1.9rem, 3.6vw, 3rem);
+    letter-spacing: 0;
+    line-height: 1.08;
+  }
+
+  .event-empty p {
+    color: var(--ai-fg-muted);
+    line-height: 1.65;
+  }
+
+  .event-formats {
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
+    gap: 0.85rem 1rem;
+    margin-top: 1.35rem;
+    color: var(--ai-fg);
+    font-weight: 800;
+  }
+
+  .event-formats span + span::before {
+    color: var(--ai-azure);
+    content: "/";
+    margin-right: 1rem;
+  }
+
+  .event-empty__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1.8rem;
+  }
+
+  .event-list {
+    border: 1px solid var(--ai-border);
+    border-radius: 1.35rem;
+    background: var(--ai-surface);
     overflow: hidden;
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s;
-    backdrop-filter: blur(12px);
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 4px 20px rgba(0, 0, 0, 0.02);
+  }
+
+  .event-row {
+    display: grid;
+    grid-template-columns: 11rem 1fr auto;
+    gap: 1.5rem;
+    align-items: center;
+    padding: 1.35rem 1.5rem;
+  }
+
+  .event-row + .event-row {
+    border-top: 1px solid var(--ai-border);
+  }
+
+  .event-row time {
+    color: var(--ai-azure);
+    font-weight: 850;
+  }
+
+  .event-row h3 {
+    margin: 0 0 0.35rem;
+    color: var(--ai-fg);
+    font-size: 1.15rem;
+  }
+
+  .event-row p {
+    margin: 0;
+    color: var(--ai-fg-muted);
+  }
+
+  .event-row a {
+    color: var(--ai-azure);
+    font-weight: 800;
     text-decoration: none;
   }
 
-  .event-card:hover {
-    transform: translateY(-4px);
-    border-color: var(--ai-border-strong);
+  .event-visual {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 24rem;
+    margin: 0;
+    overflow: clip;
+    border-radius: 1.35rem;
+    border: 1px solid var(--ai-border);
+    background:
+      radial-gradient(circle at 70% 18%, color-mix(in srgb, var(--ai-azure) 16%, transparent), transparent 14rem),
+      radial-gradient(circle at 28% 82%, color-mix(in srgb, var(--ai-coral) 14%, transparent), transparent 14rem),
+      var(--ai-surface);
   }
 
-  .card-glow {
+  .event-visual::after {
+    content: "";
     position: absolute;
     inset: 0;
-    opacity: 0;
-    filter: blur(60px);
-    transform: scale(1.5);
-    transition: opacity 0.5s ease;
-    z-index: 0;
+    background:
+      linear-gradient(0deg, color-mix(in srgb, var(--ai-bg) 24%, transparent), transparent 56%),
+      linear-gradient(90deg, transparent, color-mix(in srgb, var(--ai-azure) 8%, transparent));
     pointer-events: none;
   }
 
-  .event-card:hover .card-glow {
-    opacity: 0.15;
-  }
-
-  .event-content {
+  .event-visual__board {
     position: relative;
     z-index: 1;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
+    display: grid;
+    width: min(78%, 24rem);
+    gap: 0.9rem;
+    padding: clamp(1.2rem, 3vw, 1.8rem);
+    border: 1px solid var(--ai-border-strong);
+    border-radius: 1.1rem;
+    background: color-mix(in srgb, var(--ai-bg) 78%, transparent);
+    box-shadow: 0 28px 58px rgba(17, 24, 39, 0.14);
+    transform: rotate(-2deg);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .event-visual:hover .event-visual__board {
+    transform: rotate(0deg) translateY(-0.35rem);
+  }
+
+  .event-visual__board span {
+    display: block;
+    height: 2.8rem;
+    border-radius: 0.85rem;
+    background:
+      linear-gradient(90deg, color-mix(in srgb, var(--ai-azure) 22%, transparent), transparent 46%),
+      color-mix(in srgb, var(--ai-bg) 72%, var(--ai-surface));
+    border: 1px solid var(--ai-border);
+  }
+
+  .event-visual__board span:nth-child(2) {
+    width: 82%;
+    background:
+      linear-gradient(90deg, color-mix(in srgb, var(--ai-coral) 22%, transparent), transparent 52%),
+      color-mix(in srgb, var(--ai-bg) 72%, var(--ai-surface));
+  }
+
+  .event-visual__board span:nth-child(3) {
+    width: 70%;
+    background:
+      linear-gradient(90deg, color-mix(in srgb, var(--ai-sage) 18%, transparent), transparent 52%),
+      color-mix(in srgb, var(--ai-bg) 72%, var(--ai-surface));
+  }
+
+  .event-visual__board span:nth-child(4) {
+    width: 90%;
+  }
+
+  .event-visual__board span:nth-child(5) {
+    width: 64%;
+  }
+
+  .event-visual svg {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    mix-blend-mode: screen;
+  }
+
+  .event-visual path {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.68);
+    stroke-width: 2;
+    stroke-dasharray: 16 18;
+    animation: event-signal 7s linear infinite;
+  }
+
+  .event-visual path + path {
+    stroke: color-mix(in srgb, var(--ai-coral) 74%, #ffffff);
+    animation-direction: reverse;
+  }
+
+  @keyframes event-signal {
+    to {
+      stroke-dashoffset: -136;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .events-preview-grid,
+    .event-row {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .event-visual path {
+      animation: none;
+    }
   }
 </style>

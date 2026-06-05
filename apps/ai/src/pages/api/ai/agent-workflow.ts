@@ -105,7 +105,7 @@ export const POST: APIRoute = async ({ request }) => {
 };
 
 function buildPrompt(input: { task: string }): string {
-  return `You are an Autonomous Agentic Orchestrator for Surrey AI Society. Decompose and execute the following task through a sequential multi-agent hierarchy.
+  return `You are an Autonomous Agentic Orchestrator for Surrey AI and Data Science Society. Decompose and execute the following task through a sequential multi-agent hierarchy.
 
 Task to execute: ${promptString(input.task, MAX_TASK_LENGTH)}
 

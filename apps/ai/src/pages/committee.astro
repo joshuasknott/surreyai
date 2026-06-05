@@ -1,164 +1,333 @@
 ---
 export const prerender = false;
-import Layout from '../layouts/Layout.astro';
-import AnimatedHero from '../components/common/AnimatedHero.astro';
-import { queryPublicConvex } from '@surreysocieties/admin';
-import { getSocietyById } from '@surreysocieties/admin/config';
-import '../styles/global.css';
+import Layout from "../layouts/Layout.astro";
+import { queryPublicConvex } from "@surreysocieties/admin";
+import { getSocietyById } from "@surreysocieties/admin/config";
+import CutoutVisual from "../components/common/CutoutVisual.astro";
+import committeePlanningCutout from "../assets/generated/ai-committee-planning-cutout.png";
+import "../styles/global.css";
 
-const SOCIETY_ID = 'ai';
+const SOCIETY_ID = "ai";
 const society = getSocietyById(SOCIETY_ID)!;
 const committee: any[] = (await queryPublicConvex<any[]>("committee:listActive", { societySlug: SOCIETY_ID }, []))
   .sort((a: any, b: any) =>
     (a.displayOrder ?? Number.MAX_SAFE_INTEGER) - (b.displayOrder ?? Number.MAX_SAFE_INTEGER)
-    || (a.name || '').localeCompare(b.name || '')
+    || (a.name || "").localeCompare(b.name || "")
   );
 const pastCommittee: any[] = (await queryPublicConvex<any[]>("committee:listPast", { societySlug: SOCIETY_ID }, []))
   .sort((a: any, b: any) =>
-    (b.yearLabel || '').localeCompare(a.yearLabel || '') ||
-    (a.displayOrder ?? Number.MAX_SAFE_INTEGER) - (b.displayOrder ?? Number.MAX_SAFE_INTEGER) ||
-    (a.name || '').localeCompare(b.name || '')
+    (b.yearLabel || "").localeCompare(a.yearLabel || "")
+    || (a.displayOrder ?? Number.MAX_SAFE_INTEGER) - (b.displayOrder ?? Number.MAX_SAFE_INTEGER)
+    || (a.name || "").localeCompare(b.name || "")
   );
-const pastCommitteeYears = [...new Set(pastCommittee.map(member => member.yearLabel))];
+const pastCommitteeYears = [...new Set(pastCommittee.map((member) => member.yearLabel))];
 
 const getInitials = (name?: string, role?: string) => {
-  const source = (name || role || '?').trim();
+  const source = (name || role || "?").trim();
   const words = source.split(/\s+/).filter(Boolean);
-  if (words.length === 0) return '?';
+  if (words.length === 0) return "?";
   if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
-  return words.slice(0, 2).map((word) => word[0]).join('').toUpperCase();
+  return words.slice(0, 2).map((word) => word[0]).join("").toUpperCase();
 };
+
+const operatingModel = [
+  {
+    title: "Programme planning",
+    text: "Choose workshops, project sessions, discussion topics, and practical formats that are useful for different levels of experience.",
+  },
+  {
+    title: "Member support",
+    text: "Make routes into AI and data science visible for beginners, builders, researchers, and students from non-computing disciplines.",
+  },
+  {
+    title: "Responsible delivery",
+    text: "Keep accessibility, data quality, safeguarding, and social impact in view when activities are planned and promoted.",
+  },
+];
 ---
 
-<Layout title="Committee" description="Meet the student committee running Surrey Artificial Intelligence Society — the team behind our workshops, events, and community.">
+<Layout
+  title="Committee"
+  description="Meet the student committee running Surrey Artificial Intelligence and Data Science Society."
+>
+  <section class="committee-hero">
+    <div class="committee-hero__copy">
+      <h1>Student leadership for a practical AI and data society.</h1>
+      <p>
+        The committee turns student interest into workshops, projects, discussions, and clear routes into the society. Named records appear here once they are confirmed in the admin system.
+      </p>
+    </div>
+    <CutoutVisual
+      image={committeePlanningCutout}
+      alt="Committee planning table with laptops, tablet, notebook, cards, pens, and connected workflow ribbon"
+      title="Planning works best when decisions stay visible."
+      body="The committee keeps programme, inclusion, and project momentum in the same conversation."
+      align="right"
+      compact
+      loading="eager"
+    />
+  </section>
 
-  <AnimatedHero 
-    title="Meet the people running the society."
-    description="Student volunteers who plan and run the society — organising workshops, events, and everything in between."
-    centered={true}
-  />
+  <section class="ai-section ai-section--tinted" aria-labelledby="leadership-title">
+    <div class="ai-section__inner">
+      <div class="ai-section__header ai-section__header--split">
+        <h2 id="leadership-title" class="section-title">What the committee stewards.</h2>
+        <p class="section-intro">
+          The page is less about headshots and more about the system of work: programming, inclusion, project momentum, and responsible delivery.
+        </p>
+      </div>
 
-  <!-- Committee Grid -->
-  <section class="py-16 sm:py-24 px-6 bg-ai-bg text-ai-fg relative z-10">
-    <div class="mx-auto max-w-7xl">
+      <div class="leadership-list">
+        {operatingModel.map((item, index) => (
+          <article>
+            <span>{String(index + 1).padStart(2, "0")}</span>
+            <div>
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="ai-section" aria-labelledby="committee-title">
+    <div class="ai-section__inner">
+      <div class="ai-section__header ai-section__header--split">
+        <div>
+          <h2 id="committee-title" class="section-title">Current committee</h2>
+        </div>
+        <a href={`mailto:${society.contactEmail}`} class="text-link">Contact the society -></a>
+      </div>
+
       {committee.length === 0 ? (
-        <div class="premium-card p-12 text-center" style="--card-brand-color: var(--ai-azure);">
-          <div class="premium-glow"></div>
-
-          <div class="relative z-10">
-            <h2 class="text-2xl sm:text-3xl font-extrabold mb-4 text-ai-fg tracking-tight">Committee details will appear here once confirmed</h2>
-            <p class="text-ai-fg-muted leading-relaxed mb-8 max-w-2xl mx-auto text-lg">
-              Our current committee roster will be published once confirmed through the Surrey Students&apos; Union. In the meantime, get in touch via our socials.
-            </p>
-            <a href="/join" class="btn-primary">
-              Learn about joining the society
-            </a>
-            <p class="text-ai-fg-muted text-sm mt-6">
-              Follow us on <a href={society.socials.instagram} target="_blank" rel="noopener noreferrer" class="text-ai-azure hover:underline font-semibold">Instagram</a> · <a href={society.studentsUnionUrl} target="_blank" rel="noopener noreferrer" class="text-ai-azure hover:underline font-semibold">Students&apos; Union</a>
-            </p>
+        <div class="committee-empty">
+          <h3>Committee details will appear here once confirmed.</h3>
+          <p>
+            The current roster will be published when it has been added by the next signatories. Until then, use the Students' Union page or email for verified contact routes.
+          </p>
+          <div class="committee-empty__actions">
+            <a href={society.studentsUnionUrl} target="_blank" rel="noopener noreferrer" class="btn-primary">Students' Union page</a>
+            <a href={`mailto:${society.contactEmail}`} class="btn-secondary">Email the society</a>
           </div>
         </div>
       ) : (
-        <div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {committee.map((member, i) => {
-              const colors = ['var(--ai-coral)', 'var(--ai-azure)', 'var(--ai-sage)'];
-              const glowColor = colors[i % colors.length];
-              return (
-                <article class="premium-card items-center text-center p-7 group" style={`--card-brand-color: ${glowColor};`}>
-                  <div class="premium-glow"></div>
-
-                  <div class="relative z-10 w-full flex flex-col items-center h-full justify-between">
-                    
-                    <div class="flex flex-col items-center w-full">
-                      <!-- Sleek Profile Photo Frame -->
-                      <div class="relative w-28 h-28 mb-6 group/photo">
-                        <!-- Premium gradient ring -->
-                        <div class="absolute -inset-1.5 rounded-full bg-gradient-to-tr from-[var(--card-brand-color)]/25 to-transparent p-0.5 opacity-60 group-hover:opacity-100 transition-opacity duration-300"></div>
-                        <div class="absolute inset-0 rounded-full border border-ai-border/40 bg-ai-bg"></div>
-
-                        <!-- Main profile image mask -->
-                        <div class="absolute inset-1.5 rounded-full overflow-hidden border border-ai-border/70 bg-ai-surface relative z-10 group-hover/photo:scale-[1.03] transition-transform duration-300">
-                          {member.imageUrl ? (
-                            <img src={member.imageUrl} alt={member.name || member.role} class="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500" />
-                          ) : (
-                            <div class="w-full h-full flex items-center justify-center text-[var(--card-brand-color)] font-bold text-2xl">
-                              {getInitials(member.name, member.role)}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      <h2 class="font-bold text-xl text-ai-fg mb-1 group-hover:text-[var(--card-brand-color)] transition-colors duration-300 line-clamp-1 tracking-tight">{member.name || 'Pending Confirmation'}</h2>
-                      <p class="text-ai-fg-muted text-[11px] font-bold uppercase tracking-wider">{member.role}</p>
-                    </div>
-
-                    <!-- Committee year metadata -->
-                    <div class="mt-6 pt-4 border-t border-ai-border/30 w-full flex items-center justify-between text-[11px] font-medium text-ai-fg-muted tracking-wide">
-                      <span class="flex items-center gap-1.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-[var(--card-brand-color)] opacity-60"></span>
-                        Current Committee
-                      </span>
-                      <span class="text-[var(--card-brand-color)] font-semibold">2025–26</span>
-                    </div>
-
-                  </div>
-                </article>
-              );
-            })}
-          </div>
+        <div class="committee-grid">
+          {committee.map((member) => (
+            <article class="person-card">
+              <div class="person-card__avatar">
+                {member.imageUrl ? (
+                  <img src={member.imageUrl} alt={member.name || member.role} />
+                ) : (
+                  <span>{getInitials(member.name, member.role)}</span>
+                )}
+              </div>
+              <div>
+                <h2>{member.name || "Pending confirmation"}</h2>
+                <p>{member.role}</p>
+              </div>
+            </article>
+          ))}
         </div>
       )}
 
       {pastCommittee.length > 0 && (
-        <div class="mt-24 pt-16 border-t border-ai-border/40">
-          <div class="mb-12">
-            <h2 class="text-3xl sm:text-4xl font-extrabold text-ai-fg tracking-tight">Past Committee</h2>
+        <div class="past-committee">
+          <div class="ai-section__header">
+            <h2 class="section-title">Past committee</h2>
           </div>
-          <div class="space-y-16">
-            {pastCommitteeYears.map(yearLabel => (
-              <section>
-                <h3 class="font-bold text-2xl text-ai-fg mb-6 tracking-tight">{yearLabel}</h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                  {pastCommittee.filter(member => member.yearLabel === yearLabel).map((member, i) => {
-                    const colors = ['var(--ai-sage)', 'var(--ai-coral)', 'var(--ai-azure)'];
-                    const glowColor = colors[i % colors.length];
-                    return (
-                      <article class="premium-card p-4 flex flex-row items-center gap-4 group" style={`--card-brand-color: ${glowColor};`}>
-                        <div class="premium-glow"></div>
-
-                        <div class="relative z-10 flex flex-row items-center gap-4 w-full">
-                          
-                          <!-- Clean mini photo frame -->
-                          <div class="relative w-12 h-12 shrink-0">
-                            <div class="absolute -inset-1 rounded-full bg-gradient-to-tr from-[var(--card-brand-color)]/20 to-transparent opacity-60"></div>
-                            <div class="absolute inset-0.5 rounded-full overflow-hidden border border-ai-border/80 bg-ai-surface z-10">
-                              {member.imageUrl ? (
-                                <img src={member.imageUrl} alt={member.name || member.role} class="w-full h-full object-cover" />
-                              ) : (
-                                <div class="w-full h-full flex items-center justify-center text-[var(--card-brand-color)] font-bold text-[10px]">
-                                  {getInitials(member.name, member.role)}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-
-                          <div class="overflow-hidden">
-                            <h4 class="font-semibold text-base text-ai-fg truncate group-hover:text-[var(--card-brand-color)] transition-colors duration-300 tracking-tight">{member.name || 'Pending Confirmation'}</h4>
-                            <p class="text-ai-fg-muted text-[10px] uppercase tracking-wider font-bold mt-0.5 truncate">{member.role}</p>
-                          </div>
-                        </div>
-                      </article>
-                    );
-                  })}
-                </div>
-              </section>
-            ))}
-          </div>
+          {pastCommitteeYears.map((yearLabel) => (
+            <section class="past-year">
+              <h3>{yearLabel}</h3>
+              <div class="committee-grid committee-grid--compact">
+                {pastCommittee.filter((member) => member.yearLabel === yearLabel).map((member) => (
+                  <article class="person-card person-card--compact">
+                    <div class="person-card__avatar">
+                      {member.imageUrl ? (
+                        <img src={member.imageUrl} alt={member.name || member.role} />
+                      ) : (
+                        <span>{getInitials(member.name, member.role)}</span>
+                      )}
+                    </div>
+                    <div>
+                      <h2>{member.name || "Pending confirmation"}</h2>
+                      <p>{member.role}</p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+          ))}
         </div>
       )}
-
     </div>
   </section>
-
 </Layout>
+
+<style>
+  .committee-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(20rem, 0.95fr);
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: center;
+    max-width: 82rem;
+    margin: 0 auto;
+    padding: clamp(5rem, 9vw, 8rem) 1.25rem clamp(3rem, 6vw, 5rem);
+  }
+
+  .committee-hero__copy h1 {
+    margin: 0;
+    color: var(--ai-fg);
+    font-size: clamp(2.55rem, 4.6vw, 4.65rem);
+    font-weight: 850;
+    letter-spacing: 0;
+    line-height: 1;
+  }
+
+  .committee-hero__copy p {
+    max-width: 42rem;
+    margin: 1.3rem 0 0;
+    color: var(--ai-fg-muted);
+    font-size: 1.12rem;
+    line-height: 1.65;
+  }
+
+  .leadership-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(1.25rem, 3vw, 2rem);
+  }
+
+  .leadership-list article {
+    border-top: 3px solid var(--ai-azure);
+    padding-top: 1.25rem;
+  }
+
+  .leadership-list article:nth-child(2) {
+    border-top-color: var(--ai-sage);
+  }
+
+  .leadership-list article:nth-child(3) {
+    border-top-color: var(--ai-coral);
+  }
+
+  .leadership-list span {
+    color: var(--ai-azure);
+    font-weight: 850;
+  }
+
+  .leadership-list h3 {
+    margin: 0.75rem 0 0.45rem;
+    color: var(--ai-fg);
+    font-size: 1.2rem;
+    letter-spacing: 0;
+  }
+
+  .leadership-list p {
+    margin: 0;
+    color: var(--ai-fg-muted);
+    line-height: 1.6;
+  }
+
+  .committee-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    border-top: 1px solid var(--ai-border);
+  }
+
+  .person-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border-bottom: 1px solid var(--ai-border);
+    padding: 1rem 0;
+  }
+
+  .person-card__avatar {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    overflow: hidden;
+    border-radius: 0.85rem;
+    background: color-mix(in srgb, var(--ai-azure) 10%, var(--ai-surface));
+    color: var(--ai-azure);
+    flex: 0 0 auto;
+    font-weight: 850;
+  }
+
+  .person-card__avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .person-card h2 {
+    margin: 0 0 0.25rem;
+    color: var(--ai-fg);
+    font-size: 1.1rem;
+    letter-spacing: 0;
+  }
+
+  .person-card p {
+    margin: 0;
+    color: var(--ai-fg-muted);
+    font-weight: 700;
+  }
+
+  .past-committee {
+    margin-top: 5rem;
+    padding-top: 4rem;
+    border-top: 1px solid var(--ai-border);
+  }
+
+  .past-year + .past-year {
+    margin-top: 2.5rem;
+  }
+
+  .past-year h3 {
+    color: var(--ai-fg);
+    font-size: 1.4rem;
+    letter-spacing: 0;
+  }
+
+  .person-card--compact .person-card__avatar {
+    width: 2.6rem;
+    height: 2.6rem;
+    font-size: 0.85rem;
+  }
+
+  .committee-empty {
+    max-width: 58rem;
+    border-top: 1px solid var(--ai-border);
+    padding-top: clamp(1.6rem, 4vw, 2.4rem);
+  }
+
+  .committee-empty h3 {
+    margin: 0 0 0.85rem;
+    color: var(--ai-fg);
+    font-size: clamp(1.8rem, 3.6vw, 2.8rem);
+    letter-spacing: 0;
+    line-height: 1.08;
+  }
+
+  .committee-empty p {
+    color: var(--ai-fg-muted);
+    line-height: 1.65;
+  }
+
+  .committee-empty__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1.6rem;
+  }
+
+  @media (max-width: 840px) {
+    .committee-hero,
+    .leadership-list {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

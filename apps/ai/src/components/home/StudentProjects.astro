@@ -1,100 +1,81 @@
 ---
+import { Image } from "astro:assets";
 import StudentProjectSlot from "./StudentProjectSlot.astro";
-import IdeaAnalyser from "./student-projects/IdeaAnalyser.astro";
 import AgenticWorkspace from "./student-projects/AgenticWorkspace.astro";
+import racingPreview from "../../assets/generated/ai-racing-simulator.png";
+import agenticPreview from "../../assets/generated/ai-agentic-builder.png";
 
 const projects = [
   {
     id: "drift-lab",
     title: "Racing Simulator",
-    type: "Playable game",
-    description: "A third-person browser racing simulator with AI drivers, tire grip, and automatic drift handling.",
-    action: "Play",
-    color: "var(--ai-azure)"
-  },
-  {
-    id: "idea-analyser",
-    title: "Idea Analyser",
-    type: "Live AI feedback",
-    description: "Instant AI feedback on business, startup, product, and project ideas.",
-    action: "Analyse",
-    color: "var(--ai-coral)"
+    type: "Playable project",
+    description: "An autonomous racing environment for experimenting with perception, planning, and control.",
+    action: "Open project",
+    image: racingPreview,
+    alt: "Racing simulator track preview with AI trajectory overlay",
   },
   {
     id: "agentic-workspace",
     title: "Agentic Builder",
-    type: "Live AI generation",
-    description: "Watch Planner, Researcher, Builder, and Reviewer agents sequentially design, code, and live-render applications in real-time.",
-    action: "Launch",
-    color: "var(--ai-sage)"
-  }
+    type: "Interactive tool",
+    description: "A live workspace showing how agent steps can plan, generate, review, and refine an app idea.",
+    action: "Launch demo",
+    image: agenticPreview,
+    alt: "Laptop showing an abstract AI agent workflow interface",
+  },
 ];
 ---
 
-<section class="student-projects-section" aria-labelledby="student-projects-title">
-  <div class="projects-container">
-    <div class="projects-header">
-      <h2 id="student-projects-title" class="projects-title">Student Projects</h2>
-      <p class="projects-subtitle">An interactive gallery of prototypes, games, and tools built by our members.</p>
-    </div>
-
-    <div class="projects-layout">
-      <div class="projects-scroll-container">
-        <div class="projects-scroll-row" aria-label="Student projects list">
-          {projects.map((p) => (
-            <button 
-              class="premium-card project-card scrollable-card text-left group" 
-              data-project-id={p.id}
-              aria-label={`View ${p.title}`}
-              aria-haspopup="dialog"
-              style={`--card-brand-color: ${p.color}; --brand-color: ${p.color};`}
-            >
-              <!-- Cybernetic Corner Brackets -->
-              <div class="corner-tick top-left"></div>
-              <div class="corner-tick top-right"></div>
-              <div class="corner-tick bottom-left"></div>
-              <div class="corner-tick bottom-right"></div>
-
-              <!-- Luminescent Glow, Grid, and Sweep Scan -->
-              <div class="premium-glow"></div>
-              <div class="premium-grid opacity-25"></div>
-              <div class="premium-scan"></div>
-
-              <div class="card-content relative z-10 flex-grow flex flex-col justify-between h-full w-full">
-                <div>
-                  <div class="card-meta flex justify-between items-center mb-6">
-                    <span class="card-type text-[10px] font-semibold uppercase tracking-wider text-ai-azure">{p.type}</span>
-                  </div>
-                  <h3 class="card-title font-extrabold text-2xl text-ai-fg mb-3 tracking-tight group-hover:text-[var(--card-brand-color)] transition-colors duration-300">{p.title}</h3>
-                  <p class="card-description text-ai-fg-muted leading-relaxed text-sm mb-6 flex-grow">{p.description}</p>
-                </div>
-                <div class="card-action flex items-center gap-2 text-sm font-bold text-[var(--card-brand-color)] mt-auto transition-all duration-300 group-hover:translate-x-1">
-                  <span class="action-text">{p.action}</span>
-                  <svg class="action-icon w-4 h-4" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
-                </div>
-              </div>
-            </button>
-          ))}
-        </div>
+<section id="projects" class="ai-section" aria-labelledby="student-projects-title">
+  <div class="ai-section__inner">
+    <div class="ai-section__header ai-section__header--split">
+      <div>
+        <h2 id="student-projects-title" class="section-title">Projects should feel real before you open them.</h2>
       </div>
+      <p class="section-intro">
+        The homepage gives existing member work room to breathe, with rich previews and clear actions instead of a generic gallery.
+      </p>
     </div>
 
-    <dialog id="project-modal" class="project-modal" aria-label="Project Interactive View">
+    <div class="project-showcase" aria-label="Student projects list">
+      {projects.map((project) => (
+        <button
+          class="project-preview"
+          type="button"
+          data-project-id={project.id}
+          aria-label={`Open ${project.title}`}
+          aria-haspopup="dialog"
+        >
+          <Image
+            src={project.image}
+            alt={project.alt}
+            widths={[640, 960, 1280]}
+            sizes="(min-width: 900px) 50vw, 100vw"
+            class="project-preview__image"
+            loading="lazy"
+            format="webp"
+          />
+          <span class="project-preview__scrim" aria-hidden="true"></span>
+          <span class="project-preview__content">
+            <span class="project-preview__type">{project.type}</span>
+            <strong>{project.title}</strong>
+            <span>{project.description}</span>
+            <span class="project-preview__action">{project.action} -></span>
+          </span>
+        </button>
+      ))}
+    </div>
+
+    <dialog id="project-modal" class="project-modal" aria-label="Project interactive view">
       <div class="modal-wrapper">
-        <button id="close-modal" class="close-modal-btn" aria-label="Close Project">
-          <span class="close-text">Close</span>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        <button id="close-modal" class="close-modal-btn" aria-label="Close project">
+          Close
         </button>
         <div class="modal-content" aria-live="polite">
           <div id="panel-drift-lab" class="project-panel" hidden>
             <div class="panel-inner">
               <StudentProjectSlot />
-            </div>
-          </div>
-
-          <div id="panel-idea-analyser" class="project-panel" hidden>
-            <div class="panel-inner">
-              <IdeaAnalyser />
             </div>
           </div>
 
@@ -109,241 +90,177 @@ const projects = [
   </div>
 </section>
 
+<script>
+  const modal = document.getElementById("project-modal") as HTMLDialogElement | null;
+  const closeBtn = document.getElementById("close-modal");
+  const projectButtons = document.querySelectorAll<HTMLButtonElement>("[data-project-id]");
+  const panels = document.querySelectorAll<HTMLElement>(".project-panel");
+
+  const showProject = (id: string) => {
+    panels.forEach((panel) => {
+      panel.hidden = panel.id !== `panel-${id}`;
+    });
+    if (modal && !modal.open) modal.showModal();
+  };
+
+  projectButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const id = button.dataset.projectId;
+      if (id) showProject(id);
+    });
+  });
+
+  closeBtn?.addEventListener("click", () => {
+    modal?.close();
+    window.dispatchEvent(new CustomEvent("surrey-ai-project-modal-close"));
+  });
+
+  modal?.addEventListener("click", (event) => {
+    if (event.target === modal) {
+      modal.close();
+      window.dispatchEvent(new CustomEvent("surrey-ai-project-modal-close"));
+    }
+  });
+</script>
+
 <style>
-  .student-projects-section {
-    padding: 6rem 1.5rem;
-    background: var(--ai-bg);
-    border-top: 1px solid var(--ai-border);
+  .project-showcase {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+
+  .project-preview {
     position: relative;
+    min-height: clamp(23rem, 33vw, 31rem);
     overflow: hidden;
-  }
-
-  .projects-container {
-    max-width: 80rem; /* matches max-w-7xl */
-    margin: 0 auto;
-    padding: 0 1.5rem;
-    position: relative;
-    z-index: 2;
-  }
-
-  .projects-header {
-    margin-bottom: 4rem;
+    border: 0;
+    border-radius: clamp(1rem, 2vw, 1.7rem);
+    background: color-mix(in srgb, var(--ai-surface) 70%, var(--ai-bg));
+    color: #fff;
+    cursor: pointer;
+    font: inherit;
+    padding: 0;
     text-align: left;
   }
 
-  .projects-title {
-    font-size: 2.25rem; /* matches text-4xl sm:text-5xl */
-    font-weight: 800;
-    letter-spacing: -0.025em; /* matches tracking-tight */
-    color: var(--ai-fg);
-    margin-bottom: 1rem;
-  }
-  @media (min-width: 640px) {
-    .projects-title {
-      font-size: 3rem;
-    }
+  .project-preview__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: inherit;
+    object-fit: cover;
+    transform: scale(1.01);
+    transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .projects-subtitle {
-    font-size: 1.125rem; /* matches text-lg */
-    color: var(--ai-fg-muted);
-    max-width: 42rem;
-    line-height: 1.7;
+  .project-preview:hover .project-preview__image {
+    transform: scale(1.05);
   }
 
-  .projects-layout {
+  .project-preview__scrim {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, rgba(5, 10, 18, 0.84), rgba(5, 10, 18, 0.2) 62%, rgba(5, 10, 18, 0.1)),
+      linear-gradient(0deg, rgba(5, 10, 18, 0.55), transparent 45%);
+  }
+
+  .project-preview__content {
+    position: absolute;
+    inset: auto 0 0;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
-    margin-bottom: 3rem;
+    max-width: 28rem;
+    gap: 0.7rem;
+    padding: clamp(1.35rem, 3vw, 2rem);
   }
 
-  .projects-scroll-container {
-    width: 100%;
-    overflow: visible;
+  .project-preview__type {
+    width: max-content;
+    color: rgba(255, 255, 255, 0.86);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0;
   }
 
-  .projects-scroll-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
-    gap: 1.5rem;
-    align-items: stretch;
+  .project-preview strong {
+    color: #fff;
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    letter-spacing: 0;
+    line-height: 1.05;
   }
 
-  .scrollable-card {
-    width: 100%;
-    min-width: 0;
+  .project-preview span {
+    color: rgba(255, 255, 255, 0.82);
+    line-height: 1.5;
   }
 
-  .project-card {
-    min-height: 260px;
-    font-family: inherit;
-    outline: none;
-    border-radius: 1.5rem;
+  .project-preview__action {
+    color: #fff !important;
+    font-weight: 800;
+    margin-top: 0.25rem;
   }
 
-  .project-card:focus-visible {
-    outline: 2px solid var(--ai-azure);
+  .project-preview:focus-visible {
+    outline: 3px solid var(--ai-azure);
     outline-offset: 4px;
   }
 
-  .project-card.active {
-    border-color: var(--brand-color);
-    box-shadow: 0 0 0 2px var(--brand-color), 0 12px 32px color-mix(in srgb, var(--brand-color) 20%, transparent);
-  }
-
-  .card-content {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-  }
-
-  .card-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-  }
-
-  .card-type {
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--ai-fg-muted);
-  }
-
-  .card-title {
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: var(--ai-fg);
-    margin-bottom: 0.75rem;
-    letter-spacing: -0.02em;
-  }
-
-  .card-description {
-    font-size: 0.9375rem;
-    color: var(--ai-fg-muted);
-    line-height: 1.6;
-    margin-bottom: 2rem;
-    flex-grow: 1;
-  }
-
-  .card-action {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--brand-color);
-    font-weight: 700;
-    font-size: 0.9375rem;
-    margin-top: auto;
-    transition: transform 0.2s ease;
-  }
-
-  .project-card:hover .card-action {
-    transform: translateX(4px);
-  }
-
-  .project-card.active .card-action {
-    color: var(--ai-fg);
-  }
-
-  /* ── Modal Area ── */
-
   .project-modal {
-    padding: 0;
-    border: none;
-    background: transparent;
-    max-width: 100vw;
-    max-height: 100vh;
     width: 100%;
     height: 100%;
+    max-width: 100vw;
+    max-height: 100vh;
+    padding: 0;
+    border: 0;
+    background: transparent;
   }
 
   .project-modal::backdrop {
-    background: rgba(6, 10, 18, 0.85);
+    background: rgba(6, 10, 18, 0.82);
     backdrop-filter: blur(12px);
   }
 
   .project-modal[open] {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: modal-fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
-
-  @keyframes modal-fade-in {
-    from { opacity: 0; transform: scale(0.96); }
-    to { opacity: 1; transform: scale(1); }
+    display: grid;
+    place-items: center;
   }
 
   .modal-wrapper {
     position: relative;
-    width: 95vw;
-    height: 95vh;
-    max-width: 1600px;
-    margin: 2.5vh;
-    border-radius: 1.5rem;
-    background: var(--ai-bg);
-    border: 1px solid var(--ai-border);
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
-    overflow: hidden;
     display: flex;
     flex-direction: column;
+    width: min(96vw, 96rem);
+    height: min(94vh, 62rem);
+    overflow: hidden;
+    border: 1px solid var(--ai-border);
+    border-radius: 1.35rem;
+    background: var(--ai-bg);
   }
 
   .close-modal-btn {
     position: absolute;
-    top: 1.5rem;
-    right: 1.5rem;
-    z-index: 50;
-    height: 48px;
-    padding: 0 1.25rem;
-    border-radius: 9999px;
-    background: color-mix(in srgb, var(--ai-surface) 86%, transparent);
-    backdrop-filter: blur(8px);
+    top: 1rem;
+    right: 1rem;
+    z-index: 20;
     border: 1px solid var(--ai-border);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--ai-surface) 88%, transparent);
     color: var(--ai-fg);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
     cursor: pointer;
-    font-weight: 600;
-    font-size: 0.9375rem;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .close-modal-btn:hover {
-    background: color-mix(in srgb, var(--ai-surface) 94%, var(--ai-fg));
-    transform: scale(1.02);
-  }
-
-  .close-modal-btn:focus-visible {
-    outline: 2px solid var(--ai-azure);
-    outline-offset: 2px;
-  }
-
-  @media (max-width: 640px) {
-    .close-text {
-      display: none;
-    }
-    .close-modal-btn {
-      padding: 0;
-      width: 48px;
-      justify-content: center;
-    }
+    font-weight: 800;
+    padding: 0.8rem 1rem;
   }
 
   .modal-content {
-    position: relative;
     width: 100%;
     height: 100%;
-    overflow: hidden;
+    overflow: auto;
   }
 
-  .project-panel {
+  .project-panel,
+  .panel-inner {
     width: 100%;
     height: 100%;
   }
@@ -352,115 +269,15 @@ const projects = [
     display: none;
   }
 
-  .panel-inner {
-    width: 100%;
-    height: 100%;
-  }
-
-  /* Hide inner redundant headers and backgrounds from modules to make them fit */
   .panel-inner > :global(section) {
-    border: none !important;
-    background: transparent !important;
-    padding: 1.5rem !important;
-    height: 100%;
+    min-height: 100%;
     box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+    overflow: visible;
   }
 
-  @media (max-width: 768px) {
-    .student-projects-section {
-      padding: 4rem 1rem;
-    }
-    .projects-scroll-row {
-      gap: 1rem;
-    }
-    .modal-content {
-      min-height: 500px;
-    }
-    .panel-inner > :global(.drift-lab-section) {
-      padding: 1rem 0.5rem;
-    }
-    .modal-wrapper {
-      margin: 1rem;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .project-card {
-      transition: none;
-    }
-    .card-glow {
-      display: none;
+  @media (max-width: 840px) {
+    .project-showcase {
+      grid-template-columns: 1fr;
     }
   }
 </style>
-
-<script>
-  // Vanilla JS for Modal Interaction
-  document.addEventListener('DOMContentLoaded', () => {
-    const cards = document.querySelectorAll('.project-card');
-    const modal = document.getElementById('project-modal') as HTMLDialogElement;
-    const closeModalBtn = document.getElementById('close-modal');
-    const panels = document.querySelectorAll('.project-panel');
-
-    const resetActiveProject = () => {
-      window.dispatchEvent(new CustomEvent('surrey-ai-project-modal-close'));
-      panels.forEach(p => p.setAttribute('hidden', ''));
-      document.body.style.overflow = '';
-    };
-
-    // Open modal when card is clicked
-    cards.forEach(card => {
-      card.addEventListener('click', () => {
-        const projectId = card.getAttribute('data-project-id');
-        const targetId = `panel-${projectId}`;
-
-        // Hide all panels
-        panels.forEach(p => p.setAttribute('hidden', ''));
-        
-        // Show selected panel
-        const targetPanel = document.getElementById(targetId);
-        if (targetPanel) {
-          targetPanel.removeAttribute('hidden');
-        }
-
-        // Show modal
-        if (modal) {
-          modal.showModal();
-          // Prevent scrolling on body
-          document.body.style.overflow = 'hidden';
-        }
-      });
-    });
-
-    // Close modal function
-    const closeModal = () => {
-      if (modal?.open) {
-        modal.close();
-      }
-    };
-
-    if (closeModalBtn) {
-      closeModalBtn.addEventListener('click', closeModal);
-    }
-
-    // Close on backdrop click
-    if (modal) {
-      modal.addEventListener('click', (e) => {
-        const rect = modal.getBoundingClientRect();
-        const isInDialog = (rect.top <= e.clientY && e.clientY <= rect.top + rect.height &&
-          rect.left <= e.clientX && e.clientX <= rect.left + rect.width);
-        if (!isInDialog) {
-          closeModal();
-        }
-      });
-
-      // Handle Escape key (dialog handles it natively, but we need to reset body overflow)
-      modal.addEventListener('close', () => {
-        resetActiveProject();
-      });
-    }
-  });
-</script>

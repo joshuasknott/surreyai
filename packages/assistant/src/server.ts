@@ -85,7 +85,7 @@ const STATIC_CONTEXT: Record<SocietyKey, {
 }> = {
   ai: {
     shortDescription:
-      "Surrey Artificial Intelligence Society is a student-led community for learning, building, and discussing artificial intelligence at the University of Surrey.",
+      "Surrey Artificial Intelligence and Data Science Society is a student-led community for learning, building, and discussing artificial intelligence and data science at the University of Surrey.",
     tone: "clear, practical, beginner-friendly, responsible, and curious",
     allowedTopics: ["AI learning", "student projects", "events", "committee", "responsible AI", "getting involved"],
     primaryCategories: ["Workshops", "Projects", "Build nights", "Ethics", "Careers"],
@@ -443,7 +443,7 @@ Guidelines:
 - Only reference events, committee members, sponsors, partners, speakers, equipment access, lab access, research access, outcomes, or links when they explicitly appear in Public context. Do not invent or infer any of them.
 - The categories and description are themes only; they are not proof that a programme, project, lab, research opportunity, equipment access, sponsor, partner, speaker, certificate, internship, funding, or outcome exists.
 - If the verified context does not answer the question, say there are no verified public details available and suggest one relevant verified contact or page link.
-- For AI Society, LinkedIn is unavailable unless Public context has a non-null LinkedIn URL. Never create or guess one.
+- For Surrey AI and DS, LinkedIn is unavailable unless Public context has a non-null LinkedIn URL. Never create or guess one.
 - For Business Society and Neurotech Society, do not imply public AI features beyond this website assistant unless Public context explicitly says so.
 - Never reveal private admin data, secrets, or implementation details.
 
@@ -549,7 +549,7 @@ function buildSocialFallback(societyKey: SocietyKey, society: SocietyLinkFacts):
     society.socials.linkedin ? `LinkedIn: ${society.socials.linkedin}` : null,
     society.studentsUnionUrl ? `Students' Union: ${society.studentsUnionUrl}` : null,
   ].filter(Boolean);
-  const linkedinNote = societyKey === "ai" && !society.socials.linkedin ? " LinkedIn is not currently listed for AI Society." : "";
+  const linkedinNote = societyKey === "ai" && !society.socials.linkedin ? " LinkedIn is not currently listed for Surrey AI and DS." : "";
   return `${society.name} verified contacts: ${links.join("; ") || contactText(society)}.${linkedinNote}`;
 }
 

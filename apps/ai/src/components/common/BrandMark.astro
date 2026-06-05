@@ -1,0 +1,52 @@
+---
+interface Props {
+  size?: "small" | "default" | "large";
+}
+
+const { size = "default" } = Astro.props;
+---
+
+<span class:list={["brand-mark", `brand-mark--${size}`]} aria-hidden="true">
+  <img class="brand-mark__img brand-mark__img--light" src="/logos/surrey-ai-ds-logo.png" alt="" loading="eager" />
+  <img class="brand-mark__img brand-mark__img--dark" src="/logos/surrey-ai-ds-logo-dark.png" alt="" loading="eager" />
+</span>
+
+<style>
+  .brand-mark {
+    display: inline-grid;
+    width: 3rem;
+    height: 3rem;
+    flex: 0 0 auto;
+    place-items: center;
+  }
+
+  .brand-mark--small {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .brand-mark--large {
+    width: 5rem;
+    height: 5rem;
+  }
+
+  .brand-mark__img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 8px 16px color-mix(in srgb, var(--ai-slate-base) 10%, transparent));
+  }
+
+  .brand-mark__img--dark {
+    display: none;
+  }
+
+  :global(:root[data-theme="dark"]) .brand-mark__img--light {
+    display: none;
+  }
+
+  :global(:root[data-theme="dark"]) .brand-mark__img--dark {
+    display: block;
+  }
+</style>

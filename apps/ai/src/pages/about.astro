@@ -1,460 +1,320 @@
 ---
 export const prerender = true;
-import Layout from '../layouts/Layout.astro';
-import AnimatedHero from '../components/common/AnimatedHero.astro';
-import '../styles/global.css';
+import Layout from "../layouts/Layout.astro";
+import CutoutVisual from "../components/common/CutoutVisual.astro";
+import aboutLiteracyCutout from "../assets/generated/ai-about-literacy-cutout.png";
+import "../styles/global.css";
+
+const principles = [
+  {
+    title: "Open to every discipline",
+    text: "The society is built for students who are curious about AI and data science, whether they arrive from computing, business, health, arts, law, or somewhere else entirely.",
+  },
+  {
+    title: "Project-led where possible",
+    text: "Members should be able to see ideas become prototypes: small tools, experiments, demos, analyses, and creative uses that can be discussed and improved.",
+  },
+  {
+    title: "Impact is part of the work",
+    text: "Responsible use, bias, accessibility, data quality, and human consequences are treated as practical design questions, not optional extras.",
+  },
+];
+
+const pathways = [
+  {
+    title: "Learn the field",
+    text: "Plain-language sessions connect models, datasets, evaluation, and ethics without assuming everyone starts from computer science.",
+  },
+  {
+    title: "Build in public",
+    text: "Small demos and prototypes give members something concrete to test, critique, and improve together.",
+  },
+  {
+    title: "Discuss consequences",
+    text: "Bias, accessibility, reliability, privacy, and creative work stay part of the same conversation as the technical material.",
+  },
+];
 ---
 
-<Layout title="About" description="Learn about Surrey Artificial Intelligence Society — our mission, values, and what members can expect from our student-led AI community.">
-
-  <AnimatedHero 
-    title="Why we built this society." 
-    description="We are a student-led technical collective at the University of Surrey dedicated to explaining machine learning, generative tools, and responsible engineering."
-    centered={true} 
-  />
-
-  <!-- Mission -->
-  <section class="py-16 sm:py-24 px-6 bg-ai-bg text-ai-fg relative z-10 border-b border-ai-border">
-    <div class="mx-auto max-w-5xl premium-card p-8 sm:p-16" style="--card-brand-color: var(--ai-azure);">
-      <div class="premium-glow"></div>
-      
-      <div class="relative z-10">
-        <div class="mb-10 pb-10 border-b border-ai-border/50">
-          <p class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-ai-fg leading-tight max-w-4xl">
-            <span class="text-transparent bg-clip-text bg-gradient-to-r from-ai-azure to-ai-coral">AI literacy</span> is no longer just for computer scientists. It is a fundamental requirement for law, medicine, arts, and business.
-          </p>
-        </div>
-        
-        <div class="grid sm:grid-cols-2 gap-8 sm:gap-16 text-lg sm:text-xl leading-relaxed text-ai-fg-muted">
-          <p>
-            <strong class="text-ai-fg font-semibold">Surrey Artificial Intelligence Society</strong> exists to make artificial intelligence accessible, understandable, and engaging for students — regardless of course or prior experience. We believe that understanding how AI works and what it means for your field matters more than ever.
-          </p>
-          <p>
-            As a student-led society under the Surrey Students' Union, we provide a space to learn, debate, and build — with <strong class="text-ai-fg font-semibold">no gatekeeping and no jargon</strong>. We welcome arts, humanities, and business students just as much as computer science students.
-          </p>
-        </div>
+<Layout
+  title="About"
+  description="Learn about Surrey Artificial Intelligence and Data Science Society - our mission, values, and student-led approach to AI and data science."
+>
+  <section class="about-hero">
+    <div class="about-hero__inner">
+      <div class="about-hero__copy">
+        <h1>AI and data science should feel possible to start, useful to build, and responsible to question.</h1>
+        <p>
+          Surrey AI and DS is a student-led society under Surrey Students' Union. We create space for students to learn the ideas, build practical projects, and discuss how AI and data science affect the world around them.
+        </p>
       </div>
+      <CutoutVisual
+        image={aboutLiteracyCutout}
+        alt="Open notebook, model cards, magnifying glass, balance objects, and tablet for responsible AI literacy"
+        title="Literacy, usefulness, and impact belong together."
+        body="The society treats AI as something students can inspect, shape, and question."
+        align="right"
+        compact
+        loading="eager"
+      />
     </div>
   </section>
 
-  <!-- Principles -->
-  <section class="py-16 sm:py-24 px-6 bg-ai-bg text-ai-fg relative z-10">
-    <div class="mx-auto max-w-7xl">
-      <div class="mb-16">
-        <h2 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4">Our Approach</h2>
-        <p class="text-ai-fg-muted text-lg leading-relaxed max-w-2xl">The values that shape how we run the society — practically, not just on paper.</p>
+  <section class="ai-section" aria-labelledby="mission-title">
+    <div class="ai-section__inner mission-grid">
+      <div class="mission-panel">
+        <h2 id="mission-title">Make AI literacy social, practical, and honest.</h2>
+        <p>
+          AI literacy is no longer only a computing topic. It now shapes study, work, creativity, research, public services, and everyday decisions. The society helps students build enough understanding to participate with confidence.
+        </p>
+        <p>
+          That means mixing beginner-friendly explainers with real tools, visible data, and enough ethical pressure to ask whether a system should be built at all.
+        </p>
       </div>
-      <div class="grid md:grid-cols-3 gap-6">
-        
-        <!-- Beginner Friendly Card -->
-        <article class="premium-card h-full flex flex-col justify-between group" style="--card-brand-color: var(--ai-coral);">
-          <div class="premium-glow"></div>
-
-          <div class="relative z-10 flex flex-col h-full justify-between p-6 sm:p-8">
-            <div>
-              <!-- Micro-Visual: Modern Google-style approachable overlapping circles -->
-              <div class="about-visual h-40 w-full rounded-2xl relative overflow-hidden flex items-center justify-center bg-ai-surface border border-ai-border/80 mb-6 group-hover:border-ai-coral/30 transition-colors">
-                <svg class="w-full h-full max-w-[140px] relative z-10" viewBox="0 0 140 100" fill="none">
-                  <defs>
-                    <linearGradient id="friendly-grad-1" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="var(--ai-coral)" stop-opacity="0.8" />
-                      <stop offset="100%" stop-color="var(--ai-coral)" stop-opacity="0.2" />
-                    </linearGradient>
-                    <linearGradient id="friendly-grad-2" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="var(--ai-azure)" stop-opacity="0.8" />
-                      <stop offset="100%" stop-color="var(--ai-azure)" stop-opacity="0.2" />
-                    </linearGradient>
-                  </defs>
-                  <!-- Intersecting friendly glowing circles -->
-                  <circle cx="50" cy="50" r="28" fill="url(#friendly-grad-1)" class="friendly-circle-1" />
-                  <circle cx="90" cy="50" r="28" fill="url(#friendly-grad-2)" class="friendly-circle-2" style="mix-blend-mode: screen;" />
-                  <circle cx="70" cy="50" r="8" fill="var(--ai-fg)" class="friendly-dot opacity-80" />
-                </svg>
-              </div>
-
-              <h3 class="text-2xl font-bold mb-4 text-ai-fg tracking-tight group-hover:text-ai-coral transition-colors duration-300">Beginner Friendly</h3>
-              <p class="text-ai-fg-muted leading-relaxed text-sm">Every event should be approachable. We don't gatekeep knowledge or use unnecessary jargon. If a concept is complex, we break it down. We actively recruit and welcome students from non-STEM backgrounds to ensure diverse perspectives.</p>
-            </div>
-          </div>
+      <div class="mission-proof" aria-label="Mission emphasis">
+        <article>
+          <span>Learn</span>
+          <strong>Plain language before jargon.</strong>
         </article>
-        
-        <!-- Project Driven Card -->
-        <article class="premium-card h-full flex flex-col justify-between group" style="--card-brand-color: var(--ai-azure);">
-          <div class="premium-glow"></div>
-
-          <div class="relative z-10 flex flex-col h-full justify-between p-6 sm:p-8">
-            <div>
-              <!-- Micro-Visual: Clean building blocks geometry -->
-              <div class="about-visual h-40 w-full rounded-2xl relative overflow-hidden flex items-center justify-center bg-ai-surface border border-ai-border/80 mb-6 group-hover:border-ai-azure/30 transition-colors">
-                <svg class="w-full h-full max-w-[140px] relative z-10" viewBox="0 0 140 100" fill="none">
-                  <defs>
-                    <linearGradient id="block-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="var(--ai-azure)" />
-                      <stop offset="100%" stop-color="var(--ai-sage)" />
-                    </linearGradient>
-                  </defs>
-                  <!-- Building blocks dynamic alignment -->
-                  <rect x="30" y="55" width="35" height="20" rx="6" fill="url(#block-grad)" opacity="0.8" class="block-anim-1" />
-                  <rect x="75" y="55" width="35" height="20" rx="6" fill="url(#block-grad)" opacity="0.8" class="block-anim-2" />
-                  <rect x="45" y="25" width="50" height="22" rx="6" fill="var(--ai-coral)" opacity="0.9" class="block-anim-3" />
-                </svg>
-              </div>
-
-              <h3 class="text-2xl font-bold mb-4 text-ai-fg tracking-tight group-hover:text-ai-azure transition-colors duration-300">Project Driven</h3>
-              <p class="text-ai-fg-muted leading-relaxed text-sm">Theory matters, but building things teaches you faster. We emphasize practical application over purely academic lectures, hosting build nights and workshops designed to give you hands-on experience.</p>
-            </div>
-          </div>
+        <article>
+          <span>Build</span>
+          <strong>Small prototypes before hype.</strong>
         </article>
-        
-        <!-- Ethically Grounded Card -->
-        <article class="premium-card h-full flex flex-col justify-between group" style="--card-brand-color: var(--ai-sage);">
-          <div class="premium-glow"></div>
-
-          <div class="relative z-10 flex flex-col h-full justify-between p-6 sm:p-8">
-            <div>
-              <!-- Micro-Visual: Clean safety guardrail alignment ring -->
-              <div class="about-visual h-40 w-full rounded-2xl relative overflow-hidden flex items-center justify-center bg-ai-surface border border-ai-border/80 mb-6 group-hover:border-ai-sage/30 transition-colors">
-                <svg class="w-full h-full max-w-[140px] relative z-10" viewBox="0 0 140 100" fill="none">
-                  <defs>
-                    <linearGradient id="ring-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="var(--ai-sage)" />
-                      <stop offset="100%" stop-color="var(--ai-azure)" />
-                    </linearGradient>
-                  </defs>
-                  <!-- Safe alignment rings -->
-                  <circle cx="70" cy="50" r="30" stroke="url(#ring-grad)" stroke-width="4" stroke-linecap="round" stroke-dasharray="120 40" class="ethics-ring-1" />
-                  <circle cx="70" cy="50" r="18" stroke="var(--ai-coral)" stroke-width="2" stroke-linecap="round" stroke-dasharray="60 30" class="ethics-ring-2" />
-                  <circle cx="70" cy="50" r="5" fill="var(--ai-fg)" />
-                </svg>
-              </div>
-
-              <h3 class="text-2xl font-bold mb-4 text-ai-fg tracking-tight group-hover:text-ai-sage transition-colors duration-300">Ethically Grounded</h3>
-              <p class="text-ai-fg-muted leading-relaxed text-sm">We care about how AI is built and deployed, not just what it can do. Safety, bias, and ethics are regular topics of our discussions. We think about the long-term impacts of the systems we build.</p>
-            </div>
-          </div>
+        <article>
+          <span>Question</span>
+          <strong>Impact before autopilot.</strong>
         </article>
       </div>
     </div>
   </section>
 
-  <!-- Interactive Curriculum Learning Sandbox -->
-  <section class="py-16 sm:py-24 px-6 bg-ai-bg text-ai-fg relative z-10 border-t border-ai-border">
-    <div class="mx-auto max-w-7xl">
-      <div class="mb-16">
-        <span class="text-xs font-semibold uppercase tracking-widest text-ai-azure">Learning Pipeline</span>
-        <h2 class="text-4xl sm:text-5xl font-extrabold tracking-tight mt-2 mb-4">Our Technical Roadmap</h2>
-        <p class="text-ai-fg-muted text-lg leading-relaxed max-w-2xl">
-          From first principles to advanced deployments. Click each node to explore the concepts, code, and output of each learning milestone.
+  <section class="ai-section ai-section--tinted" aria-labelledby="principles-title">
+    <div class="ai-section__inner">
+      <div class="ai-section__header">
+        <h2 id="principles-title" class="section-title">A society with standards, not just ambition.</h2>
+        <p class="section-intro">
+          Each activity should help students understand something, make something, or judge something more clearly than before.
         </p>
       </div>
 
-      <div class="grid lg:grid-cols-12 gap-8 items-stretch">
-        <!-- Left: Interactive Node Map -->
-        <div class="lg:col-span-5 flex flex-col justify-between premium-card p-6 sm:p-8" style="--card-brand-color: var(--ai-azure);">
-          <div class="premium-glow"></div>
-          <div class="relative z-10 flex flex-col justify-between h-full">
-            <h3 class="font-bold text-xl mb-6 tracking-tight">Milestone Explorer</h3>
-
-            <!-- SVG Grid Wireframe Background -->
-            <div class="relative w-full aspect-[4/3] rounded-2xl bg-ai-bg border border-ai-border/80 p-6 flex flex-col justify-around overflow-hidden shadow-inner">
-              <div class="absolute inset-0 bg-size-[16px_16px] bg-[linear-gradient(to_right,rgba(30,30,31,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(30,30,31,0.015)_1px,transparent_1px)] opacity-50 dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.005)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.005)_1px,transparent_1px)]"></div>
-              
-              <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 400 300" fill="none">
-                <!-- Roadmap curve wire path -->
-                <path d="M 50,75 C 200,75 50,225 200,225 C 350,225 200,75 350,75" stroke="var(--ai-border-strong)" stroke-width="2.5" stroke-dasharray="6 6" class="roadmap-wire" />
-              </svg>
-
-              <!-- Roadmap Interactive Nodes -->
-              <div class="flex flex-col gap-8 relative z-10">
-                <!-- Node 1 -->
-                <button type="button" class="roadmap-node active group/node flex items-center gap-4 text-left focus:outline-none" data-milestone="1">
-                  <span class="node-bullet w-10 h-10 rounded-full flex items-center justify-center border font-bold font-mono text-sm transition-all duration-300">01</span>
-                  <div>
-                    <h4 class="font-bold text-sm tracking-tight transition-colors duration-300 node-text">Neural Networks</h4>
-                    <p class="text-[10px] text-ai-fg-muted uppercase tracking-wider font-semibold">Foundations</p>
-                  </div>
-                </button>
-
-                <!-- Node 2 -->
-                <button type="button" class="roadmap-node group/node flex items-center gap-4 text-left focus:outline-none" data-milestone="2">
-                  <span class="node-bullet w-10 h-10 rounded-full flex items-center justify-center border font-bold font-mono text-sm transition-all duration-300">02</span>
-                  <div>
-                    <h4 class="font-bold text-sm tracking-tight transition-colors duration-300 node-text">Fine-Tuning & Weights</h4>
-                    <p class="text-[10px] text-ai-fg-muted uppercase tracking-wider font-semibold">Customisation</p>
-                  </div>
-                </button>
-
-                <!-- Node 3 -->
-                <button type="button" class="roadmap-node group/node flex items-center gap-4 text-left focus:outline-none" data-milestone="3">
-                  <span class="node-bullet w-10 h-10 rounded-full flex items-center justify-center border font-bold font-mono text-sm transition-all duration-300">03</span>
-                  <div>
-                    <h4 class="font-bold text-sm tracking-tight transition-colors duration-300 node-text">Agentic Workflows</h4>
-                    <p class="text-[10px] text-ai-fg-muted uppercase tracking-wider font-semibold">Application</p>
-                  </div>
-                </button>
-
-                <!-- Node 4 -->
-                <button type="button" class="roadmap-node group/node flex items-center gap-4 text-left focus:outline-none" data-milestone="4">
-                  <span class="node-bullet w-10 h-10 rounded-full flex items-center justify-center border font-bold font-mono text-sm transition-all duration-300">04</span>
-                  <div>
-                    <h4 class="font-bold text-sm tracking-tight transition-colors duration-300 node-text">Responsible Guardrails</h4>
-                    <p class="text-[10px] text-ai-fg-muted uppercase tracking-wider font-semibold">Ethics & Safety</p>
-                  </div>
-                </button>
-              </div>
+      <div class="principle-list">
+        {principles.map((principle, index) => (
+          <article class="principle-row">
+            <span>{String(index + 1).padStart(2, "0")}</span>
+            <div>
+              <h3>{principle.title}</h3>
+              <p>{principle.text}</p>
             </div>
-            
-            <p class="text-xs text-ai-fg-muted mt-6">
-              All roadmap materials are provided through hands-on hack nights, workshops, and build nights.
-            </p>
-          </div>
-        </div>
-
-        <!-- Right: Code Output Display Panel -->
-        <div class="lg:col-span-7 premium-card p-6 sm:p-8 flex flex-col justify-between" style="--card-brand-color: var(--ai-coral);">
-          <div class="premium-glow"></div>
-          <div class="relative z-10 flex flex-col h-full justify-between">
-            <div class="flex items-center justify-between border-b border-ai-border/40 pb-4 mb-6">
-              <div class="flex items-center gap-2">
-                <span class="w-3 h-3 rounded-full bg-ai-coral opacity-80"></span>
-                <span class="font-bold text-sm tracking-tight font-mono-tech uppercase text-ai-fg-muted" id="panel-title">neural_network.py</span>
-              </div>
-              <span class="px-2 py-0.5 bg-ai-surface border border-ai-border text-[9px] font-bold font-mono-tech uppercase tracking-wider rounded text-ai-fg-muted">Python 3.11</span>
-            </div>
-
-            <!-- Code content dynamic area -->
-            <div class="flex-grow flex flex-col justify-center min-h-[220px]">
-              <pre class="bg-ai-bg border border-ai-border rounded-xl p-5 text-xs font-mono-tech text-ai-fg overflow-x-auto leading-relaxed shadow-inner" id="code-block"></pre>
-            </div>
-
-            <!-- Console Output area -->
-            <div class="mt-6">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-bold uppercase tracking-widest text-ai-fg-muted font-mono-tech">Output Logs</span>
-                <span class="text-[9px] px-1.5 py-0.5 rounded bg-ai-sage/10 text-ai-sage border border-ai-sage/20 font-bold uppercase font-mono-tech">Ready</span>
-              </div>
-              <div class="bg-ai-surface border border-ai-border rounded-xl p-4 font-mono-tech text-[11px] text-ai-fg-muted min-h-[90px] shadow-sm flex flex-col justify-center" id="console-block"></div>
-            </div>
-          </div>
-        </div>
+          </article>
+        ))}
       </div>
     </div>
   </section>
 
+  <section class="ai-section" aria-labelledby="route-title">
+    <div class="ai-section__inner">
+      <div class="ai-section__header ai-section__header--split">
+        <div>
+          <h2 id="route-title" class="section-title">Different students need different first steps.</h2>
+        </div>
+        <p class="section-intro">
+          The society should be clear enough for a beginner, useful enough for a builder, and serious enough for students thinking about impact.
+        </p>
+      </div>
+
+      <div class="route-grid">
+        {pathways.map((pathway) => (
+          <article>
+            <span aria-hidden="true"></span>
+            <h3>{pathway.title}</h3>
+            <p>{pathway.text}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
 </Layout>
 
-<script>
-  // Roadmap milestone content dictionary
-  const milestones = {
-    "1": {
-      title: "neural_network.py",
-      code: `import torch
-import torch.nn as nn
-
-class StudentClassifier(nn.Module):
-    def __init__(self, input_dim=64):
-        super().__init__()
-        self.network = nn.Sequential(
-            nn.Linear(input_dim, 32),
-            nn.ReLU(),
-            nn.Linear(32, 2)  # [Technical, Beginner]
-        )
-
-    def forward(self, x):
-        return torch.softmax(self.network(x), dim=-1)`,
-      logs: `>>> Initialising StudentClassifier weights...
->>> Epoch 10: Training loss = 0.4283
->>> Epoch 20: Training loss = 0.1205
->>> Test accuracy: 98.4% (Interdisciplinary Access confirmed)`
-    },
-    "2": {
-      title: "model_finetuning.py",
-      code: `from transformers import AutoModelForCausalLM, AutoTokenizer
-from peft import LoraConfig, get_peft_model
-
-model_id = "surrey-ai-foundation-v1"
-tokenizer = AutoTokenizer.from_pretrained(model_id)
-model = AutoModelForCausalLM.from_pretrained(model_id)
-
-peft_config = LoraConfig(
-    r=16, lora_alpha=32, target_modules=["q_proj", "v_proj"],
-    lora_dropout=0.05, bias="none", task_type="CAUSAL_LM"
-)
-lora_model = get_peft_model(model, peft_config)`,
-      logs: `>>> Initialising LoRA adapters for fine-tuning...
->>> Added trainable parameter ratio: 0.28% of base model size
->>> Epoch 3: Fine-tuning loss = 0.0560
->>> Save checkpoint: ./checkpoints/surrey-ai-custom-weights`
-    },
-    "3": {
-      title: "agentic_workflow.py",
-      code: `class AgenticBuilder:
-    def __init__(self):
-        self.pipeline = [
-            "PlannerAgent", "ResearcherAgent",
-            "BuilderAgent", "ReviewerAgent"
-        ]
-
-    async def execute_task(self, prompt: str):
-        context = {}
-        for agent in self.pipeline:
-            print(f"[Run] {agent} executing...")
-            context = await self.run_agent(agent, prompt, context)
-        return context["code"]`,
-      logs: `>>> PlannerAgent: Checklist created (5 items)
->>> ResearcherAgent: Extracted 12 code-native docs
->>> BuilderAgent: Live rendering code output...
->>> ReviewerAgent: Code verified. Launching build sprint!`
-    },
-    "4": {
-      title: "safety_guardrails.py",
-      code: `from guardrails import Guard
-from guardrails.hub import ProfanityFree, SafePrompt
-
-guard = Guard().use_many(
-    ProfanityFree(on_fail="exception"),
-    SafePrompt(on_fail="filter")
-)
-
-def secure_inference(prompt: str):
-    try:
-        validated_prompt = guard.validate(prompt)
-        return generate_response(validated_prompt)
-    except Exception as e:
-        return "Input blocked: Guardrails safety boundary violated."`,
-      logs: `>>> Safety filter initialized with profanity & toxic prompt checks
->>> Input check: "Write a malicious python script..."
->>> ProfanityFree: PASSED
->>> SafePrompt: BLOCKED (Prompt injection risk detected)`
-    }
-  };
-
-  document.addEventListener("DOMContentLoaded", () => {
-    const nodes = document.querySelectorAll(".roadmap-node");
-    const panelTitle = document.getElementById("panel-title");
-    const codeBlock = document.getElementById("code-block");
-    const consoleBlock = document.getElementById("console-block");
-
-    const updatePanel = (id: string) => {
-      const milestone = milestones[id];
-      if (milestone && panelTitle && codeBlock && consoleBlock) {
-        panelTitle.textContent = milestone.title;
-        // Escape special chars just in case
-        codeBlock.textContent = milestone.code;
-        consoleBlock.innerHTML = milestone.logs
-          .split("\\n")
-          .map(line => `<p class="leading-relaxed py-0.5">${line}</p>`)
-          .join("");
-      }
-    };
-
-    // Initialize with first milestone
-    updatePanel("1");
-
-    nodes.forEach(node => {
-      node.addEventListener("click", () => {
-        nodes.forEach(n => n.classList.remove("active"));
-        node.classList.add("active");
-        const milestoneId = node.getAttribute("data-milestone");
-        if (milestoneId) {
-          updatePanel(milestoneId);
-        }
-      });
-    });
-  });
-</script>
-
 <style>
-  /* Premium Micro Visual animations */
-  .friendly-circle-1 {
-    animation: float-left 6s ease-in-out infinite alternate;
-  }
-  .friendly-circle-2 {
-    animation: float-right 6s ease-in-out infinite alternate;
-  }
-  @keyframes float-left {
-    from { transform: translate(0, 0); }
-    to { transform: translate(4px, -2px); }
-  }
-  @keyframes float-right {
-    from { transform: translate(0, 0); }
-    to { transform: translate(-4px, 2px); }
+  .about-hero {
+    position: relative;
+    overflow: clip;
+    padding: clamp(4.5rem, 8vw, 7rem) 1.25rem clamp(3.5rem, 7vw, 5rem);
+    background:
+      radial-gradient(circle at 80% 26%, color-mix(in srgb, var(--ai-azure) 15%, transparent), transparent 22rem),
+      linear-gradient(180deg, color-mix(in srgb, var(--ai-surface) 60%, var(--ai-bg)), var(--ai-bg));
+    color: var(--ai-fg);
+    border-bottom: 1px solid var(--ai-border);
   }
 
-  .block-anim-1 {
-    animation: block-float 5s ease-in-out infinite alternate;
-  }
-  .block-anim-2 {
-    animation: block-float 5s ease-in-out infinite alternate;
-    animation-delay: 1s;
-  }
-  .block-anim-3 {
-    animation: block-float-big 6s ease-in-out infinite alternate;
-    animation-delay: 0.5s;
-  }
-  @keyframes block-float {
-    from { transform: translateY(0); }
-    to { transform: translateY(-4px); }
-  }
-  @keyframes block-float-big {
-    from { transform: translateY(0); }
-    to { transform: translateY(-6px); }
+  .about-hero__inner {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 0.92fr) minmax(22rem, 0.95fr);
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: center;
+    width: min(100%, 82rem);
+    margin: 0 auto;
   }
 
-  .ethics-ring-1 {
-    transform-origin: 70px 50px;
-    animation: spin-clockwise 20s linear infinite;
-  }
-  .ethics-ring-2 {
-    transform-origin: 70px 50px;
-    animation: spin-counter-clockwise 14s linear infinite;
-  }
-  @keyframes spin-clockwise {
-    to { transform: rotate(360deg); }
-  }
-  @keyframes spin-counter-clockwise {
-    to { transform: rotate(-360deg); }
+  .about-hero__copy {
+    max-width: 62rem;
   }
 
-  /* Interactive Curriculum Path Styles */
-  .roadmap-node .node-bullet {
-    background: var(--ai-surface);
-    border-color: var(--ai-border-strong);
+  .about-hero h1 {
+    margin: 0;
+    color: var(--ai-fg);
+    font-size: clamp(2.7rem, 5.2vw, 5.2rem);
+    font-weight: 850;
+    letter-spacing: 0;
+    line-height: 1;
+  }
+
+  .about-hero p {
+    max-width: 43rem;
+    margin: 1.35rem 0 0;
     color: var(--ai-fg-muted);
+    font-size: 1.12rem;
+    line-height: 1.65;
   }
 
-  .roadmap-node.active .node-bullet {
-    background: var(--ai-azure);
-    border-color: var(--ai-azure);
-    color: #ffffff;
-    box-shadow: 0 0 12px color-mix(in srgb, var(--ai-azure) 40%, transparent);
+  .mission-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.82fr) minmax(18rem, 0.58fr);
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: stretch;
   }
 
-  .roadmap-node.active .node-text {
+  .mission-panel {
+    max-width: 58rem;
+    border-left: 4px solid var(--ai-azure);
+    padding-left: clamp(1.25rem, 4vw, 2rem);
+  }
+
+  .mission-panel h2 {
+    margin: 0 0 1rem;
+    color: var(--ai-fg);
+    font-size: clamp(2.2rem, 5vw, 4.25rem);
+    letter-spacing: 0;
+    line-height: 1.03;
+  }
+
+  .mission-panel p {
+    margin: 0;
+    color: var(--ai-fg-muted);
+    font-size: 1.15rem;
+    line-height: 1.65;
+  }
+
+  .mission-panel p + p {
+    margin-top: 1rem;
+  }
+
+  .mission-proof {
+    display: grid;
+    align-content: center;
+    gap: 1px;
+    border: 1px solid var(--ai-border);
+    border-radius: 1.2rem;
+    overflow: hidden;
+    background: var(--ai-border);
+  }
+
+  .mission-proof article {
+    padding: clamp(1.1rem, 3vw, 1.5rem);
+    background:
+      linear-gradient(90deg, color-mix(in srgb, var(--ai-azure) 8%, transparent), transparent 44%),
+      var(--ai-surface);
+  }
+
+  .mission-proof article:nth-child(2) {
+    background:
+      linear-gradient(90deg, color-mix(in srgb, var(--ai-sage) 8%, transparent), transparent 44%),
+      var(--ai-surface);
+  }
+
+  .mission-proof article:nth-child(3) {
+    background:
+      linear-gradient(90deg, color-mix(in srgb, var(--ai-coral) 8%, transparent), transparent 44%),
+      var(--ai-surface);
+  }
+
+  .mission-proof span {
+    display: block;
     color: var(--ai-azure);
+    font-size: 0.78rem;
+    font-weight: 850;
+    text-transform: uppercase;
   }
 
-  .roadmap-node:hover .node-bullet {
-    border-color: var(--ai-azure);
-    transform: scale(1.05);
+  .mission-proof strong {
+    display: block;
+    margin-top: 0.45rem;
+    color: var(--ai-fg);
+    font-size: 1.1rem;
+    line-height: 1.35;
   }
 
-  @keyframes dash {
-    to {
-      stroke-dashoffset: -40;
-    }
+  .principle-list {
+    border-top: 1px solid var(--ai-border);
   }
 
-  .roadmap-wire {
-    animation: dash 3s linear infinite;
+  .principle-row {
+    display: grid;
+    grid-template-columns: 5rem 1fr;
+    gap: 1.5rem;
+    padding: clamp(1.4rem, 3vw, 2rem);
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .roadmap-wire {
-      animation: none;
-    }
-    .roadmap-node:hover .node-bullet {
-      transform: none;
+  .principle-row {
+    border-bottom: 1px solid var(--ai-border);
+  }
+
+  .principle-row > span {
+    color: var(--ai-azure);
+    font-weight: 850;
+  }
+
+  .principle-row h3,
+  .route-grid h3 {
+    margin: 0 0 0.45rem;
+    color: var(--ai-fg);
+    font-size: 1.25rem;
+    letter-spacing: 0;
+  }
+
+  .principle-row p,
+  .route-grid p {
+    margin: 0;
+    color: var(--ai-fg-muted);
+    line-height: 1.6;
+  }
+
+  .route-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(1.5rem, 4vw, 2.25rem);
+  }
+
+  .route-grid article {
+    padding-top: 1.4rem;
+    border-top: 3px solid var(--ai-azure);
+  }
+
+  .route-grid article:nth-child(2) {
+    border-top-color: var(--ai-sage);
+  }
+
+  .route-grid article:nth-child(3) {
+    border-top-color: var(--ai-coral);
+  }
+
+  @media (max-width: 760px) {
+    .about-hero__inner,
+    .mission-grid,
+    .principle-row,
+    .route-grid {
+      grid-template-columns: 1fr;
     }
   }
 </style>

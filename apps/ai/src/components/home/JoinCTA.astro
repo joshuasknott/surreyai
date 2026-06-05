@@ -1,20 +1,55 @@
 ---
+import BrandMark from "../common/BrandMark.astro";
 ---
 
-<section class="bg-ai-bg text-ai-fg py-16 sm:py-24 px-6 relative border-t border-ai-border">
-  <div class="mx-auto max-w-4xl text-center">
-    <h2 class="text-4xl sm:text-6xl font-extrabold tracking-[-0.05em] leading-[1] mb-5">
-      Become a part of the future.
-    </h2>
-    <ul class="text-ai-fg-muted text-lg sm:text-xl mb-10 max-w-2xl mx-auto leading-relaxed list-none p-0 flex flex-col gap-3">
-      <li>Access to hands-on workshops.</li>
-      <li>Entry to society hackathons.</li>
-      <li>Networking with industry speakers.</li>
-    </ul>
-    <div class="flex justify-center">
-      <a href="/join" class="btn-primary text-center text-lg px-8 py-4">
-        Join the Society via Student Union
-      </a>
+<section class="ai-section join-strip" aria-labelledby="join-strip-title">
+  <div class="ai-section__inner join-strip__inner">
+    <div class="join-strip__copy">
+      <BrandMark size="small" />
+      <h2 id="join-strip-title" class="section-title">Join Surrey AI and DS.</h2>
+      <p class="section-intro">
+        Become part of the student community following AI and data science from first principles to real-world impact.
+      </p>
     </div>
+    <a href="/join" class="btn-primary">Join via Students' Union</a>
   </div>
 </section>
+
+<style>
+  .join-strip {
+    position: relative;
+    border-top: 1px solid var(--ai-border);
+    overflow: clip;
+  }
+
+  .join-strip::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(115deg, transparent 0 28%, color-mix(in srgb, var(--ai-azure) 10%, transparent) 28.2% 28.6%, transparent 28.8% 100%),
+      linear-gradient(132deg, transparent 0 55%, color-mix(in srgb, var(--ai-sage) 12%, transparent) 55.2% 55.6%, transparent 55.8% 100%);
+    pointer-events: none;
+  }
+
+  .join-strip__inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+
+  .join-strip__copy {
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  @media (max-width: 760px) {
+    .join-strip__inner {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+  }
+</style>

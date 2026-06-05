@@ -1,0 +1,267 @@
+---
+import { Image } from "astro:assets";
+import eegSignalLab from "../../assets/generated/ai-eeg-signal-lab.png";
+
+interface Props {
+  title?: string;
+  body?: string;
+  compact?: boolean;
+}
+
+const {
+  title = "EEG signals become learning material.",
+  body = "Hover the visual to inspect the live signal layer, feature bands, and model pathways.",
+  compact = false,
+} = Astro.props;
+---
+
+<figure class:list={["signal-lab", compact && "signal-lab--compact"]} tabindex="0" aria-label="Interactive EEG and AI signal visual">
+  <Image
+    src={eegSignalLab}
+    alt="EEG cap and neural signal visualisation with machine learning feature maps"
+    widths={[720, 1080, 1440, 1800]}
+    sizes={compact ? "(min-width: 900px) 38vw, 100vw" : "(min-width: 900px) 58vw, 100vw"}
+    class="signal-lab__image"
+    loading="eager"
+    format="webp"
+  />
+  <div class="signal-lab__wash" aria-hidden="true"></div>
+  <div class="signal-lab__focus" aria-hidden="true"></div>
+  <svg class="signal-lab__overlay" viewBox="0 0 1200 700" preserveAspectRatio="none" aria-hidden="true">
+    <path class="signal-lab__wave signal-lab__wave--blue" d="M0 230 C90 180 150 280 230 230 S390 170 470 225 620 290 700 225 850 165 930 230 1085 295 1200 230" />
+    <path class="signal-lab__wave signal-lab__wave--green" d="M0 338 C95 370 175 285 265 330 S435 390 525 330 685 275 775 332 970 390 1200 320" />
+    <path class="signal-lab__wave signal-lab__wave--coral" d="M0 452 C120 395 205 500 315 438 S505 365 615 438 790 520 900 442 1060 380 1200 432" />
+    <g class="signal-lab__nodes">
+      <circle cx="705" cy="214" r="5" />
+      <circle cx="806" cy="296" r="4" />
+      <circle cx="878" cy="371" r="6" />
+      <circle cx="972" cy="420" r="4.5" />
+      <circle cx="1038" cy="494" r="5.5" />
+      <path d="M705 214 806 296 878 371 972 420 1038 494" />
+    </g>
+  </svg>
+  <figcaption class="signal-lab__caption">
+    <strong>{title}</strong>
+    <span>{body}</span>
+  </figcaption>
+</figure>
+
+<script>
+  document.querySelectorAll<HTMLElement>(".signal-lab").forEach((visual) => {
+    const setPointer = (event: PointerEvent) => {
+      const rect = visual.getBoundingClientRect();
+      const x = ((event.clientX - rect.left) / rect.width) * 100;
+      const y = ((event.clientY - rect.top) / rect.height) * 100;
+      visual.style.setProperty("--mx", `${Math.max(0, Math.min(100, x))}%`);
+      visual.style.setProperty("--my", `${Math.max(0, Math.min(100, y))}%`);
+      visual.classList.add("is-active");
+    };
+
+    visual.addEventListener("pointerenter", () => visual.classList.add("is-active"));
+    visual.addEventListener("pointermove", setPointer);
+    visual.addEventListener("pointerleave", () => {
+      visual.classList.remove("is-active");
+      visual.style.removeProperty("--mx");
+      visual.style.removeProperty("--my");
+    });
+    visual.addEventListener("focus", () => visual.classList.add("is-active"));
+    visual.addEventListener("blur", () => visual.classList.remove("is-active"));
+  });
+</script>
+
+<style>
+  .signal-lab {
+    --mx: 64%;
+    --my: 44%;
+    position: relative;
+    min-height: clamp(23rem, 42vw, 38rem);
+    overflow: clip;
+    border-radius: clamp(1.2rem, 2vw, 2rem);
+    background: var(--ai-surface);
+    isolation: isolate;
+  }
+
+  .signal-lab--compact {
+    min-height: clamp(19rem, 32vw, 28rem);
+  }
+
+  .signal-lab__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: inherit;
+    object-fit: cover;
+    object-position: center right;
+    transform: scale(1.01);
+    transform-origin: var(--mx) var(--my);
+    transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), filter 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .signal-lab:hover .signal-lab__image,
+  .signal-lab.is-active .signal-lab__image,
+  .signal-lab:focus-visible .signal-lab__image {
+    filter: saturate(1.14) contrast(1.04);
+    transform: scale(1.12);
+  }
+
+  .signal-lab__wash {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background:
+      radial-gradient(circle at var(--mx) var(--my), transparent 0 12%, rgba(5, 10, 18, 0.08) 30%, rgba(5, 10, 18, 0.28) 100%),
+      linear-gradient(90deg, rgba(5, 10, 18, 0.66), transparent 50%),
+      linear-gradient(0deg, rgba(5, 10, 18, 0.72), transparent 42%);
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+  }
+
+  .signal-lab:hover .signal-lab__wash,
+  .signal-lab.is-active .signal-lab__wash,
+  .signal-lab:focus-visible .signal-lab__wash {
+    opacity: 0.92;
+  }
+
+  .signal-lab__focus {
+    position: absolute;
+    left: var(--mx);
+    top: var(--my);
+    z-index: 3;
+    width: clamp(7rem, 15vw, 13rem);
+    aspect-ratio: 1;
+    border: 1px solid rgba(255, 255, 255, 0.58);
+    border-radius: 50%;
+    box-shadow:
+      0 0 0 999px rgba(5, 10, 18, 0.1),
+      0 0 36px rgba(80, 180, 255, 0.34),
+      inset 0 0 28px rgba(255, 255, 255, 0.1);
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, -50%) scale(0.72);
+    transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .signal-lab:hover .signal-lab__focus,
+  .signal-lab.is-active .signal-lab__focus,
+  .signal-lab:focus-visible .signal-lab__focus {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  .signal-lab__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    mix-blend-mode: screen;
+  }
+
+  .signal-lab__wave {
+    fill: none;
+    stroke-linecap: round;
+    stroke-width: 3;
+    stroke-dasharray: 18 18;
+    opacity: 0.82;
+    animation: signal-run 5.6s linear infinite;
+  }
+
+  .signal-lab__wave--blue {
+    stroke: rgba(89, 179, 255, 0.84);
+  }
+
+  .signal-lab__wave--green {
+    stroke: rgba(48, 217, 156, 0.72);
+    animation-duration: 6.8s;
+    animation-direction: reverse;
+  }
+
+  .signal-lab__wave--coral {
+    stroke: rgba(255, 138, 120, 0.76);
+    animation-duration: 7.4s;
+  }
+
+  .signal-lab__nodes {
+    fill: rgba(255, 255, 255, 0.92);
+    stroke: rgba(95, 187, 255, 0.72);
+    stroke-width: 2;
+    animation: nodes-pulse 2.8s ease-in-out infinite;
+  }
+
+  .signal-lab__nodes path {
+    fill: none;
+    stroke: rgba(95, 187, 255, 0.42);
+  }
+
+  .signal-lab__caption {
+    position: absolute;
+    inset: auto clamp(1.2rem, 3vw, 2rem) clamp(1.2rem, 3vw, 2rem);
+    z-index: 4;
+    max-width: 28rem;
+    color: #ffffff;
+    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.55);
+  }
+
+  .signal-lab__caption strong {
+    display: block;
+    font-size: clamp(1.5rem, 3vw, 2.45rem);
+    line-height: 1.05;
+    letter-spacing: 0;
+  }
+
+  .signal-lab__caption span {
+    display: block;
+    margin-top: 0.65rem;
+    color: rgba(255, 255, 255, 0.82);
+    line-height: 1.55;
+  }
+
+  .signal-lab:focus-visible {
+    outline: 3px solid var(--ai-azure);
+    outline-offset: 4px;
+  }
+
+  @keyframes signal-run {
+    to {
+      stroke-dashoffset: -144;
+    }
+  }
+
+  @keyframes nodes-pulse {
+    0%, 100% {
+      opacity: 0.54;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .signal-lab__wave,
+    .signal-lab__nodes {
+      animation: none;
+    }
+
+    .signal-lab__image {
+      transition: none;
+    }
+
+    .signal-lab:hover .signal-lab__image,
+    .signal-lab.is-active .signal-lab__image,
+    .signal-lab:focus-visible .signal-lab__image {
+      transform: scale(1.03);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .signal-lab {
+      border-radius: 1.1rem;
+    }
+
+    .signal-lab__caption {
+      max-width: calc(100% - 2.4rem);
+      bottom: 5.25rem;
+    }
+  }
+</style>
