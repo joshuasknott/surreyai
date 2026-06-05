@@ -60,6 +60,7 @@ type SocietyLinkFacts = PublicAssistantContext["society"];
 const JSON_HEADERS = { "Content-Type": "application/json" };
 const DEFAULT_MAX_MESSAGES = 12;
 const DEFAULT_MAX_INPUT_CHARS = 1200;
+const DEFAULT_GEMINI_MODEL = "gemini-3.1-flash-lite";
 const MAX_TOTAL_USER_CHARS = 6000;
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_REQUESTS = 24;
@@ -130,11 +131,11 @@ function isAIEnabled(): boolean {
 }
 
 function getModel(): string {
-  return env("AI_MODEL") || "gemini-3.1-flash-lite-preview";
+  return env("AI_MODEL") || DEFAULT_GEMINI_MODEL;
 }
 
 function getFallbackModel(): string {
-  return env("AI_FALLBACK_MODEL") || "gemini-3-flash-preview";
+  return env("AI_FALLBACK_MODEL") || DEFAULT_GEMINI_MODEL;
 }
 
 function getThinkingLevel(): string {
@@ -443,7 +444,7 @@ Guidelines:
 - Only reference events, committee members, sponsors, partners, speakers, equipment access, lab access, research access, outcomes, or links when they explicitly appear in Public context. Do not invent or infer any of them.
 - The categories and description are themes only; they are not proof that a programme, project, lab, research opportunity, equipment access, sponsor, partner, speaker, certificate, internship, funding, or outcome exists.
 - If the verified context does not answer the question, say there are no verified public details available and suggest one relevant verified contact or page link.
-- For Surrey AI and DS, LinkedIn is unavailable unless Public context has a non-null LinkedIn URL. Never create or guess one.
+- For Surrey AI and Data Science, LinkedIn is unavailable unless Public context has a non-null LinkedIn URL. Never create or guess one.
 - For Business Society and Neurotech Society, do not imply public AI features beyond this website assistant unless Public context explicitly says so.
 - Never reveal private admin data, secrets, or implementation details.
 
@@ -549,7 +550,7 @@ function buildSocialFallback(societyKey: SocietyKey, society: SocietyLinkFacts):
     society.socials.linkedin ? `LinkedIn: ${society.socials.linkedin}` : null,
     society.studentsUnionUrl ? `Students' Union: ${society.studentsUnionUrl}` : null,
   ].filter(Boolean);
-  const linkedinNote = societyKey === "ai" && !society.socials.linkedin ? " LinkedIn is not currently listed for Surrey AI and DS." : "";
+  const linkedinNote = societyKey === "ai" && !society.socials.linkedin ? " LinkedIn is not currently listed for Surrey AI and Data Science." : "";
   return `${society.name} verified contacts: ${links.join("; ") || contactText(society)}.${linkedinNote}`;
 }
 

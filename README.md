@@ -80,8 +80,8 @@ A monorepo containing three University of Surrey society websites, built with As
    ```bash
    GEMINI_API_KEY=...
    AI_FEATURES_ENABLED=true
-   AI_MODEL=gemini-3.1-flash-lite-preview
-   AI_FALLBACK_MODEL=gemini-3-flash-preview
+   AI_MODEL=gemini-3.1-flash-lite
+   AI_FALLBACK_MODEL=gemini-3.1-flash-lite
    ```
 
    `GEMINI_API_KEY` and `CLERK_SECRET_KEY` must stay server-side only. If `GEMINI_API_KEY` is missing, the assistant falls back to non-generative responses.

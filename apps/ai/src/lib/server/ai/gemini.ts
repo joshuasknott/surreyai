@@ -9,6 +9,8 @@ export type GenerateContentOptions = {
   timeoutMs?: number;
 };
 
+export const GEMINI_3_FLASH_LITE_MODEL = "gemini-3.1-flash-lite";
+
 type GeminiGenerateResult = {
   text?: unknown;
 };
@@ -32,11 +34,11 @@ export function isAIEnabled(): boolean {
 }
 
 function getModel(): string {
-  return env("AI_MODEL") || "gemini-3.1-flash-lite-preview";
+  return env("AI_MODEL") || GEMINI_3_FLASH_LITE_MODEL;
 }
 
 function getFallbackModel(): string {
-  return env("AI_FALLBACK_MODEL") || "gemini-3-flash-preview";
+  return env("AI_FALLBACK_MODEL") || GEMINI_3_FLASH_LITE_MODEL;
 }
 
 function getThinkingLevel(): string {
@@ -46,13 +48,13 @@ function getThinkingLevel(): string {
 function getMaxTokens(): number {
   const raw = env("AI_MAX_OUTPUT_TOKENS");
   const n = raw ? parseInt(raw, 10) : NaN;
-  return Number.isFinite(n) && n > 0 ? n : 512;
+  return Number.isFinite(n) && n > 0 ? n : 4096;
 }
 
 function getTimeoutMs(): number {
   const raw = env("AI_TIMEOUT_MS");
   const n = raw ? parseInt(raw, 10) : NaN;
-  return Number.isFinite(n) && n > 0 ? Math.min(n, 10000) : 4000;
+  return Number.isFinite(n) && n > 0 ? Math.min(n, 30000) : 15000;
 }
 
 function isTimeoutError(error: unknown): boolean {

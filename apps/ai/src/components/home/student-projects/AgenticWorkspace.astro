@@ -12,7 +12,11 @@
     </div>
 
     <div class="aw-top-actions" aria-label="Builder actions">
-      <span class="aw-model-note">Powered by Gemini Flash</span>
+      <span class="aw-model-note">Powered by Gemini 3 Flash</span>
+      <button type="button" class="aw-ghost-btn" data-aw-regenerate>Regenerate</button>
+      <button type="button" class="aw-ghost-btn" data-aw-copy>Copy HTML</button>
+      <button type="button" class="aw-ghost-btn" data-aw-download>Download</button>
+      <button type="button" class="aw-ghost-btn" data-aw-fullscreen>Full screen</button>
       <button type="button" class="aw-ghost-btn" data-aw-share>Share</button>
       <button type="button" class="aw-ghost-btn" data-aw-new>New build</button>
       <button type="button" class="aw-ghost-btn" data-aw-close>Close</button>
@@ -109,7 +113,12 @@
             </div>
           </div>
 
-          <iframe data-aw-preview-iframe title="Agentic Builder generated preview" hidden></iframe>
+          <iframe
+            data-aw-preview-iframe
+            title="Agentic Builder generated preview"
+            sandbox="allow-forms allow-modals allow-popups allow-scripts"
+            hidden
+          ></iframe>
           <pre data-aw-text-result hidden></pre>
         </div>
       </section>
@@ -762,6 +771,17 @@
     reviewer?: AgentStep;
   };
 
+  type StreamEvent = {
+    type?: string;
+    agent?: keyof WorkflowData;
+    step?: AgentStep;
+    output?: WorkflowData;
+    buildId?: string | null;
+    source?: string;
+    model?: string;
+    error?: string;
+  };
+
   const root = document.querySelector<HTMLElement>('[data-agentic-workspace]');
 
   if (root) {
@@ -780,6 +800,10 @@
     const previewIframe = root.querySelector<HTMLIFrameElement>('[data-aw-preview-iframe]');
     const textResult = root.querySelector<HTMLElement>('[data-aw-text-result]');
     const shareButton = root.querySelector<HTMLButtonElement>('[data-aw-share]');
+    const copyButton = root.querySelector<HTMLButtonElement>('[data-aw-copy]');
+    const downloadButton = root.querySelector<HTMLButtonElement>('[data-aw-download]');
+    const fullscreenButton = root.querySelector<HTMLButtonElement>('[data-aw-fullscreen]');
+    const regenerateButton = root.querySelector<HTMLButtonElement>('[data-aw-regenerate]');
     const newButton = root.querySelector<HTMLButtonElement>('[data-aw-new]');
     const closeButton = root.querySelector<HTMLButtonElement>('[data-aw-close]');
 
@@ -791,6 +815,7 @@
     ];
 
     let workflowData: WorkflowData | null = null;
+    let currentBuildId: string | null = null;
 
     const setStatus = (message: string, tone = '') => {
       if (!status) return;
@@ -836,10 +861,20 @@
       });
     };
 
+    const stageForAgent = (agent?: keyof WorkflowData) => {
+      return stageMap.find((stage) => stage.agent === agent);
+    };
+
+    const completedStageKeys = () => {
+      return stageMap
+        .filter((stage) => Boolean(workflowData?.[stage.agent as keyof WorkflowData]))
+        .map((stage) => stage.key);
+    };
+
     const trimText = (text = '', max = 250) => {
       const cleaned = text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
       if (cleaned.length <= max) return cleaned;
-      return `${cleaned.slice(0, max - 1).trimEnd()}…`;
+      return `${cleaned.slice(0, max - 3).trimEnd()}...`;
     };
 
     const resetStepCards = () => {
@@ -874,6 +909,7 @@
 
     const resetWorkspace = (clearPrompt = false) => {
       workflowData = null;
+      currentBuildId = null;
       if (clearPrompt && textarea) textarea.value = '';
       updateCount();
       setLoading(false);
@@ -883,6 +919,15 @@
       resetPreview();
       updateGuidance('Ready when you are', 'Describe a small app, page, or tool and start the build.', 'Preview stays central', 'The working draft will render in the main canvas.', 'Try an example or write your own brief.');
       switchView('preview');
+    };
+
+    const getFinalCode = () => workflowData?.reviewer?.output || workflowData?.builder?.output || '';
+
+    const syncShareUrl = () => {
+      if (!currentBuildId) return window.location.href;
+      const url = new URL(window.location.href);
+      url.searchParams.set('build', currentBuildId);
+      return url.toString();
     };
 
     const updateGuidance = (
@@ -941,7 +986,8 @@
     };
 
     const renderResult = (data: WorkflowData) => {
-      const finalCode = data.reviewer?.output || data.builder?.output || '';
+      workflowData = data;
+      const finalCode = getFinalCode();
       const isHtml = /<!DOCTYPE html>|<html|<body|<style|<script/i.test(finalCode);
 
       previewPlaceholder?.setAttribute('hidden', '');
@@ -958,6 +1004,117 @@
         textResult.hidden = false;
       }
       if (previewIframe) previewIframe.hidden = true;
+    };
+
+    const applyStreamEvent = (event: StreamEvent) => {
+      if (event.type === 'stage-start') {
+        const stage = stageForAgent(event.agent);
+        if (stage) {
+          setStage(stage.key, completedStageKeys());
+          updateGuidance(`${stage.title} running`, 'This agent is working on the build now.', 'Preview pending', 'The canvas will update when the reviewed draft is ready.', 'Build steps are updating live.');
+        }
+        return;
+      }
+
+      if (event.type === 'stage-complete' && event.agent && event.step) {
+        workflowData = { ...(workflowData || {}), [event.agent]: event.step };
+        const stage = stageForAgent(event.agent);
+        if (stage) {
+          updateStepCard(event.agent, `${stage.title} complete`, event.step);
+          setStage('', completedStageKeys());
+        }
+        return;
+      }
+
+      if (event.type === 'complete') {
+        workflowData = event.output || workflowData;
+        currentBuildId = event.buildId || null;
+        if (workflowData) {
+          setStage('', stageMap.map((stage) => stage.key));
+          stageMap.forEach((stage) => {
+            updateStepCard(
+              stage.agent as keyof WorkflowData,
+              `${stage.title} complete`,
+              workflowData?.[stage.agent as keyof WorkflowData]
+            );
+          });
+          renderResult(workflowData);
+        }
+        setStatus(currentBuildId ? 'Draft ready. Share link saved.' : 'Draft ready. Sharing is unavailable.', 'success');
+        updateGuidance('Build complete', 'The working draft is ready in Preview.', 'Review available', 'Open Build steps to inspect the agent outputs.', 'Copy, download, regenerate, or share the build.');
+        return;
+      }
+
+      if (event.type === 'error') {
+        setStatus(event.error || 'Agentic Builder is unavailable right now.', 'error');
+        updateGuidance('Build paused', 'The builder could not finish this request.', 'Nothing was changed', 'Your prompt is still here if you want to try again.', 'Try regenerating the build.');
+      }
+    };
+
+    const readWorkflowStream = async (response: Response) => {
+      const reader = response.body?.getReader();
+      if (!reader) {
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(payload.error || 'Agentic Builder is unavailable right now.');
+        applyStreamEvent({ type: 'complete', output: payload.output, buildId: payload.buildId, source: payload.source });
+        return;
+      }
+
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          if (!line.trim()) continue;
+          applyStreamEvent(JSON.parse(line) as StreamEvent);
+        }
+      }
+
+      if (buffer.trim()) {
+        applyStreamEvent(JSON.parse(buffer) as StreamEvent);
+      }
+    };
+
+    const loadSharedBuild = async (buildId: string) => {
+      setLoading(true);
+      resetPreview();
+      resetStepCards();
+      setStatus('Loading shared build.');
+      updateGuidance('Loading build', 'The saved prompt and preview are being restored.', 'Preview pending', 'The generated app will appear shortly.', 'Keep this window open.');
+
+      try {
+        const response = await fetch(`/api/ai/agent-build?id=${encodeURIComponent(buildId)}`);
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(payload.error || 'Build could not be loaded.');
+        workflowData = payload.output || null;
+        currentBuildId = buildId;
+        if (textarea && typeof payload.task === 'string') textarea.value = payload.task;
+        updateCount();
+        if (workflowData) {
+          stageMap.forEach((stage) => {
+            updateStepCard(
+              stage.agent as keyof WorkflowData,
+              `${stage.title} complete`,
+              workflowData?.[stage.agent as keyof WorkflowData]
+            );
+          });
+          setStage('', stageMap.map((stage) => stage.key));
+          renderResult(workflowData);
+        }
+        setStatus('Shared draft loaded.', 'success');
+        updateGuidance('Build loaded', 'The saved generated draft is ready in Preview.', 'Steps restored', 'Open Build steps to inspect the agent outputs.', 'Copy, download, regenerate, or share the build.');
+      } catch {
+        setStatus('Shared build could not be loaded.', 'error');
+        updateGuidance('Load failed', 'The saved build may no longer be available.', 'Prompt unchanged', 'You can still start a new build.', 'Try a new prompt or check the shared link.');
+      } finally {
+        setLoading(false);
+      }
     };
 
     tabs.forEach((tab) => {
@@ -990,12 +1147,14 @@
       }
 
       setLoading(true);
+      workflowData = null;
+      currentBuildId = null;
       resetPreview();
       resetStepCards();
       setStage('brief', []);
       switchView('preview');
-      setStatus('Gemini Flash is building your draft.');
-      updateGuidance('Reading your brief', 'We are turning your prompt into a simple build plan.', 'Preparing the draft', 'The preview will update when the result is ready.', 'Keep this window open while the build runs.');
+      setStatus('Gemini 3 Flash is building your draft.');
+      updateGuidance('Reading your brief', 'We are turning your prompt into a simple build plan.', 'Preparing the draft', 'The preview will update when the reviewed result is ready.', 'Keep this window open while the build runs.');
 
       try {
         const response = await fetch('/api/ai/agent-workflow', {
@@ -1004,23 +1163,14 @@
           body: JSON.stringify({ task }),
         });
 
-        const payload = await response.json().catch(() => ({}));
         if (!response.ok) {
+          const payload = await response.json().catch(() => ({}));
           setStatus(payload.error || 'Agentic Builder is unavailable right now.', 'error');
           updateGuidance('Build paused', 'The builder could not start from this environment.', 'Nothing was changed', 'Your prompt is still here if you want to try again.', 'Check the AI configuration or start a new build.');
           return;
         }
 
-        workflowData = payload.output || null;
-        if (!workflowData) {
-          setStatus('The builder returned an empty result. Try again.', 'error');
-          return;
-        }
-
-        await animateStages(workflowData);
-        renderResult(workflowData);
-        setStatus('Draft ready.', 'success');
-        updateGuidance('Build complete', 'The working draft is ready in Preview.', 'Review available', 'Open Build steps to see what changed.', 'Share, start a new build, or close the tool.');
+        await readWorkflowStream(response);
       } catch {
         setStatus('Network error. Please try again.', 'error');
         updateGuidance('Build paused', 'The connection dropped before the draft was ready.', 'Prompt saved', 'Your text is still available on the left.', 'Try starting the build again.');
@@ -1037,23 +1187,80 @@
       window.dispatchEvent(new CustomEvent('surrey-ai-project-modal-close'));
     });
 
+    regenerateButton?.addEventListener('click', () => {
+      form?.requestSubmit();
+    });
+
+    copyButton?.addEventListener('click', async () => {
+      const code = getFinalCode();
+      if (!code) {
+        setStatus('Build something first, then copy the HTML.', 'error');
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(code);
+        setStatus('Generated HTML copied.', 'success');
+      } catch {
+        setStatus('Copy failed. Try downloading instead.', 'error');
+      }
+    });
+
+    downloadButton?.addEventListener('click', () => {
+      const code = getFinalCode();
+      if (!code) {
+        setStatus('Build something first, then download it.', 'error');
+        return;
+      }
+
+      const blob = new Blob([code], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'agentic-builder-draft.html';
+      document.body.append(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      setStatus('HTML download started.', 'success');
+    });
+
+    fullscreenButton?.addEventListener('click', () => {
+      const code = getFinalCode();
+      if (!code) {
+        setStatus('Build something first, then open it full screen.', 'error');
+        return;
+      }
+
+      const preview = window.open('', '_blank', 'noopener,noreferrer');
+      if (!preview) {
+        setStatus('Full screen preview was blocked by the browser.', 'error');
+        return;
+      }
+      preview.document.open();
+      preview.document.write(code);
+      preview.document.close();
+      setStatus('Full screen preview opened.', 'success');
+    });
+
     shareButton?.addEventListener('click', async () => {
       const shareText = textarea?.value.trim()
         ? `Agentic Builder draft: ${textarea.value.trim()}`
         : 'Agentic Builder on Surrey AI Society';
+      const shareUrl = syncShareUrl();
 
       try {
         if (navigator.share) {
           await navigator.share({
             title: 'Agentic Builder',
             text: shareText,
-            url: window.location.href,
+            url: shareUrl,
           });
           setStatus('Share sheet opened.', 'success');
           return;
         }
 
-        await navigator.clipboard.writeText(`${shareText}\n${window.location.href}`);
+        await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
         setStatus('Share link copied.', 'success');
       } catch {
         setStatus('Share was cancelled.');
@@ -1061,5 +1268,10 @@
     });
 
     updateCount();
+
+    const sharedBuildId = new URL(window.location.href).searchParams.get('build');
+    if (sharedBuildId) {
+      loadSharedBuild(sharedBuildId);
+    }
   }
 </script>

@@ -139,4 +139,28 @@ export default defineSchema({
     details: v.optional(v.string()),
   })
     .index("by_society", ["societyId"]),
+
+  agentBuilds: defineTable({
+    task: v.string(),
+    title: v.string(),
+    plannerThinking: v.string(),
+    plannerOutput: v.string(),
+    researcherThinking: v.string(),
+    researcherOutput: v.string(),
+    builderThinking: v.string(),
+    builderOutput: v.string(),
+    reviewerThinking: v.string(),
+    reviewerOutput: v.string(),
+    source: v.union(v.literal("ai"), v.literal("fallback")),
+    model: v.string(),
+    createdAt: v.number(),
+  }).index("by_created_at", ["createdAt"]),
+
+  agentRateLimits: defineTable({
+    scope: v.string(),
+    key: v.string(),
+    count: v.number(),
+    resetAt: v.number(),
+    updatedAt: v.number(),
+  }).index("by_scope_and_key", ["scope", "key"]),
 });

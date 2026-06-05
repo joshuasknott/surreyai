@@ -4,7 +4,7 @@ export const SOCIETIES: Record<string, Society> = {
   ai: {
     id: 'ai',
     name: 'Surrey Artificial Intelligence and Data Science Society',
-    shortName: 'Surrey AI and DS',
+    shortName: 'Surrey AI and Data Science',
     slug: 'ai',
     adminBasePath: '/admin',
     publicBasePath: '/',

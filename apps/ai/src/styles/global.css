@@ -357,10 +357,10 @@ img.duotone-tint {
 .section-title {
   margin: 0.55rem 0 0;
   color: var(--ai-fg);
-  font-size: clamp(2rem, 4vw, 4rem);
+  font-size: clamp(1.65rem, 3vw, 3rem);
   font-weight: 850;
   letter-spacing: 0;
-  line-height: 1.04;
+  line-height: 1.08;
 }
 
 .section-intro {
@@ -420,10 +420,10 @@ img.duotone-tint {
 .page-hero h1 {
   margin: 0.7rem 0 0;
   color: var(--ai-fg);
-  font-size: clamp(2.8rem, 5.8vw, 5.2rem);
+  font-size: clamp(2.1rem, 4.8vw, 4rem);
   font-weight: 850;
   letter-spacing: 0;
-  line-height: 1.02;
+  line-height: 1.08;
 }
 
 .page-hero p {

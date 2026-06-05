@@ -21,29 +21,29 @@ const formatEventDate = (date?: string) => {
 
 const programmeFormats = [
   {
-    title: "Build sessions",
-    text: "Hands-on evenings for small tools, model experiments, data notebooks, and member demos.",
+    title: "Workshops and tutorials",
+    text: "Hands-on sessions covering practical AI and data science skills, from Python and machine learning to evaluation and data analysis.",
   },
   {
-    title: "AI literacy workshops",
-    text: "Beginner-friendly sessions on prompts, datasets, evaluation, model limits, and everyday AI use.",
+    title: "Hackathons and project nights",
+    text: "Collaborative sessions for coding challenges, data science competitions, prototypes, portfolio projects, and member demos.",
   },
   {
-    title: "Impact discussions",
-    text: "Structured conversations about bias, reliability, labour, accessibility, privacy, and creative practice.",
+    title: "Talks, careers, and socials",
+    text: "Guest sessions, career conversations, responsible AI discussions, quizzes, casual coding nights, and meetups for the community.",
   },
 ];
 ---
 
 <Layout
   title="Events"
-  description="Upcoming and planned events from Surrey Artificial Intelligence and Data Science Society."
+  description="Upcoming AI and data science workshops, project sessions, competitions, talks, careers activity, and socials from Surrey Artificial Intelligence and Data Science Society."
 >
   <section class="events-hero">
     <div class="events-hero__copy">
-      <h1>Workshops, discussions, and project sessions for AI curious students.</h1>
+      <h1>Events and workshops</h1>
       <p>
-        Confirmed sessions appear from the society admin system. The programme is designed around learning by seeing, building, testing, and debating real AI and data workflows.
+        Confirmed sessions appear from the society admin system. The programme is designed around learning by seeing, building, testing, competing, meeting people, and debating real AI and data workflows.
       </p>
     </div>
     <CutoutVisual
@@ -51,7 +51,7 @@ const programmeFormats = [
       image={eventsWorkshopCutout}
       alt="AI workshop kit with projector, laptop, sticky notes, blank event cards, coffee, and cable"
       title="Events are built around things students can try."
-      body="Workshops, clinics, and discussions stay practical without becoming a technical wall."
+      body="Workshops, clinics, competitions, talks, and discussions stay practical without becoming a technical wall."
       loading="eager"
     />
   </section>
@@ -59,9 +59,9 @@ const programmeFormats = [
   <section class="ai-section ai-section--tinted" aria-labelledby="formats-title">
     <div class="ai-section__inner">
       <div class="ai-section__header ai-section__header--split">
-        <h2 id="formats-title" class="section-title">Programme formats.</h2>
+        <h2 id="formats-title" class="section-title">Event formats</h2>
         <p class="section-intro">
-          The calendar can shift each semester, but these are the recurring types of activities members should expect.
+          The calendar can shift each semester, but these are the types of activities the society is built to support.
         </p>
       </div>
 
@@ -95,7 +95,7 @@ const programmeFormats = [
           <div class="calendar-empty__copy">
             <h3>Next events will appear here once confirmed.</h3>
             <p>
-              This page stays honest until the next committee or signatories publish the calendar. Join the society or follow the socials for updates.
+              This page stays honest until the next committee or signatories publish the calendar. Join the society or follow the socials for workshop, competition, talk, project, and social updates.
             </p>
             <div class="calendar-empty__actions">
               <a href="/join" class="btn-primary">Join the Society</a>
@@ -103,9 +103,9 @@ const programmeFormats = [
             </div>
           </div>
           <div class="calendar-empty__board" aria-label="Planned event formats">
-            <span>Build sessions</span>
-            <span>AI literacy workshops</span>
-            <span>Impact discussions</span>
+            <span>Workshops and tutorials</span>
+            <span>Hackathons and project nights</span>
+            <span>Talks, careers, and socials</span>
           </div>
         </div>
       ) : (
@@ -148,10 +148,10 @@ const programmeFormats = [
   .events-hero__copy h1 {
     margin: 0;
     color: var(--ai-fg);
-    font-size: clamp(2.55rem, 4.6vw, 4.65rem);
+    font-size: clamp(2.1rem, 4vw, 3.6rem);
     font-weight: 850;
     letter-spacing: 0;
-    line-height: 1;
+    line-height: 1.08;
   }
 
   .events-hero__copy p {

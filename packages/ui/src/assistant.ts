@@ -24,12 +24,12 @@ export const ASSISTANT_CONFIGS: Record<AssistantSocietyKey, AssistantSocietyConf
   ai: {
     societyKey: "ai",
     societyName: "Surrey Artificial Intelligence and Data Science Society",
-    shortName: "Surrey AI and DS",
+    shortName: "Surrey AI and Data Science",
     shortDescription:
       "A student-led community for learning, building, and discussing artificial intelligence and data science at the University of Surrey.",
     tone: "clear, practical, beginner-friendly, responsible, and curious",
     starterPrompts: [
-      "What is Surrey AI and DS about?",
+      "What is Surrey AI and Data Science about?",
       "What events are coming up?",
       "I am new to AI. Where should I start?",
       "How can I get involved in projects?",
