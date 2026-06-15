@@ -2,9 +2,11 @@
 export const prerender = false;
 import AdminLayout from '../../../layouts/AdminLayout.astro';
 import { actions } from 'astro:actions';
+import { generateCsrfToken } from '@surreysocieties/admin';
 
 const SOCIETY_ID = 'ai';
 const client = Astro.locals.convexClient;
+const csrfToken = generateCsrfToken(Astro.locals.user!._id);
 const members: any[] = (await client.query('committee:listPastForAdmin', { societySlug: SOCIETY_ID }))
   .sort((a: any, b: any) =>
     (b.yearLabel || '').localeCompare(a.yearLabel || '') ||
@@ -59,6 +61,7 @@ const actionDeleted = actionResult && !actionResult.error;
                 <div class="table-actions">
                   <a href={`/admin/past-committee/${member._id}/edit`} class="btn btn-outline btn-sm">Edit</a>
                   <form method="POST" action={actions.admin.deletePastCommitteeMember} style="display:inline;" onsubmit="return confirm('Remove this past committee member?')">
+                    <input type="hidden" name="_csrf" value={csrfToken} />
                     <input type="hidden" name="id" value={member._id} />
                     <button type="submit" class="btn btn-ghost btn-sm" style="color: var(--color-admin-danger);">Remove</button>
                   </form>

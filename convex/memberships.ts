@@ -3,6 +3,7 @@ import { v } from "convex/values";
 import {
   requireAuth,
   requireAdmin,
+  requireExistingAdmin,
   canManageRole,
   isProtectedEmail,
   logAction,
@@ -19,6 +20,12 @@ export const listBySociety = query({
       .withIndex("by_slug", (q) => q.eq("slug", societySlug))
       .first();
     if (!society) return [];
+
+    try {
+      await requireExistingAdmin(ctx, society._id);
+    } catch {
+      return [];
+    }
 
     const memberships = await ctx.db
       .query("memberships")
@@ -146,6 +153,12 @@ export const listInvitations = query({
       )
       .first();
     if (!membership || membership.status !== "active") return [];
+
+    try {
+      await requireExistingAdmin(ctx, society._id);
+    } catch {
+      return [];
+    }
 
     return await ctx.db
       .query("invitations")

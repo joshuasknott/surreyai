@@ -1,7 +1,15 @@
 import { createHmac, randomBytes } from 'node:crypto';
 
-const CSRF_SECRET = process.env.CSRF_SECRET || randomBytes(32).toString('hex');
+const DEV_CSRF_SECRET = randomBytes(32).toString('hex');
 const TOKEN_EXPIRY_MS = 4 * 60 * 60 * 1000; // 4 hours
+
+function getCsrfSecret(): string {
+  if (process.env.CSRF_SECRET) return process.env.CSRF_SECRET;
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('CSRF_SECRET is required in production');
+  }
+  return DEV_CSRF_SECRET;
+}
 
 /**
  * Generates a CSRF token bound to a session identifier.
@@ -10,7 +18,7 @@ const TOKEN_EXPIRY_MS = 4 * 60 * 60 * 1000; // 4 hours
 export function generateCsrfToken(sessionId: string): string {
   const timestamp = Date.now().toString(36);
   const payload = `${sessionId}:${timestamp}`;
-  const signature = createHmac('sha256', CSRF_SECRET)
+  const signature = createHmac('sha256', getCsrfSecret())
     .update(payload)
     .digest('hex');
   return `${payload}:${signature}`;
@@ -36,7 +44,7 @@ export function verifyCsrfToken(token: string | undefined | null, sessionId: str
 
   // Verify signature
   const expectedPayload = `${storedSessionId}:${timestamp}`;
-  const expectedSignature = createHmac('sha256', CSRF_SECRET)
+  const expectedSignature = createHmac('sha256', getCsrfSecret())
     .update(expectedPayload)
     .digest('hex');
 

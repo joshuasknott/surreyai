@@ -2,15 +2,17 @@
 export const prerender = false;
 import AdminLayout from '../../../layouts/AdminLayout.astro';
 import { actions } from 'astro:actions';
+import { generateCsrfToken } from '@surreysocieties/admin';
 
 const SOCIETY_ID = 'ai';
 const user = Astro.locals.user!;
 const client = Astro.locals.convexClient;
-
-const members: any[] = await client.query("memberships:listBySociety", { societySlug: SOCIETY_ID });
-const invitations: any[] = await client.query("memberships:listInvitations", { societySlug: SOCIETY_ID });
-const pendingInvitations = invitations.filter(i => i.status === 'pending');
 const isManager = user.role === 'owner' || user.role === 'protectedAdmin' || user.role === 'admin';
+const csrfToken = generateCsrfToken(user._id);
+
+const members: any[] = isManager ? await client.query("memberships:listBySociety", { societySlug: SOCIETY_ID }) : [];
+const invitations: any[] = isManager ? await client.query("memberships:listInvitations", { societySlug: SOCIETY_ID }) : [];
+const pendingInvitations = invitations.filter(i => i.status === 'pending');
 
 const success = Astro.url.searchParams.get('success');
 const invited = Astro.url.searchParams.get('invited');
@@ -34,6 +36,8 @@ function formatRole(role: string): string {
   {(success || actionSuccess) && <div class="alert alert-success">Admin action completed.</div>}
   {invited && <div class="alert alert-success">Invitation sent.</div>}
 
+  {isManager ? (
+    <>
   <div class="admin-table-wrapper" style="margin-bottom: 2.5rem;">
     <table class="admin-table">
       <thead>
@@ -54,6 +58,7 @@ function formatRole(role: string): string {
               <td>
                 {member.role !== 'owner' && (user.role === 'owner' || member.role !== 'protectedAdmin') && member.user?._id !== user._id && (
                   <form method="POST" action={actions.admin.removeAdmin} style="display:inline;" onsubmit="return confirm('Remove admin access for this user?')">
+                    <input type="hidden" name="_csrf" value={csrfToken} />
                     <input type="hidden" name="userId" value={member.user?._id} />
                     <button type="submit" class="btn btn-ghost btn-sm" style="color: var(--color-admin-danger);">Remove</button>
                   </form>
@@ -116,6 +121,7 @@ function formatRole(role: string): string {
                   {isManager && (
                     <td>
                       <form method="POST" action={actions.admin.revokeInvite} style="display:inline;">
+                        <input type="hidden" name="_csrf" value={csrfToken} />
                         <input type="hidden" name="invitationId" value={inv._id} />
                         <button type="submit" class="btn btn-ghost btn-sm" style="color: var(--color-admin-danger);">Revoke</button>
                       </form>
@@ -128,6 +134,15 @@ function formatRole(role: string): string {
         </table>
       </div>
     </>
+  )}
+    </>
+  ) : (
+    <div class="admin-table-wrapper">
+      <div class="empty-state">
+        <div class="empty-state-title">Admin role required</div>
+        <p>User and invitation management is available to society admins only.</p>
+      </div>
+    </div>
   )}
 
   <script is:inline>
