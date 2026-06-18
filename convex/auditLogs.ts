@@ -1,6 +1,7 @@
 import { query } from "./_generated/server";
 import { v } from "convex/values";
 import { requireExistingAdmin } from "./permissions";
+import type { Doc } from "./_generated/dataModel";
 
 export const listBySociety = query({
   args: { societySlug: v.string() },
@@ -21,12 +22,11 @@ export const listBySociety = query({
       .query("auditLogs")
       .withIndex("by_society", (q) => q.eq("societyId", society._id))
       .order("desc")
-      .take(100)
-      .collect();
+      .take(100);
 
     const result = [];
     for (const log of logs) {
-      const logUser = await ctx.db.get(log.userId);
+      const logUser: Doc<"users"> | null = await ctx.db.get(log.userId);
       result.push({
         ...log,
         userName: logUser?.name || "Unknown",

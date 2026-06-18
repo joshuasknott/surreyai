@@ -2,6 +2,7 @@
 export const prerender = false;
 import Layout from "../layouts/Layout.astro";
 import { queryPublicConvex } from "@surreysocieties/admin";
+import { api } from "../../../../convex/_generated/api.js";
 import { getSocietyById } from "@surreysocieties/admin/config";
 import CutoutVisual from "../components/common/CutoutVisual.astro";
 import eventsWorkshopCutout from "../assets/generated/ai-events-workshop-cutout.png";
@@ -9,7 +10,7 @@ import "../styles/global.css";
 
 const SOCIETY_ID = "ai";
 const society = getSocietyById(SOCIETY_ID)!;
-const events: any[] = (await queryPublicConvex<any[]>("events:listPublished", { societySlug: SOCIETY_ID }, []))
+const events: any[] = (await queryPublicConvex(api.events.listPublished, { societySlug: SOCIETY_ID }, []))
   .filter((event: any) => event.status === "published");
 
 const formatEventDate = (date?: string) => {
@@ -22,7 +23,7 @@ const formatEventDate = (date?: string) => {
 const programmeFormats = [
   {
     title: "Workshops and tutorials",
-    text: "Hands-on sessions covering practical AI and data science skills, from Python and machine learning to evaluation and data analysis.",
+    text: "Hands-on sessions covering practical artificial intelligence skills, from Python and machine learning to evaluation and data analysis.",
   },
   {
     title: "Hackathons and project nights",
@@ -37,7 +38,7 @@ const programmeFormats = [
 
 <Layout
   title="Events"
-  description="Upcoming AI and data science workshops, project sessions, competitions, talks, careers activity, and socials from Surrey Artificial Intelligence and Data Science Society."
+  description="Upcoming artificial intelligence workshops, project sessions, competitions, talks, careers activity, and socials from Surrey Artificial Intelligence Society."
 >
   <section class="events-hero">
     <div class="events-hero__copy">

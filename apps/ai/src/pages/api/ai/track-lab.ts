@@ -520,7 +520,7 @@ function normalizeSwatches(value: unknown): JsonObject[] {
   if (!Array.isArray(value)) return [];
 
   return value
-    .map((swatch) => {
+    .map((swatch): JsonObject | null => {
       if (!isRecord(swatch)) return null;
       const name = cleanString(swatch.name, 40);
       const hex = cleanString(swatch.hex, 12);

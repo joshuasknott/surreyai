@@ -61,7 +61,7 @@ A monorepo containing three University of Surrey society websites, built with As
 
    | Society | Email |
    |---------|-------|
-   | AI Society | ussu.aianddatascience@surrey.ac.uk |
+   | Surrey AI Society | ussu.aianddatascience@surrey.ac.uk |
    | Business Society | ussu.bizsoc@surrey.ac.uk |
    | Neurotech Society | ussu.neurotechsoc@surrey.ac.uk |
 
@@ -152,7 +152,7 @@ These are the society signatory emails with permanent `protectedAdmin` access:
 
 | Society | Email |
 |---------|-------|
-| AI Society | ussu.aianddatascience@surrey.ac.uk |
+| Surrey AI Society | ussu.aianddatascience@surrey.ac.uk |
 | Business Society | ussu.bizsoc@surrey.ac.uk |
 | Neurotech Society | ussu.neurotechsoc@surrey.ac.uk |
 

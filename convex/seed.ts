@@ -33,7 +33,7 @@ type CanonicalMetadataPatch = {
 const canonicalSocietyData: CanonicalSocietyData[] = [
   {
     name: "Surrey Artificial Intelligence Society",
-    shortName: "AI Society",
+    shortName: "Surrey AI Society",
     slug: "ai",
     domain: "surreyaisociety.org",
     establishedYear: 2025,

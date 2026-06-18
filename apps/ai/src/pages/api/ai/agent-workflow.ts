@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
 import { createConvexClient } from "@surreysocieties/admin";
+import { api } from "../../../../../../convex/_generated/api.js";
 import {
   GEMINI_3_FLASH_LITE_MODEL,
   generateContent,
@@ -305,10 +306,8 @@ async function saveBuild(
   source: Source
 ): Promise<string | null> {
   try {
-    const client = createConvexClient() as unknown as {
-      mutation(name: string, args: Record<string, unknown>): Promise<unknown>;
-    };
-    const id = await client.mutation("agentBuilds:create", {
+    const client = createConvexClient();
+    const id = await client.mutation(api.agentBuilds.create, {
       task,
       title: titleFromTask(task),
       plannerThinking: output.planner.thinking,
@@ -351,10 +350,8 @@ async function consumeBuilderRun(
   | { verified: false }
 > {
   try {
-    const client = createConvexClient() as unknown as {
-      mutation(name: string, args: Record<string, unknown>): Promise<unknown>;
-    };
-    const result = await client.mutation("agentBuilds:consumeRateLimit", { key });
+    const client = createConvexClient();
+    const result = await client.mutation(api.agentBuilds.consumeRateLimit, { key });
     if (!isRecord(result) || typeof result.allowed !== "boolean") {
       return { verified: false };
     }

@@ -18,18 +18,28 @@
     "build:business": "npm run build -w apps/business",
     "build:neurotech": "npm run build -w apps/neurotech",
     "build:all": "npm run build -w apps/ai && npm run build -w apps/business && npm run build -w apps/neurotech",
+    "typecheck": "tsc -b --pretty false",
     "test:e2e": "playwright test",
     "e2e": "npm run test:e2e",
     "provision:admins": "node scripts/provision-admins.mjs"
   },
   "overrides": {
-    "vite": "^7.3.2"
+    "esbuild": "0.28.1",
+    "ws": "8.21.0",
+    "astro": {
+      "esbuild": "0.28.1"
+    },
+    "vite": {
+      ".": "^7.3.2",
+      "esbuild": "0.28.1"
+    }
   },
   "dependencies": {
     "convex": "^1.37.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.60.0",
-    "sharp": "^0.34.5"
+    "sharp": "^0.34.5",
+    "typescript": "^5.9.3"
   }
 }

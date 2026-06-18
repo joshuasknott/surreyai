@@ -1,60 +1,440 @@
 ---
-import { Image } from "astro:assets";
-import homeStudyCutout from "../../assets/generated/ai-home-study-cutout.png";
+import robotHead from "../../assets/generated/ai-robot-head.png";
 ---
 
-<section class="home-hero" aria-labelledby="home-hero-title">
-  <div class="home-hero__art" aria-hidden="true">
-    <div class="home-hero__art-glow"></div>
-    <Image
-      src={homeStudyCutout}
-      alt=""
-      widths={[720, 1080, 1440, 1800]}
-      sizes="(min-width: 900px) 58vw, 100vw"
-      class="home-hero__image"
-      loading="eager"
-      format="webp"
-    />
+<section class="home-hero" aria-labelledby="home-hero-title" data-ai-robot-hero>
+  <div class="home-hero__backplate" aria-hidden="true"></div>
+
+  <div class="home-hero__stage" aria-hidden="true">
+    <canvas class="home-hero__canvas" id="ai-robot-head-canvas" data-robot-head-src={robotHead.src}></canvas>
+    <div class="home-hero__fallback">
+      <div class="home-hero__fallback-head">
+        <span></span>
+        <span></span>
+      </div>
+    </div>
   </div>
-  <svg class="home-hero__signal" viewBox="0 0 1400 760" preserveAspectRatio="none" aria-hidden="true">
-    <path d="M0 542 C178 472 292 588 450 502 S710 342 892 416 1140 548 1400 392" />
-    <path d="M118 650 C264 572 394 624 522 548 S772 396 938 474 1180 596 1368 474" />
-    <circle cx="450" cy="502" r="5" />
-    <circle cx="892" cy="416" r="7" />
-    <circle cx="1164" cy="486" r="5" />
-  </svg>
+
   <div class="home-hero__inner">
     <div class="home-hero__copy">
-      <h1 id="home-hero-title" class="home-hero__title">
-        Surrey AI and Data Science Society
+      <p class="home-hero__kicker" data-hero-reveal>Student-led artificial intelligence at Surrey</p>
+      <h1 id="home-hero-title" class="home-hero__title" data-hero-reveal>
+        Surrey Artificial Intelligence Society
       </h1>
-      <p class="home-hero__intro">
-        A student community for exploring artificial intelligence, machine learning, and data science through practical workshops, projects, competitions, and responsible discussion.
+      <p class="home-hero__intro" data-hero-reveal>
+        Explore artificial intelligence, machine learning, and data science through practical workshops, projects, competitions, and responsible discussion.
       </p>
-      <p class="home-hero__domains">Beginner-friendly learning / hands-on projects / hackathons / responsible AI / careers</p>
-      <div class="home-hero__actions">
+      <p class="home-hero__domains" data-hero-reveal>
+        Beginner-friendly learning / hands-on projects / hackathons / responsible AI / careers
+      </p>
+
+      <div class="home-hero__actions" data-hero-reveal>
         <a href="/join" class="btn-primary">Join the Society</a>
         <a href="#projects" class="btn-secondary">See Projects</a>
       </div>
     </div>
+
+    <nav class="home-hero__rail" aria-label="Surrey AI Society quick links" data-hero-reveal>
+      <a href="#events" class="home-hero__rail-item">
+        <span>Events</span>
+        <strong>Workshops, talks, socials</strong>
+      </a>
+      <a href="#explore" class="home-hero__rail-item">
+        <span>Learning</span>
+        <strong>Skills, projects, impact</strong>
+      </a>
+      <a href="#projects" class="home-hero__rail-item">
+        <span>Projects</span>
+        <strong>Member-made demos</strong>
+      </a>
+    </nav>
   </div>
 </section>
 
+<script>
+  import * as THREE from "three";
+  import { animate, stagger } from "animejs";
+
+  const hero = document.querySelector("[data-ai-robot-hero]") as HTMLElement | null;
+  const canvas = document.getElementById("ai-robot-head-canvas") as HTMLCanvasElement | null;
+  const stage = canvas?.closest(".home-hero__stage") as HTMLElement | null;
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const clamp = (value: number, min = 0, max = 1) => Math.min(max, Math.max(min, value));
+
+  if (hero && canvas && stage) {
+    if (!prefersReducedMotion) {
+      animate(hero.querySelectorAll("[data-hero-reveal]"), {
+        opacity: [0, 1],
+        y: [18, 0],
+        duration: 820,
+        delay: stagger(75),
+        ease: "outCubic",
+      });
+    }
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
+    camera.position.set(0, -0.08, 8.8);
+
+    let renderer: THREE.WebGLRenderer | null = null;
+
+    try {
+      renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, preserveDrawingBuffer: true });
+    } catch {
+      renderer = null;
+    }
+
+    if (renderer) {
+      renderer.setClearColor(0x000000, 0);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      hero.classList.add("home-hero--ready");
+
+      const robotGroup = new THREE.Group();
+      const headGroup = new THREE.Group();
+      const imageHeadGroup = new THREE.Group();
+      const orbitGroup = new THREE.Group();
+      const ambientGroup = new THREE.Group();
+      robotGroup.add(imageHeadGroup, orbitGroup);
+      scene.add(robotGroup, ambientGroup);
+
+      const roundedRectShape = (width: number, height: number, radius: number) => {
+        const x = -width / 2;
+        const y = -height / 2;
+        const shape = new THREE.Shape();
+        shape.moveTo(x + radius, y);
+        shape.lineTo(x + width - radius, y);
+        shape.quadraticCurveTo(x + width, y, x + width, y + radius);
+        shape.lineTo(x + width, y + height - radius);
+        shape.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        shape.lineTo(x + radius, y + height);
+        shape.quadraticCurveTo(x, y + height, x, y + height - radius);
+        shape.lineTo(x, y + radius);
+        shape.quadraticCurveTo(x, y, x + radius, y);
+        return shape;
+      };
+
+      const roundedExtrude = (width: number, height: number, radius: number, depth: number, bevel: number) => {
+        const geometry = new THREE.ExtrudeGeometry(roundedRectShape(width, height, radius), {
+          depth,
+          bevelEnabled: true,
+          bevelSize: bevel,
+          bevelThickness: bevel,
+          bevelSegments: 10,
+          steps: 1,
+        });
+        geometry.center();
+        return geometry;
+      };
+
+      const shellGeometry = roundedExtrude(3.1, 2.45, 0.55, 1.1, 0.13);
+      const shellEdgeGeometry = new THREE.EdgesGeometry(shellGeometry, 24);
+      const visorGeometry = roundedExtrude(2.2, 1.16, 0.28, 0.06, 0.025);
+      const eyeGeometry = new THREE.SphereGeometry(0.16, 24, 16);
+      const sideGeometry = new THREE.CylinderGeometry(0.2, 0.2, 0.52, 28);
+      const antennaStemGeometry = new THREE.CylinderGeometry(0.035, 0.035, 0.52, 16);
+      const antennaNodeGeometry = new THREE.SphereGeometry(0.12, 20, 12);
+      const nodeGeometry = new THREE.SphereGeometry(0.055, 14, 10);
+
+      const shellMaterial = new THREE.MeshPhysicalMaterial({
+        color: 0xdfe8f6,
+        metalness: 0.32,
+        roughness: 0.28,
+        clearcoat: 0.52,
+        clearcoatRoughness: 0.24,
+        emissive: 0x0f172a,
+        emissiveIntensity: 0.04,
+      });
+      const edgeMaterial = new THREE.LineBasicMaterial({
+        color: 0x74b7ff,
+        transparent: true,
+        opacity: 0.34,
+      });
+      const accentMeshMaterial = new THREE.MeshBasicMaterial({
+        color: 0x74b7ff,
+        transparent: true,
+        opacity: 0.72,
+      });
+      const visorMaterial = new THREE.MeshPhysicalMaterial({
+        color: 0x07111e,
+        metalness: 0.16,
+        roughness: 0.18,
+        transmission: 0.08,
+        transparent: true,
+        opacity: 0.9,
+        emissive: 0x155e75,
+        emissiveIntensity: 0.55,
+      });
+      const eyeMaterial = new THREE.MeshBasicMaterial({ color: 0x8fe6ff });
+      const coralMaterial = new THREE.MeshBasicMaterial({ color: 0xff7d68 });
+      const darkJointMaterial = new THREE.MeshStandardMaterial({
+        color: 0x111827,
+        roughness: 0.42,
+        metalness: 0.45,
+      });
+
+      const shell = new THREE.Mesh(shellGeometry, shellMaterial);
+      const shellEdges = new THREE.LineSegments(shellEdgeGeometry, edgeMaterial);
+      headGroup.add(shell, shellEdges);
+
+      const visor = new THREE.Mesh(visorGeometry, visorMaterial);
+      visor.position.z = 0.59;
+      headGroup.add(visor);
+
+      const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+      const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+      leftEye.scale.set(2.2, 0.55, 0.22);
+      rightEye.scale.copy(leftEye.scale);
+      leftEye.position.set(-0.55, 0.18, 0.66);
+      rightEye.position.set(0.55, 0.18, 0.66);
+      headGroup.add(leftEye, rightEye);
+
+      const mouthBars = [-0.34, 0, 0.34].map((x, index) => {
+        const bar = new THREE.Mesh(new THREE.BoxGeometry(index === 1 ? 0.24 : 0.18, 0.045, 0.04), coralMaterial);
+        bar.position.set(x, -0.46, 0.68);
+        return bar;
+      });
+      headGroup.add(...mouthBars);
+
+      const leftSide = new THREE.Mesh(sideGeometry, darkJointMaterial);
+      const rightSide = new THREE.Mesh(sideGeometry, darkJointMaterial);
+      leftSide.rotation.z = Math.PI / 2;
+      rightSide.rotation.z = Math.PI / 2;
+      leftSide.position.set(-1.72, 0.02, 0);
+      rightSide.position.set(1.72, 0.02, 0);
+      headGroup.add(leftSide, rightSide);
+
+      const antennaStem = new THREE.Mesh(antennaStemGeometry, accentMeshMaterial);
+      antennaStem.position.set(0, 1.46, -0.04);
+      const antennaNode = new THREE.Mesh(antennaNodeGeometry, coralMaterial);
+      antennaNode.position.set(0, 1.76, -0.04);
+      headGroup.add(antennaStem, antennaNode);
+
+      const robotTexture = new THREE.TextureLoader().load(canvas.dataset.robotHeadSrc || "");
+      robotTexture.colorSpace = THREE.SRGBColorSpace;
+      const imageHeadGeometry = new THREE.PlaneGeometry(4.5, 4.5);
+      const imageHeadMaterial = new THREE.MeshBasicMaterial({
+        map: robotTexture,
+        transparent: true,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+      });
+      const imageHead = new THREE.Mesh(imageHeadGeometry, imageHeadMaterial);
+      imageHeadGroup.add(imageHead);
+
+      const orbitMaterial = new THREE.MeshBasicMaterial({ color: 0x75f0c1 });
+      const orbitPositions = [
+        [-1.52, 1.08, -0.82],
+        [-0.6, 1.46, -0.9],
+        [0.78, 1.38, -0.88],
+        [1.58, 0.86, -0.82],
+        [1.54, -0.82, -0.84],
+        [0.42, -1.34, -0.92],
+        [-0.98, -1.22, -0.88],
+        [-1.58, -0.32, -0.82],
+      ].map(([x, y, z]) => new THREE.Vector3(x, y, z));
+
+      orbitPositions.forEach((position, index) => {
+        const node = new THREE.Mesh(nodeGeometry, index % 3 === 0 ? coralMaterial : orbitMaterial);
+        node.position.copy(position);
+        orbitGroup.add(node);
+      });
+
+      const ambientCount = 150;
+      const ambientPositions = new Float32Array(ambientCount * 3);
+      const ambientColors = new Float32Array(ambientCount * 3);
+      const colorChoices = [new THREE.Color(0x4aa8ff), new THREE.Color(0xff7d68), new THREE.Color(0x5de2a1)];
+
+      for (let i = 0; i < ambientCount; i += 1) {
+        const radius = 2.5 + Math.random() * 2.9;
+        const angle = Math.random() * Math.PI * 2;
+        ambientPositions[i * 3] = Math.cos(angle) * radius;
+        ambientPositions[i * 3 + 1] = -1.75 + Math.random() * 4;
+        ambientPositions[i * 3 + 2] = -1.35 + Math.random() * 1.6;
+        const color = colorChoices[i % colorChoices.length];
+        ambientColors[i * 3] = color.r;
+        ambientColors[i * 3 + 1] = color.g;
+        ambientColors[i * 3 + 2] = color.b;
+      }
+
+      const ambientGeometry = new THREE.BufferGeometry();
+      ambientGeometry.setAttribute("position", new THREE.BufferAttribute(ambientPositions, 3));
+      ambientGeometry.setAttribute("color", new THREE.BufferAttribute(ambientColors, 3));
+      const ambientPoints = new THREE.Points(
+        ambientGeometry,
+        new THREE.PointsMaterial({
+          size: 0.035,
+          vertexColors: true,
+          transparent: true,
+          opacity: 0.7,
+          blending: THREE.AdditiveBlending,
+        })
+      );
+      ambientGroup.add(ambientPoints);
+
+      scene.add(new THREE.AmbientLight(0xffffff, 1.18));
+
+      const keyLight = new THREE.DirectionalLight(0xffffff, 2.15);
+      keyLight.position.set(2.4, 3.6, 5.5);
+      scene.add(keyLight);
+
+      const coralLight = new THREE.PointLight(0xff7866, 6.4, 8);
+      coralLight.position.set(-2.8, -0.4, 2.4);
+      scene.add(coralLight);
+
+      const azureLight = new THREE.PointLight(0x4aa8ff, 5.2, 8);
+      azureLight.position.set(2.7, 1.1, 2.6);
+      scene.add(azureLight);
+
+      const pointer = { x: 0, y: 0, active: false };
+      const scrollState = { progress: 0, lift: 0, scale: 1 };
+      let scrollTween: ReturnType<typeof animate> | null = null;
+      let scrollFrame = 0;
+      let animationFrame = 0;
+
+      const resize = () => {
+        const rect = stage.getBoundingClientRect();
+        const width = Math.max(1, rect.width);
+        const height = Math.max(1, rect.height);
+        renderer.setSize(width, height, false);
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+
+        const compact = width < 560;
+        robotGroup.scale.setScalar(compact ? 0.86 : 1.22);
+        robotGroup.position.x = compact ? -0.12 : 0.18;
+        robotGroup.position.y = compact ? 0.08 : 0.12;
+      };
+
+      const syncScroll = () => {
+        scrollFrame = 0;
+        const rect = hero.getBoundingClientRect();
+        const travel = Math.max(rect.height - window.innerHeight * 0.25, 1);
+        const nextProgress = clamp(-rect.top / travel);
+        hero.style.setProperty("--hero-scroll-progress", nextProgress.toFixed(3));
+
+        if (prefersReducedMotion) {
+          scrollState.progress = 0;
+          scrollState.lift = 0;
+          scrollState.scale = 1;
+          return;
+        }
+
+        scrollTween?.cancel();
+        scrollTween = animate(scrollState, {
+          progress: nextProgress,
+          lift: nextProgress * 0.18,
+          scale: 1 + nextProgress * 0.045,
+          duration: 360,
+          ease: "outCubic",
+        });
+      };
+
+      const requestScrollSync = () => {
+        if (scrollFrame) return;
+        scrollFrame = window.requestAnimationFrame(syncScroll);
+      };
+
+      const render = (time = 0) => {
+        const seconds = time * 0.001;
+        const progress = scrollState.progress;
+        const pointerWeight = pointer.active ? 1 : 0.35;
+
+        imageHeadGroup.rotation.y = 0;
+        imageHeadGroup.rotation.x = 0;
+        imageHeadGroup.rotation.z = Math.sin(seconds * 0.65) * 0.006;
+        imageHeadGroup.position.x = pointer.x * 0.025 * pointerWeight;
+        imageHeadGroup.position.y = scrollState.lift + Math.sin(seconds * 0.8) * 0.025;
+        imageHeadGroup.scale.setScalar(scrollState.scale);
+
+        orbitGroup.rotation.z = seconds * 0.08 + progress * 0.7;
+        orbitGroup.rotation.y = pointer.x * 0.025 * pointerWeight;
+        ambientGroup.rotation.y = -seconds * 0.035 - progress * 0.2;
+        ambientGroup.position.y = progress * -0.16;
+
+        const blink = 1 + Math.sin(seconds * 3.2) * 0.16;
+        leftEye.scale.y = 0.55 * blink;
+        rightEye.scale.y = 0.55 * blink;
+        visorMaterial.emissiveIntensity = 0.48 + progress * 0.34 + Math.sin(seconds * 1.6) * 0.08;
+        edgeMaterial.opacity = 0.28 + progress * 0.2;
+
+        renderer.render(scene, camera);
+
+        if (!prefersReducedMotion) {
+          animationFrame = window.requestAnimationFrame(render);
+        }
+      };
+
+      resize();
+      syncScroll();
+      render(0);
+
+      if (!prefersReducedMotion) {
+        animationFrame = window.requestAnimationFrame(render);
+      }
+
+      hero.addEventListener("pointermove", (event) => {
+        const rect = hero.getBoundingClientRect();
+        pointer.x = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
+        pointer.y = ((event.clientY - rect.top) / rect.height - 0.5) * 2;
+        pointer.active = true;
+      });
+
+      hero.addEventListener("pointerleave", () => {
+        pointer.active = false;
+      });
+
+      window.addEventListener("resize", resize);
+      window.addEventListener("scroll", requestScrollSync, { passive: true });
+      document.addEventListener("astro:before-swap", () => {
+        window.cancelAnimationFrame(animationFrame);
+        window.cancelAnimationFrame(scrollFrame);
+        window.removeEventListener("resize", resize);
+        window.removeEventListener("scroll", requestScrollSync);
+        renderer.dispose();
+        shellGeometry.dispose();
+        shellEdgeGeometry.dispose();
+        visorGeometry.dispose();
+        eyeGeometry.dispose();
+        sideGeometry.dispose();
+        antennaStemGeometry.dispose();
+        antennaNodeGeometry.dispose();
+        nodeGeometry.dispose();
+        ambientGeometry.dispose();
+        imageHeadGeometry.dispose();
+        imageHeadMaterial.dispose();
+        robotTexture.dispose();
+      }, { once: true });
+    }
+  }
+</script>
+
 <style>
   .home-hero {
+    --hero-scroll-progress: 0;
     position: relative;
-    display: flex;
-    min-height: min(760px, calc(100svh - 5rem));
-    align-items: center;
-    overflow: clip;
-    padding: clamp(4.5rem, 7vw, 6.75rem) 1.25rem clamp(4rem, 7vw, 5.5rem);
-    border-bottom: 1px solid var(--ai-border);
-    background:
-      radial-gradient(circle at 84% 28%, color-mix(in srgb, var(--ai-azure) 16%, transparent), transparent 24rem),
-      radial-gradient(circle at 70% 80%, color-mix(in srgb, var(--ai-coral) 12%, transparent), transparent 22rem),
-      linear-gradient(90deg, var(--ai-bg) 0%, color-mix(in srgb, var(--ai-surface) 68%, var(--ai-bg)) 100%);
+    overflow: hidden;
+    min-height: calc(100svh - 8rem);
     color: var(--ai-fg);
+    background:
+      linear-gradient(112deg, var(--ai-bg) 0%, var(--ai-bg) 44%, color-mix(in srgb, var(--ai-azure) 11%, var(--ai-bg)) 74%, color-mix(in srgb, var(--ai-coral) 12%, var(--ai-bg)) 100%);
+    border-bottom: 1px solid var(--ai-border);
     isolation: isolate;
+  }
+
+  .home-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(color-mix(in srgb, var(--ai-fg) 6%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in srgb, var(--ai-fg) 6%, transparent) 1px, transparent 1px);
+    background-size: 4.5rem 4.5rem;
+    mask-image: linear-gradient(90deg, transparent 0%, #000 38%, #000 100%);
+    opacity: 0.32;
   }
 
   .home-hero::after {
@@ -62,172 +442,331 @@ import homeStudyCutout from "../../assets/generated/ai-home-study-cutout.png";
     position: absolute;
     inset: 0;
     z-index: 1;
-    background:
-      linear-gradient(90deg, var(--ai-bg) 0%, color-mix(in srgb, var(--ai-bg) 92%, transparent) 38%, transparent 72%),
-      linear-gradient(0deg, var(--ai-bg) 0%, transparent 34%);
     pointer-events: none;
+    background:
+      linear-gradient(90deg, var(--ai-bg) 0%, color-mix(in srgb, var(--ai-bg) 96%, transparent) 42%, transparent 76%),
+      linear-gradient(0deg, color-mix(in srgb, var(--ai-bg) 86%, transparent) 0%, transparent 32%);
   }
 
-  .home-hero__art {
+  .home-hero__backplate {
     position: absolute;
-    inset: clamp(1rem, 4vw, 3rem) max(-9rem, -8vw) -2rem 43%;
+    inset: auto -12rem -9rem 36%;
     z-index: 0;
-    display: grid;
-    place-items: center;
+    height: 18rem;
+    transform: skewY(-8deg);
+    background: linear-gradient(90deg, color-mix(in srgb, var(--ai-sage) 22%, transparent), color-mix(in srgb, var(--ai-coral) 18%, transparent));
+    opacity: 0.48;
     pointer-events: none;
   }
 
-  .home-hero__art-glow {
+  .home-hero__stage {
     position: absolute;
-    inset: 14% 8% 4%;
-    border-radius: 999px;
-    background:
-      radial-gradient(ellipse at 56% 48%, color-mix(in srgb, var(--ai-azure) 22%, transparent), transparent 60%),
-      radial-gradient(ellipse at 42% 70%, color-mix(in srgb, var(--ai-coral) 16%, transparent), transparent 55%);
-    filter: blur(18px);
-  }
-
-  .home-hero__image {
-    position: relative;
+    inset: 0 0 0 42%;
     z-index: 1;
-    width: min(100%, 58rem);
-    height: auto;
-    filter: drop-shadow(0 42px 58px rgba(17, 24, 39, 0.18));
-    animation: hero-float 8s ease-in-out infinite;
+    min-width: 0;
   }
 
-  .home-hero__signal {
+  .home-hero__canvas,
+  .home-hero__fallback {
     position: absolute;
     inset: 0;
-    z-index: 2;
     width: 100%;
     height: 100%;
-    pointer-events: none;
-    mix-blend-mode: multiply;
-    opacity: 0.7;
   }
 
-  :global(:root[data-theme="dark"]) .home-hero__signal {
-    mix-blend-mode: screen;
-    opacity: 0.82;
+  .home-hero__canvas {
+    z-index: 2;
   }
 
-  .home-hero__signal path {
-    fill: none;
-    stroke: color-mix(in srgb, var(--ai-azure) 58%, transparent);
-    stroke-width: 2.2;
-    stroke-linecap: round;
-    stroke-dasharray: 18 22;
-    animation: hero-signal 8s linear infinite;
+  .home-hero__fallback {
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    opacity: 0.86;
+    transition: opacity 0.25s ease;
   }
 
-  .home-hero__signal path + path {
-    stroke: color-mix(in srgb, var(--ai-coral) 46%, transparent);
-    animation-duration: 10s;
-    animation-direction: reverse;
+  .home-hero--ready .home-hero__fallback {
+    opacity: 0;
   }
 
-  .home-hero__signal circle {
-    fill: color-mix(in srgb, var(--ai-coral) 80%, #ffffff);
-    filter: drop-shadow(0 0 12px color-mix(in srgb, var(--ai-coral) 55%, transparent));
-    animation: hero-node 2.8s ease-in-out infinite;
+  .home-hero__fallback-head {
+    width: 17rem;
+    height: 13rem;
+    border: 1px solid color-mix(in srgb, var(--ai-azure) 42%, transparent);
+    border-radius: 8px;
+    background: linear-gradient(145deg, color-mix(in srgb, var(--ai-surface) 85%, var(--ai-azure)), color-mix(in srgb, var(--ai-surface) 92%, var(--ai-coral)));
+    box-shadow: 0 1.6rem 5rem color-mix(in srgb, var(--ai-azure) 16%, transparent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.2rem;
+  }
+
+  .home-hero__fallback-head span {
+    width: 3.4rem;
+    height: 0.7rem;
+    border-radius: 999px;
+    background: var(--ai-azure);
   }
 
   .home-hero__inner {
     position: relative;
-    z-index: 3;
-    width: 100%;
-    max-width: 82rem;
+    z-index: 2;
+    width: min(100%, 82rem);
+    min-height: calc(100svh - 8rem);
     margin: 0 auto;
+    padding: 4rem 2rem 1.45rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2.2rem;
   }
 
   .home-hero__copy {
-    max-width: 46rem;
+    max-width: 42rem;
+  }
+
+  .home-hero__kicker {
+    margin: 0 0 1rem;
+    color: var(--ai-azure);
+    font-size: 0.82rem;
+    line-height: 1.2;
+    font-weight: 850;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
   }
 
   .home-hero__title {
-    max-width: 15ch;
-    margin: 0 0 1.15rem;
+    max-width: 13ch;
+    margin: 0;
     color: var(--ai-fg);
-    font-size: clamp(2.35rem, 5vw, 4.85rem);
-    font-weight: 850;
-    line-height: 1.03;
+    font-size: 4.45rem;
+    line-height: 1;
     letter-spacing: 0;
+    font-weight: 850;
+    text-wrap: balance;
   }
 
   .home-hero__intro {
-    max-width: 38rem;
+    max-width: 37rem;
+    margin: 1.2rem 0 0;
     color: var(--ai-fg-muted);
-    font-size: clamp(1.08rem, 1.7vw, 1.3rem);
+    font-size: 1.18rem;
     line-height: 1.55;
+    letter-spacing: 0;
   }
 
   .home-hero__domains {
     max-width: 40rem;
-    margin: 1.35rem 0 0;
+    margin: 1.2rem 0 0;
     color: color-mix(in srgb, var(--ai-fg) 74%, var(--ai-fg-muted));
     font-size: 0.96rem;
     font-weight: 800;
-    line-height: 1.6;
+    line-height: 1.55;
+    letter-spacing: 0;
   }
 
   .home-hero__actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
-    margin-top: 1.9rem;
+    gap: 0.9rem;
+    margin-top: 1.75rem;
   }
 
-  @keyframes hero-float {
-    0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
-    50% { transform: translate3d(0, -0.55rem, 0) rotate(0.4deg); }
+  .home-hero__actions .btn-primary,
+  .home-hero__actions .btn-secondary {
+    min-height: 3.1rem;
   }
 
-  @keyframes hero-signal {
-    to {
-      stroke-dashoffset: -160;
+  .home-hero__rail {
+    width: min(100%, 64rem);
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.7rem;
+    transform: translateY(calc(var(--hero-scroll-progress) * -0.6rem));
+  }
+
+  .home-hero__rail-item {
+    min-height: 5.1rem;
+    padding: 1rem;
+    border: 1px solid var(--ai-border);
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--ai-surface) 82%, transparent);
+    color: var(--ai-fg);
+    text-decoration: none;
+    backdrop-filter: blur(18px);
+    transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+  }
+
+  .home-hero__rail-item:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--ai-azure) 42%, var(--ai-border));
+    background: color-mix(in srgb, var(--ai-surface) 92%, var(--ai-azure) 8%);
+  }
+
+  .home-hero__rail-item:focus-visible {
+    outline: 2px solid var(--ai-azure);
+    outline-offset: 3px;
+  }
+
+  .home-hero__rail-item span {
+    display: block;
+    margin-bottom: 0.35rem;
+    color: var(--ai-fg-muted);
+    font-size: 0.78rem;
+    line-height: 1.2;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .home-hero__rail-item strong {
+    display: block;
+    color: var(--ai-fg);
+    font-size: 0.98rem;
+    line-height: 1.35;
+    letter-spacing: 0;
+  }
+
+  :global(:root[data-theme="dark"]) .home-hero {
+    background:
+      linear-gradient(112deg, var(--ai-bg) 0%, var(--ai-bg) 44%, color-mix(in srgb, var(--ai-azure) 18%, var(--ai-bg)) 74%, color-mix(in srgb, var(--ai-coral) 16%, var(--ai-bg)) 100%);
+  }
+
+  :global(:root[data-theme="dark"]) .home-hero__rail-item {
+    background: color-mix(in srgb, var(--ai-surface) 74%, transparent);
+  }
+
+  @media (max-width: 1040px) {
+    .home-hero__stage {
+      inset: 0 0 0 38%;
+    }
+
+    .home-hero__title {
+      font-size: 3.7rem;
+    }
+
+    .home-hero__copy {
+      max-width: 36rem;
     }
   }
 
-  @keyframes hero-node {
-    0%, 100% { opacity: 0.38; transform: scale(0.92); }
-    50% { opacity: 1; transform: scale(1.05); }
-  }
-
-  @media (max-width: 980px) {
+  @media (max-width: 760px) {
     .home-hero {
-      min-height: auto;
-      padding-top: 4.25rem;
+      min-height: calc(100svh - 6.5rem);
+      background:
+        linear-gradient(160deg, var(--ai-bg) 0%, var(--ai-bg) 56%, color-mix(in srgb, var(--ai-azure) 12%, var(--ai-bg)) 82%, color-mix(in srgb, var(--ai-coral) 12%, var(--ai-bg)) 100%);
+    }
+
+    .home-hero::before {
+      mask-image: linear-gradient(180deg, #000 0%, transparent 96%);
+      background-size: 3.2rem 3.2rem;
+    }
+
+    .home-hero__backplate {
+      inset: auto -10rem -8rem 12%;
+      height: 14rem;
+    }
+
+    .home-hero__stage {
+      inset: 7rem -5rem 0 44%;
+      opacity: 0.24;
     }
 
     .home-hero::after {
       background:
-        linear-gradient(180deg, color-mix(in srgb, var(--ai-bg) 98%, transparent) 0%, color-mix(in srgb, var(--ai-bg) 82%, transparent) 58%, color-mix(in srgb, var(--ai-bg) 48%, transparent) 100%);
+        linear-gradient(90deg, color-mix(in srgb, var(--ai-bg) 98%, transparent) 0%, color-mix(in srgb, var(--ai-bg) 92%, transparent) 62%, transparent 100%),
+        linear-gradient(0deg, color-mix(in srgb, var(--ai-bg) 82%, transparent) 0%, transparent 34%);
     }
 
-    .home-hero__art {
-      inset: 3.5rem -12rem -2rem 18%;
-      opacity: 0.36;
+    .home-hero__inner {
+      min-height: calc(100svh - 6.5rem);
+      padding: 1.8rem 1.2rem 1rem;
+      gap: 1rem;
+      justify-content: center;
+    }
+
+    .home-hero__copy {
+      max-width: 100%;
+    }
+
+    .home-hero__kicker {
+      margin-bottom: 0.7rem;
+      font-size: 0.72rem;
     }
 
     .home-hero__title {
-      max-width: 14ch;
-      font-size: clamp(2.2rem, 10vw, 3.7rem);
+      max-width: 12ch;
+      font-size: 2.42rem;
+      line-height: 1.02;
+    }
+
+    .home-hero__intro {
+      max-width: 29rem;
+      margin-top: 0.9rem;
+      font-size: 1rem;
+      line-height: 1.46;
+    }
+
+    .home-hero__domains {
+      margin-top: 0.85rem;
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+
+    .home-hero__actions {
+      margin-top: 1.1rem;
+      gap: 0.6rem;
+    }
+
+    .home-hero__actions .btn-primary,
+    .home-hero__actions .btn-secondary {
+      width: 100%;
+      min-height: 2.75rem;
+      padding: 0.8rem 1rem;
+    }
+
+    .home-hero__rail {
+      grid-template-columns: 1fr;
+      gap: 0.42rem;
+    }
+
+    .home-hero__rail-item {
+      min-height: 0;
+      padding: 0.66rem 0.8rem;
+    }
+
+    .home-hero__rail-item span {
+      margin-bottom: 0.16rem;
+      font-size: 0.66rem;
+    }
+
+    .home-hero__rail-item strong {
+      font-size: 0.88rem;
     }
   }
 
-  @media (max-width: 560px) {
-    .home-hero__actions {
-      align-items: stretch;
-      flex-direction: column;
+  @media (max-width: 380px) {
+    .home-hero__title {
+      font-size: 2.2rem;
+    }
+
+    .home-hero__intro {
+      font-size: 0.94rem;
+    }
+
+    .home-hero__domains {
+      display: none;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .home-hero__image,
-    .home-hero__signal path,
-    .home-hero__signal circle {
-      animation: none;
+    .home-hero__rail,
+    .home-hero__rail-item,
+    .home-hero__fallback {
+      transition: none;
+      transform: none;
     }
   }
 </style>

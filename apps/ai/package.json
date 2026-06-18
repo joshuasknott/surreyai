@@ -11,15 +11,17 @@
   },
   "dependencies": {
     "@astrojs/node": "^10.0.6",
-    "@google/genai": "^1.0.0",
     "@clerk/astro": "^3.1.0",
+    "@google/genai": "^1.0.0",
     "@surreysocieties/admin": "*",
     "@surreysocieties/assistant": "*",
     "@surreysocieties/ui": "*",
     "@tailwindcss/vite": "^4.2.4",
+    "animejs": "^4.4.1",
     "astro": "^6.1.10",
     "convex": "^1.37.0",
-    "tailwindcss": "^4.2.4"
-  },
-  "devDependencies": {}
+    "sharp": "^0.34.5",
+    "tailwindcss": "^4.2.4",
+    "three": "^0.172.0"
+  }
 }

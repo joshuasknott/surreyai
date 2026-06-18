@@ -2,6 +2,7 @@
 export const prerender = false;
 import Layout from "../layouts/Layout.astro";
 import { queryPublicConvex } from "@surreysocieties/admin";
+import { api } from "../../../../convex/_generated/api.js";
 import { getSocietyById } from "@surreysocieties/admin/config";
 import CutoutVisual from "../components/common/CutoutVisual.astro";
 import committeePlanningCutout from "../assets/generated/ai-committee-planning-cutout.png";
@@ -9,12 +10,12 @@ import "../styles/global.css";
 
 const SOCIETY_ID = "ai";
 const society = getSocietyById(SOCIETY_ID)!;
-const committee: any[] = (await queryPublicConvex<any[]>("committee:listActive", { societySlug: SOCIETY_ID }, []))
+const committee: any[] = (await queryPublicConvex(api.committee.listActive, { societySlug: SOCIETY_ID }, []))
   .sort((a: any, b: any) =>
     (a.displayOrder ?? Number.MAX_SAFE_INTEGER) - (b.displayOrder ?? Number.MAX_SAFE_INTEGER)
     || (a.name || "").localeCompare(b.name || "")
   );
-const pastCommittee: any[] = (await queryPublicConvex<any[]>("committee:listPast", { societySlug: SOCIETY_ID }, []))
+const pastCommittee: any[] = (await queryPublicConvex(api.committee.listPast, { societySlug: SOCIETY_ID }, []))
   .sort((a: any, b: any) =>
     (b.yearLabel || "").localeCompare(a.yearLabel || "")
     || (a.displayOrder ?? Number.MAX_SAFE_INTEGER) - (b.displayOrder ?? Number.MAX_SAFE_INTEGER)
@@ -37,7 +38,7 @@ const operatingModel = [
   },
   {
     title: "Member support",
-    text: "Make routes into AI and data science visible for beginners, builders, researchers, career-minded students, and members from non-computing disciplines.",
+    text: "Make routes into artificial intelligence visible for beginners, builders, researchers, career-minded students, and members from non-computing disciplines.",
   },
   {
     title: "Responsible delivery",
@@ -48,7 +49,7 @@ const operatingModel = [
 
 <Layout
   title="Committee"
-  description="Meet the student committee running Surrey Artificial Intelligence and Data Science Society and shaping its workshops, projects, competitions, talks, socials, and responsible AI activity."
+  description="Meet the student committee running Surrey Artificial Intelligence Society and shaping its workshops, projects, competitions, talks, socials, and responsible AI activity."
 >
   <section class="committee-hero">
     <div class="committee-hero__copy">

@@ -1,6 +1,6 @@
-import { defineMiddleware } from 'astro:middleware';
 import { clerkMiddleware, createRouteMatcher } from '@clerk/astro/server';
 import { createConvexClient, getSocietyById } from '@surreysocieties/admin';
+import { api } from '../../../convex/_generated/api.js';
 
 const SOCIETY_ID = 'ai';
 const society = getSocietyById(SOCIETY_ID);
@@ -10,15 +10,15 @@ const isPublicAdminRoute = createRouteMatcher([
   '/admin/invite/accept',
 ]);
 
-export const onRequest = clerkMiddleware(async (auth, context) => {
+export const onRequest = clerkMiddleware(async (auth, context, next) => {
   const { pathname } = new URL(context.request.url);
 
   if (!pathname.startsWith('/admin') && !pathname.startsWith('/api/admin') && !pathname.startsWith('/_actions/')) {
-    return;
+    return next();
   }
 
   if (isPublicAdminRoute(context.request)) {
-    return;
+    return next();
   }
 
   const { userId } = auth();
@@ -39,7 +39,7 @@ export const onRequest = clerkMiddleware(async (auth, context) => {
   }
   const client = createConvexClient(token || undefined);
 
-  const membership = await client.query("memberships:getMyMembership", {
+  const membership = await client.query(api.memberships.getMyMembership, {
     societySlug: SOCIETY_ID,
   });
 
@@ -61,4 +61,6 @@ export const onRequest = clerkMiddleware(async (auth, context) => {
     role: membership.role,
   };
   context.locals.societySlug = SOCIETY_ID;
+
+  return next();
 });

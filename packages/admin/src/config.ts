@@ -3,8 +3,8 @@ import type { Society } from './types.js';
 export const SOCIETIES: Record<string, Society> = {
   ai: {
     id: 'ai',
-    name: 'Surrey Artificial Intelligence and Data Science Society',
-    shortName: 'Surrey AI and Data Science',
+    name: 'Surrey Artificial Intelligence Society',
+    shortName: 'Surrey AI Society',
     slug: 'ai',
     adminBasePath: '/admin',
     publicBasePath: '/',

@@ -36,3 +36,10 @@ output/
 .convex/
 
 .env.local
+
+# TypeScript build outputs (compiled from .ts sources; _generated/ stays tracked)
+convex/*.js
+convex/*.js.map
+convex/*.d.ts
+convex/*.d.ts.map
+**/tsconfig.tsbuildinfo

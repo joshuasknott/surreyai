@@ -1,5 +1,7 @@
 import type { APIRoute } from "astro";
 import { createConvexClient } from "@surreysocieties/admin";
+import { api } from "../../../../../../convex/_generated/api.js";
+import type { Id } from "../../../../../../convex/_generated/dataModel.js";
 
 type JsonObject = Record<string, unknown>;
 
@@ -12,10 +14,8 @@ export const GET: APIRoute = async ({ url }) => {
   }
 
   try {
-    const client = createConvexClient() as unknown as {
-      query(name: string, args: Record<string, unknown>): Promise<unknown>;
-    };
-    const build = await client.query("agentBuilds:get", { id });
+    const client = createConvexClient();
+    const build = await client.query(api.agentBuilds.get, { id: id as Id<"agentBuilds"> });
     if (!isRecord(build)) {
       return jsonResponse({ error: "Build not found" }, 404);
     }
