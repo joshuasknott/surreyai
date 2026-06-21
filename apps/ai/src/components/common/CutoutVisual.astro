@@ -40,13 +40,7 @@ const {
     loading={loading}
     format="webp"
   />
-  <svg class="cutout-visual__signal" viewBox="0 0 900 520" preserveAspectRatio="none" aria-hidden="true">
-    <path d="M74 366 C160 290 244 342 326 282 S472 178 568 230 704 338 836 242" />
-    <path d="M112 424 C210 352 286 400 382 328 S552 234 666 300 750 356 864 308" />
-    <circle cx="326" cy="282" r="5" />
-    <circle cx="568" cy="230" r="6" />
-    <circle cx="704" cy="338" r="5" />
-  </svg>
+
   {(title || body) && (
     <figcaption class="cutout-visual__caption">
       {title && <strong>{title}</strong>}
@@ -162,41 +156,7 @@ const {
     transform: translateY(4%) scale(1.04);
   }
 
-  .cutout-visual__signal {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    mix-blend-mode: multiply;
-    opacity: 0.68;
-  }
 
-  :global(:root[data-theme="dark"]) .cutout-visual__signal {
-    mix-blend-mode: screen;
-    opacity: 0.82;
-  }
-
-  .cutout-visual__signal path {
-    fill: none;
-    stroke: color-mix(in srgb, var(--ai-azure) 64%, transparent);
-    stroke-width: 2.4;
-    stroke-linecap: round;
-    stroke-dasharray: 16 18;
-    animation: cutout-signal 7.6s linear infinite;
-  }
-
-  .cutout-visual__signal path + path {
-    stroke: color-mix(in srgb, var(--ai-coral) 60%, transparent);
-    animation-direction: reverse;
-    animation-duration: 9.4s;
-  }
-
-  .cutout-visual__signal circle {
-    fill: color-mix(in srgb, var(--ai-azure) 70%, #ffffff);
-    animation: cutout-node 2.8s ease-in-out infinite;
-  }
 
   .cutout-visual__caption {
     position: absolute;
@@ -231,16 +191,7 @@ const {
     outline-offset: 0.35rem;
   }
 
-  @keyframes cutout-signal {
-    to {
-      stroke-dashoffset: -144;
-    }
-  }
 
-  @keyframes cutout-node {
-    0%, 100% { opacity: 0.42; transform: scale(0.94); }
-    50% { opacity: 1; transform: scale(1.06); }
-  }
 
   @media (max-width: 640px) {
     .cutout-visual {
@@ -268,9 +219,6 @@ const {
       transform: none;
     }
 
-    .cutout-visual__signal path,
-    .cutout-visual__signal circle {
-      animation: none;
-    }
+
   }
 </style>

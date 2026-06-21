@@ -76,10 +76,7 @@ const formatEventDate = (date?: string) => {
           <span></span>
           <span></span>
         </div>
-        <svg viewBox="0 0 600 420" preserveAspectRatio="none" aria-hidden="true">
-          <path d="M0 310 C92 242 168 336 254 268 S416 182 600 248" />
-          <path d="M72 372 C156 292 236 350 310 288 S460 206 572 272" />
-        </svg>
+
       </aside>
     </div>
   </div>
@@ -250,34 +247,9 @@ const formatEventDate = (date?: string) => {
     width: 64%;
   }
 
-  .event-visual svg {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    mix-blend-mode: screen;
-  }
 
-  .event-visual path {
-    fill: none;
-    stroke: rgba(255, 255, 255, 0.68);
-    stroke-width: 2;
-    stroke-dasharray: 16 18;
-    animation: event-signal 7s linear infinite;
-  }
 
-  .event-visual path + path {
-    stroke: color-mix(in srgb, var(--ai-coral) 74%, #ffffff);
-    animation-direction: reverse;
-  }
 
-  @keyframes event-signal {
-    to {
-      stroke-dashoffset: -136;
-    }
-  }
 
   @media (max-width: 720px) {
     .events-preview-grid,
@@ -286,9 +258,5 @@ const formatEventDate = (date?: string) => {
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .event-visual path {
-      animation: none;
-    }
-  }
+
 </style>
