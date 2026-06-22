@@ -7,8 +7,11 @@ export type GenerateContentOptions = {
   responseSchema?: GeminiResponseSchema;
   maxOutputTokens?: number;
   timeoutMs?: number;
+  model?: string;
+  files?: Array<{ mimeType: string; data: string }>;
 };
 
+export const GEMINI_3_FLASH_MODEL = "gemini-3.0-flash";
 export const GEMINI_3_FLASH_LITE_MODEL = "gemini-3.1-flash-lite";
 
 type GeminiGenerateResult = {
@@ -99,11 +102,18 @@ export async function generateContent(
   if (!isAIEnabled()) return null;
 
   const apiKey = env("GEMINI_API_KEY")!;
-  const model = getModel();
+  const model = options.model || getModel();
   const fallbackModel = getFallbackModel();
   const maxTokens = options.maxOutputTokens ?? getMaxTokens();
   const timeoutMs = options.timeoutMs ?? getTimeoutMs();
   const startedAt = Date.now();
+
+  const contents: string | Array<Record<string, unknown>> = options.files?.length
+    ? [
+        { text: prompt },
+        ...options.files.map((f) => ({ inlineData: { mimeType: f.mimeType, data: f.data } })),
+      ]
+    : prompt;
 
   const config: Record<string, unknown> = {
     maxOutputTokens: maxTokens,
@@ -126,7 +136,7 @@ export async function generateContent(
   for (const candidate of models) {
     const primary = await safeRequestContent(
       ai,
-      { model: candidate, contents: prompt, config },
+      { model: candidate, contents, config },
       timeoutMs
     );
     if (primary) return primary;
@@ -148,7 +158,7 @@ export async function generateContent(
   for (const candidate of models) {
     const relaxed = await safeRequestContent(
       ai,
-      { model: candidate, contents: prompt, config: relaxedConfig },
+      { model: candidate, contents, config: relaxedConfig },
       remainingMs
     );
     if (relaxed) return relaxed;

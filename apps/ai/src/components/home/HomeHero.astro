@@ -1,5 +1,13 @@
 ---
+import { getImage } from "astro:assets";
 import robotHead from "../../assets/generated/ai-robot-head.png";
+
+const robotHeadTexture = await getImage({
+  src: robotHead,
+  width: 768,
+  format: "webp",
+  quality: 70,
+});
 ---
 
 <section class="home-hero" aria-labelledby="home-hero-title" data-ai-robot-hero>
@@ -25,7 +33,7 @@ import robotHead from "../../assets/generated/ai-robot-head.png";
     </div>
 
     <div class="home-hero__stage" aria-hidden="true">
-      <canvas class="home-hero__canvas" id="ai-robot-head-canvas" data-robot-head-src={robotHead.src}></canvas>
+      <canvas class="home-hero__canvas" id="ai-robot-head-canvas" data-robot-head-src={robotHeadTexture.src}></canvas>
       <div class="home-hero__fallback">
         <div class="home-hero__fallback-head">
           <span></span>
@@ -52,9 +60,6 @@ import robotHead from "../../assets/generated/ai-robot-head.png";
 </section>
 
 <script>
-  import * as THREE from "three";
-  import { animate, stagger } from "animejs";
-
   const hero = document.querySelector("[data-ai-robot-hero]") as HTMLElement | null;
   const canvas = document.getElementById("ai-robot-head-canvas") as HTMLCanvasElement | null;
   const stage = canvas?.closest(".home-hero__stage") as HTMLElement | null;
@@ -62,16 +67,13 @@ import robotHead from "../../assets/generated/ai-robot-head.png";
 
   const clamp = (value: number, min = 0, max = 1) => Math.min(max, Math.max(min, value));
 
-  if (hero && canvas && stage) {
-    if (!prefersReducedMotion) {
-      animate(hero.querySelectorAll("[data-hero-reveal]"), {
-        opacity: [0, 1],
-        y: [18, 0],
-        duration: 820,
-        delay: stagger(75),
-        ease: "outCubic",
-      });
-    }
+  const startRobot = async () => {
+    const [THREE, { animate }] = await Promise.all([
+      import("three"),
+      import("animejs"),
+    ]);
+
+    if (hero && canvas && stage) {
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
@@ -406,6 +408,15 @@ import robotHead from "../../assets/generated/ai-robot-head.png";
         imageHeadMaterial.dispose();
         robotTexture.dispose();
       }, { once: true });
+    }
+    }
+  };
+
+  if (hero && canvas && stage) {
+    if ("requestIdleCallback" in window) {
+      window.requestIdleCallback(() => { void startRobot(); }, { timeout: 1200 });
+    } else {
+      window.setTimeout(() => { void startRobot(); }, 200);
     }
   }
 </script>

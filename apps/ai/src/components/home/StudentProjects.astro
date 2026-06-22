@@ -61,7 +61,7 @@ const projects = [
             <span class="project-preview__type">{project.type}</span>
             <strong>{project.title}</strong>
             <span>{project.description}</span>
-            <span class="project-preview__action">{project.action} -></span>
+            <span class="project-preview__action">{project.action} &rarr;</span>
           </span>
         </button>
       ))}
@@ -70,7 +70,9 @@ const projects = [
     <dialog id="project-modal" class="project-modal" aria-label="Project interactive view">
       <div class="modal-wrapper">
         <button id="close-modal" class="close-modal-btn" aria-label="Close project">
-          Close
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
         </button>
         <div class="modal-content" aria-live="polite">
           <div id="panel-drift-lab" class="project-panel" hidden>
@@ -241,22 +243,38 @@ const projects = [
 
   .close-modal-btn {
     position: absolute;
-    top: 1rem;
-    right: 1rem;
-    z-index: 20;
-    border: 1px solid var(--ai-border);
-    border-radius: 999px;
-    background: color-mix(in srgb, var(--ai-surface) 88%, transparent);
+    top: 1.25rem;
+    right: 1.25rem;
+    z-index: 50;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--ai-border-strong);
+    border-radius: 9999px;
+    background: color-mix(in srgb, var(--ai-surface) 90%, transparent);
     color: var(--ai-fg);
     cursor: pointer;
-    font-weight: 800;
-    padding: 0.8rem 1rem;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s, border-color 0.2s;
+  }
+
+  .close-modal-btn:hover {
+    transform: scale(1.08);
+    background: var(--ai-surface);
+    border-color: var(--ai-azure);
+    color: var(--ai-azure);
+  }
+
+  .close-modal-btn svg {
+    width: 1.15rem;
+    height: 1.15rem;
   }
 
   .modal-content {
     width: 100%;
     height: 100%;
-    overflow: auto;
+    overflow: hidden;
   }
 
   .project-panel,

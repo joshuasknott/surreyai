@@ -10,12 +10,16 @@ import "../styles/global.css";
 
 const SOCIETY_ID = "ai";
 const society = getSocietyById(SOCIETY_ID)!;
-const committee: any[] = (await queryPublicConvex(api.committee.listActive, { societySlug: SOCIETY_ID }, []))
+const [committeeResult, pastCommitteeResult] = await Promise.all([
+  queryPublicConvex(api.committee.listActive, { societySlug: SOCIETY_ID }, []),
+  queryPublicConvex(api.committee.listPast, { societySlug: SOCIETY_ID }, []),
+]);
+const committee: any[] = committeeResult
   .sort((a: any, b: any) =>
     (a.displayOrder ?? Number.MAX_SAFE_INTEGER) - (b.displayOrder ?? Number.MAX_SAFE_INTEGER)
     || (a.name || "").localeCompare(b.name || "")
   );
-const pastCommittee: any[] = (await queryPublicConvex(api.committee.listPast, { societySlug: SOCIETY_ID }, []))
+const pastCommittee: any[] = pastCommitteeResult
   .sort((a: any, b: any) =>
     (b.yearLabel || "").localeCompare(a.yearLabel || "")
     || (a.displayOrder ?? Number.MAX_SAFE_INTEGER) - (b.displayOrder ?? Number.MAX_SAFE_INTEGER)
@@ -98,14 +102,14 @@ const operatingModel = [
         <div>
           <h2 id="committee-title" class="section-title">Current committee</h2>
         </div>
-        <a href={`mailto:${society.contactEmail}`} class="text-link">Contact the society -></a>
+        <a href={`mailto:${society.contactEmail}`} class="text-link">Contact the society &rarr;</a>
       </div>
 
       {committee.length === 0 ? (
         <div class="committee-empty">
           <h3>Committee details will appear here once confirmed.</h3>
           <p>
-            The current roster will be published when it has been added by the next signatories. Until then, use the Students' Union page or email for verified contact routes.
+            The current roster will be published when it has been added by the next committee. Until then, use the Students' Union page or email for verified contact routes.
           </p>
           <div class="committee-empty__actions">
             <a href={society.studentsUnionUrl} target="_blank" rel="noopener noreferrer" class="btn-primary">Students' Union page</a>
