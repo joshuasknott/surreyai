@@ -8,7 +8,7 @@ export default defineConfig({
   compressHTML: true,
   site: 'https://surreyaisociety.org',
   output: 'server',
-  adapter: vercel(),
+  adapter: vercel({ imageService: true }),
   integrations: [clerk()],
   security: {
     checkOrigin: true,
