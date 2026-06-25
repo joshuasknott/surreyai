@@ -24,18 +24,18 @@ export const ASSISTANT_CONFIGS: Record<AssistantSocietyKey, AssistantSocietyConf
   ai: {
     societyKey: "ai",
     societyName: "Surrey Artificial Intelligence Society",
-    shortName: "Surrey AI Society",
+    shortName: "Surrey Artificial Intelligence Society",
     shortDescription:
       "A student-led community for learning, building, and discussing artificial intelligence at the University of Surrey.",
     tone: "clear, practical, beginner-friendly, responsible, and curious",
     starterPrompts: [
-      "What is Surrey AI Society about?",
+      "What is Surrey Artificial Intelligence Society about?",
       "What events are coming up?",
-      "I am new to AI. Where should I start?",
-      "How can I get involved in projects?",
+      "I am new to artificial intelligence. Where should I start?",
+      "How can I get involved?",
     ],
-    allowedTopics: ["AI learning", "student projects", "events", "committee", "responsible AI"],
-    primaryCategories: ["Workshops", "Projects", "Build nights", "Ethics", "Careers"],
+    allowedTopics: ["artificial intelligence learning", "events", "committee", "responsible artificial intelligence"],
+    primaryCategories: ["Workshops", "Build nights", "Ethics", "Careers"],
     fallbackLinks: [
       { label: "Join", href: "/join" },
       { label: "Events", href: "/events" },
@@ -84,16 +84,16 @@ export const ASSISTANT_CONFIGS: Record<AssistantSocietyKey, AssistantSocietyConf
     societyName: "Surrey Neurotech Society",
     shortName: "Neurotech Society",
     shortDescription:
-      "A student-led society exploring neuroscience, brain-computer interfaces, signal processing, AI, ethics, and human-centred innovation.",
+      "A student-led society exploring neuroscience, brain-computer interfaces, signal processing, artificial intelligence, ethics, and human-centred innovation.",
     tone: "friendly, accessible, thoughtful, technically grounded, and ethics-aware",
     starterPrompts: [
       "What is Surrey Neurotech Society about?",
       "What events are coming up?",
       "I am new to neurotech. Where should I start?",
-      "What projects or topics can I explore?",
+      "What topics can I explore?",
     ],
     allowedTopics: ["neurotechnology", "BCIs", "neuroscience basics", "signal processing", "ethics"],
-    primaryCategories: ["Neuroscience", "Brain-computer interfaces", "AI", "Ethics", "Projects"],
+    primaryCategories: ["Neuroscience", "Brain-computer interfaces", "Artificial intelligence", "Ethics"],
     fallbackLinks: [
       { label: "Join", href: "/join" },
       { label: "Events", href: "/events" },

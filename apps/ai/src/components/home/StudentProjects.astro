@@ -1,28 +1,26 @@
 ---
 import { Image } from "astro:assets";
-import StudentProjectSlot from "./StudentProjectSlot.astro";
-import AgenticWorkspace from "./student-projects/AgenticWorkspace.astro";
 import racingPreview from "../../assets/generated/ai-racing-simulator.png";
 import agenticPreview from "../../assets/generated/ai-agentic-builder.png";
 
 const projects = [
   {
     id: "drift-lab",
-    title: "Racing Simulator",
-    type: "Playable project",
-    description: "An autonomous racing environment for experimenting with perception, planning, and control.",
-    action: "Open project",
+    title: "Interactive learning",
+    type: "Website preview",
+    description: "A glimpse of the hands-on, technical learning culture the society wants to make easier to discover.",
+    action: "Preview visual",
     image: racingPreview,
-    alt: "Racing simulator track preview with AI trajectory overlay",
+    alt: "Website preview visual with a racing track and trajectory overlay",
   },
   {
     id: "agentic-workspace",
-    title: "Agentic Builder",
-    type: "Interactive tool",
-    description: "A live workspace showing how agent steps can plan, generate, review, and refine an app idea.",
-    action: "Launch demo",
+    title: "Build nights",
+    type: "Coming soon",
+    description: "A teaser for future sessions where members can explore tools, ideas, workflows, and responsible technology together.",
+    action: "Preview visual",
     image: agenticPreview,
-    alt: "Laptop showing an abstract AI agent workflow interface",
+    alt: "Laptop showing an abstract artificial intelligence workflow interface",
   },
 ];
 ---
@@ -31,22 +29,16 @@ const projects = [
   <div class="ai-section__inner">
     <div class="ai-section__header ai-section__header--split">
       <div>
-        <h2 id="student-projects-title" class="section-title">Student projects</h2>
+        <h2 id="student-projects-title" class="section-title">Website preview</h2>
       </div>
       <p class="section-intro">
-        Open interactive demos, inspect how they work, and see the kind of practical experiments members can build toward.
+        A teaser of the visual and technical direction for the new Surrey Artificial Intelligence Society website, launching this September.
       </p>
     </div>
 
     <div class="project-showcase" aria-label="Student projects list">
       {projects.map((project) => (
-        <button
-          class="project-preview"
-          type="button"
-          data-project-id={project.id}
-          aria-label={`Open ${project.title}`}
-          aria-haspopup="dialog"
-        >
+        <article class="project-preview">
           <Image
             src={project.image}
             alt={project.alt}
@@ -61,69 +53,13 @@ const projects = [
             <span class="project-preview__type">{project.type}</span>
             <strong>{project.title}</strong>
             <span>{project.description}</span>
-            <span class="project-preview__action">{project.action} &rarr;</span>
+            <span class="project-preview__action">{project.action}</span>
           </span>
-        </button>
+        </article>
       ))}
     </div>
-
-    <dialog id="project-modal" class="project-modal" aria-label="Project interactive view">
-      <div class="modal-wrapper">
-        <button id="close-modal" class="close-modal-btn" aria-label="Close project">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-        <div class="modal-content" aria-live="polite">
-          <div id="panel-drift-lab" class="project-panel" hidden>
-            <div class="panel-inner">
-              <StudentProjectSlot />
-            </div>
-          </div>
-
-          <div id="panel-agentic-workspace" class="project-panel" hidden>
-            <div class="panel-inner">
-              <AgenticWorkspace />
-            </div>
-          </div>
-        </div>
-      </div>
-    </dialog>
   </div>
 </section>
-
-<script>
-  const modal = document.getElementById("project-modal") as HTMLDialogElement | null;
-  const closeBtn = document.getElementById("close-modal");
-  const projectButtons = document.querySelectorAll<HTMLButtonElement>("[data-project-id]");
-  const panels = document.querySelectorAll<HTMLElement>(".project-panel");
-
-  const showProject = (id: string) => {
-    panels.forEach((panel) => {
-      panel.hidden = panel.id !== `panel-${id}`;
-    });
-    if (modal && !modal.open) modal.showModal();
-  };
-
-  projectButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      const id = button.dataset.projectId;
-      if (id) showProject(id);
-    });
-  });
-
-  closeBtn?.addEventListener("click", () => {
-    modal?.close();
-    window.dispatchEvent(new CustomEvent("surrey-ai-project-modal-close"));
-  });
-
-  modal?.addEventListener("click", (event) => {
-    if (event.target === modal) {
-      modal.close();
-      window.dispatchEvent(new CustomEvent("surrey-ai-project-modal-close"));
-    }
-  });
-</script>
 
 <style>
   .project-showcase {
@@ -140,7 +76,6 @@ const projects = [
     border-radius: clamp(1rem, 2vw, 1.7rem);
     background: color-mix(in srgb, var(--ai-surface) 70%, var(--ai-bg));
     color: #fff;
-    cursor: pointer;
     font: inherit;
     padding: 0;
     text-align: left;
@@ -202,95 +137,6 @@ const projects = [
     color: #fff !important;
     font-weight: 800;
     margin-top: 0.25rem;
-  }
-
-  .project-preview:focus-visible {
-    outline: 3px solid var(--ai-azure);
-    outline-offset: 4px;
-  }
-
-  .project-modal {
-    width: 100%;
-    height: 100%;
-    max-width: 100vw;
-    max-height: 100vh;
-    padding: 0;
-    border: 0;
-    background: transparent;
-  }
-
-  .project-modal::backdrop {
-    background: rgba(6, 10, 18, 0.82);
-    backdrop-filter: blur(12px);
-  }
-
-  .project-modal[open] {
-    display: grid;
-    place-items: center;
-  }
-
-  .modal-wrapper {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    width: min(96vw, 96rem);
-    height: min(94vh, 62rem);
-    overflow: hidden;
-    border: 1px solid var(--ai-border);
-    border-radius: 1.35rem;
-    background: var(--ai-bg);
-  }
-
-  .close-modal-btn {
-    position: absolute;
-    top: 1.25rem;
-    right: 1.25rem;
-    z-index: 50;
-    width: 2.5rem;
-    height: 2.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--ai-border-strong);
-    border-radius: 9999px;
-    background: color-mix(in srgb, var(--ai-surface) 90%, transparent);
-    color: var(--ai-fg);
-    cursor: pointer;
-    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s, border-color 0.2s;
-  }
-
-  .close-modal-btn:hover {
-    transform: scale(1.08);
-    background: var(--ai-surface);
-    border-color: var(--ai-azure);
-    color: var(--ai-azure);
-  }
-
-  .close-modal-btn svg {
-    width: 1.15rem;
-    height: 1.15rem;
-  }
-
-  .modal-content {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-  }
-
-  .project-panel,
-  .panel-inner {
-    width: 100%;
-    height: 100%;
-  }
-
-  .project-panel[hidden] {
-    display: none;
-  }
-
-  .panel-inner > :global(section) {
-    min-height: 100%;
-    box-sizing: border-box;
-    overflow: visible;
   }
 
   @media (max-width: 840px) {

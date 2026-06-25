@@ -15,7 +15,7 @@ interface Props {
 
 const { events } = Astro.props;
 
-const plannedFormats = ["Workshops", "Hackathons", "Project nights", "Talks", "Socials"];
+const plannedFormats = ["Website launch", "Welcome session", "Workshops", "Build nights", "Talks"];
 
 const formatEventDate = (date?: string) => {
   if (!date) return "Date TBC";
@@ -32,7 +32,7 @@ const formatEventDate = (date?: string) => {
   <div class="ai-section__inner">
     <div class="ai-section__header ai-section__header--split">
       <div>
-        <h2 id="events-preview-title" class="section-title">Events and workshops</h2>
+        <h2 id="events-preview-title" class="section-title">Launching in September</h2>
       </div>
       <a href="/events" class="text-link">View all events &rarr;</a>
     </div>
@@ -40,16 +40,16 @@ const formatEventDate = (date?: string) => {
     <div class="events-preview-grid">
       {events.length === 0 ? (
         <div class="event-empty">
-          <h3>Next sessions are being confirmed.</h3>
+          <h3>The first updates are being prepared.</h3>
           <p>
-            The calendar is managed by society signatories. While the live list is pending, the programme direction is clear: hands-on workshops, coding challenges, data clinics, guest sessions, project collaboration, and relaxed meetups.
+            The new website will launch in September with clearer information about welcome activity, workshops, build nights, responsible artificial intelligence, careers, and ways to join.
           </p>
           <div class="event-formats" aria-label="Likely event formats">
             {plannedFormats.map((format) => <span>{format}</span>)}
           </div>
           <div class="event-empty__actions">
             <a href="/join" class="btn-primary">Become a member</a>
-            <a href="/events" class="btn-secondary">Events page</a>
+            <a href="/events" class="btn-secondary">Launch updates</a>
           </div>
         </div>
       ) : (
@@ -68,7 +68,7 @@ const formatEventDate = (date?: string) => {
           ))}
         </div>
       )}
-      <aside class="event-visual" aria-label="AI event planning visual">
+      <aside class="event-visual" aria-label="Artificial intelligence event planning visual">
         <div class="event-visual__board">
           <span></span>
           <span></span>

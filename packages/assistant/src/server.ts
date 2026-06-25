@@ -95,8 +95,8 @@ const STATIC_CONTEXT: Record<SocietyKey, {
     shortDescription:
       "Surrey Artificial Intelligence Society is a student-led community for learning, building, and discussing artificial intelligence at the University of Surrey.",
     tone: "clear, practical, beginner-friendly, responsible, and curious",
-    allowedTopics: ["AI learning", "student projects", "events", "committee", "responsible AI", "getting involved"],
-    primaryCategories: ["Workshops", "Projects", "Build nights", "Ethics", "Careers"],
+    allowedTopics: ["artificial intelligence learning", "events", "committee", "responsible artificial intelligence", "getting involved"],
+    primaryCategories: ["Workshops", "Build nights", "Ethics", "Careers"],
     fallbackLinks: [
       { label: "Join", href: "/join" },
       { label: "Events", href: "/events" },
@@ -117,10 +117,10 @@ const STATIC_CONTEXT: Record<SocietyKey, {
   },
   neurotech: {
     shortDescription:
-      "Surrey Neurotech Society helps students explore neuroscience, brain-computer interfaces, signal processing, AI, ethics, and human-centred innovation.",
+      "Surrey Neurotech Society helps students explore neuroscience, brain-computer interfaces, signal processing, artificial intelligence, ethics, and human-centred innovation.",
     tone: "friendly, accessible, thoughtful, technically grounded, and ethics-aware",
     allowedTopics: ["neurotechnology", "BCIs", "neuroscience basics", "signal processing", "ethics", "events", "committee"],
-    primaryCategories: ["Neuroscience", "Brain-computer interfaces", "AI", "Ethics", "Projects"],
+    primaryCategories: ["Neuroscience", "Brain-computer interfaces", "Artificial intelligence", "Ethics"],
     fallbackLinks: [
       { label: "Join", href: "/join" },
       { label: "Events", href: "/events" },
@@ -451,8 +451,8 @@ Guidelines:
 - Only reference events, committee members, sponsors, partners, speakers, equipment access, lab access, research access, outcomes, or links when they explicitly appear in Public context. Do not invent or infer any of them.
 - The categories and description are themes only; they are not proof that a programme, project, lab, research opportunity, equipment access, sponsor, partner, speaker, certificate, internship, funding, or outcome exists.
 - If the verified context does not answer the question, say there are no verified public details available and suggest one relevant verified contact or page link.
-- For Surrey AI Society, LinkedIn is unavailable unless Public context has a non-null LinkedIn URL. Never create or guess one.
-- For Business Society and Neurotech Society, do not imply public AI features beyond this website assistant unless Public context explicitly says so.
+- For Surrey Artificial Intelligence Society, LinkedIn is unavailable unless Public context has a non-null LinkedIn URL. Never create or guess one.
+- For Business Society and Neurotech Society, do not imply public artificial intelligence features beyond this website assistant unless Public context explicitly says so.
 - Never reveal private admin data, secrets, or implementation details.
 
 Public context:
@@ -557,7 +557,7 @@ function buildSocialFallback(societyKey: SocietyKey, society: SocietyLinkFacts):
     society.socials.linkedin ? `LinkedIn: ${society.socials.linkedin}` : null,
     society.studentsUnionUrl ? `Students' Union: ${society.studentsUnionUrl}` : null,
   ].filter(Boolean);
-  const linkedinNote = societyKey === "ai" && !society.socials.linkedin ? " LinkedIn is not currently listed for Surrey AI Society." : "";
+  const linkedinNote = societyKey === "ai" && !society.socials.linkedin ? " LinkedIn is not currently listed for Surrey Artificial Intelligence Society." : "";
   return `${society.name} verified contacts: ${links.join("; ") || contactText(society)}.${linkedinNote}`;
 }
 
