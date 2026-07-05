@@ -11,10 +11,12 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+*.log
 test-results/
 playwright-report/
 .playwright-cli/
 output/
+.codex/
 
 
 # environment variables
