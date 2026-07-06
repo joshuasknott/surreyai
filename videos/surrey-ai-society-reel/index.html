@@ -1,0 +1,772 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #f7f8f3;
+        font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+        color: #172329;
+      }
+
+      #root {
+        position: relative;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #f7f8f3;
+      }
+
+      .scene {
+        position: absolute;
+        inset: 0;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #f7f8f3;
+      }
+
+      .scene:not(#scene-1) {
+        opacity: 0;
+      }
+
+      .grid {
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(220, 228, 224, 0.52) 1px, rgba(247, 248, 243, 0) 1px),
+          linear-gradient(90deg, rgba(220, 228, 224, 0.5) 1px, rgba(247, 248, 243, 0) 1px);
+        background-size: 72px 72px;
+        opacity: 0.58;
+      }
+
+      .glow {
+        position: absolute;
+        width: 680px;
+        height: 680px;
+        border-radius: 999px;
+        background: radial-gradient(circle, rgba(63, 109, 128, 0.2), rgba(63, 109, 128, 0));
+        filter: blur(8px);
+      }
+
+      .logo-chip {
+        position: absolute;
+        top: 64px;
+        left: 72px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        color: #172329;
+        font-size: 28px;
+        font-weight: 800;
+        letter-spacing: 0;
+      }
+
+      .logo-chip img {
+        width: 64px;
+        height: 64px;
+        border-radius: 999px;
+      }
+
+      .kicker {
+        color: #3f6d80;
+        font-size: 28px;
+        font-weight: 850;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+
+      .display {
+        margin: 0;
+        color: #172329;
+        font-size: 116px;
+        font-weight: 900;
+        line-height: 0.95;
+        letter-spacing: 0;
+      }
+
+      .body-copy {
+        color: #5e6c70;
+        font-size: 34px;
+        font-weight: 400;
+        line-height: 1.42;
+      }
+
+      .pill-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+
+      .pill {
+        border: 1px solid #bfcbc8;
+        border-radius: 999px;
+        background: #ffffff;
+        color: #172329;
+        padding: 18px 26px;
+        font-size: 24px;
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .pill--teal {
+        border-color: rgba(63, 109, 128, 0.4);
+        background: #3f6d80;
+        color: #ffffff;
+        box-shadow: 0 18px 38px rgba(63, 109, 128, 0.18);
+      }
+
+      .caption-bar {
+        position: absolute;
+        left: 64px;
+        right: 64px;
+        bottom: 72px;
+        z-index: 20;
+        min-height: 112px;
+        border: 1px solid #dce4e0;
+        border-radius: 28px;
+        background: rgba(255, 255, 255, 0.88);
+        padding: 24px 28px;
+        color: #172329;
+        font-size: 34px;
+        font-weight: 850;
+        line-height: 1.2;
+        box-shadow: 0 18px 40px rgba(63, 109, 128, 0.1);
+      }
+
+      .caption-bar strong {
+        color: #3f6d80;
+      }
+
+      #scene-1 .content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        height: 100%;
+        flex-direction: column;
+        justify-content: flex-end;
+        gap: 34px;
+        padding: 196px 68px 240px;
+      }
+
+      .robot-wrap {
+        position: absolute;
+        top: 238px;
+        right: -128px;
+        z-index: 1;
+        width: 760px;
+        height: 760px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .robot-wrap img {
+        width: 760px;
+        height: 760px;
+        object-fit: contain;
+        filter: drop-shadow(0 44px 70px rgba(63, 109, 128, 0.2));
+      }
+
+      .orbit-ring {
+        position: absolute;
+        width: 820px;
+        height: 820px;
+        border: 2px solid rgba(63, 109, 128, 0.16);
+        border-radius: 999px;
+      }
+
+      .dot {
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        border-radius: 999px;
+        background: #10b981;
+        box-shadow: 0 0 22px rgba(16, 185, 129, 0.5);
+      }
+
+      .dot-a {
+        top: 120px;
+        left: 160px;
+      }
+
+      .dot-b {
+        right: 110px;
+        bottom: 190px;
+        background: #3f6d80;
+      }
+
+      .hook-line {
+        max-width: 760px;
+      }
+
+      .subline {
+        max-width: 680px;
+        color: #5e6c70;
+        font-size: 44px;
+        font-weight: 650;
+        line-height: 1.16;
+      }
+
+      .type-line {
+        width: max-content;
+        max-width: 820px;
+        border: 1px solid #dce4e0;
+        border-radius: 20px;
+        background: #ffffff;
+        padding: 18px 24px;
+        color: #3f6d80;
+        font-family: monospace;
+        font-size: 28px;
+        font-weight: 600;
+      }
+
+      #scene-2 {
+        background: #fcfcfb;
+      }
+
+      #scene-2 .content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        height: 100%;
+        flex-direction: column;
+        gap: 36px;
+        padding: 150px 64px 210px;
+      }
+
+      .toolkit {
+        position: relative;
+        height: 670px;
+        margin-top: 24px;
+      }
+
+      .toolkit img {
+        position: absolute;
+        left: -96px;
+        bottom: 0;
+        width: 820px;
+        height: 520px;
+        object-fit: contain;
+        filter: drop-shadow(0 34px 42px rgba(63, 109, 128, 0.1));
+      }
+
+      .lesson-card {
+        position: relative;
+        display: grid;
+        grid-template-columns: 76px 1fr;
+        gap: 24px;
+        align-items: start;
+        border-top: 1px solid #dce4e0;
+        padding: 28px 0;
+      }
+
+      .lesson-card .num {
+        color: #3f6d80;
+        font-size: 28px;
+        font-weight: 900;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .lesson-card h3 {
+        margin: 0 0 10px;
+        color: #172329;
+        font-size: 40px;
+        font-weight: 800;
+        letter-spacing: 0;
+      }
+
+      .lesson-card p {
+        margin: 0;
+        color: #5e6c70;
+        font-size: 27px;
+        line-height: 1.35;
+      }
+
+      .draw-svg {
+        position: absolute;
+        inset: 0;
+        width: 1080px;
+        height: 1920px;
+        pointer-events: none;
+      }
+
+      .draw-path {
+        stroke: #3f6d80;
+        stroke-width: 5;
+        stroke-linecap: round;
+        fill: none;
+        stroke-dasharray: 900;
+        stroke-dashoffset: 900;
+        opacity: 0.78;
+      }
+
+      #scene-3 {
+        background: #0b0f19;
+        color: #ffffff;
+      }
+
+      #scene-3 .grid {
+        opacity: 0.14;
+      }
+
+      #scene-3 .content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        height: 100%;
+        flex-direction: column;
+        justify-content: center;
+        gap: 30px;
+        padding: 112px 54px 170px;
+      }
+
+      .project-panel {
+        position: relative;
+        min-height: 610px;
+        overflow: hidden;
+        border: 1px solid rgba(220, 228, 224, 0.2);
+        border-radius: 34px;
+        background: #0b0f19;
+        box-shadow: 0 30px 64px rgba(0, 0, 0, 0.28);
+      }
+
+      .project-panel img {
+        width: 100%;
+        height: 100%;
+        min-height: 610px;
+        object-fit: cover;
+        opacity: 0.92;
+      }
+
+      .project-panel::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(11, 15, 25, 0.18), rgba(11, 15, 25, 0.74));
+      }
+
+      .project-label {
+        position: absolute;
+        left: 42px;
+        right: 42px;
+        bottom: 42px;
+        z-index: 2;
+        border: 1px solid #dce4e0;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.94);
+        padding: 24px;
+        box-shadow: 0 20px 42px rgba(0, 0, 0, 0.24);
+      }
+
+      .project-label span {
+        color: #3f6d80;
+        font-size: 24px;
+        font-weight: 800;
+      }
+
+      .project-label h2 {
+        margin: 8px 0 12px;
+        color: #172329;
+        font-size: 62px;
+        font-weight: 900;
+        line-height: 1;
+      }
+
+      .project-label p {
+        margin: 0;
+        max-width: 690px;
+        color: #5e6c70;
+        font-size: 28px;
+        line-height: 1.32;
+      }
+
+      .terminal {
+        border: 1px solid rgba(220, 228, 224, 0.24);
+        border-radius: 22px;
+        background: rgba(8, 12, 20, 0.86);
+        padding: 20px 24px;
+        color: #10b981;
+        font-family: monospace;
+        font-size: 24px;
+        font-weight: 600;
+      }
+
+      #scene-4 {
+        background: #fcfcfb;
+      }
+
+      #scene-4 .content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        height: 100%;
+        flex-direction: column;
+        justify-content: center;
+        gap: 46px;
+        padding: 136px 68px 220px;
+      }
+
+      .ethics-title {
+        max-width: 860px;
+      }
+
+      .ethics-card {
+        position: relative;
+        min-height: 570px;
+        border: 1px solid #dce4e0;
+        border-radius: 34px;
+        background: #ffffff;
+        overflow: hidden;
+        box-shadow: 0 20px 52px rgba(63, 109, 128, 0.1);
+      }
+
+      .ethics-card img {
+        position: absolute;
+        right: -160px;
+        bottom: -80px;
+        width: 720px;
+        height: 540px;
+        object-fit: contain;
+        opacity: 0.55;
+      }
+
+      .chip-cloud {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px;
+        padding: 52px;
+      }
+
+      .topic-chip {
+        border: 1px solid #dce4e0;
+        border-radius: 999px;
+        background: #f7f8f3;
+        color: #172329;
+        padding: 18px 24px;
+        font-size: 28px;
+        font-weight: 850;
+      }
+
+      .topic-chip.primary {
+        background: #3f6d80;
+        color: #ffffff;
+      }
+
+      .format-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+      }
+
+      #scene-5 {
+        background: #f7f8f3;
+      }
+
+      #scene-5 .content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        height: 100%;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 34px;
+        padding: 166px 68px 250px;
+      }
+
+      .join-bg {
+        position: absolute;
+        right: -230px;
+        bottom: 170px;
+        width: 760px;
+        opacity: 0.32;
+        filter: blur(0.2px);
+      }
+
+      .final-robot {
+        position: absolute;
+        top: 230px;
+        right: -92px;
+        width: 500px;
+        filter: drop-shadow(0 30px 58px rgba(63, 109, 128, 0.18));
+      }
+
+      .final-logo {
+        width: 92px;
+        height: 92px;
+        border-radius: 999px;
+      }
+
+      .cta-button {
+        margin-top: 12px;
+        border: 1px solid rgba(63, 109, 128, 0.4);
+        border-radius: 999px;
+        background: #3f6d80;
+        color: #ffffff;
+        padding: 25px 38px;
+        font-size: 34px;
+        font-weight: 900;
+        box-shadow: 0 18px 42px rgba(63, 109, 128, 0.22);
+      }
+
+      .wipe {
+        position: absolute;
+        inset: 0;
+        z-index: 50;
+        pointer-events: none;
+        opacity: 0;
+      }
+
+      #wipe-teal {
+        background: #3f6d80;
+      }
+
+      #wipe-pale {
+        background: #f7f8f3;
+      }
+
+      #wipe-dark {
+        background: #0b0f19;
+      }
+
+      #flash {
+        background: #ffffff;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="surrey-ai-society-reel"
+      data-start="0"
+      data-duration="23"
+      data-width="1080"
+      data-height="1920"
+    >
+      <audio
+        id="narration"
+        data-start="0"
+        data-duration="22.56"
+        data-track-index="10"
+        src="narration.wav"
+        data-volume="1"
+      ></audio>
+
+      <section id="scene-1" class="scene">
+        <div class="grid"></div>
+        <div class="glow" data-layout-ignore style="right: -160px; top: 260px"></div>
+        <div class="logo-chip">
+          <img src="assets/site/surrey-ai-ds-logo.png" alt="" />
+          <span>Surrey Artificial Intelligence Society</span>
+        </div>
+        <div class="robot-wrap" data-layout-allow-overflow>
+          <div class="orbit-ring"></div>
+          <span class="dot dot-a"></span>
+          <span class="dot dot-b"></span>
+          <img src="assets/site/ai-robot-head.png" alt="" />
+        </div>
+        <div class="content">
+          <p class="kicker">New society website</p>
+          <h1 class="display hook-line">Welcome to Surrey Artificial Intelligence</h1>
+          <div class="subline">events, updates, and ways to join.</div>
+          <div class="type-line" id="typed-hook">events / resources / join</div>
+          <div class="pill-row">
+            <span class="pill pill--teal">Events</span>
+            <span class="pill">Resources</span>
+            <span class="pill">Join</span>
+          </div>
+        </div>
+        <div class="caption-bar">Welcome to the new <strong>Surrey Artificial Intelligence Society</strong> website.</div>
+      </section>
+
+      <section id="scene-2" class="scene">
+        <div class="grid"></div>
+        <svg class="draw-svg" viewBox="0 0 1080 1920" aria-hidden="true">
+          <path class="draw-path" d="M 106 1085 C 290 920 476 902 628 1040 S 860 1110 990 914" />
+        </svg>
+        <div class="content">
+          <p class="kicker">Website preview</p>
+          <h2 class="display" style="font-size: 88px">Learn, connect, and get involved.</h2>
+          <div class="toolkit">
+            <img src="assets/site/ai-learning-toolkit-cutout.png" alt="" />
+          </div>
+          <div class="lesson-card">
+            <span class="num">01</span>
+            <div>
+              <h3>Explore the society</h3>
+              <p>Artificial intelligence, data science, responsible technology, and student community.</p>
+            </div>
+          </div>
+          <div class="lesson-card">
+            <span class="num">02</span>
+            <div>
+              <h3>Find what you need</h3>
+              <p>Events, workshops, resources, committee updates, and simple ways to join.</p>
+            </div>
+          </div>
+        </div>
+        <div class="caption-bar">A student home for <strong>artificial intelligence</strong>, data science, and responsible technology.</div>
+      </section>
+
+      <section id="scene-3" class="scene">
+        <div class="grid"></div>
+        <div class="glow" data-layout-ignore style="left: -260px; top: 360px; background: radial-gradient(circle, rgba(16, 185, 129, 0.18), rgba(16, 185, 129, 0))"></div>
+        <svg class="draw-svg" viewBox="0 0 1080 1920" aria-hidden="true">
+          <path class="draw-path race-path" d="M 122 860 C 300 760 438 780 526 914 C 620 1064 770 1052 942 920" />
+        </svg>
+        <div class="content">
+          <div class="project-panel" id="racing-panel">
+            <img src="assets/site/ai-racing-simulator.png" alt="" data-layout-allow-overflow />
+            <div class="project-label">
+              <span>Website section</span>
+              <h2>Events and workshops</h2>
+              <p>See what is coming up and how to take part.</p>
+            </div>
+          </div>
+          <div class="project-panel" id="agent-panel">
+            <img src="assets/site/ai-agentic-builder.png" alt="" data-layout-allow-overflow />
+            <div class="project-label">
+              <span>Get involved</span>
+              <h2>Resources and membership</h2>
+              <p>Meet the committee, follow updates, and join the society.</p>
+            </div>
+          </div>
+          <div class="terminal" id="terminal-line">&gt; society_updates --events --join</div>
+        </div>
+        <div class="caption-bar"><strong>Find</strong> events, workshops, resources, and ways to join.</div>
+      </section>
+
+      <section id="scene-4" class="scene">
+        <div class="grid"></div>
+        <div class="content">
+          <p class="kicker">Responsible technology + careers</p>
+          <h2 class="display ethics-title" style="font-size: 90px">Build skill. Keep judgement in the loop.</h2>
+          <div class="ethics-card">
+            <img src="assets/site/ai-events-workshop-cutout.png" alt="" data-layout-ignore />
+            <div class="chip-cloud">
+              <span class="topic-chip primary">Responsible technology</span>
+              <span class="topic-chip">Bias</span>
+              <span class="topic-chip">Accessibility</span>
+              <span class="topic-chip">Careers</span>
+              <span class="topic-chip">Impact</span>
+              <span class="topic-chip">Ethics</span>
+            </div>
+          </div>
+          <div class="format-row">
+            <span class="pill">Workshops</span>
+            <span class="pill">Hackathons</span>
+            <span class="pill">Project nights</span>
+            <span class="pill">Talks</span>
+          </div>
+        </div>
+        <div class="caption-bar">Responsible technology, careers, and community are part of the website.</div>
+      </section>
+
+      <section id="scene-5" class="scene">
+        <div class="grid"></div>
+        <img class="join-bg" src="assets/site/ai-join-kit-cutout.png" alt="" data-layout-ignore />
+        <img class="final-robot" src="assets/site/ai-robot-head.png" alt="" data-layout-allow-overflow />
+        <div class="content">
+          <img class="final-logo" src="assets/site/surrey-ai-ds-logo.png" alt="" />
+          <p class="kicker">Beginner-friendly / hands-on / careers</p>
+          <h2 class="display" style="font-size: 118px; max-width: 790px">Join the society</h2>
+          <p class="body-copy" style="max-width: 720px">Find events, updates, committee information, and ways to join.</p>
+          <div class="pill-row">
+            <span class="pill">Events</span>
+            <span class="pill">Resources</span>
+            <span class="pill">Membership</span>
+          </div>
+          <div class="cta-button">Join Surrey Artificial Intelligence Society</div>
+        </div>
+        <div class="caption-bar"><strong>Join Surrey Artificial Intelligence Society.</strong></div>
+      </section>
+
+      <div id="wipe-teal" class="wipe"></div>
+      <div id="wipe-dark" class="wipe"></div>
+      <div id="wipe-pale" class="wipe"></div>
+      <div id="flash" class="wipe"></div>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      var tl = gsap.timeline({ paused: true });
+      var scenes = ["#scene-1", "#scene-2", "#scene-3", "#scene-4", "#scene-5"];
+
+      function enterScene(selector, t) {
+        tl.fromTo(selector + " .kicker", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, t + 0.15);
+        tl.fromTo(selector + " .display", { opacity: 0, y: 58 }, { opacity: 1, y: 0, duration: 0.62, ease: "expo.out" }, t + 0.25);
+        tl.fromTo(selector + " .caption-bar", { opacity: 0, y: 34 }, { opacity: 1, y: 0, duration: 0.42, ease: "back.out(1.4)" }, t + 0.48);
+      }
+
+      function coveredSwap(oldScene, newScene, cover, t, colorHold) {
+        tl.fromTo(cover, { opacity: 0, x: -1080 }, { opacity: 1, x: 0, duration: 0.25, ease: "power4.inOut" }, t);
+        tl.set(oldScene, { opacity: 0 }, t + colorHold);
+        tl.set(newScene, { opacity: 1 }, t + colorHold);
+        tl.to(cover, { x: 1080, duration: 0.28, ease: "power4.inOut" }, t + colorHold + 0.02);
+        tl.set(cover, { opacity: 0, x: -1080 }, t + colorHold + 0.34);
+      }
+
+      enterScene("#scene-1", 0);
+      tl.fromTo(".logo-chip", { opacity: 0, y: -24 }, { opacity: 1, y: 0, duration: 0.48, ease: "power3.out" }, 0.14);
+      tl.fromTo(".robot-wrap", { opacity: 0, x: 120, rotation: 5, scale: 0.88 }, { opacity: 1, x: 0, rotation: 0, scale: 1, duration: 0.72, ease: "expo.out" }, 0.18);
+      tl.to(".robot-wrap img", { y: -18, rotation: -1.6, duration: 1.8, ease: "sine.inOut" }, 0.7);
+      tl.to(".orbit-ring", { rotation: 26, duration: 2.1, ease: "none" }, 0.22);
+      tl.fromTo("#scene-1 .pill", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.38, stagger: 0.08, ease: "back.out(1.7)" }, 1.2);
+      tl.fromTo("#typed-hook", { opacity: 0, width: 0 }, { opacity: 1, width: 390, duration: 0.62, ease: "steps(16)" }, 0.95);
+
+      coveredSwap("#scene-1", "#scene-2", "#wipe-teal", 2.14, 0.18);
+      enterScene("#scene-2", 2.32);
+      tl.fromTo(".toolkit img", { opacity: 0, y: 62, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.72, ease: "power3.out" }, 2.72);
+      tl.to("#scene-2 .draw-path", { strokeDashoffset: 0, duration: 1.25, ease: "power2.out" }, 3.12);
+      tl.fromTo("#scene-2 .lesson-card", { opacity: 0, x: 42 }, { opacity: 1, x: 0, duration: 0.48, stagger: 0.16, ease: "power2.out" }, 4.3);
+      tl.fromTo("#scene-2 .num", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.32, stagger: 0.16, ease: "back.out(1.9)" }, 4.45);
+      tl.to(".toolkit img", { y: -16, duration: 4.8, ease: "sine.inOut" }, 3.6);
+
+      coveredSwap("#scene-2", "#scene-3", "#wipe-dark", 8.62, 0.2);
+      tl.fromTo("#scene-3 .caption-bar", { opacity: 0, y: 34 }, { opacity: 1, y: 0, duration: 0.42, ease: "back.out(1.4)" }, 9.08);
+      tl.fromTo("#racing-panel", { opacity: 0, x: -90, rotation: -2, scale: 0.94 }, { opacity: 1, x: 0, rotation: 0, scale: 1, duration: 0.5, ease: "power4.out" }, 8.95);
+      tl.fromTo("#agent-panel", { opacity: 0, x: 90, rotation: 2, scale: 0.94 }, { opacity: 1, x: 0, rotation: 0, scale: 1, duration: 0.5, ease: "power3.out" }, 10.55);
+      tl.to("#scene-3 .race-path", { strokeDashoffset: 0, duration: 0.9, ease: "power2.out" }, 9.25);
+      tl.fromTo(".project-label", { opacity: 0, y: 34 }, { opacity: 1, y: 0, duration: 0.36, stagger: 0.16, ease: "expo.out" }, 9.18);
+      tl.fromTo("#terminal-line", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 11.45);
+      tl.to("#racing-panel img", { scale: 1.045, duration: 3.7, ease: "none" }, 8.95);
+      tl.to("#agent-panel img", { scale: 1.035, duration: 2.1, ease: "none" }, 10.75);
+
+      coveredSwap("#scene-3", "#scene-4", "#wipe-pale", 12.68, 0.2);
+      enterScene("#scene-4", 12.9);
+      tl.fromTo(".ethics-card", { opacity: 0, y: 56, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "power3.out" }, 13.35);
+      tl.fromTo(".topic-chip", { opacity: 0, y: 24, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.32, stagger: 0.055, ease: "back.out(1.8)" }, 13.72);
+      tl.fromTo(".format-row .pill", { opacity: 0, x: 28 }, { opacity: 1, x: 0, duration: 0.28, stagger: 0.06, ease: "power2.out" }, 14.7);
+      tl.to(".ethics-card img", { x: -22, y: -12, duration: 2.5, ease: "sine.inOut" }, 13.6);
+
+      tl.to("#flash", { opacity: 1, duration: 0.18, ease: "power2.in" }, 16.05);
+      tl.set("#scene-4", { opacity: 0 }, 16.2);
+      tl.set("#scene-5", { opacity: 1 }, 16.2);
+      tl.to("#flash", { opacity: 0, duration: 0.35, ease: "power2.out" }, 16.25);
+      enterScene("#scene-5", 16.22);
+      tl.fromTo(".final-logo", { opacity: 0, scale: 0.75 }, { opacity: 1, scale: 1, duration: 0.46, ease: "back.out(1.7)" }, 16.36);
+      tl.fromTo(".final-robot", { opacity: 0, x: 80, rotation: 4 }, { opacity: 1, x: 0, rotation: 0, duration: 0.7, ease: "expo.out" }, 16.48);
+      tl.fromTo("#scene-5 .pill", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.32, stagger: 0.08, ease: "back.out(1.7)" }, 17.55);
+      tl.fromTo(".cta-button", { opacity: 0, y: 34, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.46, ease: "expo.out" }, 18.28);
+      tl.to(".cta-button", { scale: 1.035, duration: 0.24, yoyo: true, repeat: 1, ease: "power1.inOut" }, 20.0);
+      tl.to(".final-robot", { y: -12, rotation: -1.2, duration: 2.1, ease: "sine.inOut" }, 18.4);
+      tl.to("#root", { opacity: 0.98, duration: 0.2, ease: "none" }, 21.4);
+
+      window.__timelines["surrey-ai-society-reel"] = tl;
+    </script>
+  </body>
+</html>

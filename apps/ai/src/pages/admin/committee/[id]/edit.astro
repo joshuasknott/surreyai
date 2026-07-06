@@ -51,7 +51,7 @@ if (Astro.request.method === 'POST') {
 
   <div class="admin-page-header">
     <h1 class="admin-page-title">Edit Committee Member</h1>
-    <a href="/admin/committee" class="btn btn-outline">← Back</a>
+    <a href="/admin/committee" class="btn btn-outline">Back</a>
   </div>
 
   <div class="form-card">
@@ -72,6 +72,7 @@ if (Astro.request.method === 'POST') {
       <div class="form-group">
         <label for="bio" class="form-label">Bio</label>
         <textarea id="bio" name="bio" class="form-textarea">{member.bio}</textarea>
+        <p class="form-hint">Use short, public-facing copy that can be scanned quickly.</p>
       </div>
 
       <div class="form-group">
@@ -87,61 +88,38 @@ if (Astro.request.method === 'POST') {
       <div class="form-group">
         <label class="form-label">Photo</label>
         {member.imageUrl && (
-          <div style="margin-bottom: 0.5rem;">
-            <img src={member.imageUrl} alt="Current photo" style="max-width: 200px; max-height: 200px; border-radius: 8px;" />
-          </div>
+          <div class="upload-preview"><img src={member.imageUrl} alt="Current photo" /></div>
         )}
-        <input type="file" id="imageFile" accept="image/jpeg,image/png,image/webp" />
+        <div class="upload-field"><input type="file" id="imageFile" accept="image/jpeg,image/png,image/webp" data-admin-upload data-target="[name='imageStorageId']" data-status="#uploadStatus" />
         <input type="hidden" name="imageStorageId" value={member.imageStorageId || ''} />
-        <div id="uploadStatus" style="font-size: 0.875rem; margin-top: 0.25rem;"></div>
+        <div id="uploadStatus" class="upload-status" role="status">Optional. JPEG, PNG, or WebP under 5 MB.</div></div>
       </div>
       <div class="form-group">
-        <label for="image" class="form-label">Or image URL (fallback)</label>
+        <label for="image" class="form-label">Image URL fallback</label>
         <input type="text" id="image" name="image" class="form-input" value={member.image || ''} />
       </div>
 
       <div class="form-group">
-        <label for="displayOrder" class="form-label">Display Order</label>
-        <input type="number" id="displayOrder" name="displayOrder" class="form-input" value={member.displayOrder} />
+        <label for="isActive" class="form-label">Visibility</label>
+        <select id="isActive" name="isActive" class="form-select">
+          <option value="true" selected={member.isActive !== false}>Active - visible on the public site</option>
+          <option value="false" selected={member.isActive === false}>Inactive - keep hidden for now</option>
+        </select>
+        <p class="form-hint">Use inactive for records you want to keep in admin without showing publicly.</p>
       </div>
 
-      <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+
+      <div class="form-group">
+        <label for="displayOrder" class="form-label">Display order</label>
+        <input type="number" id="displayOrder" name="displayOrder" class="form-input" value={member.displayOrder} min="0" />
+      </div>
+
+      <div class="form-actions">
         <button type="submit" class="btn btn-primary">Save Changes</button>
         <a href="/admin/committee" class="btn btn-outline">Cancel</a>
       </div>
     </form>
   </div>
 
-<script is:inline>
-(function() {
-  var fileInput = document.getElementById('imageFile');
-  var hiddenField = document.querySelector('[name="imageStorageId"]');
-  var statusEl = document.getElementById('uploadStatus');
-  if (!fileInput) return;
-  fileInput.addEventListener('change', function(e) {
-    var file = e.target.files[0];
-    if (!file) return;
-    if (['image/jpeg','image/png','image/webp'].indexOf(file.type) === -1) {
-      statusEl.textContent = 'Only JPEG, PNG, and WebP images are allowed.';
-      statusEl.style.color = 'red';
-      e.target.value = '';
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      statusEl.textContent = 'File must be under 5MB.';
-      statusEl.style.color = 'red';
-      e.target.value = '';
-      return;
-    }
-    statusEl.textContent = 'Uploading...';
-    statusEl.style.color = '';
-    fetch('/api/admin/upload-url', { method: 'POST' })
-      .then(function(res) { if (!res.ok) throw new Error('Failed'); return res.json(); })
-      .then(function(data) { return fetch(data.uploadUrl, { method: 'POST', body: file }); })
-      .then(function(res) { if (!res.ok) throw new Error('Upload failed'); return res.json(); })
-      .then(function(data) { hiddenField.value = data.storageId; statusEl.textContent = 'Image uploaded successfully.'; statusEl.style.color = 'green'; })
-      .catch(function() { statusEl.textContent = 'Upload failed. Please try again.'; statusEl.style.color = 'red'; e.target.value = ''; });
-  });
-})();
-</script>
+
 </AdminLayout>

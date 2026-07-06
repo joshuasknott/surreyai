@@ -7,34 +7,34 @@ export function validateEventInput(input: CreateEventInput | UpdateEventInput, i
 
   if (!isUpdate || input.title !== undefined) {
     if (!input.title || input.title.trim().length === 0) {
-      errors.title = 'Title is required';
+      errors.title = 'Enter an event title.';
     }
   }
 
   if (!isUpdate || input.date !== undefined) {
     if (input.date && !/^\d{4}-\d{2}-\d{2}$/.test(input.date)) {
-      errors.date = 'Date must be in YYYY-MM-DD format';
+      errors.date = 'Choose a valid event date.';
     }
   }
 
   if (input.startTime && !/^\d{2}:\d{2}$/.test(input.startTime)) {
-    errors.startTime = 'Start time must be in HH:MM format';
+    errors.startTime = 'Choose a valid start time.';
   }
 
   if (input.endTime && !/^\d{2}:\d{2}$/.test(input.endTime)) {
-    errors.endTime = 'End time must be in HH:MM format';
+    errors.endTime = 'Choose a valid end time.';
   }
 
   if (input.registrationUrl && !URL_REGEX.test(input.registrationUrl)) {
-    errors.registrationUrl = 'Registration URL must be a valid URL';
+    errors.registrationUrl = 'Enter a full registration URL starting with http:// or https://.';
   }
 
   if (input.image && !URL_REGEX.test(input.image) && !input.image.startsWith('/')) {
-    errors.image = 'Image must be a valid URL or path';
+    errors.image = 'Enter a full image URL or a site path beginning with /.';
   }
 
   if (input.status && !['draft', 'published'].includes(input.status)) {
-    errors.status = 'Status must be draft or published';
+    errors.status = 'Choose Draft or Published.';
   }
 
   return { valid: Object.keys(errors).length === 0, errors };

@@ -10,6 +10,10 @@ export type AssistantSocietyConfig = {
   allowedTopics: string[];
   primaryCategories: string[];
   fallbackLinks: Array<{ label: string; href: string }>;
+  logo: {
+    src: string;
+    alt: string;
+  };
   brand: {
     accent: string;
     accentText: string;
@@ -41,6 +45,10 @@ export const ASSISTANT_CONFIGS: Record<AssistantSocietyKey, AssistantSocietyConf
       { label: "Events", href: "/events" },
       { label: "Committee", href: "/committee" },
     ],
+    logo: {
+      src: "/logos/ai-logo.png",
+      alt: "Surrey Artificial Intelligence Society",
+    },
     brand: {
       accent: "#4F46E5",
       accentText: "#FFFFFF",
@@ -70,6 +78,10 @@ export const ASSISTANT_CONFIGS: Record<AssistantSocietyKey, AssistantSocietyConf
       { label: "Events", href: "/events" },
       { label: "Committee", href: "/committee" },
     ],
+    logo: {
+      src: "/logos/sbs-logo.png",
+      alt: "Surrey Business Society",
+    },
     brand: {
       accent: "#C9A84C",
       accentText: "#0F172A",
@@ -99,6 +111,10 @@ export const ASSISTANT_CONFIGS: Record<AssistantSocietyKey, AssistantSocietyConf
       { label: "Events", href: "/events" },
       { label: "Committee", href: "/committee" },
     ],
+    logo: {
+      src: "/logos/neurotech-logo.png",
+      alt: "Surrey Neurotech Society",
+    },
     brand: {
       accent: "#E5C158",
       accentText: "#040A18",

@@ -39,10 +39,14 @@ const styleVars = [
     aria-expanded="false"
     aria-controls={`${widgetId}-panel`}
   >
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M4.75 5.75A3.25 3.25 0 0 1 8 2.5h8A3.25 3.25 0 0 1 19.25 5.75v6.5A3.25 3.25 0 0 1 16 15.5H9.2l-3.45 3.08a.75.75 0 0 1-1.25-.56V15.2a3.25 3.25 0 0 1-2-2.95v-6.5Z" fill="currentColor"></path>
-      <path d="M8 8h8M8 11.25h5.5" fill="none" stroke="var(--assistant-accent-text)" stroke-linecap="round" stroke-width="1.5"></path>
-    </svg>
+    <span class="assistant-toggle-mark" aria-hidden="true">
+      <img src={config.logo.src} alt="" width="42" height="42" loading="lazy" decoding="async" />
+    </span>
+    <span class="assistant-toggle-spark" aria-hidden="true">
+      <svg viewBox="0 0 24 24">
+        <path d="M7 8.25h10M7 12h6.5M7 15.75h4.75" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.8"></path>
+      </svg>
+    </span>
   </button>
 
   <section
@@ -54,9 +58,14 @@ const styleVars = [
     hidden
   >
     <header class="assistant-header">
-      <div>
+      <div class="assistant-brand">
+        <span class="assistant-brand-mark">
+          <img src={config.logo.src} alt={config.logo.alt} width="44" height="44" loading="lazy" decoding="async" />
+        </span>
+        <div>
         <p class="assistant-eyebrow">{config.shortName}</p>
         <h2 id={`${widgetId}-title`}>Website assistant</h2>
+        </div>
       </div>
       <div class="assistant-header-actions">
         <button type="button" class="assistant-reset" aria-label="Reset assistant conversation">Reset</button>
@@ -104,6 +113,7 @@ const styleVars = [
   .assistant-toggle {
     width: 3.5rem;
     height: 3.5rem;
+    position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -131,9 +141,45 @@ const styleVars = [
     outline-offset: 3px;
   }
 
-  .assistant-toggle svg {
-    width: 1.55rem;
-    height: 1.55rem;
+  .assistant-toggle-mark {
+    width: 2.45rem;
+    height: 2.45rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--assistant-accent-text) 58%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--assistant-surface) 92%, transparent);
+  }
+
+  .assistant-toggle-mark img,
+  .assistant-brand-mark img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .assistant-toggle-spark {
+    position: absolute;
+    right: -0.18rem;
+    bottom: -0.18rem;
+    width: 1.45rem;
+    height: 1.45rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid color-mix(in srgb, var(--assistant-accent) 45%, var(--assistant-border));
+    border-radius: 999px;
+    background: var(--assistant-surface);
+    color: var(--assistant-accent);
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.16);
+  }
+
+  .assistant-toggle-spark svg {
+    width: 0.9rem;
+    height: 0.9rem;
   }
 
   .assistant-panel {
@@ -164,6 +210,27 @@ const styleVars = [
     padding: 1rem;
     border-bottom: 1px solid var(--assistant-border);
     background: color-mix(in srgb, var(--assistant-surface) 92%, var(--assistant-accent) 8%);
+  }
+
+  .assistant-brand {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    gap: 0.75rem;
+  }
+
+  .assistant-brand-mark {
+    width: 2.75rem;
+    height: 2.75rem;
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--assistant-accent) 28%, var(--assistant-border));
+    border-radius: 0.85rem;
+    background: color-mix(in srgb, var(--assistant-surface) 88%, #ffffff 12%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.48);
   }
 
   .assistant-eyebrow {
@@ -224,7 +291,10 @@ const styleVars = [
     flex: 1;
     min-height: 0;
     overflow-y: auto;
-    padding: 1rem;
+    padding: 0.95rem;
+    background:
+      radial-gradient(circle at 12% 0%, color-mix(in srgb, var(--assistant-accent) 10%, transparent), transparent 13rem),
+      var(--assistant-surface);
   }
 
   .assistant-intro {
@@ -251,12 +321,13 @@ const styleVars = [
 
   .assistant-starter {
     max-width: 100%;
-    padding: 0.55rem 0.7rem;
+    padding: 0.6rem 0.75rem;
     border: 1px solid var(--assistant-border);
-    border-radius: 999px;
-    background: var(--assistant-surface);
+    border-radius: 0.8rem;
+    background: color-mix(in srgb, var(--assistant-surface) 96%, var(--assistant-accent) 4%);
     color: var(--assistant-text);
     font-size: 0.78rem;
+    font-weight: 700;
     line-height: 1.25;
     cursor: pointer;
   }
@@ -310,7 +381,7 @@ const styleVars = [
     gap: 0.6rem;
     padding: 0.85rem;
     border-top: 1px solid var(--assistant-border);
-    background: var(--assistant-surface);
+    background: color-mix(in srgb, var(--assistant-surface) 94%, var(--assistant-accent) 6%);
   }
 
   .assistant-input {
@@ -382,175 +453,90 @@ const styleVars = [
   }
 </style>
 
+<style is:global>
+  [data-assistant-widget] .assistant-starter {
+    max-width: 100%;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--assistant-border);
+    border-radius: 0.8rem;
+    background: color-mix(in srgb, var(--assistant-surface) 96%, var(--assistant-accent) 4%);
+    color: var(--assistant-text);
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1.25;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  [data-assistant-widget] .assistant-starter:hover {
+    border-color: color-mix(in srgb, var(--assistant-accent) 65%, var(--assistant-border));
+  }
+
+  [data-assistant-widget] .assistant-starter:focus-visible,
+  [data-assistant-widget] .assistant-message:focus-visible {
+    outline: 2px solid var(--assistant-accent);
+    outline-offset: 3px;
+  }
+
+  [data-assistant-widget] .assistant-message {
+    max-width: 88%;
+    padding: 0.75rem 0.85rem;
+    border-radius: 0.9rem;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  [data-assistant-widget] .assistant-message.user {
+    align-self: flex-end;
+    background: var(--assistant-accent);
+    color: var(--assistant-accent-text);
+    border-bottom-right-radius: 0.25rem;
+  }
+
+  [data-assistant-widget] .assistant-message.assistant,
+  [data-assistant-widget] .assistant-message.loading,
+  [data-assistant-widget] .assistant-message.error {
+    align-self: flex-start;
+    border: 1px solid var(--assistant-border);
+    background: color-mix(in srgb, var(--assistant-surface) 92%, #f8fafc 8%);
+    color: var(--assistant-text);
+    border-bottom-left-radius: 0.25rem;
+  }
+
+  [data-assistant-widget] .assistant-message.error {
+    color: #991b1b;
+    border-color: #fecaca;
+    background: #fef2f2;
+  }
+</style>
+
 <script>
-  function initSocietyAssistant(root) {
-    if (!root || root.dataset.initialized === 'true') return;
-    root.dataset.initialized = 'true';
+  let assistantModulePromise;
 
-    const endpoint = root.dataset.endpoint || '/api/assistant/chat';
-    const societyName = root.dataset.societyName || 'the society';
-    const shortName = root.dataset.shortName || societyName;
-    const starters = readJsonArray(root.dataset.starterPrompts);
+  const loadAssistant = () => {
+    assistantModulePromise ??= import('../assistantWidget.client');
+    return assistantModulePromise;
+  };
+
+  document.querySelectorAll('[data-assistant-widget]').forEach((root) => {
     const toggle = root.querySelector('.assistant-toggle');
-    const panel = root.querySelector('.assistant-panel');
-    const closeButton = root.querySelector('.assistant-close');
-    const resetButton = root.querySelector('.assistant-reset');
-    const form = root.querySelector('.assistant-form');
-    const input = root.querySelector('.assistant-input');
-    const sendButton = root.querySelector('.assistant-send');
-    const messagesEl = root.querySelector('.assistant-messages');
-    const startersEl = root.querySelector('.assistant-starters');
-    const messages = [];
-    let lastFocus = null;
-    let isSending = false;
 
-    starters.forEach((prompt) => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'assistant-starter';
-      button.textContent = prompt;
-      button.addEventListener('click', () => submitMessage(prompt));
-      startersEl?.appendChild(button);
-    });
+    toggle?.addEventListener('pointerenter', () => {
+      loadAssistant();
+    }, { once: true, passive: true });
 
-    toggle?.addEventListener('click', () => {
-      if (panel?.hidden) openPanel();
-      else closePanel();
-    });
+    toggle?.addEventListener('focus', () => {
+      loadAssistant();
+    }, { once: true });
 
-    closeButton?.addEventListener('click', closePanel);
-    resetButton?.addEventListener('click', resetConversation);
-
-    form?.addEventListener('submit', (event) => {
+    toggle?.addEventListener('click', async (event) => {
+      if (root.dataset.initialized === 'true') return;
       event.preventDefault();
-      submitMessage(input?.value || '');
+      const { initSocietyAssistant } = await loadAssistant();
+      initSocietyAssistant(root, { open: true });
     });
-
-    input?.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter' && !event.shiftKey) {
-        event.preventDefault();
-        submitMessage(input.value || '');
-      }
-    });
-
-    input?.addEventListener('input', () => {
-      autoResizeInput();
-    });
-
-    function autoResizeInput() {
-      if (!input) return;
-      input.style.height = 'auto';
-      input.style.height = Math.min(input.scrollHeight, 112) + 'px';
-    }
-
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape' && !panel?.hidden) {
-        closePanel();
-      }
-    });
-
-    function openPanel() {
-      lastFocus = document.activeElement;
-      if (panel) panel.hidden = false;
-      toggle?.setAttribute('aria-expanded', 'true');
-      toggle?.setAttribute('aria-label', `Close ${shortName} assistant`);
-      window.setTimeout(() => input?.focus(), 0);
-    }
-
-    function closePanel() {
-      if (panel) panel.hidden = true;
-      toggle?.setAttribute('aria-expanded', 'false');
-      toggle?.setAttribute('aria-label', `Open ${shortName} assistant`);
-      if (lastFocus && typeof lastFocus.focus === 'function') {
-        lastFocus.focus();
-      } else {
-        toggle?.focus();
-      }
-    }
-
-    function resetConversation() {
-      messages.splice(0, messages.length);
-      if (messagesEl) messagesEl.textContent = '';
-      if (input) {
-        input.value = '';
-        input.style.height = 'auto';
-      }
-      startersEl?.removeAttribute('hidden');
-      input?.focus();
-    }
-
-    async function submitMessage(rawText) {
-      const text = String(rawText || '').replace(/\s+/g, ' ').trim();
-      if (!text || isSending) return;
-
-      if (panel?.hidden) openPanel();
-      isSending = true;
-      setDisabled(true);
-      if (input) {
-        input.value = '';
-        input.style.height = 'auto';
-      }
-
-      appendMessage('user', text);
-      messages.push({ role: 'user', content: text });
-      startersEl?.setAttribute('hidden', '');
-      const loading = appendMessage('loading', `${shortName} assistant is thinking...`);
-
-      try {
-        const response = await fetch(endpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ messages }),
-        });
-        const data = await response.json().catch(() => ({}));
-
-        loading?.remove();
-
-        if (typeof data.message === 'string') {
-          const reply = data.message.trim();
-          appendMessage('assistant', reply || `I could not answer that from the ${societyName} context right now.`);
-          messages.push({ role: 'assistant', content: reply });
-          return;
-        }
-
-        throw new Error('Assistant request failed');
-      } catch {
-        loading?.remove();
-        appendMessage('error', 'The assistant is unavailable right now. Please try again shortly or use the site links.');
-      } finally {
-        isSending = false;
-        setDisabled(false);
-        input?.focus();
-      }
-    }
-
-    function appendMessage(role, text) {
-      if (!messagesEl) return null;
-      const item = document.createElement('div');
-      item.className = `assistant-message ${role}`;
-      item.textContent = text;
-      messagesEl.appendChild(item);
-      item.scrollIntoView({ block: 'end', behavior: 'smooth' });
-      return item;
-    }
-
-    function setDisabled(disabled) {
-      if (input) input.disabled = disabled;
-      if (sendButton) sendButton.disabled = disabled;
-      root.querySelectorAll('.assistant-starter').forEach((button) => {
-        button.disabled = disabled;
-      });
-    }
-  }
-
-  function readJsonArray(value) {
-    try {
-      const parsed = JSON.parse(value || '[]');
-      return Array.isArray(parsed) ? parsed.filter((item) => typeof item === 'string') : [];
-    } catch {
-      return [];
-    }
-  }
-
-  document.querySelectorAll('[data-assistant-widget]').forEach(initSocietyAssistant);
+  });
 </script>

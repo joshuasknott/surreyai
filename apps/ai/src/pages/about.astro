@@ -1,8 +1,8 @@
 ---
 export const prerender = true;
+import { Image } from "astro:assets";
 import Layout from "../layouts/Layout.astro";
-import CutoutVisual from "../components/common/CutoutVisual.astro";
-import aboutLiteracyCutout from "../assets/generated/ai-about-literacy-cutout.png";
+import aboutHero from "../assets/generated/ai-about-campus-sketch-hero.optimized.webp";
 import "../styles/global.css";
 
 const principles = [
@@ -27,7 +27,7 @@ const pathways = [
   },
   {
     title: "Build and compete",
-    text: "Hackathons, project nights, and prototypes give members something concrete to test, critique, improve, and show in a portfolio.",
+    text: "Challenges, project nights, and prototypes give members something concrete to test, critique, improve, and show in a portfolio.",
   },
   {
     title: "Connect and reflect",
@@ -40,23 +40,28 @@ const pathways = [
   title="About"
   description="Learn about Surrey Artificial Intelligence Society - our mission, values, and student-led approach to artificial intelligence."
 >
-  <section class="about-hero">
-    <div class="about-hero__inner">
-      <div class="about-hero__copy">
-        <h1>About the society</h1>
+  <section class="ai-photo-hero ai-photo-hero--about" aria-labelledby="about-title">
+    <Image
+      src={aboutHero}
+      alt=""
+      aria-hidden="true"
+      class="ai-photo-hero__image"
+      widths={[640, 960, 1440, 1800]}
+      sizes="100vw"
+      loading="eager"
+      decoding="async"
+      fetchpriority="high"
+      format="webp"
+      quality={72}
+    />
+    <div class="ai-photo-hero__inner">
+      <div class="ai-photo-hero__copy">
+        <p class="ai-photo-hero__eyebrow">About the society</p>
+        <h1 id="about-title">About the society</h1>
         <p>
           Surrey AI Society is a student-led society under Surrey Students' Union. We make space for students to learn practical skills, work on data-driven projects, explore modern AI tools, and discuss how these systems affect the world around them.
         </p>
       </div>
-      <CutoutVisual
-        image={aboutLiteracyCutout}
-        alt="Open notebook, model cards, magnifying glass, balance objects, and tablet for responsible AI literacy"
-        title="Literacy, usefulness, and impact belong together."
-        body="The society treats AI as something students can inspect, shape, and question."
-        align="right"
-        compact
-        loading="eager"
-      />
     </div>
   </section>
 
@@ -68,7 +73,7 @@ const pathways = [
           AI literacy now reaches well beyond computing. It shapes study, work, creativity, research, and everyday decisions. We help students build enough understanding to take part with confidence, whether they are writing their first script or already experimenting with models.
         </p>
         <p>
-          That means mixing beginner-friendly explainers with workshops, tutorials, competitions, project collaboration, industry awareness, and enough ethical judgement to ask whether a system should be built at all.
+          That means mixing beginner-friendly explainers with workshops, tutorials, competitions, project collaboration, career awareness, and enough ethical judgement to ask whether a system should be built at all.
         </p>
       </div>
       <div class="mission-proof" aria-label="Mission emphasis">
@@ -136,48 +141,6 @@ const pathways = [
 </Layout>
 
 <style>
-  .about-hero {
-    position: relative;
-    overflow: clip;
-    padding: clamp(4.5rem, 8vw, 7rem) 1.25rem clamp(3.5rem, 7vw, 5rem);
-    background:
-      radial-gradient(circle at 80% 26%, color-mix(in srgb, var(--ai-azure) 15%, transparent), transparent 22rem),
-      linear-gradient(180deg, color-mix(in srgb, var(--ai-surface) 60%, var(--ai-bg)), var(--ai-bg));
-    color: var(--ai-fg);
-    border-bottom: 1px solid var(--ai-border);
-  }
-
-  .about-hero__inner {
-    position: relative;
-    display: grid;
-    grid-template-columns: minmax(0, 0.92fr) minmax(22rem, 0.95fr);
-    gap: clamp(2rem, 5vw, 4rem);
-    align-items: center;
-    width: min(100%, 82rem);
-    margin: 0 auto;
-  }
-
-  .about-hero__copy {
-    max-width: 62rem;
-  }
-
-  .about-hero h1 {
-    margin: 0;
-    color: var(--ai-fg);
-    font-size: clamp(2.15rem, 4.4vw, 3.8rem);
-    font-weight: 850;
-    letter-spacing: 0;
-    line-height: 1.08;
-  }
-
-  .about-hero p {
-    max-width: 43rem;
-    margin: 1.35rem 0 0;
-    color: var(--ai-fg-muted);
-    font-size: 1.12rem;
-    line-height: 1.65;
-  }
-
   .mission-grid {
     display: grid;
     grid-template-columns: minmax(0, 0.82fr) minmax(18rem, 0.58fr);
@@ -310,7 +273,6 @@ const pathways = [
   }
 
   @media (max-width: 760px) {
-    .about-hero__inner,
     .mission-grid,
     .principle-row,
     .route-grid {

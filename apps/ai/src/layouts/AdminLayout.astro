@@ -37,7 +37,7 @@ function isActive(href: string): boolean {
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <title>{title} — {society?.name || 'Admin'}</title>
+    <title>{title} - {society?.name || 'Admin'}</title>
   </head>
   <body class="admin-body">
     <div class="admin-layout">
@@ -65,7 +65,7 @@ function isActive(href: string): boolean {
         </nav>
         <div style="padding: 0.75rem; border-top: 1px solid rgba(255,255,255,0.1);">
           <a href="/" class="admin-sidebar-link" style="font-size: 0.75rem; color: rgba(255,255,255,0.5);">
-            ← Back to public site
+            Back to public site
           </a>
         </div>
       </aside>
@@ -116,6 +116,78 @@ function isActive(href: string): boolean {
         if (window.Clerk) {
           await window.Clerk.signOut({ redirectUrl: '/admin/login' });
         }
+      });
+
+      document.querySelectorAll('[data-admin-upload]').forEach(function(input) {
+        const hiddenField = document.querySelector(input.getAttribute('data-target') || '[name="imageStorageId"]');
+        const statusEl = document.querySelector(input.getAttribute('data-status') || '#uploadStatus');
+        const submitButtons = Array.from(document.querySelectorAll('form button[type="submit"]'));
+
+        function setStatus(message, state) {
+          if (!statusEl) return;
+          statusEl.textContent = message;
+          statusEl.classList.remove('is-success', 'is-error', 'is-loading');
+          if (state) statusEl.classList.add(`is-${state}`);
+        }
+
+        function setUploading(isUploading) {
+          submitButtons.forEach(function(button) {
+            button.disabled = isUploading;
+          });
+        }
+
+        input.addEventListener('change', function(event) {
+          const file = event.target.files && event.target.files[0];
+          if (!file) {
+            setStatus('No new image selected.', '');
+            return;
+          }
+
+          if (['image/jpeg', 'image/png', 'image/webp'].indexOf(file.type) === -1) {
+            setStatus('Use a JPEG, PNG, or WebP image.', 'error');
+            event.target.value = '';
+            return;
+          }
+
+          if (file.size > 5 * 1024 * 1024) {
+            setStatus('Choose an image under 5 MB.', 'error');
+            event.target.value = '';
+            return;
+          }
+
+          setStatus('Uploading image. Keep this page open until it finishes.', 'loading');
+          setUploading(true);
+
+          fetch('/api/admin/upload-url', { method: 'POST' })
+            .then(function(response) {
+              if (!response.ok) throw new Error('Upload URL request failed');
+              return response.json();
+            })
+            .then(function(data) {
+              if (!data.uploadUrl) throw new Error('Missing upload URL');
+              return fetch(data.uploadUrl, {
+                method: 'POST',
+                headers: file.type ? { 'Content-Type': file.type } : {},
+                body: file,
+              });
+            })
+            .then(function(response) {
+              if (!response.ok) throw new Error('Image upload failed');
+              return response.json();
+            })
+            .then(function(data) {
+              if (!data.storageId) throw new Error('Missing storage ID');
+              if (hiddenField) hiddenField.value = data.storageId;
+              setStatus('Image uploaded. Save the form to publish this change.', 'success');
+            })
+            .catch(function() {
+              setStatus('Image upload failed. Check the file and try again, or use an image URL.', 'error');
+              event.target.value = '';
+            })
+            .finally(function() {
+              setUploading(false);
+            });
+        });
       });
     </script>
   </body>

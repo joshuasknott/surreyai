@@ -13,6 +13,7 @@ export type GenerateContentOptions = {
 
 export const GEMINI_3_FLASH_MODEL = "gemini-3.0-flash";
 export const GEMINI_3_FLASH_LITE_MODEL = "gemini-3.1-flash-lite";
+export const GEMINI_3_5_FLASH_MODEL = "gemini-3.5-flash";
 
 type GeminiGenerateResult = {
   text?: unknown;
@@ -103,7 +104,7 @@ export async function generateContent(
 
   const apiKey = env("GEMINI_API_KEY")!;
   const model = options.model || getModel();
-  const fallbackModel = getFallbackModel();
+  const fallbackModel = options.model ? model : getFallbackModel();
   const maxTokens = options.maxOutputTokens ?? getMaxTokens();
   const timeoutMs = options.timeoutMs ?? getTimeoutMs();
   const startedAt = Date.now();

@@ -1,14 +1,15 @@
 ---
 export const prerender = false;
+import { Image } from "astro:assets";
 import Layout from "../layouts/Layout.astro";
 import { queryPublicConvex } from "@surreysocieties/admin";
 import { api } from "../../../../convex/_generated/api.js";
 import { getSocietyById } from "@surreysocieties/admin/config";
-import CutoutVisual from "../components/common/CutoutVisual.astro";
-import committeePlanningCutout from "../assets/generated/ai-committee-planning-cutout.png";
+import committeeHero from "../assets/generated/ai-events-campus-sketch-hero.optimized.webp";
 import "../styles/global.css";
 
 const SOCIETY_ID = "ai";
+Astro.response.headers.set("Cache-Control", "public, s-maxage=300, stale-while-revalidate=3600");
 const society = getSocietyById(SOCIETY_ID)!;
 const [committeeResult, pastCommitteeResult] = await Promise.all([
   queryPublicConvex(api.committee.listActive, { societySlug: SOCIETY_ID }, []),
@@ -38,7 +39,7 @@ const getInitials = (name?: string, role?: string) => {
 const operatingModel = [
   {
     title: "Programme planning",
-    text: "Choose workshops, tutorials, hackathons, project sessions, talks, socials, and discussion topics that are useful for different levels of experience.",
+    text: "Choose workshops, tutorials, challenges, project sessions, talks, socials, and discussion topics that are useful for different levels of experience.",
   },
   {
     title: "Member support",
@@ -49,28 +50,39 @@ const operatingModel = [
     text: "Keep accessibility, data quality, safeguarding, and social impact in view when activities are planned and promoted.",
   },
 ];
+
 ---
 
 <Layout
   title="Committee"
   description="Meet the student committee running Surrey Artificial Intelligence Society and shaping its workshops, projects, competitions, talks, socials, and responsible AI activity."
 >
-  <section class="committee-hero">
-    <div class="committee-hero__copy">
-      <h1>Meet the committee</h1>
+  <section
+    class="ai-photo-hero ai-photo-hero--committee"
+    aria-labelledby="committee-hero-title"
+  >
+    <Image
+      src={committeeHero}
+      alt=""
+      aria-hidden="true"
+      class="ai-photo-hero__image"
+      widths={[640, 960, 1440, 1800]}
+      sizes="100vw"
+      loading="eager"
+      decoding="async"
+      fetchpriority="high"
+      format="webp"
+      quality={72}
+    />
+    <div class="ai-photo-hero__inner">
+      <div class="ai-photo-hero__copy">
+        <p class="ai-photo-hero__eyebrow">Committee</p>
+      <h1 id="committee-hero-title">Meet the committee</h1>
       <p>
-        The committee turns student interest into workshops, tutorials, hackathons, projects, discussions, socials, and clear routes into the society. Named records appear here once they are confirmed in the admin system.
+        The committee turns student interest into workshops, tutorials, challenges, projects, discussions, socials, and clear routes into the society. Named records appear here once committee members add them.
       </p>
     </div>
-    <CutoutVisual
-      image={committeePlanningCutout}
-      alt="Committee planning table with laptops, tablet, notebook, cards, pens, and connected workflow ribbon"
-      title="Planning works best when decisions stay visible."
-      body="The committee keeps programme, inclusion, and project momentum in the same conversation."
-      align="right"
-      compact
-      loading="eager"
-    />
+    </div>
   </section>
 
   <section class="ai-section ai-section--tinted" aria-labelledby="leadership-title">
@@ -101,6 +113,7 @@ const operatingModel = [
       <div class="ai-section__header ai-section__header--split">
         <div>
           <h2 id="committee-title" class="section-title">Current committee</h2>
+          <p class="section-intro">Committee records appear once the team is ready to share them publicly.</p>
         </div>
         <a href={`mailto:${society.contactEmail}`} class="text-link">Contact the society &rarr;</a>
       </div>
@@ -109,7 +122,7 @@ const operatingModel = [
         <div class="committee-empty">
           <h3>Committee details will appear here once confirmed.</h3>
           <p>
-            The current roster will be published when it has been added by the next committee. Until then, use the Students' Union page or email for verified contact routes.
+            The current roster will be published once committee members add it. Until then, use the Students' Union page or email for verified contact routes.
           </p>
           <div class="committee-empty__actions">
             <a href={society.studentsUnionUrl} target="_blank" rel="noopener noreferrer" class="btn-primary">Students' Union page</a>

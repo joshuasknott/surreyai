@@ -1,22 +1,22 @@
 ---
 import CutoutVisual from "../common/CutoutVisual.astro";
-import learningToolkitCutout from "../../assets/generated/ai-learning-toolkit-cutout.png";
+import learningToolkitCutout from "../../assets/generated/ai-learning-toolkit-cutout.optimized.webp";
 
 const routes = [
   {
     label: "01",
-    title: "Start with confidence",
-    text: "The new website will guide members toward workshops, beginner-friendly resources, and practical routes into artificial intelligence.",
+    title: "Learn the basics",
+    text: "Join workshops, beginner sessions, and practical activities that make artificial intelligence easier to understand.",
   },
   {
     label: "02",
-    title: "Find the community",
-    text: "Launch updates will make it easier to discover welcome sessions, build nights, hackathons, and other ways to meet people.",
+    title: "Meet other builders",
+    text: "Come to build nights, challenges, talks, and socials with students working on similar ideas.",
   },
   {
     label: "03",
-    title: "Understand the impact",
-    text: "Responsible artificial intelligence, careers, accessibility, bias, and social impact stay part of the society from the start.",
+    title: "Use AI responsibly",
+    text: "Discuss data quality, bias, accessibility, careers, and the real impact of AI tools.",
   },
 ];
 ---
@@ -25,10 +25,10 @@ const routes = [
   <div class="ai-section__inner">
     <div class="ai-section__header ai-section__header--split">
       <div>
-      <h2 id="explore-title" class="section-title">What the website is for</h2>
+      <h2 id="explore-title" class="section-title">What members can do</h2>
       </div>
       <p class="section-intro">
-        The September launch will give curious beginners, experienced coders, and students from any discipline a clearer place to find the society, understand the offer, and get involved.
+        Join practical sessions, meet other students, and explore how AI systems are built and used.
       </p>
     </div>
 
@@ -37,8 +37,8 @@ const routes = [
         compact
         image={learningToolkitCutout}
         alt="Artificial intelligence learning toolkit with a whiteboard tablet, notebook, data cards, calculator, and headphones"
-        title="A clearer place to begin."
-        body="The website will bring together society updates, learning routes, event information, and simple joining steps in one student-friendly space."
+        title="Start where you are."
+        body="Find events, projects, learning routes, and the official joining link in one place."
       />
       <div class="impact-routes">
         {routes.map((route) => (

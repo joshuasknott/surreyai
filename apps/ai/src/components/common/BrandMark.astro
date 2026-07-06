@@ -4,11 +4,30 @@ interface Props {
 }
 
 const { size = "default" } = Astro.props;
+
+const pixelSize = size === "large" ? 80 : size === "small" ? 36 : 48;
+const loading = size === "small" ? "lazy" : "eager";
 ---
 
 <span class:list={["brand-mark", `brand-mark--${size}`]} aria-hidden="true">
-  <img class="brand-mark__img brand-mark__img--light" src="/logos/surrey-ai-ds-logo.png" alt="" loading="eager" />
-  <img class="brand-mark__img brand-mark__img--dark" src="/logos/surrey-ai-ds-logo-dark.png" alt="" loading="eager" />
+  <img
+    class="brand-mark__img brand-mark__img--light"
+    src="/logos/surrey-ai-ds-logo.png"
+    alt=""
+    width={pixelSize}
+    height={pixelSize}
+    loading={loading}
+    decoding="async"
+  />
+  <img
+    class="brand-mark__img brand-mark__img--dark"
+    src="/logos/surrey-ai-ds-logo-dark.png"
+    alt=""
+    width={pixelSize}
+    height={pixelSize}
+    loading={loading}
+    decoding="async"
+  />
 </span>
 
 <style>

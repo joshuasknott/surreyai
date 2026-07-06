@@ -1,147 +1,361 @@
 ---
 import { Image } from "astro:assets";
-import racingPreview from "../../assets/generated/ai-racing-simulator.png";
-import agenticPreview from "../../assets/generated/ai-agentic-builder.png";
-
-const projects = [
-  {
-    id: "drift-lab",
-    title: "Interactive learning",
-    type: "Website preview",
-    description: "A glimpse of the hands-on, technical learning culture the society wants to make easier to discover.",
-    action: "Preview visual",
-    image: racingPreview,
-    alt: "Website preview visual with a racing track and trajectory overlay",
-  },
-  {
-    id: "agentic-workspace",
-    title: "Build nights",
-    type: "Coming soon",
-    description: "A teaser for future sessions where members can explore tools, ideas, workflows, and responsible technology together.",
-    action: "Preview visual",
-    image: agenticPreview,
-    alt: "Laptop showing an abstract artificial intelligence workflow interface",
-  },
-];
+import StudentProjectSlot from "./StudentProjectSlot.astro";
+import AgenticWorkspace from "./student-projects/AgenticWorkspace.astro";
+import racingSimulator from "../../assets/generated/ai-racing-simulator.optimized.webp";
+import agenticBuilder from "../../assets/generated/ai-agentic-builder.optimized.webp";
 ---
 
-<section id="projects" class="ai-section" aria-labelledby="student-projects-title">
+<section id="projects" class="ai-section student-projects" aria-labelledby="student-projects-title">
   <div class="ai-section__inner">
     <div class="ai-section__header ai-section__header--split">
       <div>
-        <h2 id="student-projects-title" class="section-title">Website preview</h2>
+        <h2 id="student-projects-title" class="section-title">Student projects</h2>
       </div>
       <p class="section-intro">
-        A teaser of the visual and technical direction for the new Surrey Artificial Intelligence Society website, launching this September.
+        Try the interactive projects on this page: race the simulator, or use the builder to generate a working prototype.
       </p>
     </div>
 
-    <div class="project-showcase" aria-label="Student projects list">
-      {projects.map((project) => (
-        <article class="project-preview">
+    <div class="project-tools" aria-label="Interactive student projects">
+      <article class="project-tool project-tool--racing" data-project-tool="racing">
+        <button class="project-preview" type="button" data-project-start aria-label="Open Racing Simulator">
           <Image
-            src={project.image}
-            alt={project.alt}
-            widths={[640, 960, 1280]}
-            sizes="(min-width: 900px) 50vw, 100vw"
-            class="project-preview__image"
-            loading="lazy"
+            src={racingSimulator}
+            alt="Racing simulator preview with a race car on a campus-inspired track"
+            widths={[480, 720, 960]}
+            sizes="(min-width: 860px) 32vw, 100vw"
             format="webp"
+            quality={76}
+            loading="lazy"
           />
-          <span class="project-preview__scrim" aria-hidden="true"></span>
-          <span class="project-preview__content">
-            <span class="project-preview__type">{project.type}</span>
-            <strong>{project.title}</strong>
-            <span>{project.description}</span>
-            <span class="project-preview__action">{project.action}</span>
+          <span class="project-preview__copy">
+            <strong>Racing Simulator</strong>
           </span>
-        </article>
-      ))}
+        </button>
+        <dialog class="project-modal" data-project-modal aria-label="Racing Simulator">
+          <div class="project-modal__frame">
+            <header class="project-modal__header">
+              <div>
+                <p>Student project</p>
+                <h3>Racing Simulator</h3>
+              </div>
+              <button class="project-modal__close" type="button" data-project-close aria-label="Close Racing Simulator">Close</button>
+            </header>
+            <div class="project-modal__body" tabindex="-1">
+              <StudentProjectSlot />
+            </div>
+          </div>
+        </dialog>
+      </article>
+
+      <article class="project-tool project-tool--builder" data-project-tool="builder">
+        <button class="project-preview" type="button" data-project-start aria-label="Open Agentic Builder">
+          <Image
+            src={agenticBuilder}
+            alt="Agentic Builder preview with a generated app interface and workflow controls"
+            widths={[480, 720, 960]}
+            sizes="(min-width: 860px) 32vw, 100vw"
+            format="webp"
+            quality={76}
+            loading="lazy"
+          />
+          <span class="project-preview__copy">
+            <strong>Agentic Builder</strong>
+          </span>
+        </button>
+        <dialog class="project-modal" data-project-modal aria-label="Agentic Builder">
+          <div class="project-modal__frame">
+            <header class="project-modal__header">
+              <div>
+                <p>Student project</p>
+                <h3>Agentic Builder</h3>
+              </div>
+              <button class="project-modal__close" type="button" data-project-close aria-label="Close Agentic Builder">Close</button>
+            </header>
+            <div class="project-modal__body" tabindex="-1">
+              <AgenticWorkspace />
+            </div>
+          </div>
+        </dialog>
+      </article>
     </div>
   </div>
 </section>
 
+<script>
+  document.querySelectorAll<HTMLElement>("[data-project-tool]").forEach((tool) => {
+    const starter = tool.querySelector<HTMLButtonElement>("[data-project-start]");
+    const modal = tool.querySelector<HTMLDialogElement>("[data-project-modal]");
+    const closeButton = tool.querySelector<HTMLButtonElement>("[data-project-close]");
+    const modalBody = tool.querySelector<HTMLElement>(".project-modal__body");
+
+    starter?.addEventListener("click", () => {
+      if (!modal) return;
+      if (typeof modal.showModal === "function") {
+        modal.showModal();
+      } else {
+        modal.setAttribute("open", "");
+      }
+      window.dispatchEvent(new CustomEvent("surrey-ai-project-modal-open", {
+        detail: { project: tool.dataset.projectTool },
+      }));
+      modalBody?.focus({ preventScroll: true });
+    });
+
+    closeButton?.addEventListener("click", () => modal?.close());
+
+    modal?.addEventListener("click", (event) => {
+      if (event.target === modal) modal.close();
+    });
+
+    modal?.addEventListener("close", () => {
+      window.dispatchEvent(new CustomEvent("surrey-ai-project-modal-close", {
+        detail: { project: tool.dataset.projectTool },
+      }));
+    });
+  });
+</script>
+
 <style>
-  .project-showcase {
+  .student-projects {
+    overflow: hidden;
+  }
+
+  .project-tools {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1.25rem;
+    gap: clamp(1.25rem, 3vw, 2rem);
+    align-items: stretch;
+  }
+
+  .project-tool {
+    position: relative;
+    min-height: clamp(25rem, 40vw, 34rem);
+    overflow: visible;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
   }
 
   .project-preview {
     position: relative;
-    min-height: clamp(23rem, 33vw, 31rem);
-    overflow: hidden;
-    border: 0;
-    border-radius: clamp(1rem, 2vw, 1.7rem);
-    background: color-mix(in srgb, var(--ai-surface) 70%, var(--ai-bg));
-    color: #fff;
-    font: inherit;
-    padding: 0;
-    text-align: left;
-  }
-
-  .project-preview__image {
-    display: block;
+    display: grid;
     width: 100%;
     height: 100%;
-    min-height: inherit;
+    min-height: 100%;
+    padding: 0;
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid var(--ai-border-strong);
+    border-radius: 8px;
+    background: var(--ai-paper);
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    box-shadow: 0 18px 46px color-mix(in srgb, var(--ai-slate-base) 12%, transparent);
+    transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+  }
+
+  .project-preview img {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-    transform: scale(1.01);
-    transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    filter: saturate(1.03) contrast(1.02);
+    transition: transform 0.35s ease;
   }
 
-  .project-preview:hover .project-preview__image {
-    transform: scale(1.05);
-  }
-
-  .project-preview__scrim {
+  .project-preview::after {
+    content: "";
     position: absolute;
     inset: 0;
     background:
-      linear-gradient(90deg, rgba(5, 10, 18, 0.84), rgba(5, 10, 18, 0.2) 62%, rgba(5, 10, 18, 0.1)),
-      linear-gradient(0deg, rgba(5, 10, 18, 0.55), transparent 45%);
+      linear-gradient(0deg, color-mix(in srgb, var(--ai-slate-base) 72%, transparent) 0%, color-mix(in srgb, var(--ai-slate-base) 22%, transparent) 34%, transparent 68%);
+    pointer-events: none;
   }
 
-  .project-preview__content {
+  .project-preview__copy {
     position: absolute;
-    inset: auto 0 0;
-    display: flex;
-    flex-direction: column;
-    max-width: 28rem;
-    gap: 0.7rem;
-    padding: clamp(1.35rem, 3vw, 2rem);
-  }
-
-  .project-preview__type {
-    width: max-content;
-    color: rgba(255, 255, 255, 0.86);
-    font-size: 0.78rem;
-    font-weight: 800;
-    letter-spacing: 0;
+    inset: auto 1.35rem 1.35rem;
+    z-index: 1;
+    display: grid;
+    max-width: 30rem;
+    color: #fff;
+    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45);
   }
 
   .project-preview strong {
     color: #fff;
-    font-size: clamp(1.8rem, 3vw, 2.6rem);
-    letter-spacing: 0;
+    font-size: clamp(1.35rem, 2.6vw, 2.1rem);
     line-height: 1.05;
   }
 
-  .project-preview span {
-    color: rgba(255, 255, 255, 0.82);
-    line-height: 1.5;
+  .project-preview:hover,
+  .project-preview:focus-visible {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--ai-azure) 38%, var(--ai-border-strong));
+    box-shadow: 0 24px 58px color-mix(in srgb, var(--ai-slate-base) 16%, transparent);
+    outline: 0;
   }
 
-  .project-preview__action {
-    color: #fff !important;
-    font-weight: 800;
-    margin-top: 0.25rem;
+  .project-preview:hover img,
+  .project-preview:focus-visible img {
+    transform: scale(1.025);
   }
 
-  @media (max-width: 840px) {
-    .project-showcase {
+  .project-modal {
+    position: fixed;
+    inset: 50% auto auto 50%;
+    width: min(92rem, calc(100vw - 2rem));
+    max-width: none;
+    height: min(52rem, calc(100dvh - 2rem));
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--ai-fg);
+    box-shadow: none;
+    transform: translate(-50%, -50%);
+  }
+
+  .project-modal::backdrop {
+    background: color-mix(in srgb, var(--ai-slate-base) 62%, transparent);
+    backdrop-filter: blur(10px);
+  }
+
+  .project-modal__frame {
+    position: relative;
+    display: block;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .project-modal__header {
+    position: absolute;
+    z-index: 20;
+    top: 0.75rem;
+    right: 0.75rem;
+    display: block;
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+
+  .project-modal__header > div {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .project-modal__header p {
+    margin: 0 0 0.2rem;
+    color: var(--ai-coral);
+    font-size: 0.68rem;
+    font-weight: 850;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .project-modal__header h3 {
+    margin: 0;
+    color: var(--ai-fg);
+    font-size: clamp(1.25rem, 2vw, 1.75rem);
+    font-weight: 850;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  .project-modal__close {
+    min-height: 2.4rem;
+    padding: 0.55rem 0.9rem;
+    border: 1px solid color-mix(in srgb, var(--ai-border-strong) 76%, transparent);
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--ai-paper) 90%, transparent);
+    color: var(--ai-fg);
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 850;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    box-shadow: 0 12px 32px color-mix(in srgb, var(--ai-slate-base) 18%, transparent);
+    backdrop-filter: blur(14px);
+  }
+
+  .project-modal__close:hover,
+  .project-modal__close:focus-visible {
+    background: var(--ai-fg);
+    color: var(--ai-bg);
+    outline: none;
+  }
+
+  .project-modal__body {
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .project-modal__body:focus {
+    outline: none;
+  }
+
+  .project-modal__body :global(.drift-lab-section) {
+    padding: 0;
+    background: transparent;
+  }
+
+  .project-modal__body :global(.drift-lab-inner) {
+    max-width: none;
+  }
+
+  .project-modal__body :global(.drift-lab-header),
+  .project-modal__body :global(.drift-lab-note) {
+    display: none;
+  }
+
+  .project-modal__body :global(.drift-lab-game) {
+    max-height: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  @media (max-width: 860px) {
+    .project-tools {
       grid-template-columns: 1fr;
+    }
+
+    .project-tool {
+      min-height: 24rem;
+    }
+
+    .project-modal {
+      width: calc(100vw - 1rem);
+      height: calc(100dvh - 1rem);
+    }
+
+    .project-modal__header {
+      top: 0.5rem;
+      right: 0.5rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .project-preview {
+      transition: none;
+    }
+
+    .project-preview:hover,
+    .project-preview:focus-visible {
+      transform: none;
     }
   }
 </style>

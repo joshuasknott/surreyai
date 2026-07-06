@@ -7,31 +7,42 @@ import { generateCsrfToken } from '@surreysocieties/admin';
 const SOCIETY_ID = 'ai';
 const client = Astro.locals.convexClient;
 const csrfToken = generateCsrfToken(Astro.locals.user!._id);
-const events: any[] = await client.query("events:list", { societySlug: SOCIETY_ID });
+const events: any[] = await client.query('events:list', { societySlug: SOCIETY_ID });
 
 const success = Astro.url.searchParams.get('success');
 const deleted = Astro.url.searchParams.get('deleted');
-
 const actionResult = Astro.getActionResult(actions.admin.deleteEvent);
 const actionDeleted = actionResult && !actionResult.error;
+const publishedCount = events.filter((event) => event.status === 'published').length;
+const draftCount = events.filter((event) => event.status === 'draft').length;
+
+function formatDate(value?: string): string {
+  if (!value) return 'No date set';
+  return new Date(`${value}T00:00:00`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
 ---
 <AdminLayout title="Events" societyId={SOCIETY_ID} currentPath="/admin/events">
-
   <div class="admin-page-header">
-    <h1 class="admin-page-title">Events</h1>
-    <a href="/admin/events/new" class="btn btn-primary">+ Add Event</a>
+    <div>
+      <h1 class="admin-page-title">Events</h1>
+      <p class="admin-page-description">Published events are visible to students. Draft events stay hidden until you publish them.</p>
+    </div>
+    <a href="/admin/events/new" class="btn btn-primary">Add Event</a>
   </div>
 
   {success && <div class="alert alert-success">Event saved successfully.</div>}
   {(deleted || actionDeleted) && <div class="alert alert-success">Event deleted.</div>}
 
+  {events.length > 0 && (
+    <div class="notice-card" style="margin-bottom: 1rem;">{publishedCount} published, {draftCount} draft. Check status before sharing the public events page.</div>
+  )}
+
   {events.length === 0 ? (
     <div class="admin-table-wrapper">
       <div class="empty-state">
-        <div class="empty-state-icon">📅</div>
         <div class="empty-state-title">No events yet</div>
-        <p>Create your first event to get started.</p>
-        <a href="/admin/events/new" class="btn btn-primary" style="margin-top: 1rem;">+ Add Event</a>
+        <p>Create a draft first, then publish it when the date, location, and registration link are ready.</p>
+        <a href="/admin/events/new" class="btn btn-primary" style="margin-top: 1rem;">Add Event</a>
       </div>
     </div>
   ) : (
@@ -48,17 +59,17 @@ const actionDeleted = actionResult && !actionResult.error;
           </tr>
         </thead>
         <tbody>
-          {events.map(event => (
+          {events.map((event) => (
             <tr>
               <td style="font-weight: 600;">{event.title}</td>
-              <td>{event.date || '—'}</td>
-              <td>{event.category}</td>
-              <td><span class={`pill pill-${event.status}`}>{event.status}</span></td>
-              <td>{event.isFeatured ? <span class="pill pill-featured">Featured</span> : '—'}</td>
+              <td>{formatDate(event.date)}</td>
+              <td>{event.category || 'Other'}</td>
+              <td><span class={`pill pill-${event.status}`}>{event.status === 'published' ? 'Published' : 'Draft'}</span></td>
+              <td>{event.isFeatured ? <span class="pill pill-featured">Featured</span> : <span class="admin-meta">Not featured</span>}</td>
               <td>
                 <div class="table-actions">
                   <a href={`/admin/events/${event._id}/edit`} class="btn btn-outline btn-sm">Edit</a>
-                  <form method="POST" action={actions.admin.deleteEvent} style="display:inline;" onsubmit="return confirm('Delete this event?')">
+                  <form method="POST" action={actions.admin.deleteEvent} onsubmit={`return confirm('Delete "${event.title}"? This removes it from admin and the public site.')`}>
                     <input type="hidden" name="_csrf" value={csrfToken} />
                     <input type="hidden" name="id" value={event._id} />
                     <button type="submit" class="btn btn-ghost btn-sm" style="color: var(--color-admin-danger);">Delete</button>
@@ -71,5 +82,4 @@ const actionDeleted = actionResult && !actionResult.error;
       </table>
     </div>
   )}
-
 </AdminLayout>

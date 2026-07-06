@@ -1,22 +1,22 @@
 ---
 export const prerender = false;
+import { Image } from "astro:assets";
 import Layout from "../layouts/Layout.astro";
 import { queryPublicConvex } from "@surreysocieties/admin";
 import { api } from "../../../../convex/_generated/api.js";
 import { getSocietyById } from "@surreysocieties/admin/config";
-import CutoutVisual from "../components/common/CutoutVisual.astro";
-import eventsWorkshopCutout from "../assets/generated/ai-events-workshop-cutout.png";
+import eventsHero from "../assets/generated/ai-join-campus-sketch-hero.optimized.webp";
 import "../styles/global.css";
 
 const SOCIETY_ID = "ai";
+Astro.response.headers.set("Cache-Control", "public, s-maxage=300, stale-while-revalidate=3600");
 const society = getSocietyById(SOCIETY_ID)!;
-const events: any[] = (await queryPublicConvex(api.events.listPublished, { societySlug: SOCIETY_ID }, []))
-  .filter((event: any) => event.status === "published");
+const events: any[] = await queryPublicConvex(api.events.listPublished, { societySlug: SOCIETY_ID }, []);
 
 const formatEventDate = (date?: string) => {
-  if (!date) return "Date TBC";
+  if (!date) return "Date not published";
   const parsed = new Date(`${date}T00:00:00`);
-  if (Number.isNaN(parsed.getTime())) return "Date TBC";
+  if (Number.isNaN(parsed.getTime())) return "Date not published";
   return parsed.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 };
 
@@ -26,8 +26,8 @@ const programmeFormats = [
     text: "Hands-on sessions covering practical artificial intelligence skills, from Python and machine learning to evaluation and data analysis.",
   },
   {
-    title: "Hackathons and project nights",
-    text: "Collaborative sessions for coding challenges, data science competitions, prototypes, portfolio projects, and member demos.",
+    title: "Challenges and project nights",
+    text: "Collaborative sessions for coding challenges, data science practice, prototypes, portfolio projects, and member demos.",
   },
   {
     title: "Talks, careers, and socials",
@@ -40,21 +40,29 @@ const programmeFormats = [
   title="Events"
   description="Upcoming artificial intelligence workshops, project sessions, competitions, talks, careers activity, and socials from Surrey Artificial Intelligence Society."
 >
-  <section class="events-hero">
-    <div class="events-hero__copy">
-      <h1>Events and workshops</h1>
+  <section class="ai-photo-hero ai-photo-hero--events" aria-labelledby="events-hero-title">
+    <Image
+      src={eventsHero}
+      alt=""
+      aria-hidden="true"
+      class="ai-photo-hero__image"
+      widths={[640, 960, 1440, 1800]}
+      sizes="100vw"
+      loading="eager"
+      decoding="async"
+      fetchpriority="high"
+      format="webp"
+      quality={72}
+    />
+    <div class="ai-photo-hero__inner">
+      <div class="ai-photo-hero__copy">
+        <p class="ai-photo-hero__eyebrow">Events</p>
+      <h1 id="events-hero-title">Events and workshops</h1>
       <p>
-        Confirmed sessions appear from the society admin system. The programme is built around learning by seeing, building, testing, competing, meeting people, and debating real AI and data workflows.
+        Confirmed sessions appear when committee members publish them. The programme is built around learning by seeing, building, testing, competing, meeting people, and debating real AI and data workflows.
       </p>
     </div>
-    <CutoutVisual
-      compact
-      image={eventsWorkshopCutout}
-      alt="AI workshop kit with projector, laptop, sticky notes, blank event cards, coffee, and cable"
-      title="Events are built around things students can try."
-      body="Workshops, clinics, competitions, talks, and discussions stay practical without becoming a technical wall."
-      loading="eager"
-    />
+    </div>
   </section>
 
   <section class="ai-section ai-section--tinted" aria-labelledby="formats-title">
@@ -85,6 +93,7 @@ const programmeFormats = [
       <div class="ai-section__header ai-section__header--split">
         <div>
           <h2 id="events-title" class="section-title">Confirmed events</h2>
+          <p class="section-intro">Event listings appear once dates, locations, and joining details are confirmed.</p>
         </div>
         <a href={society.socials.instagram} target="_blank" rel="noopener noreferrer" class="text-link">
           Follow updates on Instagram &rarr;
@@ -96,7 +105,7 @@ const programmeFormats = [
           <div class="calendar-empty__copy">
             <h3>Next events will appear here once confirmed.</h3>
             <p>
-              This page stays honest until the next committee publishes the calendar. Join the society or follow the socials for workshop, competition, talk, project, and social updates.
+              Confirmed event details will appear once committee members add them. Join the society or follow the socials for verified updates.
             </p>
             <div class="calendar-empty__actions">
               <a href="/join" class="btn-primary">Join the Society</a>
@@ -105,7 +114,7 @@ const programmeFormats = [
           </div>
           <div class="calendar-empty__board" aria-label="Planned event formats">
             <span>Workshops and tutorials</span>
-            <span>Hackathons and project nights</span>
+            <span>Challenges and project nights</span>
             <span>Talks, careers, and socials</span>
           </div>
         </div>

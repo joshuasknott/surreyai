@@ -216,6 +216,42 @@ body.admin-body {
   letter-spacing: -0.025em;
 }
 
+.admin-page-description {
+  color: var(--color-admin-text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-top: 0.4rem;
+  max-width: 48rem;
+}
+
+.admin-section-header {
+  align-items: end;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  margin: 2rem 0 1rem;
+}
+
+.admin-section-title {
+  color: var(--color-admin-text);
+  font-size: 1rem;
+  font-weight: 750;
+}
+
+.admin-section-description,
+.form-hint {
+  color: var(--color-admin-text-secondary);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  margin-top: 0.35rem;
+}
+
+.admin-meta {
+  color: var(--color-admin-text-muted);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
 /* Stat Cards */
 .stat-grid {
   display: grid;
@@ -245,6 +281,75 @@ body.admin-body {
   font-size: 2rem;
   font-weight: 800;
   color: var(--color-admin-text);
+}
+
+.stat-card-description {
+  color: var(--color-admin-text-secondary);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  margin-top: 0.4rem;
+}
+
+.status-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  margin-bottom: 1.5rem;
+}
+
+.status-card {
+  background: var(--color-admin-card);
+  border: 1px solid var(--color-admin-border);
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  padding: 1rem;
+}
+
+.status-card-title {
+  align-items: center;
+  color: var(--color-admin-text);
+  display: flex;
+  font-size: 0.9rem;
+  font-weight: 700;
+  gap: 0.5rem;
+  justify-content: space-between;
+  margin-bottom: 0.45rem;
+}
+
+.status-card p {
+  color: var(--color-admin-text-secondary);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.next-action-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.next-action {
+  align-items: center;
+  background: var(--color-admin-card);
+  border: 1px solid var(--color-admin-border);
+  border-radius: 0.75rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  padding: 1rem;
+}
+
+.next-action strong {
+  color: var(--color-admin-text);
+  display: block;
+  font-size: 0.9rem;
+}
+
+.next-action span {
+  color: var(--color-admin-text-secondary);
+  display: block;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  margin-top: 0.25rem;
 }
 
 /* Tables */
@@ -278,6 +383,7 @@ body.admin-body {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.875rem;
+  min-width: 720px;
 }
 
 .admin-table th {
@@ -314,6 +420,7 @@ body.admin-body {
   border-radius: 9999px;
   font-size: 0.75rem;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .pill-published { background: #dcfce7; color: #166534; }
@@ -346,6 +453,7 @@ body.admin-body {
   transition: all 0.15s;
   border: none;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .btn-primary {
@@ -437,6 +545,37 @@ body.admin-body {
   font-weight: 500;
 }
 
+.form-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.form-grid-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.form-grid-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.form-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.form-card-header {
+  border-bottom: 1px solid var(--color-admin-border);
+  margin: -0.25rem 0 1.25rem;
+  padding-bottom: 1rem;
+}
+
+.form-card-title {
+  color: var(--color-admin-text);
+  font-size: 1rem;
+  font-weight: 750;
+}
+
 .form-card {
   background: var(--color-admin-card);
   border: 1px solid var(--color-admin-border);
@@ -480,6 +619,50 @@ input[type="file"]::file-selector-button {
 
 input[type="file"]::file-selector-button:hover {
   background: var(--color-admin-accent-hover);
+}
+
+.upload-field {
+  border: 1px dashed var(--color-admin-border);
+  border-radius: 0.75rem;
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+}
+
+.upload-preview img {
+  border: 1px solid var(--color-admin-border);
+  border-radius: 0.5rem;
+  display: block;
+  height: auto;
+  max-height: 12rem;
+  max-width: 12rem;
+  object-fit: cover;
+}
+
+.upload-status {
+  color: var(--color-admin-text-secondary);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  min-height: 1.2rem;
+}
+
+.upload-status.is-success {
+  color: var(--color-admin-success);
+}
+
+.upload-status.is-error {
+  color: var(--color-admin-danger);
+}
+
+.upload-status.is-loading {
+  color: var(--color-admin-info);
+}
+
+.field-status {
+  color: var(--color-admin-text-secondary);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  margin-top: 0.35rem;
 }
 
 /* Empty state */
@@ -559,6 +742,35 @@ input[type="file"]::file-selector-button:hover {
   align-items: center;
   white-space: nowrap;
   flex-wrap: nowrap;
+}
+
+.table-actions form {
+  display: inline-flex;
+}
+
+.invite-link-row {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+  min-width: 20rem;
+}
+
+.invite-link-row .form-input {
+  background: var(--color-admin-bg);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.75rem;
+  max-width: 17rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.notice-card {
+  background: var(--color-admin-bg);
+  border: 1px solid var(--color-admin-border);
+  border-radius: 0.75rem;
+  color: var(--color-admin-text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  padding: 1rem 1.25rem;
 }
 
 /* Login page */
@@ -665,6 +877,10 @@ input[type="file"]::file-selector-button:hover {
     width: 100%;
     justify-content: center;
   }
+  .table-actions .btn,
+  .table-actions button {
+    width: auto;
+  }
   .stat-grid {
     grid-template-columns: 1fr;
   }
@@ -676,7 +892,25 @@ input[type="file"]::file-selector-button:hover {
   .form-card [style*="grid-template-columns"] {
     grid-template-columns: 1fr !important;
   }
+  .form-grid-2,
+  .form-grid-3 {
+    grid-template-columns: 1fr;
+  }
+  .form-actions,
+  .next-action,
+  .admin-section-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
   .table-actions {
     flex-wrap: nowrap;
+  }
+  .invite-link-row {
+    align-items: stretch;
+    flex-direction: column;
+    min-width: 15rem;
+  }
+  .invite-link-row .form-input {
+    max-width: none;
   }
 }

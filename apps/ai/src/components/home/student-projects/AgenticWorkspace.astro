@@ -1,30 +1,21 @@
 ---
+import BrandMark from "../../common/BrandMark.astro";
 ---
 
 <section data-agentic-workspace class="aw-root" data-aw-state="initial" aria-label="Student Project: Agentic Builder">
-  <!-- Brand Header: Sleek, compact AI Society branding -->
   <header class="aw-topbar">
     <div class="aw-brand">
       <div class="aw-logo-container">
-        <!-- Spinner is only visible during working state -->
         <span class="aw-spinner" aria-hidden="true" hidden></span>
-        <!-- Custom Geometric AB Logo -->
-        <svg class="aw-brand-logo-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="3" y="3" width="7" height="7" rx="1.5" fill="var(--aw-blue)" />
-          <rect x="14" y="3" width="7" height="7" rx="1.5" fill="var(--aw-green)" />
-          <rect x="3" y="14" width="7" height="7" rx="1.5" fill="var(--aw-coral)" />
-          <rect x="14" y="14" width="7" height="7" rx="1.5" fill="var(--aw-blue)" fill-opacity="0.6" />
-        </svg>
+        <BrandMark size="small" />
       </div>
       <div>
         <h2>Agentic Builder</h2>
-        <p class="aw-brand-desc">Cooperative AI agents planning and writing code for your ideas.</p>
+        <p class="aw-brand-desc">Surrey Artificial Intelligence Society</p>
       </div>
     </div>
 
-    <!-- Actions (Only visible in 'complete' state) -->
     <div class="aw-top-actions" aria-label="Builder actions">
-      <span class="aw-model-note">Gemini 3 Flash</span>
       <button type="button" class="aw-action-btn" data-aw-new>New Build</button>
       <button type="button" class="aw-action-btn" data-aw-regenerate>Regenerate</button>
       <button type="button" class="aw-action-btn aw-btn-highlight" data-aw-copy>Copy HTML</button>
@@ -37,16 +28,8 @@
   <!-- 1. INITIAL STATE: Minimalist Prompt UI -->
   <div class="aw-initial-view">
     <div class="aw-hero">
-      <div class="aw-hero-icon">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10">
-          <rect x="3" y="3" width="7" height="7" rx="1.5" fill="var(--aw-blue)" />
-          <rect x="14" y="3" width="7" height="7" rx="1.5" fill="var(--aw-green)" />
-          <rect x="3" y="14" width="7" height="7" rx="1.5" fill="var(--aw-coral)" />
-          <rect x="14" y="14" width="7" height="7" rx="1.5" fill="var(--aw-blue)" fill-opacity="0.6" />
-        </svg>
-      </div>
-      <h1>Agentic Builder</h1>
-      <p>Describe what you want to build. Our team of AI agents will plan, code, and refine it live.</p>
+      <h1>What should we build?</h1>
+      <p>Describe an app, page, tool, or experiment. The builder will plan it, write it, and return a working preview.</p>
     </div>
 
     <form data-aw-form class="aw-chat-box-form" novalidate>
@@ -74,21 +57,12 @@
             </button>
             <input type="file" id="aw-file-input" style="display: none;" multiple />
 
-            <!-- Mock Model Selector -->
-            <div class="aw-model-dropdown-wrapper">
-              <button type="button" id="aw-model-select-btn" class="aw-control-btn" aria-haspopup="listbox">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" />
-                </svg>
-                <span id="aw-selected-model">Gemini 3 Flash</span>
-                <span class="aw-arrow-down">▼</span>
-              </button>
-
-              <div id="aw-model-dropdown-menu" class="aw-dropdown-menu" hidden role="listbox">
-                <button type="button" class="aw-dropdown-item is-active" role="option" data-model-id="flash">Gemini 3 Flash (Default)</button>
-                <button type="button" class="aw-dropdown-item" role="option" data-model-id="lite">Gemini 3.1 Flash-Lite</button>
-              </div>
-            </div>
+            <span class="aw-model-pill" aria-label="Model preset">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" />
+              </svg>
+              Gemini 3.5 Flash
+            </span>
           </div>
 
           <div class="aw-right-controls">
@@ -118,7 +92,42 @@
       </div>
     </div>
 
-    <p class="aw-status-text" data-aw-status aria-live="polite">Builds in moments. Your prompt stays on this page.</p>
+    <div class="aw-footer">
+      <button type="button" class="aw-help-link" data-aw-help-open>How this works</button>
+    </div>
+    <p class="aw-status-text aw-sr-only" data-aw-status aria-live="polite">Builds in moments. Your prompt stays on this page.</p>
+  </div>
+
+  <div class="aw-help-modal" data-aw-help-modal role="dialog" aria-modal="true" aria-labelledby="aw-help-title" hidden>
+    <div class="aw-help-panel">
+      <div class="aw-help-header">
+        <h3 id="aw-help-title">How this works</h3>
+        <button type="button" class="aw-help-close" data-aw-help-close aria-label="Close help">x</button>
+      </div>
+      <ol class="aw-help-steps">
+        <li>
+          <span>1</span>
+          <div>
+            <strong>Describe your idea</strong>
+            <p>Tell the builder what you want the prototype to do.</p>
+          </div>
+        </li>
+        <li>
+          <span>2</span>
+          <div>
+            <strong>Agents plan and build</strong>
+            <p>The workflow turns your brief into a working draft.</p>
+          </div>
+        </li>
+        <li>
+          <span>3</span>
+          <div>
+            <strong>Preview, copy, or share</strong>
+            <p>Open the result, copy the HTML, download it, or share a link.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
   </div>
 
   <!-- 2. WORKING STATE: Impressive Agent Collaborative Visualization -->
@@ -231,8 +240,6 @@
           Build steps
         </button>
       </div>
-      <!-- Model label -->
-      <span class="aw-active-model-badge">Gemini 3 Flash</span>
     </div>
 
     <section id="aw-view-preview" class="aw-view is-active" role="tabpanel" aria-labelledby="aw-tab-preview" data-aw-view="preview">
@@ -257,22 +264,22 @@
 
 <style>
   .aw-root {
-    --aw-bg: #f7f8f3;
-    --aw-surface: #ffffff;
-    --aw-surface-soft: #eef2ef;
-    --aw-line: #dce4e0;
-    --aw-line-strong: #bfcbc8;
-    --aw-text: #172329;
-    --aw-muted: #5e6c70;
-    --aw-blue: #3f6d80;
-    --aw-green: #617c65;
-    --aw-coral: #a9674b;
-    --aw-button-text: #ffffff;
+    --aw-bg: var(--ai-bg);
+    --aw-surface: var(--ai-surface);
+    --aw-surface-soft: var(--ai-paper-soft);
+    --aw-line: var(--ai-border);
+    --aw-line-strong: var(--ai-border-strong);
+    --aw-text: var(--ai-fg);
+    --aw-muted: var(--ai-fg-muted);
+    --aw-blue: var(--ai-fg);
+    --aw-green: var(--ai-sage);
+    --aw-coral: var(--ai-coral);
+    --aw-button-text: var(--ai-bg);
     display: flex;
     flex-direction: column;
     height: 100%;
     overflow: hidden;
-    background: var(--aw-bg);
+    background: var(--aw-surface);
     color: var(--aw-text);
     font-family: var(--font-sans);
   }
@@ -317,10 +324,10 @@
     align-items: center;
     justify-content: space-between;
     gap: 1.25rem;
-    min-height: 4.5rem;
-    padding: 0.75rem 2rem;
+    min-height: 4.25rem;
+    padding: 0.75rem clamp(1rem, 3vw, 2rem);
     border-bottom: 1px solid var(--aw-line);
-    background: var(--aw-surface);
+    background: color-mix(in srgb, var(--aw-surface) 96%, transparent);
     flex: 0 0 auto;
     z-index: 10;
   }
@@ -332,21 +339,25 @@
     min-width: 0;
   }
 
+  .aw-brand > div {
+    min-width: 0;
+  }
+
   .aw-logo-container {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 2.25rem;
-    height: 2.25rem;
-    border-radius: 999px;
-    background: color-mix(in srgb, var(--aw-blue) 10%, transparent);
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 8px;
+    background: var(--aw-surface);
     color: var(--aw-blue);
     flex: 0 0 auto;
   }
 
-  .aw-brand-logo-svg {
-    width: 1.25rem;
-    height: 1.25rem;
+  .aw-logo-container :global(.brand-mark) {
+    width: 2.25rem;
+    height: 2.25rem;
   }
 
   .aw-brand h2 {
@@ -355,19 +366,26 @@
     font-size: 1.25rem;
     font-weight: 850;
     line-height: 1.1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .aw-brand-desc {
     margin: 0.15rem 0 0;
     color: var(--aw-muted);
     font-size: 0.78rem;
+    font-weight: 700;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .aw-spinner {
     width: 1.25rem;
     height: 1.25rem;
     border-radius: 999px;
-    border: 2px solid color-mix(in srgb, var(--aw-blue) 20%, transparent);
+    border: 2px solid var(--aw-line);
     border-top-color: var(--aw-blue);
     animation: awSpin 1s linear infinite;
   }
@@ -378,22 +396,11 @@
     gap: 0.5rem;
   }
 
-  .aw-model-note {
-    font-size: 0.8rem;
-    color: var(--aw-muted);
-    font-weight: 700;
-    margin-right: 0.5rem;
-    border: 1px solid var(--aw-line);
-    padding: 0.25rem 0.6rem;
-    border-radius: 999px;
-    background: var(--aw-surface-soft);
-  }
-
   .aw-action-btn {
     padding: 0.5rem 0.9rem;
     font-size: 0.85rem;
     font-weight: 800;
-    border-radius: 999px;
+    border-radius: 8px;
     cursor: pointer;
     border: 1px solid var(--aw-line-strong);
     background: var(--aw-surface);
@@ -415,7 +422,7 @@
   }
 
   .aw-btn-highlight:hover {
-    background: color-mix(in srgb, var(--aw-blue) 90%, #000);
+    background: color-mix(in srgb, var(--aw-text) 92%, var(--aw-bg));
     border-color: var(--aw-blue);
     color: var(--aw-button-text);
   }
@@ -432,7 +439,7 @@
     max-width: 48rem;
     margin: 0 auto;
     padding: 2rem 1.5rem;
-    gap: 2rem;
+    gap: 1.6rem;
   }
 
   .aw-hero {
@@ -443,37 +450,19 @@
     gap: 0.75rem;
   }
 
-  .aw-hero-icon {
-    width: 3.5rem;
-    height: 3.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 1.25rem;
-    background: linear-gradient(135deg, var(--aw-blue), var(--aw-green));
-    color: #fff;
-    margin-bottom: 0.5rem;
-    box-shadow: 0 10px 25px color-mix(in srgb, var(--aw-blue) 30%, transparent);
-  }
-
-  .aw-hero-icon svg {
-    width: 2rem;
-    height: 2rem;
-  }
-
   .aw-hero h1 {
-    font-size: 2.25rem;
+    font-size: clamp(2rem, 4vw, 3.1rem);
     font-weight: 850;
     color: var(--aw-text);
     margin: 0;
-    letter-spacing: -0.02em;
+    letter-spacing: 0;
   }
 
   .aw-hero p {
     font-size: 1.05rem;
     color: var(--aw-muted);
     margin: 0;
-    max-width: 36rem;
+    max-width: 39rem;
     line-height: 1.5;
   }
 
@@ -485,8 +474,8 @@
     width: 100%;
     background: var(--aw-surface);
     border: 1px solid var(--aw-line-strong);
-    border-radius: 1.25rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    border-radius: 8px;
+    box-shadow: 0 18px 45px color-mix(in srgb, var(--ai-slate-base) 6%, transparent);
     padding: 1.25rem;
     display: flex;
     flex-direction: column;
@@ -496,7 +485,7 @@
 
   .aw-chat-container:focus-within {
     border-color: var(--aw-blue);
-    box-shadow: 0 8px 30px color-mix(in srgb, var(--aw-blue) 8%, transparent);
+    box-shadow: 0 22px 55px color-mix(in srgb, var(--ai-slate-base) 9%, transparent);
   }
 
   .aw-chat-container textarea {
@@ -532,6 +521,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    min-width: 0;
   }
 
   .aw-control-btn {
@@ -541,18 +531,18 @@
     padding: 0.45rem 0.8rem;
     border-radius: 0.5rem;
     border: 1px solid var(--aw-line);
-    background: var(--aw-surface-soft);
+    background: var(--aw-surface);
     color: var(--aw-text);
     font-size: 0.82rem;
-    font-weight: 500;
+    font-weight: 750;
     cursor: pointer;
     transition: all 0.2s;
     font-family: inherit;
   }
 
   .aw-control-btn:hover {
-    background: var(--aw-surface);
-    border-color: var(--aw-line-strong);
+    background: var(--aw-surface-soft);
+    border-color: var(--aw-text);
   }
 
   .aw-attach-icon-btn {
@@ -562,7 +552,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 9999px;
+    border-radius: 8px;
   }
 
   .aw-attach-icon-btn svg {
@@ -570,51 +560,25 @@
     height: 1.15rem;
   }
 
-  .aw-arrow-down {
-    font-size: 0.6rem;
-    opacity: 0.7;
-    margin-left: 0.15rem;
-  }
-
-  .aw-model-dropdown-wrapper {
-    position: relative;
-  }
-
-  .aw-dropdown-menu {
-    position: absolute;
-    bottom: calc(100% + 0.5rem);
-    left: 0;
-    z-index: 50;
-    width: 15rem;
+  .aw-model-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 2.2rem;
+    padding: 0.45rem 0.8rem;
+    border: 1px solid var(--aw-line);
+    border-radius: 8px;
     background: var(--aw-surface);
-    border: 1px solid var(--aw-line-strong);
-    border-radius: 0.75rem;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    padding: 0.35rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-  }
-
-  .aw-dropdown-item {
-    width: 100%;
-    padding: 0.55rem 0.75rem;
-    text-align: left;
-    background: transparent;
-    border: 0;
-    font: inherit;
-    font-size: 0.85rem;
-    font-weight: 750;
-    border-radius: 0.4rem;
     color: var(--aw-text);
-    cursor: pointer;
-    transition: all 0.15s;
+    font-size: 0.82rem;
+    font-weight: 750;
+    white-space: nowrap;
   }
 
-  .aw-dropdown-item:hover,
-  .aw-dropdown-item.is-active {
-    background: color-mix(in srgb, var(--aw-blue) 8%, transparent);
-    color: var(--aw-blue);
+  .aw-model-pill svg {
+    width: 1rem;
+    height: 1rem;
+    flex: 0 0 auto;
   }
 
   .aw-attachments-area {
@@ -635,7 +599,7 @@
     padding: 0.35rem 0.7rem;
     background: var(--aw-surface-soft);
     border: 1px solid var(--aw-line);
-    border-radius: 0.5rem;
+    border-radius: 8px;
     font-size: 0.78rem;
     font-weight: 500;
     color: var(--aw-text);
@@ -658,7 +622,7 @@
   }
 
   .aw-remove-file:hover {
-    color: var(--aw-coral);
+    color: var(--aw-text);
   }
 
   .aw-right-controls {
@@ -678,7 +642,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
+    border-radius: 8px;
     border: 0;
     background: var(--aw-blue);
     color: var(--aw-button-text);
@@ -688,7 +652,7 @@
 
   .aw-send-btn:hover {
     transform: scale(1.05);
-    background: color-mix(in srgb, var(--aw-blue) 90%, #000);
+    background: color-mix(in srgb, var(--aw-text) 92%, var(--aw-bg));
   }
 
   .aw-send-btn svg {
@@ -736,11 +700,155 @@
     background: color-mix(in srgb, var(--aw-blue) 4%, transparent);
   }
 
+  .aw-footer {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .aw-help-link {
+    border: 0;
+    background: transparent;
+    color: var(--aw-muted);
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.84rem;
+    font-weight: 800;
+    padding: 0.35rem 0.2rem;
+    text-decoration: underline;
+    text-underline-offset: 0.25rem;
+  }
+
+  .aw-help-link:hover,
+  .aw-help-link:focus-visible {
+    color: var(--aw-text);
+    outline: none;
+  }
+
   .aw-status-text {
     font-size: 0.8rem;
     color: var(--aw-muted);
     text-align: center;
     margin: 0;
+  }
+
+  .aw-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .aw-help-modal {
+    position: absolute;
+    inset: 0;
+    z-index: 40;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    background: color-mix(in srgb, var(--ai-slate-base) 32%, transparent);
+  }
+
+  .aw-help-modal[hidden] {
+    display: none;
+  }
+
+  .aw-help-panel {
+    width: min(28rem, 100%);
+    border: 1px solid var(--aw-line-strong);
+    border-radius: 8px;
+    background: var(--aw-surface);
+    box-shadow: 0 28px 70px color-mix(in srgb, var(--ai-slate-base) 18%, transparent);
+    padding: 1rem;
+  }
+
+  .aw-help-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--aw-line);
+  }
+
+  .aw-help-header h3 {
+    margin: 0;
+    color: var(--aw-text);
+    font-size: 1rem;
+    font-weight: 850;
+  }
+
+  .aw-help-close {
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid var(--aw-line);
+    border-radius: 8px;
+    background: var(--aw-surface);
+    color: var(--aw-text);
+    cursor: pointer;
+    font: inherit;
+    font-size: 1.15rem;
+    line-height: 1;
+  }
+
+  .aw-help-close:hover,
+  .aw-help-close:focus-visible {
+    background: var(--aw-text);
+    color: var(--aw-button-text);
+    outline: none;
+  }
+
+  .aw-help-steps {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .aw-help-steps li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.85rem;
+    padding: 0.95rem 0;
+    border-bottom: 1px solid var(--aw-line);
+  }
+
+  .aw-help-steps li:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .aw-help-steps span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border: 1px solid var(--aw-line-strong);
+    border-radius: 8px;
+    color: var(--aw-text);
+    font-size: 0.72rem;
+    font-weight: 850;
+  }
+
+  .aw-help-steps strong {
+    display: block;
+    color: var(--aw-text);
+    font-size: 0.9rem;
+    font-weight: 850;
+  }
+
+  .aw-help-steps p {
+    margin: 0.18rem 0 0;
+    color: var(--aw-muted);
+    font-size: 0.84rem;
+    line-height: 1.45;
   }
 
   /* ── WORKING STATE: Visualization styling ── */
@@ -793,7 +901,7 @@
     gap: 0.6rem;
     width: 7.5rem;
     border: 1px solid var(--aw-line-strong);
-    border-radius: 0.85rem;
+    border-radius: 8px;
     background: var(--aw-surface);
     padding: 1rem 0.5rem;
     z-index: 2;
@@ -806,7 +914,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
+    border-radius: 8px;
     background: var(--aw-surface-soft);
     color: var(--aw-muted);
     border: 1px solid var(--aw-line);
@@ -834,7 +942,7 @@
   .aw-node-glow {
     position: absolute;
     inset: 0;
-    border-radius: 0.85rem;
+    border-radius: 8px;
     opacity: 0;
     z-index: -1;
     transition: opacity 0.3s;
@@ -845,7 +953,7 @@
   .aw-agent-node[data-state="active"] {
     border-color: var(--aw-blue);
     transform: translateY(-4px);
-    box-shadow: 0 8px 24px color-mix(in srgb, var(--aw-blue) 12%, transparent);
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--ai-slate-base) 8%, transparent);
   }
 
   .aw-agent-node[data-state="active"] .aw-node-icon {
@@ -860,8 +968,7 @@
   }
 
   .aw-agent-node[data-state="active"] .aw-node-glow {
-    opacity: 0.6;
-    background: radial-gradient(circle, color-mix(in srgb, var(--aw-blue) 40%, transparent) 0%, transparent 70%);
+    opacity: 0;
   }
 
   /* Agent Node done states */
@@ -870,7 +977,7 @@
   }
 
   .aw-agent-node[data-state="done"] .aw-node-icon {
-    background: color-mix(in srgb, var(--aw-green) 12%, transparent);
+    background: var(--aw-surface-soft);
     color: var(--aw-green);
     border-color: var(--aw-green);
   }
@@ -882,11 +989,11 @@
   /* Agent Node error states */
   .aw-agent-node[data-state="error"] {
     border-color: var(--aw-coral);
-    box-shadow: 0 8px 24px color-mix(in srgb, var(--aw-coral) 12%, transparent);
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--ai-slate-base) 8%, transparent);
   }
 
   .aw-agent-node[data-state="error"] .aw-node-icon {
-    background: color-mix(in srgb, var(--aw-coral) 12%, transparent);
+    background: var(--aw-surface-soft);
     color: var(--aw-coral);
     border-color: var(--aw-coral);
   }
@@ -937,9 +1044,9 @@
   /* ── Terminal Console styling ── */
   .aw-console {
     width: 100%;
-    background: #0b0f17;
+    background: #111111;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 0.85rem;
+    border-radius: 8px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     overflow: hidden;
     display: flex;
@@ -948,7 +1055,7 @@
   }
 
   .aw-console-header {
-    background: #111823;
+    background: #1c1c1c;
     padding: 0.55rem 1rem;
     display: flex;
     align-items: center;
@@ -967,9 +1074,11 @@
     border-radius: 50%;
   }
 
-  .aw-dot-red { background: #ff5f56; }
-  .aw-dot-yellow { background: #ffbd2e; }
-  .aw-dot-green { background: #27c93f; }
+  .aw-dot-red,
+  .aw-dot-yellow,
+  .aw-dot-green {
+    background: rgba(255, 255, 255, 0.34);
+  }
 
   .aw-console-title {
     color: rgba(255, 255, 255, 0.4);
@@ -1014,7 +1123,7 @@
     flex-direction: column;
     min-height: 0;
     flex: 1;
-    background: color-mix(in srgb, var(--aw-bg) 88%, var(--aw-surface));
+    background: var(--aw-bg);
   }
 
   .aw-tabs-row {
@@ -1052,16 +1161,6 @@
     color: var(--aw-blue);
   }
 
-  .aw-active-model-badge {
-    font-size: 0.78rem;
-    color: var(--aw-muted);
-    font-weight: 800;
-    background: var(--aw-surface-soft);
-    padding: 0.2rem 0.6rem;
-    border-radius: 999px;
-    border: 1px solid var(--aw-line);
-  }
-
   .aw-view {
     min-height: 0;
     flex: 1;
@@ -1078,7 +1177,7 @@
     height: 100%;
     min-height: 0;
     border: 1px solid var(--aw-line-strong);
-    border-radius: 0.75rem;
+    border-radius: 8px;
     background: var(--aw-surface);
     overflow: hidden;
     display: flex;
@@ -1169,6 +1268,14 @@
     .aw-hero h1 {
       font-size: 1.75rem;
     }
+    .aw-chat-controls {
+      gap: 0.65rem;
+    }
+    .aw-model-pill {
+      max-width: min(10.5rem, 48vw);
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
     .aw-agents-grid {
       flex-direction: column;
       gap: 0.75rem;
@@ -1247,12 +1354,11 @@
     const regenerateButton = root.querySelector<HTMLButtonElement>('[data-aw-regenerate]');
     const newButton = root.querySelector<HTMLButtonElement>('[data-aw-new]');
 
-    // Dropdown selectors
-    const modelSelectBtn = root.querySelector<HTMLButtonElement>('#aw-model-select-btn');
-    const modelDropdownMenu = root.querySelector<HTMLElement>('#aw-model-dropdown-menu');
-    const selectedModelLabel = root.querySelector<HTMLElement>('#aw-selected-model');
     const attachBtn = root.querySelector<HTMLButtonElement>('#aw-attach-btn');
     const attachmentsArea = root.querySelector<HTMLElement>('#aw-attachments');
+    const helpModal = root.querySelector<HTMLElement>('[data-aw-help-modal]');
+    const helpOpenButton = root.querySelector<HTMLButtonElement>('[data-aw-help-open]');
+    const helpCloseButton = root.querySelector<HTMLButtonElement>('[data-aw-help-close]');
 
     // Terminal log selector
     const consoleLog = root.querySelector<HTMLElement>('#aw-console-log');
@@ -1266,8 +1372,10 @@
 
     let workflowData: WorkflowData | null = null;
     let currentBuildId: string | null = null;
-    let selectedModelKey = 'flash';
+    let selectedModelKey = 'gemini35';
     let attachedFiles: File[] = [];
+
+    const selectedModelName = () => 'Gemini 3.5 Flash';
 
     const setAwState = (state: 'initial' | 'working' | 'complete') => {
       root.setAttribute('data-aw-state', state);
@@ -1628,35 +1736,27 @@
 
     textarea?.addEventListener('input', updateCount);
 
-    // Model dropdown popup triggers
-    modelSelectBtn?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      if (modelDropdownMenu) {
-        modelDropdownMenu.hidden = !modelDropdownMenu.hidden;
-      }
+    const openHelpModal = () => {
+      if (!helpModal) return;
+      helpModal.hidden = false;
+      helpCloseButton?.focus();
+    };
+
+    const closeHelpModal = () => {
+      if (!helpModal) return;
+      helpModal.hidden = true;
+      helpOpenButton?.focus();
+    };
+
+    helpOpenButton?.addEventListener('click', openHelpModal);
+    helpCloseButton?.addEventListener('click', closeHelpModal);
+    helpModal?.addEventListener('click', (event) => {
+      if (event.target === helpModal) closeHelpModal();
     });
 
-    modelDropdownMenu?.querySelectorAll<HTMLButtonElement>('.aw-dropdown-item').forEach((item) => {
-      item.addEventListener('click', () => {
-        const modelText = item.textContent || 'Gemini 3 Flash';
-        selectedModelKey = item.dataset.modelId || 'flash';
-
-        if (selectedModelLabel) {
-          selectedModelLabel.textContent = modelText.replace(' (Default)', '').replace(' (Advanced)', '').replace(' (Full)', '');
-        }
-
-        modelDropdownMenu.querySelectorAll('.aw-dropdown-item').forEach((i) => i.classList.remove('is-active'));
-        item.classList.add('is-active');
-        modelDropdownMenu.hidden = true;
-
-        root.querySelectorAll('.aw-active-model-badge, .aw-model-note').forEach((badge) => {
-          badge.textContent = selectedModelLabel?.textContent || 'Gemini 3 Flash';
-        });
-      });
-    });
-
-    document.addEventListener('click', () => {
-      if (modelDropdownMenu) modelDropdownMenu.hidden = true;
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape') return;
+      if (helpModal && !helpModal.hidden) closeHelpModal();
     });
 
     // Mock file input listener for actual file picking
@@ -1690,7 +1790,7 @@
         chip.innerHTML = `
           ${iconHtml}
           <span>${file.name}</span>
-          <button type="button" class="aw-remove-file" aria-label="Remove file">✕</button>
+          <button type="button" class="aw-remove-file" aria-label="Remove file">x</button>
         `;
 
         chip.querySelector('.aw-remove-file')?.addEventListener('click', () => {
@@ -1757,8 +1857,7 @@
       setAwState('working');
       setStage('brief', []);
       switchView('preview');
-      const modelLabel = selectedModelLabel?.textContent || 'Gemini 3 Flash';
-      setStatus(`${modelLabel} is building your draft.`);
+      setStatus(`${selectedModelName()} is building your draft.`);
 
       try {
         const filePayloads = await Promise.all(

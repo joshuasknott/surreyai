@@ -34,7 +34,7 @@ export const listActive = query({
       .withIndex("by_society_active", (q) =>
         q.eq("societyId", society._id).eq("isActive", true)
       )
-      .collect();
+      .take(100);
 
     return Promise.all(members.map(async (member) => {
       if (member.imageStorageId) {

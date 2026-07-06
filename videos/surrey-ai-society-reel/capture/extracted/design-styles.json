@@ -1,0 +1,177 @@
+{
+  "typography": [
+    {
+      "role": "display",
+      "fontFamily": "Inter",
+      "fontSize": "71.2px",
+      "fontWeight": "850",
+      "lineHeight": "71.2px",
+      "letterSpacing": "normal",
+      "color": "#172329",
+      "sampleText": "Surrey Artificial Intelligence Society"
+    },
+    {
+      "role": "heading",
+      "fontFamily": "Inter",
+      "fontSize": "48px",
+      "fontWeight": "850",
+      "lineHeight": "51.84px",
+      "letterSpacing": "normal",
+      "color": "#172329",
+      "sampleText": "What we offer"
+    },
+    {
+      "role": "body",
+      "fontFamily": "Inter",
+      "fontSize": "18.88px",
+      "fontWeight": "400",
+      "lineHeight": "29.264px",
+      "letterSpacing": "normal",
+      "color": "#5E6C70",
+      "sampleText": "Explore artificial intelligence, machine learning, and data "
+    },
+    {
+      "role": "heading-3",
+      "fontFamily": "Inter",
+      "fontSize": "18.4px",
+      "fontWeight": "400",
+      "lineHeight": "27.6px",
+      "letterSpacing": "normal",
+      "color": "#172329",
+      "sampleText": "Learn practical skills"
+    },
+    {
+      "role": "label",
+      "fontFamily": "Inter",
+      "fontSize": "16px",
+      "fontWeight": "850",
+      "lineHeight": "19.2px",
+      "letterSpacing": "normal",
+      "color": "#3F6D80",
+      "sampleText": "01"
+    },
+    {
+      "role": "heading-4",
+      "fontFamily": "Inter",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "lineHeight": "20px",
+      "letterSpacing": "normal",
+      "color": "#172329",
+      "sampleText": "Pages"
+    }
+  ],
+  "spacing": {
+    "observed": [
+      4,
+      7,
+      8,
+      11,
+      12,
+      14,
+      15,
+      16,
+      19,
+      20,
+      29,
+      32,
+      35,
+      48,
+      104
+    ],
+    "baseUnit": 4
+  },
+  "radius": [
+    "4px",
+    "8px",
+    "27.2px",
+    "9999px",
+    "3.35544e+07px"
+  ],
+  "shadows": [
+    {
+      "value": "color(srgb 0.247059 0.427451 0.501961 / 0.15) 0px 12px 24px 0px",
+      "count": 3
+    },
+    {
+      "value": "color(srgb 0.247059 0.427451 0.501961 / 0.25) 0px 12px 28px 0px, color(srgb 0.247059 0.427451 0.501961 / 0.35) 0px 0px 0px 1px",
+      "count": 1
+    }
+  ],
+  "buttons": [
+    {
+      "label": "button",
+      "background": "#000000",
+      "color": "#5E6C70",
+      "padding": "8px",
+      "borderRadius": "3.35544e+07px",
+      "border": "1px solid rgb(220, 228, 224)",
+      "boxShadow": "none",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "height": "38px"
+    },
+    {
+      "label": "Join the Society",
+      "background": "#3F6D80",
+      "color": "#FFFFFF",
+      "padding": "15.2px 35.2px",
+      "borderRadius": "9999px",
+      "border": "1px solid color(srgb 0.247059 0.427451 0.501961 / 0.4)",
+      "boxShadow": "color(srgb 0.247059 0.427451 0.501961 / 0.15) 0px 12px 24px 0px",
+      "fontSize": "16px",
+      "fontWeight": "700",
+      "height": "49.5938px"
+    },
+    {
+      "label": "See Projects",
+      "background": "#000000",
+      "color": "#172329",
+      "padding": "15.2px 35.2px",
+      "borderRadius": "9999px",
+      "border": "1px solid rgb(191, 203, 200)",
+      "boxShadow": "none",
+      "fontSize": "16px",
+      "fontWeight": "700",
+      "height": "49.5938px"
+    },
+    {
+      "label": "Playable project Racing Simulator An aut",
+      "background": "color(srgb 0.990588 0.991765 0.985882)",
+      "color": "#FFFFFF",
+      "padding": "0px",
+      "borderRadius": "27.2px",
+      "border": "0px none rgb(255, 255, 255)",
+      "boxShadow": "none",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "height": "496px"
+    }
+  ],
+  "cards": [
+    {
+      "label": "card",
+      "background": "#000000",
+      "color": "#172329",
+      "padding": "0px 0px 28.8px",
+      "borderRadius": "0px",
+      "border": "",
+      "boxShadow": "none",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "height": "141.375px"
+    }
+  ],
+  "nav": {
+    "label": "navigation",
+    "background": "oklab(0.976928 -0.00285378 0.00604033 / 0.9)",
+    "color": "#172329",
+    "padding": "0px",
+    "borderRadius": "0px",
+    "border": "",
+    "boxShadow": "none",
+    "fontSize": "16px",
+    "fontWeight": "400",
+    "height": "81px"
+  }
+}

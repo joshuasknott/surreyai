@@ -20,7 +20,7 @@ if (userId) return Astro.redirect('/admin');
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <title>Login — {society?.name || 'Admin'}</title>
+    <title>Login - {society?.name || 'Admin'}</title>
   </head>
   <body class="admin-body">
     <div class="login-container">
@@ -32,7 +32,7 @@ if (userId) return Astro.redirect('/admin');
         </div>
         <SignIn fallbackRedirectUrl="/admin" />
         <p style="margin-top: 1rem; text-align: center;">
-          <a href="/" style="color: var(--color-admin-primary); text-decoration: none; font-size: 0.875rem;">← Back to public site</a>
+          <a href="/" style="color: var(--color-admin-primary); text-decoration: none; font-size: 0.875rem;">Back to public site</a>
         </p>
       </div>
     </div>

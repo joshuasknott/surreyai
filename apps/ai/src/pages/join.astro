@@ -1,9 +1,9 @@
 ---
 export const prerender = true;
 import { getSocietyById } from "@surreysocieties/admin/config";
+import { Image } from "astro:assets";
 import Layout from "../layouts/Layout.astro";
-import CutoutVisual from "../components/common/CutoutVisual.astro";
-import joinKitCutout from "../assets/generated/ai-join-kit-cutout.png";
+import joinHero from "../assets/generated/ai-committee-campus-sketch-hero.optimized.webp";
 import "../styles/global.css";
 
 const society = getSocietyById("ai")!;
@@ -11,7 +11,7 @@ const society = getSocietyById("ai")!;
 const faqs = [
   {
     question: "Do I need to know how to code?",
-    answer: "No. Some members will want technical projects, but the society also covers AI tools, data literacy, ethics, careers, creative uses, social impact, and beginner-friendly learning.",
+    answer: "No. The society covers beginner sessions, AI tools, data literacy, careers, ethics, creative uses, and technical projects.",
   },
   {
     question: "Where is membership handled?",
@@ -19,26 +19,26 @@ const faqs = [
   },
   {
     question: "Can I join before events are listed?",
-    answer: "Yes. Events and committee records will appear when signatories add them, but the official membership and contact links are already available.",
+    answer: "Yes. Join now through the official membership page. Events appear once the committee confirms dates and locations.",
   },
   {
     question: "What can I get involved with?",
-    answer: "Members can look out for workshops, tutorials, hackathons, competitions, project collaboration, talks, career-focused sessions, and socials as the programme is confirmed.",
+    answer: "Workshops, tutorials, challenges, competitions, project work, talks, careers sessions, and socials.",
   },
 ];
 
 const membershipSteps = [
   {
     title: "Join through the Students' Union",
-    text: "Use the official SU membership flow so your membership is recorded correctly.",
+    text: "Use the official membership page so your membership is recorded correctly.",
   },
   {
     title: "Follow the society channels",
     text: "Instagram and email are the confirmed routes for updates on workshops, competitions, talks, projects, and socials.",
   },
   {
-    title: "Bring a question, project, or curiosity",
-    text: "You can arrive as a beginner, builder, researcher, designer, career explorer, or impact thinker.",
+    title: "Get involved",
+    text: "Come to events, try a project, or help with the next activity.",
   },
 ];
 ---
@@ -48,26 +48,33 @@ const membershipSteps = [
   description="Join Surrey Artificial Intelligence Society through Surrey Students' Union and get involved with AI workshops, data science projects, competitions, talks, careers activity, and socials."
   hideCTA={true}
 >
-  <section class="join-hero">
-    <div class="join-hero__copy">
-      <h1>Join the society</h1>
+  <section class="ai-photo-hero ai-photo-hero--join" aria-labelledby="join-hero-title">
+    <Image
+      src={joinHero}
+      alt=""
+      aria-hidden="true"
+      class="ai-photo-hero__image"
+      widths={[640, 960, 1440, 1800]}
+      sizes="100vw"
+      loading="eager"
+      decoding="async"
+      fetchpriority="high"
+      format="webp"
+      quality={72}
+    />
+    <div class="ai-photo-hero__inner">
+      <div class="ai-photo-hero__copy">
+        <p class="ai-photo-hero__eyebrow">Membership</p>
+      <h1 id="join-hero-title">Join the society</h1>
       <p>
-        Membership is managed by Surrey Students' Union. Join there, then follow the society channels for workshops, tutorials, competitions, project collaboration, talks, career activity, and social updates as the next programme is confirmed.
+        Membership is managed by Surrey Students' Union. Use the official membership page, then follow the society channels for event updates.
       </p>
       <div class="join-hero__actions">
         <a href={society.membershipUrl} target="_blank" rel="noopener noreferrer" class="btn-primary">Join via Students' Union</a>
         <a href={society.socials.instagram} target="_blank" rel="noopener noreferrer" class="btn-secondary">Follow updates</a>
       </div>
     </div>
-    <CutoutVisual
-      image={joinKitCutout}
-      alt="Membership kit with tote bag, lanyard, blank badge, laptop, notebook, and abstract stickers"
-      title="Membership starts with curiosity, not prerequisites."
-      body="Join through the official route, then bring a question, idea, or project."
-      align="right"
-      compact
-      loading="eager"
-    />
+    </div>
   </section>
 
   <section class="ai-section" aria-labelledby="join-title">
@@ -75,7 +82,7 @@ const membershipSteps = [
       <div class="join-main">
         <h2 id="join-title">How to join</h2>
         <p>
-          The society is for students who want to understand artificial intelligence, build useful prototypes, test ideas in challenges, discuss impact, explore career routes, and meet people thinking about similar questions.
+          Join if you want to learn AI, build prototypes, enter challenges, discuss impact, explore careers, or meet students working with similar tools.
         </p>
         <div class="join-path">
           {membershipSteps.map((step, index) => (
@@ -92,10 +99,10 @@ const membershipSteps = [
 
       <aside class="join-aside" aria-label="Society contact details">
         <h2>Official contact routes</h2>
-        <p>Use these routes when you need verified society details or membership support.</p>
+        <p>Use these links for membership, updates, and society contact.</p>
         <a href={`mailto:${society.contactEmail}`}>{society.contactEmail}</a>
-        <a href={society.socials.instagram} target="_blank" rel="noopener noreferrer">@surrey.ai.ds</a>
-        <a href={society.studentsUnionUrl} target="_blank" rel="noopener noreferrer">Students' Union listing</a>
+        <a href={society.socials.instagram} target="_blank" rel="noopener noreferrer">@surreyaisociety</a>
+        <a href={society.studentsUnionUrl} target="_blank" rel="noopener noreferrer">Students' Union page</a>
       </aside>
     </div>
   </section>
@@ -103,9 +110,9 @@ const membershipSteps = [
   <section class="ai-section ai-section--tinted join-signal" aria-labelledby="join-signal-title">
     <div class="ai-section__inner join-signal__inner">
       <div>
-        <h2 id="join-signal-title" class="section-title">Questions to ask</h2>
+        <h2 id="join-signal-title" class="section-title">What members discuss</h2>
         <p class="section-intro">
-          The best members do not need to arrive expert. They arrive curious enough to ask how the data was made, how the model behaves, what the output changes, and where human judgement still matters.
+          Sessions cover how data is made, how models behave, what outputs affect, and where human judgement still matters.
         </p>
       </div>
       <div class="join-judgement" aria-label="Questions members learn to ask">

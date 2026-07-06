@@ -14,30 +14,30 @@ export function validateCommitteeInput(input: CreateCommitteeMemberInput | Updat
 
   if (!isUpdate || input.name !== undefined) {
     if (!input.name || input.name.trim().length === 0) {
-      errors.name = 'Name is required';
+      errors.name = 'Enter the committee member name.';
     }
   }
 
   if (!isUpdate || input.role !== undefined) {
     if (!input.role || input.role.trim().length === 0) {
-      errors.role = 'Role is required';
+      errors.role = 'Enter the committee role.';
     }
   }
 
   if (input.email && !EMAIL_REGEX.test(input.email)) {
-    errors.email = 'Email must be valid';
+    errors.email = 'Enter a valid email address.';
   }
 
   if (input.linkedIn && !URL_REGEX.test(input.linkedIn)) {
-    errors.linkedIn = 'LinkedIn must be a valid URL';
+    errors.linkedIn = 'Enter a full LinkedIn URL starting with http:// or https://.';
   }
 
   if (input.image && !URL_REGEX.test(input.image) && !input.image.startsWith('/')) {
-    errors.image = 'Image must be a valid URL or path';
+    errors.image = 'Enter a full image URL or a site path beginning with /.';
   }
 
   if (input.displayOrder !== undefined && (typeof input.displayOrder !== 'number' || input.displayOrder < 0)) {
-    errors.displayOrder = 'Display order must be a non-negative number';
+    errors.displayOrder = 'Enter zero or a positive number for display order.';
   }
 
   return { valid: Object.keys(errors).length === 0, errors };
@@ -51,36 +51,36 @@ export function validatePastCommitteeInput(
 
   if (!isUpdate || input.name !== undefined) {
     if (!input.name || input.name.trim().length === 0) {
-      errors.name = 'Name is required';
+      errors.name = 'Enter the past committee member name.';
     }
   }
 
   if (!isUpdate || input.role !== undefined) {
     if (!input.role || input.role.trim().length === 0) {
-      errors.role = 'Role is required';
+      errors.role = 'Enter the committee role.';
     }
   }
 
   if (!isUpdate || input.yearLabel !== undefined) {
     if (!input.yearLabel || input.yearLabel.trim().length === 0) {
-      errors.yearLabel = 'Year or term label is required';
+      errors.yearLabel = 'Enter the year or term label.';
     }
   }
 
   if (input.email && !EMAIL_REGEX.test(input.email)) {
-    errors.email = 'Email must be valid';
+    errors.email = 'Enter a valid email address.';
   }
 
   if (input.linkedIn && !URL_REGEX.test(input.linkedIn)) {
-    errors.linkedIn = 'LinkedIn must be a valid URL';
+    errors.linkedIn = 'Enter a full LinkedIn URL starting with http:// or https://.';
   }
 
   if (input.image && !URL_REGEX.test(input.image) && !input.image.startsWith('/')) {
-    errors.image = 'Image must be a valid URL or path';
+    errors.image = 'Enter a full image URL or a site path beginning with /.';
   }
 
   if (input.displayOrder !== undefined && (typeof input.displayOrder !== 'number' || input.displayOrder < 0)) {
-    errors.displayOrder = 'Display order must be a non-negative number';
+    errors.displayOrder = 'Enter zero or a positive number for display order.';
   }
 
   return { valid: Object.keys(errors).length === 0, errors };

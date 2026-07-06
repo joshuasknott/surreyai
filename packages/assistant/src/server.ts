@@ -515,7 +515,7 @@ function buildGuardedFallback(
 function buildEventsFallback(publicContext: PublicAssistantContext): string {
   const events = publicContext.events;
   if (events.length === 0) {
-    return `There are no published events for ${publicContext.society.name} right now. Check the Events page or ${contactText(publicContext.society)} for verified updates.`;
+    return `There are no published events for ${publicContext.society.name} right now. Confirmed events will appear once committee members add them. Check the Events page or ${contactText(publicContext.society)} for verified updates.`;
   }
 
   const summary = events
@@ -532,7 +532,7 @@ function buildEventsFallback(publicContext: PublicAssistantContext): string {
 function buildCommitteeFallback(publicContext: PublicAssistantContext): string {
   const committee = publicContext.committee;
   if (committee.length === 0) {
-    return `I do not have verified public committee details for ${publicContext.society.name} right now. Check the Committee page or ${contactText(publicContext.society)}.`;
+    return `I do not have verified public committee details for ${publicContext.society.name} right now. Committee details will appear once committee members add them. Check the Committee page or ${contactText(publicContext.society)}.`;
   }
 
   const summary = committee

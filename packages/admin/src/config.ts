@@ -13,7 +13,7 @@ export const SOCIETIES: Record<string, Society> = {
     logo: '/logos/ai-logo.png',
     contactEmail: 'ussu.aianddatascience@surrey.ac.uk',
     socials: {
-      instagram: 'https://www.instagram.com/surrey.ai.ds/',
+      instagram: 'https://www.instagram.com/surreyaisociety/',
       email: 'ussu.aianddatascience@surrey.ac.uk',
     },
     membershipUrl: 'https://surreyunion.org/shop/ai-and-data-science-society/293e762b-01b8-46f4-a541-2260e4d9ec4f',

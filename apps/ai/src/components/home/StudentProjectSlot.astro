@@ -1,4 +1,5 @@
 ---
+import BrandMark from "../common/BrandMark.astro";
 ---
 
 <section class="drift-lab-section" aria-label="Student Project: Racing Simulator">
@@ -11,21 +12,37 @@
       </p>
     </div>
 
-    <div id="drift-lab-game" class="drift-lab-game">
+    <div id="drift-lab-launcher" class="drift-lab-launcher">
+      <header class="drift-lab-launcher__topbar">
+        <div class="drift-lab-launcher__brand">
+          <BrandMark size="small" />
+          <div>
+            <h2>Racing Simulator</h2>
+            <p>Surrey Artificial Intelligence Society</p>
+          </div>
+        </div>
+      </header>
+
+      <main class="drift-lab-launcher__main">
+        <button id="drift-lab-launch-btn" class="drift-lab-launch-btn" type="button">
+          Start Race
+        </button>
+      </main>
+    </div>
+
+    <div id="drift-lab-game" class="drift-lab-game" hidden>
       <canvas id="drift-lab-canvas" width="960" height="540"></canvas>
 
       <div id="drift-lab-start" class="drift-lab-overlay">
         <div class="drift-lab-overlay-inner">
-          <span class="drift-lab-mode">Third-person racing prototype</span>
+          <span class="drift-lab-mode">Campus AI challenge</span>
           <h3 class="drift-lab-game-title">Racing Simulator</h3>
-          <p class="drift-lab-game-subtitle">Race three laps against AI drivers. Manage throttle, braking, gear shifts, and tire grip through every corner.</p>
+          <p class="drift-lab-game-subtitle">Race three laps around a campus-inspired circuit while AI drivers chase the line beside you.</p>
           <button id="drift-lab-play-btn" class="drift-lab-play-btn" type="button">
             Start Race
           </button>
           <div class="drift-lab-controls-info">
-            <div class="drift-lab-key-row"><kbd>W</kbd> / <kbd>&uarr;</kbd> Accelerate&emsp;<kbd>S</kbd> / <kbd>&darr;</kbd> Brake</div>
-            <div class="drift-lab-key-row"><kbd>A</kbd> / <kbd>&larr;</kbd> Steer left&emsp;<kbd>D</kbd> / <kbd>&rarr;</kbd> Steer right</div>
-            <div class="drift-lab-key-row"><kbd>R</kbd> Restart&emsp;<kbd>M</kbd> Mute&emsp;<kbd>Esc</kbd> Menu</div>
+            <div class="drift-lab-key-row">Use arrow keys or WASD once the race starts.</div>
           </div>
         </div>
       </div>
@@ -86,7 +103,7 @@
     </div>
 
     <p class="drift-lab-note">
-      A lightweight third-person racing simulator built with HTML Canvas and vanilla JavaScript.
+      A student-built racing simulator for quick play between workshops.
     </p>
   </div>
 </section>
@@ -97,7 +114,8 @@
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    background: var(--ai-bg);
+    background:
+      linear-gradient(140deg, color-mix(in srgb, var(--ai-paper) 78%, var(--ai-bg)), var(--ai-bg));
     color: var(--ai-fg);
     padding: 1.5rem 2rem;
     overflow: hidden;
@@ -114,9 +132,113 @@
     flex: 1;
   }
 
+  .drift-lab-launcher {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    flex-direction: column;
+    border-radius: 0;
+    background: var(--ai-surface);
+    color: var(--ai-fg);
+    overflow: hidden;
+  }
+
+  .drift-lab-launcher[hidden] {
+    display: none;
+  }
+
+  .drift-lab-launcher__topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.25rem;
+    min-height: 4.25rem;
+    padding: 0.75rem clamp(1rem, 3vw, 2rem);
+    border-bottom: 1px solid var(--ai-border);
+    background: color-mix(in srgb, var(--ai-surface) 96%, transparent);
+    flex: 0 0 auto;
+  }
+
+  .drift-lab-launcher__brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+  }
+
+  .drift-lab-launcher__brand :global(.brand-mark) {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .drift-lab-launcher__brand > div {
+    min-width: 0;
+  }
+
+  .drift-lab-launcher__brand h2 {
+    margin: 0;
+    color: var(--ai-fg);
+    font-size: 1.25rem;
+    font-weight: 850;
+    line-height: 1.1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .drift-lab-launcher__brand p {
+    margin: 0.15rem 0 0;
+    color: var(--ai-fg-muted);
+    font-size: 0.78rem;
+    font-weight: 700;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .drift-lab-launcher__main {
+    display: grid;
+    flex: 1;
+    min-height: 0;
+    place-items: center;
+    padding: 2rem 1.5rem;
+  }
+
+  .drift-lab-launch-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 10rem;
+    min-height: 3rem;
+    padding: 0.85rem 2rem;
+    border: 1px solid var(--ai-fg);
+    border-radius: 8px;
+    background: var(--ai-fg);
+    color: var(--ai-bg);
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.95rem;
+    font-weight: 850;
+    transition: transform 0.2s, background-color 0.2s, color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 16px 38px color-mix(in srgb, var(--ai-slate-base) 10%, transparent);
+  }
+
+  .drift-lab-launch-btn:hover {
+    transform: translateY(-1px);
+    background: var(--ai-azure);
+    border-color: var(--ai-azure);
+    color: var(--ai-accent-contrast);
+    box-shadow: 0 18px 44px color-mix(in srgb, var(--ai-azure) 20%, transparent);
+  }
+
+  .drift-lab-launch-btn:focus-visible {
+    outline: 2px solid var(--ai-azure);
+    outline-offset: 3px;
+  }
+
   .drift-lab-header {
-    text-align: center;
-    margin-bottom: 0.75rem;
+    text-align: left;
+    margin-bottom: 0.85rem;
     flex: 0 0 auto;
   }
 
@@ -128,7 +250,7 @@
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    border-radius: 9999px;
+    border-radius: 999px;
     background: color-mix(in srgb, var(--ai-azure) 12%, transparent);
     color: var(--ai-azure);
     border: 1px solid color-mix(in srgb, var(--ai-azure) 25%, transparent);
@@ -136,10 +258,10 @@
   }
 
   .drift-lab-mode {
-    background: rgba(16, 185, 129, 0.12);
-    border-color: rgba(16, 185, 129, 0.22);
-    color: #34D399;
-    margin-bottom: 0.5rem;
+    background: color-mix(in srgb, var(--ai-sage) 12%, var(--ai-paper));
+    border-color: color-mix(in srgb, var(--ai-sage) 28%, transparent);
+    color: var(--ai-sage);
+    margin-bottom: 0.75rem;
   }
 
   .drift-lab-title {
@@ -154,7 +276,7 @@
     font-size: 0.95rem;
     color: var(--ai-fg-muted);
     max-width: 36rem;
-    margin: 0 auto;
+    margin: 0;
     line-height: 1.45;
   }
 
@@ -165,12 +287,16 @@
     min-height: 0;
     max-height: calc(100% - 100px);
     margin: 0 auto;
-    border-radius: 1rem;
+    border-radius: 8px;
     overflow: hidden;
     border: 1px solid var(--ai-border-strong);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-    background: #080c14;
+    box-shadow: 0 18px 42px color-mix(in srgb, var(--ai-slate-base) 12%, transparent);
+    background: #0b1517;
     aspect-ratio: 16/9;
+  }
+
+  .drift-lab-game[hidden] {
+    display: none;
   }
 
   .drift-lab-game canvas {
@@ -187,8 +313,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(11, 17, 21, 0.96);
-    backdrop-filter: blur(16px);
+    padding: clamp(1rem, 3vw, 2rem);
+    background:
+      linear-gradient(90deg, color-mix(in srgb, var(--ai-paper) 94%, transparent), color-mix(in srgb, var(--ai-paper) 78%, transparent) 58%, color-mix(in srgb, var(--ai-paper) 36%, transparent)),
+      linear-gradient(0deg, color-mix(in srgb, var(--ai-bg) 36%, transparent), transparent 62%);
+    backdrop-filter: blur(8px);
     z-index: 10;
   }
 
@@ -197,26 +326,33 @@
   }
 
   .drift-lab-overlay-inner {
-    text-align: center;
-    padding: 2rem;
-    max-width: 42rem;
+    position: relative;
+    text-align: left;
+    padding: clamp(1rem, 3vw, 1.55rem);
+    max-width: 25rem;
     max-height: 100%;
     overflow-y: auto;
+    margin-right: auto;
+    border: 1px solid color-mix(in srgb, var(--ai-border-strong) 72%, transparent);
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--ai-surface) 88%, transparent);
+    box-shadow: 0 22px 54px color-mix(in srgb, var(--ai-slate-base) 15%, transparent);
+    backdrop-filter: blur(16px);
   }
 
   .drift-lab-game-title {
-    font-size: clamp(1.6rem, 4vw, 2.4rem);
-    font-weight: 800;
-    letter-spacing: -0.03em;
-    margin-bottom: 0.4rem;
-    color: #F8FAFC;
+    font-size: clamp(1.55rem, 3.3vw, 2.25rem);
+    font-weight: 850;
+    letter-spacing: 0;
+    margin: 0 0 0.55rem;
+    color: var(--ai-fg);
   }
 
   .drift-lab-game-subtitle {
-    color: #94A3B8;
-    font-size: 0.95rem;
+    color: var(--ai-fg-muted);
+    font-size: 1rem;
     line-height: 1.6;
-    margin-bottom: 1.5rem;
+    margin: 0 0 1rem;
   }
 
   .drift-lab-play-btn {
@@ -229,7 +365,7 @@
     color: var(--ai-accent-contrast);
     background: var(--ai-azure);
     border: 1px solid color-mix(in srgb, var(--ai-azure) 30%, transparent);
-    border-radius: 9999px;
+    border-radius: 6px;
     cursor: pointer;
     transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s, background-color 0.2s;
     box-shadow: 0 8px 24px color-mix(in srgb, var(--ai-azure) 20%, transparent);
@@ -248,25 +384,28 @@
   }
 
   .drift-lab-controls-info {
-    margin-top: 1.8rem;
-    color: #64748B;
-    font-size: 0.78rem;
-    line-height: 2.2;
+    display: grid;
+    gap: 0.45rem;
+    margin-top: 0.85rem;
+    color: var(--ai-fg-muted);
+    font-size: 0.76rem;
+    line-height: 1.45;
   }
 
   .drift-lab-key-row {
-    white-space: nowrap;
+    white-space: normal;
   }
 
   .drift-lab-controls-info kbd {
     display: inline-block;
-    padding: 0.1rem 0.45rem;
-    background: rgba(255, 255, 255, 0.07);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    min-width: 1.7rem;
+    padding: 0.12rem 0.42rem;
+    background: color-mix(in srgb, var(--ai-paper) 72%, var(--ai-surface));
+    border: 1px solid var(--ai-border);
     border-radius: 4px;
     font-family: inherit;
     font-size: 0.75rem;
-    color: #CBD5E1;
+    color: var(--ai-fg);
     margin: 0 0.1rem;
   }
 
@@ -494,7 +633,7 @@
   }
 
   .drift-lab-note {
-    text-align: center;
+    text-align: left;
     margin-top: 0.5rem;
     font-size: 0.75rem;
     color: var(--ai-fg-muted);
@@ -503,7 +642,19 @@
 
   @media (max-width: 640px) {
     .drift-lab-section {
-      padding: 2.5rem 0.75rem;
+      padding: 0;
+    }
+
+    .drift-lab-launcher__topbar {
+      padding-right: 5.75rem;
+    }
+
+    .drift-lab-launcher__brand h2 {
+      font-size: 1rem;
+    }
+
+    .drift-lab-launcher__brand p {
+      font-size: 0.7rem;
     }
 
     .drift-lab-controls-info {
@@ -563,6 +714,7 @@
   const ST = { MENU: 0, PLAY: 1, DONE: 2 };
 
   const startEl = document.getElementById('drift-lab-start');
+  const launcherEl = document.getElementById('drift-lab-launcher');
   const hudEl = document.getElementById('drift-lab-hud');
   const doneEl = document.getElementById('drift-lab-complete');
   const mobileEl = document.getElementById('drift-lab-mobile');
@@ -580,6 +732,7 @@
   const finalBestEl = document.getElementById('drift-lab-final-best');
   const breakdownEl = document.getElementById('drift-lap-breakdown');
   const playBtn = document.getElementById('drift-lab-play-btn');
+  const launchBtn = document.getElementById('drift-lab-launch-btn');
   const restartBtn = document.getElementById('drift-lab-restart-btn');
   const againBtn = document.getElementById('drift-lab-again-btn');
   const soundBtn = document.getElementById('drift-lab-sound-btn');
@@ -596,6 +749,7 @@
 
   let state = ST.MENU;
   let visible = false;
+  let launched = false;
   let lastF = 0;
   let player;
   let npcs = [];
@@ -855,10 +1009,16 @@
     keys.right = false;
   }
 
-  function startGame() {
-    initAudio();
-    if (audioCtx && audioCtx.state === 'suspended' && soundOn) {
-      audioCtx.resume().catch(() => {});
+  function startGame(withAudio = true) {
+    launched = true;
+    launcherEl.setAttribute('hidden', '');
+    gameEl.removeAttribute('hidden');
+    visible = true;
+    if (withAudio) {
+      initAudio();
+      if (audioCtx && audioCtx.state === 'suspended' && soundOn) {
+        audioCtx.resume().catch(() => {});
+      }
     }
     resetRace();
     state = ST.PLAY;
@@ -869,6 +1029,9 @@
 
   function toMenu() {
     state = ST.MENU;
+    launched = true;
+    launcherEl.setAttribute('hidden', '');
+    gameEl.removeAttribute('hidden');
     clearKeys();
     silenceAudio();
     startEl.removeAttribute('hidden');
@@ -899,6 +1062,7 @@
 
   function stopForProjectClose() {
     state = ST.MENU;
+    launched = false;
     visible = false;
     lastF = 0;
     clearKeys();
@@ -906,6 +1070,26 @@
     if (audioCtx && audioCtx.state === 'running') {
       audioCtx.suspend().catch(() => {});
     }
+    launcherEl.removeAttribute('hidden');
+    gameEl.setAttribute('hidden', '');
+    startEl.removeAttribute('hidden');
+    doneEl.setAttribute('hidden', '');
+    hudEl.setAttribute('hidden', '');
+  }
+
+  function showLauncher() {
+    state = ST.MENU;
+    launched = false;
+    visible = false;
+    lastF = 0;
+    clearKeys();
+    silenceAudio();
+    launcherEl.removeAttribute('hidden');
+    gameEl.setAttribute('hidden', '');
+    startEl.removeAttribute('hidden');
+    doneEl.setAttribute('hidden', '');
+    hudEl.setAttribute('hidden', '');
+    launchBtn?.focus({ preventScroll: true });
   }
 
   function toggleSound() {
@@ -993,7 +1177,7 @@
     if (kmap[e.code]) keys[kmap[e.code]] = true;
     if (e.code === 'Space') {
       e.preventDefault();
-      if (state === ST.MENU || state === ST.DONE) startGame();
+      if (launched && (state === ST.MENU || state === ST.DONE)) startGame();
     }
     if (e.code === 'KeyR' && state === ST.PLAY) resetRace();
     if (e.code === 'Escape' && state === ST.PLAY) toMenu();
@@ -1029,10 +1213,15 @@
     });
   }
 
-  playBtn.addEventListener('click', startGame);
+  launchBtn.addEventListener('click', () => startGame());
+  playBtn.addEventListener('click', () => startGame());
   restartBtn.addEventListener('click', resetRace);
-  againBtn.addEventListener('click', startGame);
+  againBtn.addEventListener('click', () => startGame());
   soundBtn.addEventListener('click', toggleSound);
+  window.addEventListener('surrey-ai-project-modal-open', (event) => {
+    const project = event instanceof CustomEvent ? event.detail?.project : undefined;
+    if (project === 'racing') showLauncher();
+  });
   window.addEventListener('surrey-ai-project-modal-close', stopForProjectClose);
 
   const obs = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; }, { threshold: 0 });
@@ -1512,18 +1701,6 @@
 
     ctx.restore();
 
-    if (!reducedMotion && player.speed > MAX_SPEED * 0.72) {
-      const a = (player.speed / MAX_SPEED - 0.72) * 0.32;
-      ctx.strokeStyle = 'rgba(248,250,252,' + a + ')';
-      ctx.lineWidth = 1;
-      for (let i = 0; i < 9; i++) {
-        const x = 120 + i * 90;
-        ctx.beginPath();
-        ctx.moveTo(x, H * 0.45);
-        ctx.lineTo(x + (i % 2 ? 16 : -16), H * 0.82);
-        ctx.stroke();
-      }
-    }
   }
 
   function drawVignette() {

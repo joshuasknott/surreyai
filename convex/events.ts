@@ -36,7 +36,7 @@ export const listPublished = query({
         q.eq("societyId", society._id).eq("status", "published")
       )
       .order("desc")
-      .collect();
+      .take(100);
 
     return Promise.all(events.map(async (event) => {
       if (event.imageStorageId) {
@@ -62,7 +62,7 @@ export const listFeatured = query({
       .withIndex("by_society_status", (q) =>
         q.eq("societyId", society._id).eq("status", "published")
       )
-      .collect();
+      .take(100);
     return published.filter((e) => e.isFeatured);
   },
 });

@@ -1,5 +1,7 @@
 /// <reference path="../.astro/types.d.ts" />
 
+declare module "three";
+
 declare namespace App {
   interface Locals {
     convexClient?: any;
@@ -25,5 +27,6 @@ declare namespace NodeJS {
     AI_TIMEOUT_MS?: string;
     AI_ASSISTANT_MAX_INPUT_CHARS?: string;
     AI_ASSISTANT_MAX_MESSAGES?: string;
+    AGENT_BUILDS_SERVER_SECRET?: string;
   }
 }

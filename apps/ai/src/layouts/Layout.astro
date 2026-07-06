@@ -46,9 +46,6 @@ const footerName = 'Surrey Artificial Intelligence Society';
   canonicalUrl={canonicalUrl}
   htmlClass="motion-safe:scroll-smooth"
   bodyClass="bg-ai-bg text-ai-fg font-sans min-h-screen flex flex-col transition-colors duration-200"
-  extraFontHrefs={[
-    'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
-  ]}
 >
   <Fragment slot="head">
     <link rel="icon" type="image/png" href="/logos/ai-logo.png" />
@@ -72,7 +69,7 @@ const footerName = 'Surrey Artificial Intelligence Society';
   </a>
 
   <!-- Navigation -->
-  <header class="sticky top-0 z-50 bg-ai-bg/90 backdrop-blur-md border-b border-ai-border">
+  <header class="site-header sticky top-0 z-50 border-b border-ai-border">
     <div class="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-6">
       <a href="/" class="flex min-w-0 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan">
         <BrandMark />
@@ -94,10 +91,10 @@ const footerName = 'Surrey Artificial Intelligence Society';
                 href={link.href}
                 aria-current={isActive ? 'page' : undefined}
                 class:list={[
-                'px-3.5 py-2 text-sm font-semibold rounded-full border border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan transition-colors',
+                'site-nav-link px-3.5 py-2 text-sm font-semibold border border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan transition-colors',
                 isActive
-                    ? 'text-ai-azure bg-ai-azure/10 border-ai-azure/15'
-                    : 'text-ai-fg-muted hover:text-ai-fg hover:bg-ai-surface',
+                    ? 'is-active text-ai-azure'
+                    : 'text-ai-fg-muted hover:text-ai-fg',
                 ]}
               >
                 {link.label}
@@ -138,7 +135,7 @@ const footerName = 'Surrey Artificial Intelligence Society';
     </div>
 
     <!-- Mobile nav -->
-    <div id="ai-mobile-menu" class="hidden md:hidden border-t border-ai-border bg-ai-surface" role="region" aria-label="Mobile navigation">
+    <div id="ai-mobile-menu" class="hidden md:hidden border-t border-ai-border bg-ai-paper" role="region" aria-label="Mobile navigation">
       <nav aria-label="Primary mobile navigation" class="px-6 py-3 flex flex-col gap-1">
         {navLinks.map(link => {
           const isActive = currentPath === link.href || (link.href !== '/' && currentPath.startsWith(link.href));
@@ -179,7 +176,7 @@ const footerName = 'Surrey Artificial Intelligence Society';
             <span class="text-ai-fg font-semibold tracking-tight">{displayName}</span>
           </div>
           <p class="text-sm leading-relaxed max-w-xs">
-            A student-led society under Surrey Students&apos; Union. Launching a clearer website for artificial intelligence learning, workshops, talks, careers activity, socials, and responsible discussion this September.
+            A student-led society under Surrey Students&apos; Union. Find events, updates, committee information, and ways to join, with artificial intelligence learning, workshops, talks, careers activity, socials, and responsible discussion.
           </p>
           <p class="mt-3 text-xs font-semibold uppercase tracking-widest text-ai-cyan">Established {society.establishedYear}</p>
         </div>

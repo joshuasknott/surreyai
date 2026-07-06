@@ -41,15 +41,15 @@ if (Astro.request.method === 'POST') {
 <AdminLayout title="Invite Admin" societyId={SOCIETY_ID} currentPath="/admin/admins">
 
   <div class="admin-page-header">
-    <h1 class="admin-page-title">Invite Admin</h1>
-    <a href="/admin/admins" class="btn btn-outline">← Back</a>
+    <div><h1 class="admin-page-title">Invite Admin</h1><p class="admin-page-description">Create an invite link for another committee member. Email sending is not automatic yet.</p></div>
+    <a href="/admin/admins" class="btn btn-outline">Back</a>
   </div>
 
   <div class="form-card" style="max-width: 500px;">
     <p style="color: var(--color-admin-text-secondary); font-size: 0.875rem; margin-bottom: 1.5rem;">
       Send an invitation to a new admin user. They will receive an invite link to set up their account.
       <br /><br />
-      <strong>Note:</strong> Email sending is not configured yet. The invite link will be shown in the admin users list for you to share manually.
+      <strong>Manual sharing:</strong> after creating the invite, copy the link from the Admin Users page and send it directly. Links expire after 7 days.
     </p>
 
     <form method="POST">
@@ -63,13 +63,13 @@ if (Astro.request.method === 'POST') {
       <div class="form-group">
         <label for="role" class="form-label">Role *</label>
         <select id="role" name="role" class="form-select">
-          <option value="member" selected={values.role !== 'admin'}>Member — Can manage events and committee</option>
-          <option value="admin" selected={values.role === 'admin'}>Admin — Can also manage admin users</option>
+          <option value="member" selected={values.role !== 'admin'}>Member - manage events, committee, and content</option>
+          <option value="admin" selected={values.role === 'admin'}>Admin - member access plus invites and removals</option>
         </select>
         {errors.role && <div class="form-error">{errors.role}</div>}
       </div>
 
-      <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+      <div class="form-actions">
         <button type="submit" class="btn btn-primary">Send Invitation</button>
         <a href="/admin/admins" class="btn btn-outline">Cancel</a>
       </div>

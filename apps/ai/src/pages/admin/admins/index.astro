@@ -29,7 +29,7 @@ function formatRole(role: string): string {
 <AdminLayout title="Admin Users" societyId={SOCIETY_ID} currentPath="/admin/admins">
 
   <div class="admin-page-header">
-    <h1 class="admin-page-title">Admin Users</h1>
+    <div><h1 class="admin-page-title">Admin Users</h1><p class="admin-page-description">Manage who can edit this society and copy pending invite links for manual sharing.</p></div>
     {isManager && <a href="/admin/admins/invite" class="btn btn-primary">Invite Admin</a>}
   </div>
 
@@ -52,7 +52,7 @@ function formatRole(role: string): string {
         {members.map(member => (
           <tr>
             <td style="font-weight: 600;">{member.user?.name || 'Unknown'}</td>
-            <td>{member.user?.email || '—'}</td>
+            <td>{member.user?.email || 'No email'}</td>
             <td><span class={`pill pill-${member.role}`}>{formatRole(member.role)}</span></td>
             {isManager && (
               <td>
@@ -71,12 +71,12 @@ function formatRole(role: string): string {
     </table>
   </div>
 
-  {pendingInvitations.length > 0 && (
+  {pendingInvitations.length > 0 ? (
     <>
       <h2 style="font-size: 1.125rem; font-weight: 700; margin-bottom: 1rem; color: var(--color-admin-text);">Pending Invitations</h2>
-      
-      <div style="background: var(--color-admin-bg); border: 1px dashed var(--color-admin-accent); padding: 1rem 1.25rem; border-radius: 0.5rem; margin-bottom: 1.5rem; font-size: 0.875rem; color: var(--color-admin-text-secondary); line-height: 1.5;">
-        <strong>Manual Sharing Instructions:</strong> Email notifications are not active. Copy the <em>Invite Link</em> below and send it to the invitee manually (e.g. via WhatsApp, Slack, or email). The link expires in 7 days.
+
+      <div class="notice-card" style="margin-bottom: 1.5rem;">
+        <strong>Manual sharing:</strong> Email notifications are not active. Copy the <em>Invite Link</em> below and send it to the invitee manually (e.g. via WhatsApp, Slack, or email). The link expires in 7 days.
       </div>
 
       <div class="admin-table-wrapper">
@@ -98,21 +98,21 @@ function formatRole(role: string): string {
                   <td>{inv.email}</td>
                   <td><span class={`pill pill-${inv.role}`}>{formatRole(inv.role)}</span></td>
                   <td>{new Date(inv.expiresAt).toLocaleDateString()}</td>
-                  <td style="min-width: 320px;">
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                      <input 
-                        type="text" 
-                        readonly 
-                        value={fullAcceptUrl} 
-                        class="form-input" 
-                        style="font-size: 0.75rem; padding: 0.25rem 0.5rem; width: 100%; max-width: 240px; font-family: monospace; background: var(--color-admin-bg);"
-                        onclick="this.select();" 
+                  <td>
+                    <div class="invite-link-row">
+                      <input
+                        type="text"
+                        readonly
+                        value={fullAcceptUrl}
+                        class="form-input"
+
+                        onclick="this.select();"
                       />
-                      <button 
-                        class="btn btn-outline btn-sm copy-btn" 
-                        data-clipboard-text={fullAcceptUrl} 
+                      <button
+                        class="btn btn-outline btn-sm copy-btn"
+                        data-clipboard-text={fullAcceptUrl}
                         type="button"
-                        style="flex-shrink: 0;"
+
                       >
                         Copy
                       </button>
@@ -134,6 +134,8 @@ function formatRole(role: string): string {
         </table>
       </div>
     </>
+  ) : (
+    <div class="notice-card">No pending invitations. New invite links will appear here until they are accepted, revoked, or expired.</div>
   )}
     </>
   ) : (
@@ -157,6 +159,12 @@ function formatRole(role: string): string {
           setTimeout(() => {
             btn.textContent = originalText;
             btn.classList.remove('btn-success');
+          }, 2000);
+        }).catch(() => {
+          const originalText = btn.textContent;
+          btn.textContent = 'Copy failed';
+          setTimeout(() => {
+            btn.textContent = originalText;
           }, 2000);
         });
       });

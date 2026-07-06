@@ -11,15 +11,16 @@ import StudentProjects from "../components/home/StudentProjects.astro";
 import EventsPreview from "../components/home/EventsPreview.astro";
 
 const SOCIETY_ID = "ai";
+Astro.response.headers.set("Cache-Control", "public, s-maxage=300, stale-while-revalidate=3600");
 
 const events: any[] = (
   await queryPublicConvex(api.events.listPublished, { societySlug: SOCIETY_ID }, [])
-).filter((event: any) => event.status === "published");
+);
 ---
 
 <Layout
   title="Home"
-  description="Surrey Artificial Intelligence Society - a student-led University of Surrey community preparing a new website for artificial intelligence workshops, machine learning, data science, careers activity, and responsible discussion."
+  description="Surrey Artificial Intelligence Society - a student-led University of Surrey community for artificial intelligence workshops, machine learning, data science, careers activity, and responsible discussion."
 >
   <HomeHero />
   <AreasWeExplore />

@@ -8,6 +8,7 @@ const MAX_CODE_LENGTH = 120000;
 const BUILDER_RATE_LIMIT_SCOPE = "agenticBuilder";
 const BUILDER_RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
 const BUILDER_RATE_LIMIT_REQUESTS = 2;
+const SERVER_SECRET_ENV = "AGENT_BUILDS_SERVER_SECRET";
 
 export const create = mutation({
   args: {
@@ -23,8 +24,11 @@ export const create = mutation({
     reviewerOutput: v.string(),
     source: v.union(v.literal("ai"), v.literal("fallback")),
     model: v.string(),
+    serverSecret: v.string(),
   },
   handler: async (ctx, args) => {
+    requireServerSecret(args.serverSecret);
+
     return await ctx.db.insert("agentBuilds", {
       task: limit(args.task, MAX_TASK_LENGTH),
       title: limit(args.title, MAX_TITLE_LENGTH) || "Agentic Builder draft",
@@ -57,8 +61,11 @@ export const get = query({
 export const consumeRateLimit = mutation({
   args: {
     key: v.string(),
+    serverSecret: v.string(),
   },
   handler: async (ctx, args) => {
+    requireServerSecret(args.serverSecret);
+
     const now = Date.now();
     const key = limit(args.key, 120) || "unknown";
     const existing = await ctx.db
@@ -108,6 +115,16 @@ export const consumeRateLimit = mutation({
     };
   },
 });
+
+function requireServerSecret(secret: string): void {
+  const expectedSecret = process.env[SERVER_SECRET_ENV];
+  if (!expectedSecret) {
+    throw new Error(`${SERVER_SECRET_ENV} is required for server-only mutations`);
+  }
+  if (secret !== expectedSecret) {
+    throw new Error("Unauthorized server-only mutation");
+  }
+}
 
 function limit(value: string, maxLength: number): string {
   const text = value.trim();

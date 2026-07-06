@@ -1,0 +1,136 @@
+[a] Skip to content
+[span] Surrey Artificial Intelligence Society
+[a] Committee
+[a] Committee
+[p] Student-led artificial intelligence at Surrey
+[h1] Surrey Artificial Intelligence Society
+[p] Explore artificial intelligence, machine learning, and data science through practical workshops, projects, competitions, and responsible discussion.
+[p] Beginner-friendly learning / hands-on projects / hackathons / responsible AI / careers
+[a] Join the Society
+[a] See Projects
+[strong] Workshops, talks, socials
+[span] Learning
+[strong] Skills, projects, impact
+[span] Projects
+[strong] Member-made demos
+[h2] What we offer
+[p] Surrey AI Society is designed for experienced coders, curious beginners, and students from any discipline who want to understand how artificial intelligence is changing the world.
+[strong] Test AI for yourself.
+[span] Sessions turn models, datasets, tools, and judgement into shared material members can inspect and improve.
+[h3] Learn practical skills
+[p] Workshops and tutorials help members build confidence with Python, machine learning, data analysis, generative AI, and model evaluation.
+[h3] Build with others
+[p] Hackathons, build nights, and project sessions turn ideas into small prototypes, portfolio pieces, and team experiments.
+[h3] Understand the impact
+[p] Industry awareness, ethics, careers, accessibility, bias, and social impact stay part of the conversation from the start.
+[h2] Student projects
+[p] Open interactive demos, inspect how they work, and see the kind of practical experiments members can build toward.
+[span] Playable project
+[strong] Racing Simulator
+[span] An autonomous racing environment for experimenting with perception, planning, and control.
+[span] Open project →
+[span] Interactive tool
+[strong] Agentic Builder
+[span] A live workspace showing how agent steps can plan, generate, review, and refine an app idea.
+[span] Launch demo →
+[span] Student Project
+[h2] Racing Simulator
+[p] A low-poly campus racer where you drift through corners while chasing AI drivers.
+[span] Third-person racing prototype
+[h3] Racing Simulator
+[p] Race three laps against AI drivers. Manage throttle, braking, gear shifts, and tire grip through every corner.
+[button] Start Race
+[div] Accelerate
+[div] Brake
+[div] Steer left
+[div] Steer right
+[div] Restart
+[div] Mute
+[kbd] Esc
+[div] Menu
+[div] 0 mph
+[div] G1 900 rpm
+[div] Lap 1 / 3
+[div] P5 / 5
+[div] Grip limit
+[div] --:--.--
+[div] Best race: --:--.--
+[button] Sound: On
+[button] ↺ Restart
+[span] Race complete
+[h3] Finished!
+[div] 0:00.00
+[button] Race Again
+[p] Press Space or click to race again
+[p] A lightweight third-person racing simulator built with HTML Canvas and vanilla JavaScript.
+[h2] Agentic Builder
+[p] Cooperative AI agents planning and writing code for your ideas.
+[span] Gemini 3 Flash
+[button] New Build
+[button] Regenerate
+[button] Copy HTML
+[button] Download
+[button] Full Screen
+[button] Share
+[h1] Agentic Builder
+[p] Describe what you want to build. Our team of AI agents will plan, code, and refine it live.
+[span] Gemini 3 Flash
+[button] Gemini 3 Flash (Default)
+[button] Gemini 3.1 Flash-Lite
+[span] /600
+[span] Quick examples:
+[button] Event planner
+[button] Study tracker
+[button] Club page
+[p] Builds in moments. Your prompt stays on this page.
+[h3] Building:
+[span] Your application
+[p] Cooperative Multi-Agent Environment active...
+[button] Edit Prompt
+[button] Retry Build
+[span] Planner Agent
+[span] Pending
+[span] Researcher Agent
+[span] Pending
+[span] Developer Agent
+[span] Pending
+[span] Reviewer Agent
+[span] Pending
+[span] agent_thinking_log.sh
+[span] > Initializing workspace environments...
+[button] Preview
+[button] Build steps
+[span] Gemini 3 Flash
+[h2] Events and workshops
+[a] View all events →
+[h3] Next sessions are being confirmed.
+[p] The calendar is managed by society signatories. While the live list is pending, the programme direction is clear: hands-on workshops, coding challenges, data clinics, guest sessions, project collaboration, and relaxed meetups.
+[span] Workshops
+[span] Hackathons
+[span] Project nights
+[span] Talks
+[span] Socials
+[a] Become a member
+[a] Events page
+[h2] Become a member
+[p] Become part of a student community learning artificial intelligence through workshops, projects, competitions, talks, careers activity, and socials.
+[a] Join via Students' Union
+[span] Surrey Artificial Intelligence Society
+[p] A student-led society under Surrey Students' Union. Exploring artificial intelligence through workshops, projects, competitions, talks, socials, and responsible discussion.
+[p] Established 2025
+[a] Committee
+[a] Instagram
+[a] Surrey Students' Union
+[a] Membership
+[p] © 2026 Surrey Artificial Intelligence Society.
+[p] surreyaisociety.org
+[p] Surrey AI Society
+[h2] Website assistant
+[button] Reset
+[p] A student-led community for learning, building, and discussing artificial intelligence at the University of Surrey.
+[button] What is Surrey AI Society about?
+[button] What events are coming up?
+[button] I am new to AI. Where should I start?
+[button] How can I get involved in projects?
+[label] Ask Surrey AI Society
+[button] Send

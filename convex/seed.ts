@@ -30,6 +30,8 @@ type CanonicalMetadataPatch = {
   socials?: SocietySocials;
 };
 
+const SETUP_SECRET_ENV = "SURREY_SETUP_SECRET";
+
 const canonicalSocietyData: CanonicalSocietyData[] = [
   {
     name: "Surrey Artificial Intelligence Society",
@@ -88,8 +90,12 @@ const canonicalSocietyData: CanonicalSocietyData[] = [
 ];
 
 export const seedSocieties = mutation({
-  args: {},
-  handler: async (ctx) => {
+  args: {
+    setupSecret: v.optional(v.string()),
+  },
+  handler: async (ctx, { setupSecret }) => {
+    requireSetupSecret(setupSecret);
+
     const existing = await ctx.db.query("societies").collect();
     if (existing.length > 0) {
       return "Societies already seeded; run syncCanonicalSocietyMetadata as an authenticated owner to update metadata";
@@ -135,6 +141,16 @@ export const seedSocieties = mutation({
     return "Societies seeded successfully";
   },
 });
+
+function requireSetupSecret(setupSecret: string | undefined): void {
+  const expectedSecret = process.env[SETUP_SECRET_ENV];
+  if (!expectedSecret) {
+    throw new Error(`${SETUP_SECRET_ENV} is required for setup mutations`);
+  }
+  if (!setupSecret || setupSecret !== expectedSecret) {
+    throw new Error("Unauthorized setup mutation");
+  }
+}
 
 async function requireMetadataSyncOwner(
   ctx: MutationCtx
@@ -238,11 +254,15 @@ export const syncCanonicalSocietyMetadata = mutation({
 
 export const seedOwnerMemberships = mutation({
   args: {
-    email: v.optional(v.string()),
     name: v.optional(v.string()),
   },
-  handler: async (ctx, { email, name }) => {
-    const ownerEmail = (email || OWNER_EMAIL).toLowerCase().trim();
+  handler: async (ctx, { name }) => {
+    const actor = await requireAuth(ctx);
+    const ownerEmail = actor.email.toLowerCase().trim();
+
+    if (ownerEmail !== OWNER_EMAIL) {
+      throw new Error("Owner email required to seed owner memberships");
+    }
 
     let owner = await ctx.db
       .query("users")

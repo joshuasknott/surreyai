@@ -8,7 +8,7 @@ import "../styles/global.css";
   title="404 - Page Not Found"
   description="The page you're looking for does not exist on the Surrey Artificial Intelligence Society website."
 >
-  <section class="page-hero page-hero--center">
+  <section class="atlas-page-hero page-hero page-hero--center">
     <h1>404</h1>
     <p>
       This link does not point to a current Surrey AI Society page. Try the homepage, events, or joining route instead.
@@ -23,6 +23,8 @@ import "../styles/global.css";
 <style>
   .page-hero--center {
     min-height: 62vh;
+    grid-template-columns: 1fr;
+    justify-items: center;
     text-align: center;
   }
 
@@ -30,6 +32,10 @@ import "../styles/global.css";
     color: var(--ai-azure);
     font-size: clamp(6rem, 18vw, 14rem);
     line-height: 0.85;
+  }
+
+  .page-hero--center h1::before {
+    margin-inline: auto;
   }
 
   .not-found-actions {

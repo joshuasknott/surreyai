@@ -1,0 +1,98 @@
+{
+  "files": [
+    {
+      "file": "UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuBWYMZg.ttf",
+      "family": "Inter",
+      "rawFamily": "Inter Black",
+      "subfamily": "Regular",
+      "postscript": "Inter-Black",
+      "weight": 900,
+      "style": "normal",
+      "variationAxes": [],
+      "identified": true
+    },
+    {
+      "file": "UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuDyYMZg.ttf",
+      "family": "Inter",
+      "rawFamily": "Inter ExtraBold",
+      "subfamily": "Regular",
+      "postscript": "Inter-ExtraBold",
+      "weight": 800,
+      "style": "normal",
+      "variationAxes": [],
+      "identified": true
+    },
+    {
+      "file": "UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuFuYMZg.ttf",
+      "family": "Inter",
+      "rawFamily": "Inter",
+      "subfamily": "Bold",
+      "postscript": "Inter-Bold",
+      "weight": 700,
+      "style": "normal",
+      "variationAxes": [],
+      "identified": true
+    },
+    {
+      "file": "UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuGKYMZg.ttf",
+      "family": "Inter",
+      "rawFamily": "Inter SemiBold",
+      "subfamily": "Regular",
+      "postscript": "Inter-SemiBold",
+      "weight": 600,
+      "style": "normal",
+      "variationAxes": [],
+      "identified": true
+    },
+    {
+      "file": "UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuI6fMZg.ttf",
+      "family": "Inter",
+      "rawFamily": "Inter Medium",
+      "subfamily": "Regular",
+      "postscript": "Inter-Medium",
+      "weight": 500,
+      "style": "normal",
+      "variationAxes": [],
+      "identified": true
+    },
+    {
+      "file": "UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfMZg.ttf",
+      "family": "Inter",
+      "rawFamily": "Inter",
+      "subfamily": "Regular",
+      "postscript": "Inter-Regular",
+      "weight": 400,
+      "style": "normal",
+      "variationAxes": [],
+      "identified": true
+    }
+  ],
+  "families": [
+    {
+      "family": "Inter",
+      "weights": [
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "variable": false,
+      "fileCount": 6,
+      "files": [
+        "UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuBWYMZg.ttf",
+        "UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuDyYMZg.ttf",
+        "UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuFuYMZg.ttf",
+        "UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuGKYMZg.ttf",
+        "UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuI6fMZg.ttf",
+        "UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfMZg.ttf"
+      ]
+    }
+  ],
+  "unidentified": [],
+  "meta": {
+    "generatedAt": "2026-06-22T13:50:43.239Z",
+    "tool": "fontkit"
+  }
+}

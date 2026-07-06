@@ -72,16 +72,18 @@ if (Astro.request.method === 'POST') {
   <div class="admin-page-header">
     <div>
       <h1 class="admin-page-title">Settings</h1>
-      <p style="color: var(--color-admin-text-muted); margin-top: 0.5rem;">Manage society metadata and your admin account.</p>
+      <p style="color: var(--color-admin-text-muted); margin-top: 0.5rem;">Manage public contact details, membership links, and your admin account.</p>
     </div>
   </div>
 
   {success && <div class="alert alert-success">Settings saved.</div>}
   {(errors._csrf || errors._form) && <div class="alert alert-error">{errors._csrf || errors._form}</div>}
 
+  <div class="notice-card" style="max-width: 760px; margin-bottom: 1rem;">These settings feed public contact and joining links. Leave a field blank only if the society does not currently use it.</div>
+
   <div class="form-card" style="max-width: 760px; margin-bottom: 1rem;">
-    <h2 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem;">Society metadata</h2>
-    {!isAdminRole && <p style="color: var(--color-admin-text-muted); margin-bottom: 1rem;">Your role can view settings, but only admin-level roles can update society metadata.</p>}
+    <h2 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem;">Public society details</h2>
+    {!isAdminRole && <p style="color: var(--color-admin-text-muted); margin-bottom: 1rem;">Your role can view settings, but only admin-level roles can update public society details.</p>}
     <form method="POST">
       <input type="hidden" name="_csrf" value={csrfToken} />
       <div class="form-group">
@@ -89,7 +91,7 @@ if (Astro.request.method === 'POST') {
         <input type="email" id="contactEmail" name="contactEmail" class="form-input" value={values.contactEmail} disabled={!isAdminRole} />
         {errors.contactEmail && <div class="form-error">{errors.contactEmail}</div>}
       </div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+      <div class="form-grid form-grid-2">
         <div class="form-group">
           <label for="instagram" class="form-label">Instagram URL</label>
           <input type="url" id="instagram" name="instagram" class="form-input" value={values.instagram} placeholder="https://" disabled={!isAdminRole} />
@@ -113,7 +115,7 @@ if (Astro.request.method === 'POST') {
       </div>
       <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
         <div class="form-group">
-          <label for="logo" class="form-label">Logo path</label>
+          <label for="logo" class="form-label">Logo URL or path</label>
           <input type="text" id="logo" name="logo" class="form-input" value={values.logo} placeholder="/logos/example.png" disabled={!isAdminRole} />
           {errors.logo && <div class="form-error">{errors.logo}</div>}
         </div>
@@ -129,7 +131,7 @@ if (Astro.request.method === 'POST') {
 
   <div class="admin-card" style="max-width: 680px;">
     <h2 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem;">Account</h2>
-    <p style="color: var(--color-admin-text-muted); margin-bottom: 1rem;">Signed in as {user.email}. Use Clerk account settings to change your password or recover access details.</p>
+    <p style="color: var(--color-admin-text-muted); margin-bottom: 1rem;">Signed in as {user.email}. Use Clerk account settings to change your password or recover access details. This does not change society permissions.</p>
     <button id="manage-account-btn" class="btn btn-primary">Manage Account</button>
   </div>
 

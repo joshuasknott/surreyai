@@ -1,6 +1,6 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
-import { requireAdmin, logAction } from "./permissions";
+import { requireAdmin, requireExistingMembership, logAction } from "./permissions";
 
 export const getSettings = query({
   args: { societySlug: v.string() },
@@ -10,6 +10,8 @@ export const getSettings = query({
       .withIndex("by_slug", (q) => q.eq("slug", societySlug))
       .first();
     if (!society) return null;
+
+    await requireExistingMembership(ctx, society._id);
 
     const settings = await ctx.db
       .query("siteSettings")
