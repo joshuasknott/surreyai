@@ -82,6 +82,7 @@
 
 /* ── Button: primary ── */
 .btn-primary {
+  box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -112,6 +113,7 @@
 
 /* ── Button: secondary ── */
 .btn-secondary {
+  box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -557,23 +559,38 @@
 
   .ai-photo-hero::before {
     background:
-      linear-gradient(180deg, color-mix(in srgb, var(--ai-paper) 78%, transparent) 0%, color-mix(in srgb, var(--ai-paper) 88%, transparent) 48%, color-mix(in srgb, var(--ai-bg) 94%, transparent) 100%),
-      linear-gradient(90deg, color-mix(in srgb, var(--ai-paper) 92%, transparent) 0%, color-mix(in srgb, var(--ai-paper) 48%, transparent) 70%, transparent 100%);
+      linear-gradient(180deg, color-mix(in srgb, var(--ai-paper) 68%, transparent) 0%, color-mix(in srgb, var(--ai-paper) 82%, transparent) 48%, color-mix(in srgb, var(--ai-bg) 94%, transparent) 100%),
+      linear-gradient(90deg, color-mix(in srgb, var(--ai-paper) 84%, transparent) 0%, color-mix(in srgb, var(--ai-paper) 36%, transparent) 70%, transparent 100%);
   }
 
   :root[data-theme="dark"] .ai-photo-hero::before {
     background:
-      linear-gradient(180deg, color-mix(in srgb, var(--ai-bg) 74%, transparent) 0%, color-mix(in srgb, var(--ai-bg) 88%, transparent) 54%, var(--ai-bg) 100%),
-      linear-gradient(90deg, color-mix(in srgb, var(--ai-bg) 94%, transparent) 0%, color-mix(in srgb, var(--ai-bg) 52%, transparent) 72%, transparent 100%);
+      linear-gradient(180deg, color-mix(in srgb, var(--ai-bg) 66%, transparent) 0%, color-mix(in srgb, var(--ai-bg) 82%, transparent) 54%, var(--ai-bg) 100%),
+      linear-gradient(90deg, color-mix(in srgb, var(--ai-bg) 88%, transparent) 0%, color-mix(in srgb, var(--ai-bg) 42%, transparent) 72%, transparent 100%);
   }
 
   .ai-photo-hero__inner {
     align-items: end;
+    justify-content: center;
     padding-top: clamp(8rem, 34vw, 12rem);
+  }
+
+  .ai-photo-hero__copy {
+    margin-inline: auto;
+    text-align: center;
   }
 
   .ai-photo-hero h1 {
     font-size: clamp(2.55rem, 12vw, 3.55rem);
+    margin-inline: auto;
+  }
+
+  .ai-photo-hero h1::before {
+    margin-inline: auto;
+  }
+
+  .ai-photo-hero p:not(.ai-photo-hero__eyebrow) {
+    margin-inline: auto;
   }
 }
 
@@ -599,6 +616,24 @@
     color: var(--ai-accent-contrast);
     background: var(--ai-azure);
     border-color: var(--ai-azure);
+  }
+
+  .ai-photo-hero__inner {
+    padding-inline: 1.15rem;
+  }
+
+  .ai-photo-hero__copy {
+    width: min(100%, 34rem);
+  }
+
+  .ai-photo-hero__copy :is(.join-hero__actions, .calendar-empty__actions, .empty-panel__actions) {
+    justify-content: center;
+    margin-inline: auto;
+    max-width: 24rem;
+  }
+
+  .ai-photo-hero__copy :is(.btn-primary, .btn-secondary) {
+    width: 100%;
   }
 }
 

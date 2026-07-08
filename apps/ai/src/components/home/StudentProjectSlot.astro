@@ -24,6 +24,29 @@ import BrandMark from "../common/BrandMark.astro";
       </header>
 
       <main class="drift-lab-launcher__main">
+        <div class="drift-lab-launcher__instructions" aria-label="Controls">
+          <div class="drift-lab-control-card drift-lab-control-card--desktop">
+            <span class="control-card__title">Desktop controls</span>
+            <div class="control-keys" aria-hidden="true">
+              <span></span>
+              <kbd>W</kbd>
+              <span></span>
+              <kbd>A</kbd>
+              <kbd>S</kbd>
+              <kbd>D</kbd>
+            </div>
+            <p>Steer with A/D or arrows. W accelerates, S brakes.</p>
+          </div>
+          <div class="drift-lab-control-card drift-lab-control-card--mobile">
+            <span class="control-card__title">Mobile controls</span>
+            <div class="control-phone" aria-hidden="true">
+              <span class="control-phone__stick"><span></span></span>
+              <span class="control-phone__pedal control-phone__pedal--brake">Brake</span>
+              <span class="control-phone__pedal control-phone__pedal--gas">Gas</span>
+            </div>
+            <p>Drag the stick to steer. Hold gas to accelerate, brake to slow down.</p>
+          </div>
+        </div>
         <button id="drift-lab-launch-btn" class="drift-lab-launch-btn" type="button">
           Start Race
         </button>
@@ -42,7 +65,14 @@ import BrandMark from "../common/BrandMark.astro";
             Start Race
           </button>
           <div class="drift-lab-controls-info">
-            <div class="drift-lab-key-row">Use arrow keys or WASD once the race starts.</div>
+            <div class="drift-lab-key-row drift-lab-key-row--desktop">
+              <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>
+              <span>or arrow keys</span>
+            </div>
+            <div class="drift-lab-key-row drift-lab-key-row--mobile">
+              <span class="mini-stick" aria-hidden="true"><span></span></span>
+              <span>Joystick steering plus gas and brake pedals.</span>
+            </div>
           </div>
         </div>
       </div>
@@ -70,6 +100,12 @@ import BrandMark from "../common/BrandMark.astro";
         </div>
       </div>
 
+      <div class="drift-lab-game-actions">
+        <button id="drift-lab-fullscreen-btn" class="drift-lab-fullscreen-btn" type="button" aria-label="Enter fullscreen">
+          Full screen
+        </button>
+      </div>
+
       <div id="drift-lab-complete" class="drift-lab-overlay" hidden>
         <div class="drift-lab-overlay-inner">
           <span class="drift-lab-mode">Race complete</span>
@@ -85,13 +121,14 @@ import BrandMark from "../common/BrandMark.astro";
       </div>
 
       <div id="drift-lab-mobile" class="drift-lab-mobile" hidden>
-        <div class="mobile-side mobile-left-side">
-          <button type="button" class="mobile-btn" aria-label="Steer left" data-key="left">&#9664;</button>
-          <button type="button" class="mobile-btn" aria-label="Steer right" data-key="right">&#9654;</button>
+        <div class="mobile-joystick" id="drift-lab-joystick" aria-label="Steering joystick" role="application">
+          <span class="mobile-joystick__ring" aria-hidden="true">
+            <span class="mobile-joystick__thumb" id="drift-lab-joystick-thumb"></span>
+          </span>
         </div>
-        <div class="mobile-side mobile-right-side">
-          <button type="button" class="mobile-btn" aria-label="Accelerate" data-key="up">&#9650;</button>
-          <button type="button" class="mobile-btn" aria-label="Brake" data-key="down">&#9660;</button>
+        <div class="mobile-pedals" aria-label="Pedals">
+          <button type="button" class="mobile-pedal mobile-pedal--brake" aria-label="Brake" data-key="down">Brake</button>
+          <button type="button" class="mobile-pedal mobile-pedal--gas" aria-label="Accelerate" data-key="up">Gas</button>
         </div>
       </div>
 
@@ -198,10 +235,124 @@ import BrandMark from "../common/BrandMark.astro";
 
   .drift-lab-launcher__main {
     display: grid;
+    gap: clamp(1.2rem, 3vw, 1.8rem);
     flex: 1;
     min-height: 0;
     place-items: center;
     padding: 2rem 1.5rem;
+  }
+
+  .drift-lab-launcher__instructions {
+    display: grid;
+    gap: 1rem;
+    width: min(100%, 36rem);
+  }
+
+  .drift-lab-control-card {
+    display: grid;
+    gap: 0.8rem;
+    justify-items: center;
+    padding: 1rem;
+    border: 1px solid var(--ai-border);
+    border-radius: 8px;
+    background:
+      linear-gradient(140deg, color-mix(in srgb, var(--ai-surface) 88%, transparent), color-mix(in srgb, var(--ai-paper) 72%, transparent));
+    text-align: center;
+  }
+
+  .control-card__title {
+    color: var(--ai-azure);
+    font-size: 0.7rem;
+    font-weight: 850;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .drift-lab-control-card p {
+    margin: 0;
+    color: var(--ai-fg-muted);
+    font-size: 0.82rem;
+    font-weight: 700;
+    line-height: 1.45;
+  }
+
+  .control-keys {
+    display: grid;
+    grid-template-columns: repeat(3, 2.25rem);
+    gap: 0.35rem;
+  }
+
+  .control-keys kbd,
+  .drift-lab-controls-info kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.25rem;
+    min-height: 2.05rem;
+    border: 1px solid var(--ai-border-strong);
+    border-radius: 6px;
+    background: var(--ai-paper);
+    color: var(--ai-fg);
+    font-family: inherit;
+    font-size: 0.76rem;
+    font-weight: 850;
+    box-shadow: 0 3px 0 color-mix(in srgb, var(--ai-border-strong) 55%, transparent);
+  }
+
+  .control-phone {
+    display: grid;
+    grid-template-columns: 4.5rem 3.2rem 3.7rem;
+    align-items: end;
+    gap: 0.7rem;
+  }
+
+  .control-phone__stick,
+  .mini-stick {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    width: 4.5rem;
+    height: 4.5rem;
+    border: 1px solid color-mix(in srgb, var(--ai-azure) 34%, var(--ai-border));
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--ai-azure) 8%, var(--ai-surface));
+  }
+
+  .control-phone__stick span,
+  .mini-stick span {
+    display: block;
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: 999px;
+    background: var(--ai-azure);
+    box-shadow: 0 8px 18px color-mix(in srgb, var(--ai-azure) 24%, transparent);
+  }
+
+  .control-phone__pedal {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3.6rem;
+    padding-inline: 0.5rem;
+    border-radius: 999px;
+    color: var(--ai-accent-contrast);
+    font-size: 0.62rem;
+    font-weight: 850;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .control-phone__pedal--brake {
+    background: var(--ai-coral);
+  }
+
+  .control-phone__pedal--gas {
+    min-height: 4.45rem;
+    background: var(--ai-azure);
+  }
+
+  .drift-lab-control-card--mobile {
+    display: none;
   }
 
   .drift-lab-launch-btn {
@@ -393,20 +544,26 @@ import BrandMark from "../common/BrandMark.astro";
   }
 
   .drift-lab-key-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.35rem;
     white-space: normal;
   }
 
-  .drift-lab-controls-info kbd {
-    display: inline-block;
-    min-width: 1.7rem;
-    padding: 0.12rem 0.42rem;
-    background: color-mix(in srgb, var(--ai-paper) 72%, var(--ai-surface));
-    border: 1px solid var(--ai-border);
-    border-radius: 4px;
-    font-family: inherit;
-    font-size: 0.75rem;
-    color: var(--ai-fg);
-    margin: 0 0.1rem;
+  .drift-lab-key-row--mobile {
+    display: none;
+  }
+
+  .mini-stick {
+    width: 2.5rem;
+    height: 2.5rem;
+    flex: 0 0 auto;
+  }
+
+  .mini-stick span {
+    width: 1.05rem;
+    height: 1.05rem;
   }
 
   .drift-lab-hud {
@@ -522,6 +679,40 @@ import BrandMark from "../common/BrandMark.astro";
     outline-offset: 2px;
   }
 
+  .drift-lab-game-actions {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 9;
+    display: flex;
+    gap: 0.45rem;
+    pointer-events: auto;
+  }
+
+  .drift-lab-fullscreen-btn {
+    min-height: 2.4rem;
+    padding: 0.55rem 0.9rem;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 6px;
+    background: rgba(8, 12, 20, 0.72);
+    color: #F8FAFC;
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.72rem;
+    font-weight: 850;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+    backdrop-filter: blur(14px);
+  }
+
+  .drift-lab-fullscreen-btn:hover,
+  .drift-lab-fullscreen-btn:focus-visible {
+    background: rgba(63, 109, 128, 0.88);
+    border-color: rgba(255, 255, 255, 0.28);
+    outline: none;
+  }
+
   .drift-lab-complete-title {
     font-size: clamp(1.5rem, 4vw, 2.5rem);
     font-weight: 800;
@@ -580,7 +771,8 @@ import BrandMark from "../common/BrandMark.astro";
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    padding: 0.5rem;
+    gap: 1rem;
+    padding: 0.85rem;
     z-index: 8;
     pointer-events: none;
   }
@@ -589,37 +781,132 @@ import BrandMark from "../common/BrandMark.astro";
     display: none;
   }
 
-  .mobile-side {
-    display: flex;
-    gap: 0.35rem;
+  .mobile-joystick,
+  .mobile-pedals {
     pointer-events: auto;
   }
 
-  .mobile-right-side {
-    flex-direction: column;
+  .mobile-joystick {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: clamp(7.5rem, 30vw, 9.5rem);
+    height: clamp(7.5rem, 30vw, 9.5rem);
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
   }
 
-  .mobile-btn {
-    width: 52px;
-    height: 52px;
-    display: flex;
+  .mobile-joystick__ring {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
+    background:
+      radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.1), rgba(15, 23, 42, 0.46) 52%, rgba(2, 6, 23, 0.7)),
+      rgba(8, 12, 20, 0.54);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06), 0 18px 44px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(12px);
+  }
+
+  .mobile-joystick__ring::before,
+  .mobile-joystick__ring::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    background: rgba(255, 255, 255, 0.14);
+  }
+
+  .mobile-joystick__ring::before {
+    top: 50%;
+    left: 18%;
+    right: 18%;
+    height: 1px;
+  }
+
+  .mobile-joystick__ring::after {
+    top: 18%;
+    bottom: 18%;
+    left: 50%;
+    width: 1px;
+  }
+
+  .mobile-joystick__thumb {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: clamp(3rem, 12vw, 3.75rem);
+    height: clamp(3rem, 12vw, 3.75rem);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 999px;
+    background:
+      radial-gradient(circle at 35% 28%, rgba(255, 255, 255, 0.38), transparent 34%),
+      linear-gradient(145deg, rgba(63, 109, 128, 0.92), rgba(23, 35, 41, 0.92));
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.32);
+    transform: translate(-50%, -50%) translate(var(--joy-x, 0px), var(--joy-y, 0px));
+    transition: transform 0.08s ease;
+  }
+
+  .mobile-joystick.is-active .mobile-joystick__thumb {
+    transition: none;
+  }
+
+  .mobile-pedals {
+    display: grid;
+    grid-template-columns: 4.4rem 5.2rem;
+    align-items: end;
+    gap: 0.6rem;
+  }
+
+  .mobile-pedal {
+    box-sizing: border-box;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.1rem;
-    color: rgba(255, 255, 255, 0.68);
-    background: rgba(11, 15, 25, 0.58);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 0.6rem;
+    min-height: 4.5rem;
+    padding: 0.8rem 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 999px;
+    color: rgba(255, 255, 255, 0.84);
     cursor: pointer;
+    font: inherit;
+    font-size: 0.68rem;
+    font-weight: 850;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     user-select: none;
     -webkit-user-select: none;
     touch-action: none;
-    font-family: inherit;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.26);
+    backdrop-filter: blur(12px);
   }
 
-  .mobile-btn:active {
-    background: rgba(79, 70, 229, 0.28);
+  .mobile-pedal--gas {
+    min-height: 5.8rem;
+    background: rgba(63, 109, 128, 0.74);
+  }
+
+  .mobile-pedal--brake {
+    background: rgba(169, 103, 75, 0.72);
+  }
+
+  .mobile-pedal.is-active,
+  .mobile-pedal:active {
     color: #fff;
+    border-color: rgba(255, 255, 255, 0.34);
+    transform: translateY(1px);
+  }
+
+  .mobile-pedal--gas.is-active,
+  .mobile-pedal--gas:active {
+    background: rgba(63, 109, 128, 0.96);
+  }
+
+  .mobile-pedal--brake.is-active,
+  .mobile-pedal--brake:active {
+    background: rgba(169, 103, 75, 0.96);
   }
 
   .drift-lab-nojs {
@@ -645,6 +932,10 @@ import BrandMark from "../common/BrandMark.astro";
       padding: 0;
     }
 
+    .drift-lab-launcher__main {
+      padding: 1.4rem 1rem;
+    }
+
     .drift-lab-launcher__topbar {
       padding-right: 5.75rem;
     }
@@ -657,8 +948,26 @@ import BrandMark from "../common/BrandMark.astro";
       font-size: 0.7rem;
     }
 
-    .drift-lab-controls-info {
+    .drift-lab-control-card--desktop,
+    .drift-lab-key-row--desktop {
       display: none;
+    }
+
+    .drift-lab-control-card--mobile {
+      display: grid;
+    }
+
+    .drift-lab-controls-info {
+      font-size: 0.72rem;
+    }
+
+    .drift-lab-key-row--mobile {
+      display: flex;
+    }
+
+    .drift-lab-overlay-inner {
+      max-width: min(25rem, calc(100vw - 1.5rem));
+      margin-inline: auto;
     }
 
     .drift-lab-hud {
@@ -670,17 +979,95 @@ import BrandMark from "../common/BrandMark.astro";
       display: none;
     }
 
-    .mobile-btn {
-      width: 56px;
-      height: 56px;
-      font-size: 1.3rem;
+    .drift-lab-game-actions {
+      top: 0.6rem;
+      right: 0.6rem;
     }
 
+    .drift-lab-fullscreen-btn {
+      min-height: 2.25rem;
+      padding-inline: 0.72rem;
+      font-size: 0.66rem;
+    }
+
+    .drift-lab-mobile {
+      padding: 0.65rem;
+    }
+
+    .mobile-pedals {
+      grid-template-columns: 4rem 4.85rem;
+      gap: 0.5rem;
+    }
+  }
+
+  @media (hover: none) and (pointer: coarse) {
+    .drift-lab-control-card--desktop,
+    .drift-lab-key-row--desktop {
+      display: none;
+    }
+
+    .drift-lab-control-card--mobile {
+      display: grid;
+    }
+
+    .drift-lab-key-row--mobile {
+      display: flex;
+    }
+  }
+
+  @media (max-width: 420px) and (orientation: portrait) {
+    .drift-lab-mobile {
+      align-items: center;
+      bottom: 0.3rem;
+    }
+
+    .mobile-joystick {
+      width: 7rem;
+      height: 7rem;
+    }
+
+    .mobile-pedals {
+      grid-template-columns: 3.65rem 4.35rem;
+    }
+
+    .mobile-pedal {
+      min-height: 4rem;
+      font-size: 0.62rem;
+    }
+
+    .mobile-pedal--gas {
+      min-height: 5.15rem;
+    }
+  }
+
+  .drift-lab-game:fullscreen {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    aspect-ratio: auto;
+  }
+
+  .drift-lab-game:fullscreen canvas {
+    object-fit: cover;
+  }
+
+  .drift-lab-game:fullscreen .drift-lab-mobile {
+    padding-bottom: max(0.85rem, env(safe-area-inset-bottom));
+    padding-inline: max(0.85rem, env(safe-area-inset-left)) max(0.85rem, env(safe-area-inset-right));
+  }
+
+  .drift-lab-game:fullscreen .drift-lab-fullscreen-btn {
+    margin-top: env(safe-area-inset-top);
   }
 
   @media (prefers-reduced-motion: reduce) {
     .drift-lab-play-btn,
-    .hud-drift span {
+    .hud-drift span,
+    .mobile-joystick__thumb {
       transition: none;
     }
   }
@@ -736,6 +1123,9 @@ import BrandMark from "../common/BrandMark.astro";
   const restartBtn = document.getElementById('drift-lab-restart-btn');
   const againBtn = document.getElementById('drift-lab-again-btn');
   const soundBtn = document.getElementById('drift-lab-sound-btn');
+  const fullscreenBtn = document.getElementById('drift-lab-fullscreen-btn');
+  const joystickEl = document.getElementById('drift-lab-joystick');
+  const joystickThumb = document.getElementById('drift-lab-joystick-thumb');
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const keys = { up: false, down: false, left: false, right: false };
@@ -766,6 +1156,9 @@ import BrandMark from "../common/BrandMark.astro";
   let engineGain2 = null;
   let transientAudioNodes = [];
   let soundOn = true;
+  let touchSteer = 0;
+  let touchSteerY = 0;
+  let activeJoystickPointer = null;
   let bumpFlash = 0;
   let screenSegments = new Map();
   let chaseCamera = { x: 0, heading: 0, slide: 0 };
@@ -1007,6 +1400,40 @@ import BrandMark from "../common/BrandMark.astro";
     keys.down = false;
     keys.left = false;
     keys.right = false;
+    touchSteer = 0;
+    touchSteerY = 0;
+    activeJoystickPointer = null;
+    resetJoystick();
+    mobileEl.querySelectorAll('.is-active').forEach(el => el.classList.remove('is-active'));
+  }
+
+  function resetJoystick() {
+    if (joystickThumb) {
+      joystickThumb.style.setProperty('--joy-x', '0px');
+      joystickThumb.style.setProperty('--joy-y', '0px');
+    }
+    joystickEl?.classList.remove('is-active');
+  }
+
+  function updateFullscreenLabel() {
+    if (!fullscreenBtn) return;
+    const isFull = document.fullscreenElement === gameEl;
+    fullscreenBtn.textContent = isFull ? 'Exit full screen' : 'Full screen';
+    fullscreenBtn.setAttribute('aria-label', isFull ? 'Exit fullscreen' : 'Enter fullscreen');
+  }
+
+  function toggleFullscreen() {
+    if (!document.fullscreenEnabled || !gameEl) return;
+    if (document.fullscreenElement === gameEl) {
+      document.exitFullscreen().catch(() => {});
+      return;
+    }
+    gameEl.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
+  }
+
+  function enterMobileFullscreen() {
+    if (!isTouch || !document.fullscreenEnabled || document.fullscreenElement || !gameEl) return;
+    gameEl.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
   }
 
   function startGame(withAudio = true) {
@@ -1025,6 +1452,7 @@ import BrandMark from "../common/BrandMark.astro";
     startEl.setAttribute('hidden', '');
     doneEl.setAttribute('hidden', '');
     hudEl.removeAttribute('hidden');
+    enterMobileFullscreen();
   }
 
   function toMenu() {
@@ -1075,6 +1503,9 @@ import BrandMark from "../common/BrandMark.astro";
     startEl.removeAttribute('hidden');
     doneEl.setAttribute('hidden', '');
     hudEl.setAttribute('hidden', '');
+    if (document.fullscreenElement === gameEl) {
+      document.exitFullscreen().catch(() => {});
+    }
   }
 
   function showLauncher() {
@@ -1204,13 +1635,75 @@ import BrandMark from "../common/BrandMark.astro";
     mobileEl.removeAttribute('hidden');
     mobileEl.querySelectorAll('[data-key]').forEach(btn => {
       const k = btn.dataset.key;
-      const on = e => { e.preventDefault(); keys[k] = true; };
-      const off = e => { if (e) e.preventDefault(); keys[k] = false; };
+      const on = e => {
+        e.preventDefault();
+        keys[k] = true;
+        btn.classList.add('is-active');
+        if (btn.setPointerCapture && e.pointerId !== undefined) {
+          try { btn.setPointerCapture(e.pointerId); } catch {}
+        }
+      };
+      const off = e => {
+        if (e) e.preventDefault();
+        keys[k] = false;
+        btn.classList.remove('is-active');
+      };
       btn.addEventListener('pointerdown', on);
       btn.addEventListener('pointerup', off);
       btn.addEventListener('pointerleave', off);
       btn.addEventListener('pointercancel', off);
     });
+
+    joystickEl?.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      activeJoystickPointer = e.pointerId;
+      joystickEl.classList.add('is-active');
+      try { joystickEl.setPointerCapture(e.pointerId); } catch {}
+      updateJoystick(e);
+    });
+
+    joystickEl?.addEventListener('pointermove', e => {
+      if (activeJoystickPointer !== e.pointerId) return;
+      e.preventDefault();
+      updateJoystick(e);
+    });
+
+    const endJoystick = e => {
+      if (e && activeJoystickPointer !== e.pointerId) return;
+      if (e) e.preventDefault();
+      touchSteer = 0;
+      touchSteerY = 0;
+      activeJoystickPointer = null;
+      resetJoystick();
+    };
+
+    joystickEl?.addEventListener('pointerup', endJoystick);
+    joystickEl?.addEventListener('pointercancel', endJoystick);
+    joystickEl?.addEventListener('lostpointercapture', () => {
+      touchSteer = 0;
+      touchSteerY = 0;
+      activeJoystickPointer = null;
+      resetJoystick();
+    });
+  }
+
+  function updateJoystick(e) {
+    if (!joystickEl || !joystickThumb) return;
+    const rect = joystickEl.getBoundingClientRect();
+    const radius = Math.max(1, rect.width * 0.36);
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    let dx = e.clientX - cx;
+    let dy = e.clientY - cy;
+    const dist = Math.hypot(dx, dy);
+    if (dist > radius) {
+      dx = (dx / dist) * radius;
+      dy = (dy / dist) * radius;
+    }
+    touchSteer = clamp(dx / radius, -1, 1);
+    touchSteerY = clamp(dy / radius, -1, 1);
+    joystickThumb.style.setProperty('--joy-x', dx.toFixed(1) + 'px');
+    joystickThumb.style.setProperty('--joy-y', dy.toFixed(1) + 'px');
   }
 
   launchBtn.addEventListener('click', () => startGame());
@@ -1218,6 +1711,10 @@ import BrandMark from "../common/BrandMark.astro";
   restartBtn.addEventListener('click', resetRace);
   againBtn.addEventListener('click', () => startGame());
   soundBtn.addEventListener('click', toggleSound);
+  fullscreenBtn?.addEventListener('click', toggleFullscreen);
+  document.addEventListener('fullscreenchange', updateFullscreenLabel);
+  if (!document.fullscreenEnabled) fullscreenBtn?.setAttribute('hidden', '');
+  updateFullscreenLabel();
   window.addEventListener('surrey-ai-project-modal-open', (event) => {
     const project = event instanceof CustomEvent ? event.detail?.project : undefined;
     if (project === 'racing') showLauncher();
@@ -1243,9 +1740,10 @@ import BrandMark from "../common/BrandMark.astro";
 
   function updatePlayer(dt) {
     const seg = segmentAtDistance(player.distance);
-    const steer = (keys.left ? -1 : 0) + (keys.right ? 1 : 0);
-    const targetThrottle = keys.up ? 1 : 0;
-    const targetBrake = keys.down ? 1 : 0;
+    const keyboardSteer = (keys.left ? -1 : 0) + (keys.right ? 1 : 0);
+    const steer = Math.abs(touchSteer) > 0.03 ? touchSteer : keyboardSteer;
+    const targetThrottle = keys.up || touchSteerY < -0.58 ? 1 : 0;
+    const targetBrake = keys.down || touchSteerY > 0.68 ? 1 : 0;
 
     player.throttle += (targetThrottle - player.throttle) * Math.min(1, dt * 5.8);
     player.brake += (targetBrake - player.brake) * Math.min(1, dt * 7.5);
