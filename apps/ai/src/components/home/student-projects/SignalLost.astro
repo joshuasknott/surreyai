@@ -1,0 +1,1076 @@
+---
+---
+
+<section
+  class="sl-root"
+  data-signal-lost
+  data-phase="intro"
+  data-scene-tone="alert"
+  aria-labelledby="sl-title"
+>
+  <div class="sl-shell">
+    <header class="sl-header">
+      <div class="sl-brand">
+        <span class="sl-brand__mark" aria-hidden="true">
+          <i></i><i></i><i></i>
+        </span>
+        <div>
+          <p class="sl-kicker">Interactive AI mystery</p>
+          <h2 id="sl-title">Signal Lost</h2>
+        </div>
+      </div>
+
+      <div class="sl-metrics" aria-label="Investigation status">
+        <span><small>Case</small><strong data-case-metric>&mdash; / 3</strong></span>
+        <span><small>Integrity</small><strong data-integrity-metric>100%</strong></span>
+        <span><small>Solved</small><strong data-solved-metric>0 / 3</strong></span>
+      </div>
+    </header>
+
+    <div class="sl-progress" aria-label="Case progress">
+      <span data-progress-step="0"><i></i><b>Lab</b></span>
+      <span data-progress-step="1"><i></i><b>Route</b></span>
+      <span data-progress-step="2"><i></i><b>Broadcast</b></span>
+    </div>
+
+    <div class="sl-workspace">
+      <div class="sl-visual-column">
+        <div class="sl-scene-card">
+          <div class="sl-scene-bar">
+            <span><i class="sl-live-dot"></i> AURA control room</span>
+            <span data-scene-clock>23:47:12</span>
+          </div>
+
+          <div class="sl-scene" data-scene>
+            <svg viewBox="0 0 1000 620" role="img" aria-label="A dark control room with three monitoring screens and an AI console">
+              <defs>
+                <linearGradient id="sl-room" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#0b1b23" />
+                  <stop offset="1" stop-color="#071015" />
+                </linearGradient>
+                <linearGradient id="sl-desk" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#162a32" />
+                  <stop offset="1" stop-color="#0a171d" />
+                </linearGradient>
+                <radialGradient id="sl-orb" cx="50%" cy="45%" r="55%">
+                  <stop offset="0" stop-color="#d8fbff" />
+                  <stop offset="0.22" stop-color="#72d6e6" />
+                  <stop offset="0.62" stop-color="#2f7183" />
+                  <stop offset="1" stop-color="#132e39" />
+                </radialGradient>
+                <pattern id="sl-grid" width="26" height="26" patternUnits="userSpaceOnUse">
+                  <path d="M26 0H0V26" fill="none" stroke="#8dc8d5" stroke-opacity=".08" />
+                </pattern>
+                <filter id="sl-glow" x="-100%" y="-100%" width="300%" height="300%">
+                  <feGaussianBlur stdDeviation="8" result="blur" />
+                  <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+                </filter>
+              </defs>
+
+              <rect width="1000" height="620" fill="url(#sl-room)" />
+              <rect width="1000" height="620" fill="url(#sl-grid)" />
+              <path d="M0 430L500 310L1000 430V620H0Z" fill="#091319" />
+              <g stroke="#6eb2c0" stroke-opacity=".08">
+                <path d="M500 310V620M500 310L180 620M500 310L820 620M500 310L0 530M500 310L1000 530" />
+                <path d="M86 450H914M42 510H958M0 578H1000" />
+              </g>
+
+              <path d="M0 0H1000V54H0Z" fill="#050d11" />
+              <path d="M76 0V54M924 0V54" stroke="#38525b" />
+              <circle cx="104" cy="27" r="4" fill="#e57e69" />
+              <circle cx="122" cy="27" r="4" fill="#d4ac68" />
+              <circle cx="140" cy="27" r="4" fill="#79b99a" />
+
+              <g class="sl-monitor-shell">
+                <rect x="62" y="82" width="270" height="206" rx="12" fill="#050c10" stroke="#395763" />
+                <rect x="78" y="98" width="238" height="174" rx="6" fill="#0b2028" stroke="#6ca4b4" stroke-opacity=".34" />
+                <rect x="350" y="55" width="300" height="235" rx="12" fill="#050c10" stroke="#395763" />
+                <rect x="366" y="71" width="268" height="203" rx="6" fill="#0b2028" stroke="#6ca4b4" stroke-opacity=".34" />
+                <rect x="668" y="82" width="270" height="206" rx="12" fill="#050c10" stroke="#395763" />
+                <rect x="684" y="98" width="238" height="174" rx="6" fill="#0b2028" stroke="#6ca4b4" stroke-opacity=".34" />
+              </g>
+
+              <g data-scene-layer="0">
+                <text x="94" y="122" fill="#9db8c1" font-size="14" font-family="system-ui">AIR / PARTICLES</text>
+                <path d="M96 222L130 220L160 219L190 216L212 128L232 218L274 220L300 218" fill="none" stroke="#e57e69" stroke-width="4" />
+                <path d="M96 242L300 241" stroke="#78b99a" stroke-width="3" />
+                <text x="98" y="260" fill="#78b99a" font-size="12" font-family="system-ui">HEAT NORMAL</text>
+
+                <text x="390" y="101" fill="#9db8c1" font-size="14" font-family="system-ui">SAFETY AUTOMATION</text>
+                <circle cx="500" cy="164" r="50" fill="#e57e69" fill-opacity=".12" stroke="#e57e69" stroke-width="3" />
+                <path d="M500 128V171" stroke="#f2b3a6" stroke-width="7" stroke-linecap="round" />
+                <circle cx="500" cy="189" r="5" fill="#f2b3a6" />
+                <text x="454" y="238" fill="#f2b3a6" font-size="14" font-family="system-ui">LOCKDOWN</text>
+
+                <text x="702" y="122" fill="#9db8c1" font-size="14" font-family="system-ui">VENT CAMERA</text>
+                <path d="M710 235L752 176L792 210L830 148L895 235" fill="#17323b" stroke="#5e8b97" />
+                <g stroke="#d9f4f5" stroke-opacity=".22" stroke-width="5">
+                  <path d="M712 150C760 132 802 166 890 140" />
+                  <path d="M704 177C762 155 838 197 900 166" />
+                </g>
+
+                <rect x="180" y="360" width="640" height="162" rx="18" fill="url(#sl-desk)" stroke="#355661" />
+                <text x="212" y="396" fill="#9db8c1" font-size="13" font-family="system-ui">EVENT RUN / 22:40 FOG TEST</text>
+                <path d="M212 420H440M212 444H386M212 468H472" stroke="#5f8793" stroke-width="10" stroke-linecap="round" opacity=".55" />
+                <rect x="582" y="394" width="196" height="92" rx="8" fill="#0a1d24" stroke="#e57e69" stroke-opacity=".55" />
+                <text x="605" y="425" fill="#e9b1a7" font-size="13" font-family="system-ui">RULE 04</text>
+                <text x="605" y="452" fill="#9db8c1" font-size="12" font-family="system-ui">PARTICLES → SEAL</text>
+              </g>
+
+              <g data-scene-layer="1" hidden>
+                <text x="94" y="122" fill="#9db8c1" font-size="14" font-family="system-ui">ROUTE CAMERA</text>
+                <path d="M100 250L174 142M294 250L222 142" stroke="#ebf4f2" stroke-width="9" stroke-linecap="round" />
+                <path d="M112 250L184 146M282 250L212 146" stroke="#f1c178" stroke-opacity=".65" stroke-width="3" />
+                <text x="108" y="260" fill="#e5a487" font-size="12" font-family="system-ui">BOUNDARY CONFLICT</text>
+
+                <text x="390" y="101" fill="#9db8c1" font-size="14" font-family="system-ui">CAMPUS ROUTE</text>
+                <path d="M397 230C435 174 472 214 500 153C528 94 570 165 610 112" fill="none" stroke="#6dc2d1" stroke-width="12" stroke-linecap="round" opacity=".22" />
+                <path d="M397 230C435 174 472 214 500 153C528 94 570 165 610 112" fill="none" stroke="#83d5df" stroke-width="3" stroke-dasharray="8 8" />
+                <circle cx="500" cy="153" r="14" fill="#e57e69" filter="url(#sl-glow)" />
+                <text x="445" y="254" fill="#e9b1a7" font-size="13" font-family="system-ui">SAFE STOP</text>
+
+                <text x="702" y="122" fill="#9db8c1" font-size="14" font-family="system-ui">DEPTH SENSOR</text>
+                <g fill="#75c4cf">
+                  <circle cx="724" cy="154" r="3" /><circle cx="758" cy="174" r="3" /><circle cx="796" cy="148" r="3" />
+                  <circle cx="842" cy="181" r="3" /><circle cx="884" cy="155" r="3" /><circle cx="744" cy="226" r="3" />
+                  <circle cx="806" cy="220" r="3" /><circle cx="870" cy="230" r="3" />
+                </g>
+                <path d="M710 242H898" stroke="#78b99a" stroke-width="4" />
+                <text x="720" y="262" fill="#78b99a" font-size="12" font-family="system-ui">PATH CLEAR</text>
+
+                <rect x="180" y="360" width="640" height="162" rx="18" fill="url(#sl-desk)" stroke="#355661" />
+                <text x="212" y="396" fill="#9db8c1" font-size="13" font-family="system-ui">VISION / DEPTH DISAGREEMENT</text>
+                <path d="M212 430H448" stroke="#e57e69" stroke-width="13" stroke-linecap="round" opacity=".7" />
+                <path d="M212 466H522" stroke="#78b99a" stroke-width="13" stroke-linecap="round" opacity=".7" />
+                <path d="M592 388L770 474" stroke="#eef7f5" stroke-width="8" />
+                <path d="M620 388L798 474" stroke="#eef7f5" stroke-width="8" />
+              </g>
+
+              <g data-scene-layer="2" hidden>
+                <text x="94" y="122" fill="#9db8c1" font-size="14" font-family="system-ui">UPLOAD QUEUE</text>
+                <rect x="98" y="142" width="198" height="42" rx="6" fill="#17333d" />
+                <rect x="98" y="194" width="198" height="42" rx="6" fill="#3a2525" stroke="#e57e69" stroke-opacity=".6" />
+                <text x="112" y="168" fill="#c8dde0" font-size="12" font-family="system-ui">launch_final.mp4</text>
+                <text x="112" y="220" fill="#efb7ad" font-size="12" font-family="system-ui">launch_final.mp4</text>
+
+                <text x="390" y="101" fill="#9db8c1" font-size="14" font-family="system-ui">LOBBY BROADCAST</text>
+                <rect x="404" y="122" width="192" height="108" rx="5" fill="#6f2f31" />
+                <path d="M434 151H566M434 174H540" stroke="#f5d6cd" stroke-width="12" stroke-linecap="round" opacity=".8" />
+                <text x="430" y="210" fill="#f5d6cd" font-size="14" font-family="system-ui">EVENT PAUSED</text>
+                <text x="462" y="254" fill="#e9b1a7" font-size="12" font-family="system-ui">12.0 SEC</text>
+
+                <text x="702" y="122" fill="#9db8c1" font-size="14" font-family="system-ui">FEED HEALTH</text>
+                <path d="M706 205L726 203L746 198L766 208L786 198L806 210L826 151L846 231L866 202L900 205" fill="none" stroke="#70c6d3" stroke-width="4" />
+                <path d="M706 244H900" stroke="#e57e69" stroke-width="3" stroke-dasharray="8 7" />
+                <text x="718" y="263" fill="#e9b1a7" font-size="12" font-family="system-ui">FAILOVER FIRED</text>
+
+                <rect x="180" y="360" width="640" height="162" rx="18" fill="url(#sl-desk)" stroke="#355661" />
+                <text x="212" y="396" fill="#9db8c1" font-size="13" font-family="system-ui">AUTOMATIC PUBLISH CHAIN</text>
+                <g fill="#183640" stroke="#6aa7b5">
+                  <rect x="212" y="424" width="135" height="54" rx="8" />
+                  <rect x="433" y="424" width="135" height="54" rx="8" />
+                  <rect x="654" y="424" width="135" height="54" rx="8" />
+                </g>
+                <path d="M347 451H433M568 451H654" stroke="#e57e69" stroke-width="3" stroke-dasharray="7 6" />
+                <text x="237" y="456" fill="#bad2d7" font-size="12" font-family="system-ui">FEED DIP</text>
+                <text x="452" y="456" fill="#bad2d7" font-size="12" font-family="system-ui">MATCH NAME</text>
+                <text x="675" y="456" fill="#bad2d7" font-size="12" font-family="system-ui">PUBLISH</text>
+              </g>
+
+              <g data-scene-layer="finale" hidden>
+                <g fill="#14382f" stroke="#79c49a">
+                  <rect x="78" y="98" width="238" height="174" rx="6" />
+                  <rect x="366" y="71" width="268" height="203" rx="6" />
+                  <rect x="684" y="98" width="238" height="174" rx="6" />
+                </g>
+                <g fill="none" stroke="#b8f2ce" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M157 185L188 216L248 148" />
+                  <path d="M446 176L483 213L557 128" />
+                  <path d="M759 185L790 216L850 148" />
+                </g>
+                <rect x="180" y="360" width="640" height="162" rx="18" fill="#102b25" stroke="#79c49a" />
+                <text x="332" y="422" fill="#b8f2ce" font-size="28" font-family="system-ui" letter-spacing="4">SIGNAL RESTORED</text>
+                <path d="M280 458H720" stroke="#79c49a" stroke-width="3" />
+              </g>
+
+              <g class="sl-aura-orb" aria-hidden="true">
+                <circle cx="500" cy="548" r="40" fill="#4ba8b9" fill-opacity=".12" filter="url(#sl-glow)" />
+                <circle cx="500" cy="548" r="25" fill="url(#sl-orb)" stroke="#c7f4f7" stroke-opacity=".75" />
+                <path d="M489 548H511" stroke="#09212a" stroke-width="4" stroke-linecap="round" />
+              </g>
+            </svg>
+
+            <div class="sl-hotspots" data-hotspots aria-label="Evidence hotspots">
+              <button type="button" data-hotspot="0"><span>1</span><b></b></button>
+              <button type="button" data-hotspot="1"><span>2</span><b></b></button>
+              <button type="button" data-hotspot="2"><span>3</span><b></b></button>
+              <button type="button" data-hotspot="3"><span>4</span><b></b></button>
+            </div>
+
+            <div class="sl-intro" data-intro>
+              <div class="sl-intro__card">
+                <p><span></span> 23:47 / launch night</p>
+                <h3>Three systems went dark.</h3>
+                <div class="sl-intro__signal" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+                <p class="sl-intro__copy">Inspect the room, question AURA, and restore the signal before the showcase opens.</p>
+                <button type="button" class="sl-primary" data-start>Enter control room</button>
+                <small>Three cases · about three minutes</small>
+              </div>
+            </div>
+
+            <div class="sl-transmission" aria-live="polite">
+              <span>Transmission</span>
+              <strong data-transmission>Waiting for investigator</strong>
+            </div>
+          </div>
+        </div>
+
+        <section class="sl-tray" aria-labelledby="sl-tray-title">
+          <div class="sl-tray__header">
+            <h3 id="sl-tray-title">Evidence tray</h3>
+            <span data-evidence-count>0 / 4 found</span>
+          </div>
+          <div class="sl-tray__items" data-evidence-tray role="list">
+            <p data-tray-empty>Select a numbered signal in the room.</p>
+          </div>
+        </section>
+      </div>
+
+      <aside class="sl-panel" aria-label="Case file">
+        <div class="sl-view sl-view--investigate" data-investigate-view>
+          <div class="sl-case-heading">
+            <p data-case-sector>Sector 01</p>
+            <h3 data-case-title tabindex="-1">The Locked Lab</h3>
+            <span data-case-time>Signal lost 22:41</span>
+          </div>
+          <p class="sl-briefing" data-case-briefing></p>
+
+          <div class="sl-evidence-reader" data-evidence-reader>
+            <span data-evidence-reader-label>Awaiting evidence</span>
+            <h4 data-evidence-reader-title>Choose a signal marker</h4>
+            <p data-evidence-reader-text>The room holds four clues. Two are enough to make a deduction.</p>
+          </div>
+
+          <div class="sl-aura">
+            <div class="sl-aura__topline">
+              <span class="sl-aura__face" aria-hidden="true"><i></i><i></i></span>
+              <div><strong>AURA</strong><small data-aura-mode>Witness channel</small></div>
+              <button type="button" data-ask-aura>Ask AURA</button>
+            </div>
+            <p data-aura-response aria-live="polite">I can offer one contextual nudge in each case.</p>
+            <small class="sl-aura__note" data-aura-note hidden></small>
+          </div>
+
+          <button type="button" class="sl-primary sl-deduce-start" data-open-deduction disabled>
+            Find 2 clues to deduce
+          </button>
+        </div>
+
+        <div class="sl-view sl-view--deduction" data-deduction-view hidden>
+          <button type="button" class="sl-back" data-back-to-evidence>&larr; Review evidence</button>
+          <p class="sl-panel-kicker">Lock a deduction</p>
+          <h3>What caused the signal loss?</h3>
+          <div class="sl-options" data-deduction-options role="radiogroup" aria-label="Possible causes"></div>
+          <p class="sl-deduction-feedback" data-deduction-feedback aria-live="polite">Choose the explanation that fits every clue.</p>
+          <button type="button" class="sl-primary" data-confirm-deduction disabled>Confirm deduction</button>
+        </div>
+
+        <div class="sl-view sl-view--resolved" data-resolved-view hidden>
+          <span class="sl-resolved-icon" aria-hidden="true">✓</span>
+          <p class="sl-panel-kicker">Case resolved</p>
+          <h3 data-resolution-title>Signal recovered</h3>
+          <p data-resolution-text></p>
+          <div class="sl-resolution-stats">
+            <span><small>Clues found</small><strong data-resolution-clues>0 / 4</strong></span>
+            <span><small>Integrity</small><strong data-resolution-integrity>100%</strong></span>
+          </div>
+          <button type="button" class="sl-primary" data-next-case>Open next case</button>
+        </div>
+
+        <div class="sl-view sl-view--finale" data-finale-view hidden>
+          <p class="sl-panel-kicker">All sectors online</p>
+          <h3 data-finale-title>Signal restored.</h3>
+          <p class="sl-finale-lead">There was no rogue mastermind. Three ordinary systems acted on incomplete context.</p>
+          <div class="sl-finale-causes" aria-label="Resolved causes">
+            <span>Stage fog</span><span>Reflective banner</span><span>Rehearsal fallback</span>
+          </div>
+          <blockquote>“Automation followed the rules. You supplied the judgement.” <cite>— AURA</cite></blockquote>
+          <div class="sl-final-score"><span>Final integrity</span><strong data-final-score>100%</strong></div>
+          <button type="button" class="sl-primary" data-restart>Investigate again</button>
+        </div>
+      </aside>
+    </div>
+
+    <p class="sl-privacy">AURA receives only the current case ID and the clues you opened. Nothing from this game is saved.</p>
+  </div>
+
+  <noscript>
+    <div class="sl-noscript">
+      Signal Lost needs JavaScript for its evidence controls. The mystery's lesson still stands: automated systems need context and human judgement.
+    </div>
+  </noscript>
+</section>
+
+<style>
+  .sl-root {
+    --sl-bg: var(--ai-bg, #f7f8f3);
+    --sl-surface: var(--ai-surface, #ffffff);
+    --sl-text: var(--ai-fg, #172329);
+    --sl-muted: var(--ai-fg-muted, #5e6c70);
+    --sl-line: var(--ai-border, #dce4e0);
+    --sl-line-strong: var(--ai-border-strong, #bfcbc8);
+    --sl-blue: var(--ai-azure, #3f6d80);
+    --sl-coral: var(--ai-coral, #a9674b);
+    --sl-green: var(--ai-sage, #617c65);
+    width: 100%;
+    height: 100%;
+    min-height: 44rem;
+    box-sizing: border-box;
+    color: var(--sl-text);
+    background:
+      radial-gradient(circle at 8% 10%, color-mix(in srgb, var(--sl-blue) 10%, transparent), transparent 24rem),
+      radial-gradient(circle at 90% 90%, color-mix(in srgb, var(--sl-coral) 8%, transparent), transparent 25rem),
+      var(--sl-bg);
+    overflow: hidden;
+  }
+
+  .sl-root *,
+  .sl-root *::before,
+  .sl-root *::after { box-sizing: border-box; }
+
+  .sl-root [hidden] { display: none !important; }
+
+  .sl-shell {
+    width: min(100%, 96rem);
+    height: 100%;
+    min-height: 0;
+    margin: 0 auto;
+    padding: clamp(1rem, 2.4vw, 2rem);
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+  }
+
+  .sl-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.25rem;
+    flex: 0 0 auto;
+  }
+
+  .sl-brand { display: flex; align-items: center; gap: .85rem; min-width: 0; }
+
+  .sl-brand__mark {
+    position: relative;
+    width: 2.8rem;
+    height: 2.8rem;
+    flex: 0 0 auto;
+    border: 1px solid color-mix(in srgb, var(--sl-blue) 35%, var(--sl-line));
+    border-radius: .75rem;
+    background: color-mix(in srgb, var(--sl-blue) 10%, var(--sl-surface));
+    display: grid;
+    place-items: center;
+  }
+
+  .sl-brand__mark i { position: absolute; display: block; border-radius: 999px; }
+  .sl-brand__mark i:nth-child(1) { width: 1.35rem; height: 1.35rem; border: 1px solid var(--sl-blue); }
+  .sl-brand__mark i:nth-child(2) { width: .55rem; height: .55rem; background: var(--sl-coral); }
+  .sl-brand__mark i:nth-child(3) { width: .18rem; height: 1.9rem; background: var(--sl-blue); transform: rotate(42deg); opacity: .42; }
+
+  .sl-kicker,
+  .sl-brand h2 { margin: 0; }
+  .sl-kicker { color: var(--sl-blue); font-size: .67rem; font-weight: 850; letter-spacing: .11em; text-transform: uppercase; }
+  .sl-brand h2 { margin-top: .12rem; font-size: clamp(1.35rem, 2.4vw, 2rem); line-height: 1; letter-spacing: -.03em; }
+
+  .sl-metrics { display: flex; border: 1px solid var(--sl-line); border-radius: .9rem; background: color-mix(in srgb, var(--sl-surface) 88%, transparent); overflow: hidden; }
+  .sl-metrics > span { min-width: 5.8rem; padding: .58rem .8rem; display: grid; gap: .08rem; }
+  .sl-metrics > span + span { border-left: 1px solid var(--sl-line); }
+  .sl-metrics small { color: var(--sl-muted); font-size: .61rem; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+  .sl-metrics strong { font-size: .88rem; }
+
+  .sl-progress {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: .45rem;
+    margin: .8rem 0;
+    flex: 0 0 auto;
+  }
+
+  .sl-progress > span { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: .45rem; color: var(--sl-muted); }
+  .sl-progress i { display: block; height: .18rem; border-radius: 999px; background: var(--sl-line); }
+  .sl-progress b { font-size: .63rem; font-weight: 750; }
+  .sl-progress span.is-current i { background: var(--sl-coral); }
+  .sl-progress span.is-current b { color: var(--sl-coral); }
+  .sl-progress span.is-complete i { background: var(--sl-green); }
+  .sl-progress span.is-complete b { color: var(--sl-green); }
+
+  .sl-workspace {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1.55fr) minmax(18rem, .62fr);
+    gap: 1rem;
+  }
+
+  .sl-visual-column { min-width: 0; min-height: 0; display: grid; grid-template-rows: minmax(25rem, 1fr) auto; gap: .8rem; }
+  .sl-scene-card { min-height: 0; border: 1px solid #29434d; border-radius: 1.05rem; overflow: hidden; background: #071015; box-shadow: 0 1.4rem 3rem rgba(4, 13, 17, .16); }
+  .sl-scene-bar { height: 2.25rem; padding: 0 .85rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; color: #91aeb7; background: #071015; border-bottom: 1px solid #223943; font: 700 .64rem/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .07em; text-transform: uppercase; }
+  .sl-scene-bar span { display: flex; align-items: center; gap: .45rem; }
+  .sl-live-dot { width: .42rem; height: .42rem; border-radius: 50%; background: #e57e69; box-shadow: 0 0 0 .24rem rgba(229, 126, 105, .12); }
+
+  .sl-scene { position: relative; height: calc(100% - 2.25rem); min-height: 23rem; overflow: hidden; background: #071015; isolation: isolate; }
+  .sl-scene > svg { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .sl-aura-orb { transform-origin: 500px 548px; animation: sl-breathe 2.8s ease-in-out infinite; }
+  @keyframes sl-breathe { 50% { transform: scale(1.08); opacity: .82; } }
+
+  .sl-hotspots { position: absolute; inset: 0; z-index: 4; }
+  .sl-hotspots button {
+    --hotspot-x: 50%;
+    --hotspot-y: 50%;
+    position: absolute;
+    left: var(--hotspot-x);
+    top: var(--hotspot-y);
+    transform: translate(-50%, -50%);
+    min-width: 2.3rem;
+    min-height: 2.3rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #f7fbf9;
+    cursor: pointer;
+    font: inherit;
+  }
+
+  .sl-hotspots button::before,
+  .sl-hotspots button::after { content: ""; position: absolute; inset: 0; border-radius: 50%; }
+  .sl-hotspots button::before { border: 1px solid rgba(212, 245, 248, .72); background: rgba(7, 16, 21, .7); backdrop-filter: blur(6px); }
+  .sl-hotspots button::after { border: 1px solid #e57e69; animation: sl-radar 1.8s ease-out infinite; }
+  @keyframes sl-radar { from { transform: scale(.8); opacity: .9; } to { transform: scale(1.75); opacity: 0; } }
+  .sl-hotspots button span { position: relative; z-index: 2; display: grid; place-items: center; width: 2.3rem; height: 2.3rem; color: #f2b3a6; font-size: .72rem; font-weight: 850; }
+  .sl-hotspots button b { position: absolute; left: calc(100% + .45rem); top: 50%; transform: translateY(-50%); z-index: 3; width: max-content; max-width: 9rem; padding: .38rem .55rem; border: 1px solid rgba(150, 196, 207, .35); border-radius: .42rem; background: rgba(5, 13, 17, .88); color: #dbeaec; font-size: .62rem; line-height: 1.2; text-align: left; pointer-events: none; }
+  .sl-hotspots button:hover::before,
+  .sl-hotspots button:focus-visible::before { border-color: #fff; background: rgba(48, 104, 119, .8); }
+  .sl-hotspots button:focus-visible { outline: 2px solid #fff; outline-offset: .25rem; border-radius: 50%; }
+  .sl-hotspots button.is-found::before { border-color: #79c49a; background: rgba(23, 78, 61, .84); }
+  .sl-hotspots button.is-found::after { display: none; }
+  .sl-hotspots button.is-found span { color: #c8f4d8; }
+
+  .sl-intro { position: absolute; inset: 0; z-index: 8; display: grid; place-items: center; padding: 1rem; background: linear-gradient(90deg, rgba(5, 13, 17, .94), rgba(5, 13, 17, .7)); backdrop-filter: blur(7px); }
+  .sl-intro__card { width: min(100%, 31rem); color: #f0f7f5; }
+  .sl-intro__card > p:first-child { display: flex; align-items: center; gap: .5rem; margin: 0 0 .9rem; color: #eea895; font-size: .7rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+  .sl-intro__card > p:first-child span { width: .5rem; height: .5rem; border-radius: 50%; background: #e57e69; box-shadow: 0 0 1rem #e57e69; }
+  .sl-intro h3 { margin: 0; max-width: 26rem; font-size: clamp(2rem, 5vw, 4rem); line-height: .94; letter-spacing: -.045em; }
+  .sl-intro__copy { max-width: 27rem; margin: 1rem 0 1.35rem; color: #a9c0c5; font-size: .92rem; line-height: 1.55; }
+  .sl-intro__card small { display: block; margin-top: .8rem; color: #76949c; font-size: .68rem; }
+  .sl-intro__signal { height: 2.2rem; display: flex; align-items: center; gap: .28rem; margin: .9rem 0 0; }
+  .sl-intro__signal i { width: .22rem; border-radius: 999px; background: #6cc4d1; animation: sl-bars 1s ease-in-out infinite alternate; }
+  .sl-intro__signal i:nth-child(1) { height: .5rem; }
+  .sl-intro__signal i:nth-child(2) { height: 1.1rem; animation-delay: -.2s; }
+  .sl-intro__signal i:nth-child(3) { height: 2rem; animation-delay: -.4s; background: #e57e69; }
+  .sl-intro__signal i:nth-child(4) { height: 1.25rem; animation-delay: -.3s; }
+  .sl-intro__signal i:nth-child(5) { height: .7rem; animation-delay: -.1s; }
+  @keyframes sl-bars { to { transform: scaleY(.55); opacity: .55; } }
+
+  .sl-transmission { position: absolute; left: .8rem; right: .8rem; bottom: .65rem; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .48rem .68rem; border: 1px solid rgba(118, 165, 177, .2); border-radius: .48rem; background: rgba(5, 13, 17, .78); color: #7998a0; backdrop-filter: blur(8px); font-size: .59rem; letter-spacing: .08em; text-transform: uppercase; }
+  .sl-transmission strong { min-width: 0; color: #c4dadd; font-size: .61rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .sl-tray { min-height: 6.4rem; padding: .75rem .85rem; border: 1px solid var(--sl-line); border-radius: .9rem; background: color-mix(in srgb, var(--sl-surface) 90%, transparent); }
+  .sl-tray__header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: .55rem; }
+  .sl-tray__header h3 { margin: 0; font-size: .77rem; }
+  .sl-tray__header span { color: var(--sl-muted); font-size: .64rem; font-weight: 750; }
+  .sl-tray__items { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .48rem; }
+  .sl-tray__items > p { grid-column: 1 / -1; margin: .5rem 0; color: var(--sl-muted); font-size: .72rem; }
+  .sl-evidence-chip { min-width: 0; min-height: 2.8rem; padding: .48rem .55rem; display: grid; grid-template-columns: auto 1fr; align-items: center; gap: .45rem; border: 1px solid var(--sl-line); border-radius: .55rem; background: var(--sl-bg); color: var(--sl-text); cursor: pointer; font: inherit; text-align: left; }
+  .sl-evidence-chip span { display: grid; place-items: center; width: 1.35rem; height: 1.35rem; border-radius: 50%; background: color-mix(in srgb, var(--sl-green) 14%, transparent); color: var(--sl-green); font-size: .62rem; font-weight: 900; }
+  .sl-evidence-chip strong { min-width: 0; font-size: .66rem; line-height: 1.15; overflow: hidden; text-overflow: ellipsis; }
+  .sl-evidence-chip:hover { border-color: var(--sl-blue); }
+  .sl-evidence-chip:focus-visible { outline: 2px solid var(--sl-blue); outline-offset: 2px; }
+
+  .sl-panel { min-height: 0; padding: clamp(1rem, 2vw, 1.35rem); border: 1px solid var(--sl-line); border-radius: 1.05rem; background: color-mix(in srgb, var(--sl-surface) 94%, transparent); overflow: auto; }
+  .sl-root[data-phase="intro"] .sl-panel { opacity: .42; pointer-events: none; }
+  .sl-view { min-height: 100%; display: flex; flex-direction: column; }
+  .sl-case-heading p,
+  .sl-panel-kicker { margin: 0 0 .45rem; color: var(--sl-coral); font-size: .66rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
+  .sl-case-heading h3,
+  .sl-view--deduction > h3,
+  .sl-view--resolved > h3,
+  .sl-view--finale > h3 { margin: 0; font-size: clamp(1.45rem, 2.5vw, 2.15rem); line-height: 1.04; letter-spacing: -.035em; }
+  .sl-case-heading > span { display: block; margin-top: .45rem; color: var(--sl-muted); font: 700 .63rem/1 ui-monospace, SFMono-Regular, Menlo, monospace; text-transform: uppercase; }
+  .sl-briefing { margin: .9rem 0; color: var(--sl-muted); font-size: .82rem; line-height: 1.5; }
+
+  .sl-evidence-reader { padding: .85rem; border: 1px solid var(--sl-line); border-radius: .72rem; background: var(--sl-bg); }
+  .sl-evidence-reader > span { color: var(--sl-blue); font-size: .6rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+  .sl-evidence-reader h4 { margin: .3rem 0 .35rem; font-size: .9rem; }
+  .sl-evidence-reader p { margin: 0; color: var(--sl-muted); font-size: .76rem; line-height: 1.48; }
+
+  .sl-aura { margin-top: .75rem; padding: .78rem; border: 1px solid color-mix(in srgb, var(--sl-blue) 32%, var(--sl-line)); border-radius: .72rem; background: color-mix(in srgb, var(--sl-blue) 7%, var(--sl-surface)); }
+  .sl-aura__topline { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: .55rem; }
+  .sl-aura__face { width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center; gap: .24rem; border-radius: .58rem; background: var(--sl-blue); }
+  .sl-aura__face i { width: .28rem; height: .28rem; border-radius: 50%; background: var(--sl-surface); }
+  .sl-aura__topline div { display: grid; }
+  .sl-aura__topline strong { font-size: .74rem; }
+  .sl-aura__topline small { color: var(--sl-muted); font-size: .58rem; }
+  .sl-aura__topline button { min-height: 2rem; padding: 0 .65rem; border: 1px solid var(--sl-blue); border-radius: 999px; background: transparent; color: var(--sl-blue); cursor: pointer; font: 800 .65rem/1 inherit; }
+  .sl-aura__topline button:hover { background: var(--sl-blue); color: var(--ai-accent-contrast, #fff); }
+  .sl-aura__topline button:disabled { cursor: default; opacity: .52; }
+  .sl-aura__topline button:focus-visible { outline: 2px solid var(--sl-blue); outline-offset: 2px; }
+  .sl-aura > p { min-height: 2.3em; margin: .62rem 0 0; color: var(--sl-text); font-size: .72rem; line-height: 1.48; }
+  .sl-aura__note { display: block; margin-top: .4rem; color: var(--sl-muted); font-size: .58rem; line-height: 1.35; }
+
+  .sl-primary { min-height: 2.65rem; padding: .75rem 1rem; border: 1px solid var(--sl-blue); border-radius: 999px; background: var(--sl-blue); color: var(--ai-accent-contrast, #fff); cursor: pointer; font: 800 .76rem/1 inherit; transition: transform .18s ease, box-shadow .18s ease; }
+  .sl-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 .6rem 1.2rem color-mix(in srgb, var(--sl-blue) 18%, transparent); }
+  .sl-primary:disabled { cursor: not-allowed; opacity: .45; }
+  .sl-primary:focus-visible { outline: 2px solid var(--sl-blue); outline-offset: 3px; }
+  .sl-deduce-start { width: 100%; margin-top: auto; }
+  .sl-intro .sl-primary { color: #fff; background: #4d8ca0; border-color: #6fb3c4; }
+
+  .sl-back { width: max-content; margin: 0 0 1rem; padding: .35rem 0; border: 0; background: transparent; color: var(--sl-muted); cursor: pointer; font: 750 .7rem/1 inherit; }
+  .sl-back:hover { color: var(--sl-text); }
+  .sl-back:focus-visible { outline: 2px solid var(--sl-blue); outline-offset: 2px; }
+  .sl-options { display: grid; gap: .55rem; margin: 1rem 0 .75rem; }
+  .sl-option { width: 100%; min-height: 3.25rem; padding: .7rem .8rem; display: grid; grid-template-columns: auto 1fr; align-items: center; gap: .65rem; border: 1px solid var(--sl-line); border-radius: .68rem; background: var(--sl-bg); color: var(--sl-text); cursor: pointer; font: 750 .74rem/1.35 inherit; text-align: left; }
+  .sl-option::before { content: ""; width: .9rem; height: .9rem; border: 1px solid var(--sl-line-strong); border-radius: 50%; }
+  .sl-option[aria-checked="true"] { border-color: var(--sl-blue); background: color-mix(in srgb, var(--sl-blue) 7%, var(--sl-bg)); }
+  .sl-option[aria-checked="true"]::before { border: .27rem solid var(--sl-blue); }
+  .sl-option.is-rejected { opacity: .45; text-decoration: line-through; cursor: not-allowed; }
+  .sl-option:focus-visible { outline: 2px solid var(--sl-blue); outline-offset: 2px; }
+  .sl-deduction-feedback { min-height: 3.1em; margin: 0 0 .8rem; color: var(--sl-muted); font-size: .7rem; line-height: 1.45; }
+  .sl-deduction-feedback[data-tone="error"] { color: var(--sl-coral); }
+  .sl-view--deduction .sl-primary { width: 100%; margin-top: auto; }
+
+  .sl-view--resolved { justify-content: center; }
+  .sl-resolved-icon { display: grid; place-items: center; width: 3.4rem; height: 3.4rem; margin-bottom: 1rem; border-radius: 50%; background: color-mix(in srgb, var(--sl-green) 14%, transparent); color: var(--sl-green); font-size: 1.5rem; font-weight: 900; }
+  .sl-view--resolved > p:not(.sl-panel-kicker) { color: var(--sl-muted); font-size: .8rem; line-height: 1.55; }
+  .sl-resolution-stats { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; margin: .7rem 0 1rem; }
+  .sl-resolution-stats span { padding: .75rem; display: grid; gap: .18rem; border: 1px solid var(--sl-line); border-radius: .65rem; background: var(--sl-bg); }
+  .sl-resolution-stats small { color: var(--sl-muted); font-size: .58rem; text-transform: uppercase; }
+  .sl-resolution-stats strong { font-size: 1.05rem; }
+
+  .sl-view--finale { justify-content: center; }
+  .sl-finale-lead { color: var(--sl-muted); font-size: .82rem; line-height: 1.55; }
+  .sl-finale-causes { display: flex; flex-wrap: wrap; gap: .4rem; margin: .35rem 0 .8rem; }
+  .sl-finale-causes span { padding: .42rem .55rem; border: 1px solid var(--sl-line); border-radius: 999px; color: var(--sl-green); background: color-mix(in srgb, var(--sl-green) 8%, transparent); font-size: .62rem; font-weight: 800; }
+  .sl-view--finale blockquote { margin: .3rem 0 .9rem; padding: .8rem; border-left: 2px solid var(--sl-blue); color: var(--sl-text); background: var(--sl-bg); font-size: .74rem; line-height: 1.5; }
+  .sl-view--finale cite { display: block; margin-top: .3rem; color: var(--sl-muted); font-size: .62rem; font-style: normal; }
+  .sl-final-score { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: .9rem; }
+  .sl-final-score span { color: var(--sl-muted); font-size: .68rem; }
+  .sl-final-score strong { font-size: 2rem; letter-spacing: -.04em; }
+
+  .sl-privacy { margin: .55rem 0 0; color: var(--sl-muted); font-size: .59rem; line-height: 1.35; text-align: center; flex: 0 0 auto; }
+  .sl-noscript { margin: 1rem; padding: 1rem; border: 1px solid var(--sl-line); border-radius: .75rem; background: var(--sl-surface); color: var(--sl-text); }
+
+  .sl-root[data-scene-tone="resolved"] .sl-live-dot { background: #79c49a; box-shadow: 0 0 0 .24rem rgba(121, 196, 154, .12); }
+  .sl-root[data-scene-tone="resolved"] .sl-aura-orb { opacity: 1; }
+  .sl-root[data-phase="finale"] .sl-tray { opacity: .55; }
+  .sl-root[data-phase="finale"] .sl-hotspots { display: none; }
+
+  @media (max-width: 900px) {
+    .sl-root { height: auto; min-height: calc(100svh - 4rem); overflow: visible; }
+    .sl-shell { height: auto; min-height: 100%; overflow: visible; }
+    .sl-workspace { grid-template-columns: 1fr; }
+    .sl-visual-column { grid-template-rows: auto auto; }
+    .sl-scene-card { height: min(64vw, 31rem); min-height: 23rem; }
+    .sl-panel { min-height: 25rem; }
+    .sl-root[data-phase="intro"] .sl-panel { display: none; }
+  }
+
+  @media (max-width: 620px) {
+    .sl-shell { padding: .75rem; }
+    .sl-header { align-items: flex-start; }
+    .sl-brand__mark { width: 2.35rem; height: 2.35rem; }
+    .sl-kicker { font-size: .57rem; }
+    .sl-brand h2 { font-size: 1.35rem; }
+    .sl-metrics > span { min-width: 0; padding: .5rem .55rem; }
+    .sl-metrics small { font-size: .5rem; }
+    .sl-metrics strong { font-size: .7rem; }
+    .sl-metrics > span:nth-child(3) { display: none; }
+    .sl-progress { margin: .65rem 0; }
+    .sl-progress b { display: none; }
+    .sl-progress > span { grid-template-columns: 1fr; }
+    .sl-scene-card { height: 25rem; min-height: 25rem; }
+    .sl-scene { min-height: 22.75rem; }
+    .sl-scene > svg { width: auto; min-width: 35rem; transform: translateX(-12%); }
+    .sl-hotspots button b { display: none; }
+    .sl-hotspots button { min-width: 2.65rem; min-height: 2.65rem; }
+    .sl-hotspots button span { width: 2.65rem; height: 2.65rem; }
+    .sl-transmission { left: .45rem; right: .45rem; }
+    .sl-transmission > span { display: none; }
+    .sl-transmission strong { width: 100%; text-align: center; }
+    .sl-intro { align-items: end; background: linear-gradient(0deg, rgba(5, 13, 17, .98), rgba(5, 13, 17, .55)); }
+    .sl-intro__card { padding: .7rem; }
+    .sl-intro h3 { font-size: 2.35rem; }
+    .sl-intro__signal { display: none; }
+    .sl-tray__items { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .sl-panel { padding: 1rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sl-root *,
+    .sl-root *::before,
+    .sl-root *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
+    .sl-hotspots button::after { display: none; }
+  }
+</style>
+
+<script>
+  type Evidence = {
+    id: string;
+    title: string;
+    description: string;
+    x: number;
+    y: number;
+  };
+
+  type Deduction = { id: string; label: string };
+
+  type SignalCase = {
+    id: string;
+    sector: string;
+    title: string;
+    time: string;
+    clock: string;
+    briefing: string;
+    transmission: string;
+    evidence: Evidence[];
+    deductions: Deduction[];
+    correctId: string;
+    resolutionTitle: string;
+    resolution: string;
+  };
+
+  const SIGNAL_CASES: SignalCase[] = [
+    {
+      id: "locked-lab",
+      sector: "Sector 01 / Showcase lab",
+      title: "The Locked Lab",
+      time: "Signal lost 22:41",
+      clock: "23:47:12",
+      briefing: "The safety system sealed the lab after reporting smoke. Strangely, the heat alarm stayed quiet.",
+      transmission: "Safety lock active / heat channel normal",
+      evidence: [
+        { id: "air-sensor", title: "Air sensor", description: "Particles spiked at 22:41, but the temperature line never moved.", x: 20, y: 29 },
+        { id: "automation-log", title: "Automation log", description: "The lab sealed when particles rose. The rule never checked the heat reading.", x: 50, y: 25 },
+        { id: "event-plan", title: "Event plan", description: "A stage-fog rehearsal began next door at 22:40—one minute before the alert.", x: 31, y: 70 },
+        { id: "vent-camera", title: "Vent camera", description: "The haze cleared in ninety seconds. No continuing smoke source appears on camera.", x: 81, y: 31 },
+      ],
+      deductions: [
+        { id: "fire", label: "A real fire started inside the showcase lab" },
+        { id: "fog", label: "The rehearsal fog tripped an incomplete safety rule" },
+        { id: "vent", label: "Someone deliberately disabled the ventilation" },
+      ],
+      correctId: "fog",
+      resolutionTitle: "False alarm isolated",
+      resolution: "Stage fog reached the air sensor. A one-signal safety rule reacted correctly—but without enough context.",
+    },
+    {
+      id: "phantom-shuttle",
+      sector: "Sector 02 / Campus route",
+      title: "The Phantom Shuttle",
+      time: "Signal lost 22:57",
+      clock: "23:49:38",
+      briefing: "The autonomous shuttle stopped beside the showcase hall even though its physical route was clear.",
+      transmission: "Vehicle safe / camera-depth conflict",
+      evidence: [
+        { id: "route-camera", title: "Route camera", description: "The camera marked two bright diagonal strips as unexpected lane boundaries.", x: 19, y: 30 },
+        { id: "lidar", title: "Depth sensor", description: "The depth map shows open space: no person, barrier, or vehicle blocked the route.", x: 81, y: 31 },
+        { id: "print-order", title: "Banner order", description: "A reflective silver launch banner was installed beside the route at 22:55.", x: 70, y: 70 },
+        { id: "brake-log", title: "Brake log", description: "The shuttle chose a safe stop because its camera and depth readings disagreed.", x: 50, y: 25 },
+      ],
+      deductions: [
+        { id: "brake", label: "A passenger pulled the emergency brake" },
+        { id: "forgot", label: "The route model forgot the campus map" },
+        { id: "banner", label: "The reflective banner looked like a road marker" },
+      ],
+      correctId: "banner",
+      resolutionTitle: "Route interpretation restored",
+      resolution: "The reflective banner resembled lane paint to the camera. The shuttle's safe stop prevented a worse mistake.",
+    },
+    {
+      id: "missing-message",
+      sector: "Sector 03 / Lobby broadcast",
+      title: "The Missing Message",
+      time: "Signal lost 23:03",
+      clock: "23:52:04",
+      briefing: "Lobby screens replaced the countdown with an old cancellation card for exactly twelve seconds.",
+      transmission: "Live feed stable / fallback origin unknown",
+      evidence: [
+        { id: "upload-queue", title: "Upload queue", description: "Two different clips entered the system with the same filename: launch_final.mp4.", x: 19, y: 30 },
+        { id: "rehearsal-plan", title: "Rehearsal plan", description: "Yesterday's failover test used a temporary cancellation card on the lobby screens.", x: 69, y: 70 },
+        { id: "fingerprint", title: "File fingerprint", description: "The twelve-second lobby clip exactly matches the old rehearsal asset. It was not newly generated.", x: 81, y: 31 },
+        { id: "publish-rule", title: "Publish rule", description: "When the live feed dipped, the newest file with a matching name was promoted automatically.", x: 50, y: 25 },
+      ],
+      deductions: [
+        { id: "aura", label: "AURA wrote a new cancellation message" },
+        { id: "hack", label: "Someone hacked the lobby screen network" },
+        { id: "fallback", label: "The failover rule promoted the rehearsal clip" },
+      ],
+      correctId: "fallback",
+      resolutionTitle: "Broadcast chain corrected",
+      resolution: "A brief feed dip promoted the newest matching filename—the old rehearsal card—without checking its meaning.",
+    },
+  ];
+
+  document.querySelectorAll<HTMLElement>("[data-signal-lost]").forEach((root) => {
+    if (root.dataset.signalLostReady === "true") return;
+    root.dataset.signalLostReady = "true";
+
+    const intro = root.querySelector<HTMLElement>("[data-intro]");
+    const startButton = root.querySelector<HTMLButtonElement>("[data-start]");
+    const investigateView = root.querySelector<HTMLElement>("[data-investigate-view]");
+    const deductionView = root.querySelector<HTMLElement>("[data-deduction-view]");
+    const resolvedView = root.querySelector<HTMLElement>("[data-resolved-view]");
+    const finaleView = root.querySelector<HTMLElement>("[data-finale-view]");
+    const caseMetric = root.querySelector<HTMLElement>("[data-case-metric]");
+    const integrityMetric = root.querySelector<HTMLElement>("[data-integrity-metric]");
+    const solvedMetric = root.querySelector<HTMLElement>("[data-solved-metric]");
+    const sceneClock = root.querySelector<HTMLElement>("[data-scene-clock]");
+    const transmission = root.querySelector<HTMLElement>("[data-transmission]");
+    const caseSector = root.querySelector<HTMLElement>("[data-case-sector]");
+    const caseTitle = root.querySelector<HTMLElement>("[data-case-title]");
+    const caseTime = root.querySelector<HTMLElement>("[data-case-time]");
+    const caseBriefing = root.querySelector<HTMLElement>("[data-case-briefing]");
+    const evidenceCount = root.querySelector<HTMLElement>("[data-evidence-count]");
+    const evidenceTray = root.querySelector<HTMLElement>("[data-evidence-tray]");
+    const trayEmpty = root.querySelector<HTMLElement>("[data-tray-empty]");
+    const readerLabel = root.querySelector<HTMLElement>("[data-evidence-reader-label]");
+    const readerTitle = root.querySelector<HTMLElement>("[data-evidence-reader-title]");
+    const readerText = root.querySelector<HTMLElement>("[data-evidence-reader-text]");
+    const auraButton = root.querySelector<HTMLButtonElement>("[data-ask-aura]");
+    const auraMode = root.querySelector<HTMLElement>("[data-aura-mode]");
+    const auraResponse = root.querySelector<HTMLElement>("[data-aura-response]");
+    const auraNote = root.querySelector<HTMLElement>("[data-aura-note]");
+    const openDeduction = root.querySelector<HTMLButtonElement>("[data-open-deduction]");
+    const deductionOptions = root.querySelector<HTMLElement>("[data-deduction-options]");
+    const deductionFeedback = root.querySelector<HTMLElement>("[data-deduction-feedback]");
+    const confirmDeduction = root.querySelector<HTMLButtonElement>("[data-confirm-deduction]");
+    const backButton = root.querySelector<HTMLButtonElement>("[data-back-to-evidence]");
+    const resolutionTitle = root.querySelector<HTMLElement>("[data-resolution-title]");
+    const resolutionText = root.querySelector<HTMLElement>("[data-resolution-text]");
+    const resolutionClues = root.querySelector<HTMLElement>("[data-resolution-clues]");
+    const resolutionIntegrity = root.querySelector<HTMLElement>("[data-resolution-integrity]");
+    const nextCaseButton = root.querySelector<HTMLButtonElement>("[data-next-case]");
+    const finalScore = root.querySelector<HTMLElement>("[data-final-score]");
+    const finaleTitle = root.querySelector<HTMLElement>("[data-finale-title]");
+    const restartButton = root.querySelector<HTMLButtonElement>("[data-restart]");
+    const hotspots = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-hotspot]"));
+    const progressSteps = Array.from(root.querySelectorAll<HTMLElement>("[data-progress-step]"));
+    const sceneLayers = Array.from(root.querySelectorAll<SVGGElement>("[data-scene-layer]"));
+
+    if (
+      !intro || !startButton || !investigateView || !deductionView || !resolvedView ||
+      !finaleView || !caseMetric || !integrityMetric || !solvedMetric || !sceneClock ||
+      !transmission || !caseSector || !caseTitle || !caseTime || !caseBriefing ||
+      !evidenceCount || !evidenceTray || !trayEmpty || !readerLabel || !readerTitle ||
+      !readerText || !auraButton || !auraMode || !auraResponse || !auraNote ||
+      !openDeduction || !deductionOptions || !deductionFeedback || !confirmDeduction ||
+      !backButton || !resolutionTitle || !resolutionText || !resolutionClues ||
+      !resolutionIntegrity || !nextCaseButton || !finalScore || !finaleTitle || !restartButton
+    ) return;
+
+    let caseIndex = 0;
+    let integrity = 100;
+    let solved = 0;
+    let selectedDeduction = "";
+    let collected = new Set<string>();
+    let rejected = new Set<string>();
+    let auraUsed = false;
+    let auraController: AbortController | null = null;
+
+    const currentCase = () => SIGNAL_CASES[caseIndex];
+
+    function setPhase(phase: "intro" | "investigate" | "deduce" | "resolved" | "finale") {
+      root.dataset.phase = phase;
+      intro.hidden = phase !== "intro";
+      investigateView.hidden = phase !== "intro" && phase !== "investigate";
+      deductionView.hidden = phase !== "deduce";
+      resolvedView.hidden = phase !== "resolved";
+      finaleView.hidden = phase !== "finale";
+    }
+
+    function updateMetrics() {
+      caseMetric.textContent = root.dataset.phase === "intro" ? "— / 3" : `${Math.min(caseIndex + 1, 3)} / 3`;
+      integrityMetric.textContent = `${integrity}%`;
+      solvedMetric.textContent = `${solved} / 3`;
+      progressSteps.forEach((step, index) => {
+        step.classList.toggle("is-current", root.dataset.phase !== "intro" && index === caseIndex && solved <= index);
+        step.classList.toggle("is-complete", index < solved || root.dataset.phase === "finale");
+      });
+    }
+
+    function showSceneLayer(layer: string) {
+      sceneLayers.forEach((item) => {
+        item.hidden = item.dataset.sceneLayer !== layer;
+      });
+    }
+
+    function showEvidence(item: Evidence, number: number) {
+      readerLabel.textContent = `Evidence ${String(number).padStart(2, "0")}`;
+      readerTitle.textContent = item.title;
+      readerText.textContent = item.description;
+    }
+
+    function addEvidenceChip(item: Evidence, number: number) {
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "sl-evidence-chip";
+      chip.setAttribute("role", "listitem");
+      chip.setAttribute("aria-label", `Review evidence: ${item.title}`);
+      const index = document.createElement("span");
+      index.textContent = String(number);
+      const label = document.createElement("strong");
+      label.textContent = item.title;
+      chip.append(index, label);
+      chip.addEventListener("click", () => showEvidence(item, number));
+      evidenceTray.append(chip);
+    }
+
+    function inspectEvidence(index: number) {
+      if (root.dataset.phase !== "investigate") return;
+      const item = currentCase().evidence[index];
+      if (!item) return;
+
+      const isNew = !collected.has(item.id);
+      if (isNew) {
+        collected.add(item.id);
+        trayEmpty.hidden = true;
+        hotspots[index]?.classList.add("is-found");
+        hotspots[index]?.setAttribute("aria-pressed", "true");
+        addEvidenceChip(item, index + 1);
+        evidenceCount.textContent = `${collected.size} / 4 found`;
+        transmission.textContent = `Evidence captured / ${item.title}`;
+      }
+
+      showEvidence(item, index + 1);
+      if (collected.size >= 2) {
+        openDeduction.disabled = false;
+        openDeduction.textContent = "Make a deduction";
+      } else {
+        openDeduction.textContent = `Find ${2 - collected.size} more clue${collected.size === 1 ? "" : "s"} to deduce`;
+      }
+    }
+
+    function renderHotspots() {
+      hotspots.forEach((button, index) => {
+        const item = currentCase().evidence[index];
+        if (!item) return;
+        button.style.setProperty("--hotspot-x", `${item.x}%`);
+        button.style.setProperty("--hotspot-y", `${item.y}%`);
+        button.classList.remove("is-found");
+        button.setAttribute("aria-pressed", "false");
+        button.setAttribute("aria-label", `Inspect ${item.title}`);
+        const label = button.querySelector<HTMLElement>("b");
+        if (label) label.textContent = item.title;
+      });
+    }
+
+    function renderDeductionOptions() {
+      deductionOptions.replaceChildren();
+      currentCase().deductions.forEach((deduction) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "sl-option";
+        button.dataset.deductionId = deduction.id;
+        button.setAttribute("role", "radio");
+        button.setAttribute("aria-checked", "false");
+        button.textContent = deduction.label;
+        button.addEventListener("click", () => {
+          if (rejected.has(deduction.id)) return;
+          selectedDeduction = deduction.id;
+          deductionOptions.querySelectorAll<HTMLButtonElement>(".sl-option").forEach((option) => {
+            option.setAttribute("aria-checked", option === button ? "true" : "false");
+          });
+          deductionFeedback.dataset.tone = "";
+          deductionFeedback.textContent = "Ready to test that theory against the evidence.";
+          confirmDeduction.disabled = false;
+        });
+        deductionOptions.append(button);
+      });
+    }
+
+    function renderCase() {
+      const item = currentCase();
+      collected = new Set();
+      rejected = new Set();
+      selectedDeduction = "";
+      auraUsed = false;
+      root.dataset.sceneTone = "alert";
+      caseSector.textContent = item.sector;
+      caseTitle.textContent = item.title;
+      caseTime.textContent = item.time;
+      caseBriefing.textContent = item.briefing;
+      sceneClock.textContent = item.clock;
+      transmission.textContent = item.transmission;
+      evidenceCount.textContent = "0 / 4 found";
+      evidenceTray.querySelectorAll(".sl-evidence-chip").forEach((chip) => chip.remove());
+      trayEmpty.hidden = false;
+      readerLabel.textContent = "Awaiting evidence";
+      readerTitle.textContent = "Choose a signal marker";
+      readerText.textContent = "The room holds four clues. Two are enough to make a deduction.";
+      auraMode.textContent = "Witness channel";
+      auraResponse.textContent = "I can offer one contextual nudge in each case.";
+      auraNote.hidden = true;
+      auraNote.textContent = "";
+      auraButton.disabled = false;
+      auraButton.textContent = "Ask AURA";
+      openDeduction.disabled = true;
+      openDeduction.textContent = "Find 2 clues to deduce";
+      deductionFeedback.dataset.tone = "";
+      deductionFeedback.textContent = "Choose the explanation that fits every clue.";
+      confirmDeduction.disabled = true;
+      renderHotspots();
+      renderDeductionOptions();
+      showSceneLayer(String(caseIndex));
+      setPhase("investigate");
+      updateMetrics();
+      window.setTimeout(() => caseTitle.focus(), 0);
+    }
+
+    async function askAura() {
+      if (auraUsed || auraController) return;
+      auraButton.disabled = true;
+      auraButton.textContent = "Listening…";
+      auraResponse.textContent = "AURA is checking the signals you opened…";
+      auraMode.textContent = "Connecting";
+      auraNote.hidden = true;
+
+      const controller = new AbortController();
+      auraController = controller;
+      let timedOut = false;
+      const timeout = window.setTimeout(() => {
+        timedOut = true;
+        controller.abort();
+      }, 11_500);
+
+      try {
+        const response = await fetch("/api/ai/signal-lost", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ caseId: currentCase().id, evidence: Array.from(collected) }),
+          signal: controller.signal,
+        });
+        const payload = await response.json() as Record<string, unknown>;
+        if (!response.ok || typeof payload.message !== "string") {
+          throw new Error(typeof payload.error === "string" ? payload.error : "AURA did not answer.");
+        }
+
+        auraUsed = true;
+        auraMode.textContent = payload.source === "ai" ? "Live witness" : "Built-in case notes";
+        auraResponse.textContent = payload.message;
+        auraButton.textContent = "AURA answered";
+        auraButton.disabled = true;
+        if (typeof payload.modeNote === "string") {
+          auraNote.textContent = payload.modeNote;
+          auraNote.hidden = false;
+        }
+      } catch (error) {
+        if (controller.signal.aborted && !timedOut) return;
+        auraMode.textContent = "Channel interrupted";
+        auraResponse.textContent = timedOut
+          ? "AURA's reply took too long. Your investigation can continue without it."
+          : error instanceof Error ? error.message : "AURA did not answer. Continue with the evidence.";
+        auraButton.disabled = false;
+        auraButton.textContent = "Retry AURA";
+      } finally {
+        window.clearTimeout(timeout);
+        if (auraController === controller) auraController = null;
+      }
+    }
+
+    function openDeductionView() {
+      if (collected.size < 2) return;
+      setPhase("deduce");
+      selectedDeduction = "";
+      confirmDeduction.disabled = true;
+      deductionOptions.querySelectorAll<HTMLButtonElement>(".sl-option").forEach((option) => {
+        option.setAttribute("aria-checked", "false");
+      });
+      deductionOptions.querySelector<HTMLButtonElement>(".sl-option:not(.is-rejected)")?.focus();
+    }
+
+    function confirmChoice() {
+      if (!selectedDeduction) return;
+      const item = currentCase();
+      if (selectedDeduction !== item.correctId) {
+        integrity = Math.max(40, integrity - 15);
+        rejected.add(selectedDeduction);
+        const rejectedButton = deductionOptions.querySelector<HTMLButtonElement>(`[data-deduction-id="${selectedDeduction}"]`);
+        rejectedButton?.classList.add("is-rejected");
+        rejectedButton?.setAttribute("aria-disabled", "true");
+        selectedDeduction = "";
+        confirmDeduction.disabled = true;
+        deductionFeedback.dataset.tone = "error";
+        deductionFeedback.textContent = collected.size < 4
+          ? "That theory leaves a signal unexplained. Inspect another clue or question AURA."
+          : "That theory does not connect the timing and the system logs. Try another cause.";
+        updateMetrics();
+        deductionOptions.querySelector<HTMLButtonElement>(".sl-option:not(.is-rejected)")?.focus();
+        return;
+      }
+
+      solved += 1;
+      root.dataset.sceneTone = "resolved";
+      resolutionTitle.textContent = item.resolutionTitle;
+      resolutionText.textContent = item.resolution;
+      resolutionClues.textContent = `${collected.size} / 4`;
+      resolutionIntegrity.textContent = `${integrity}%`;
+      nextCaseButton.textContent = caseIndex === SIGNAL_CASES.length - 1 ? "Restore all signals" : "Open next case";
+      transmission.textContent = "Sector restored / signal verified";
+      setPhase("resolved");
+      updateMetrics();
+      window.setTimeout(() => nextCaseButton.focus(), 0);
+    }
+
+    function showFinale() {
+      root.dataset.sceneTone = "resolved";
+      showSceneLayer("finale");
+      transmission.textContent = "All sectors nominal / showcase online";
+      sceneClock.textContent = "23:55:00";
+      finalScore.textContent = `${integrity}%`;
+      finaleTitle.textContent = integrity >= 85
+        ? "Signal restored. Clean read."
+        : integrity >= 70
+          ? "Signal restored. Mystery solved."
+          : "Signal restored—with a few false leads.";
+      setPhase("finale");
+      updateMetrics();
+      window.setTimeout(() => restartButton.focus(), 0);
+    }
+
+    hotspots.forEach((button, index) => button.addEventListener("click", () => inspectEvidence(index)));
+    startButton.addEventListener("click", renderCase);
+    auraButton.addEventListener("click", () => void askAura());
+    openDeduction.addEventListener("click", openDeductionView);
+    backButton.addEventListener("click", () => {
+      setPhase("investigate");
+      openDeduction.focus();
+    });
+    confirmDeduction.addEventListener("click", confirmChoice);
+    nextCaseButton.addEventListener("click", () => {
+      if (caseIndex < SIGNAL_CASES.length - 1) {
+        caseIndex += 1;
+        renderCase();
+      } else {
+        showFinale();
+      }
+    });
+    restartButton.addEventListener("click", () => {
+      caseIndex = 0;
+      integrity = 100;
+      solved = 0;
+      renderCase();
+    });
+
+    const abortAura = () => {
+      auraController?.abort();
+      auraController = null;
+    };
+    window.addEventListener("surrey-ai-project-modal-close", abortAura);
+    document.addEventListener("astro:before-swap", abortAura, { once: true });
+
+    showSceneLayer("0");
+    caseBriefing.textContent = SIGNAL_CASES[0].briefing;
+    renderHotspots();
+    updateMetrics();
+  });
+</script>

@@ -13,7 +13,7 @@ import agenticBuilder from "../../assets/generated/ai-agentic-builder.optimized.
         <h2 id="student-projects-title" class="section-title">Student projects</h2>
       </div>
       <p class="section-intro">
-        Try the interactive projects on this page: race the simulator, or use the builder to generate a working prototype.
+        Four interactive demos, designed to be tried: build a prototype, race the circuit, compose a track, or solve a live AI mystery.
       </p>
     </div>
 
@@ -78,6 +78,36 @@ import agenticBuilder from "../../assets/generated/ai-agentic-builder.optimized.
             </div>
           </div>
         </dialog>
+      </article>
+
+      <article class="project-tool project-tool--beat">
+        <a class="project-preview" href="/projects/neural-beat-lab" aria-label="Open Neural Beat Lab">
+          <span class="project-preview__art project-preview__art--beat" aria-hidden="true">
+            <span class="beat-art__topline"><span>NEURAL BEAT LAB</span><span>124 BPM</span></span>
+            <span class="beat-art__orb"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+            <span class="beat-art__grid"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+            <span class="beat-art__track">MIDNIGHT / MOTION</span>
+          </span>
+          <span class="project-preview__copy">
+            <small>AI music studio</small>
+            <strong>Neural Beat Lab</strong>
+          </span>
+        </a>
+      </article>
+
+      <article class="project-tool project-tool--signal">
+        <a class="project-preview" href="/projects/signal-lost" aria-label="Open Signal Lost">
+          <span class="project-preview__art project-preview__art--signal" aria-hidden="true">
+            <span class="signal-art__case">CASE 02 / 03</span>
+            <span class="signal-art__room"><i></i><i></i><i></i><i></i><b></b></span>
+            <span class="signal-art__trace"></span>
+            <span class="signal-art__status">3 clues recovered</span>
+          </span>
+          <span class="project-preview__copy">
+            <small>Adaptive AI mystery</small>
+            <strong>Signal Lost</strong>
+          </span>
+        </a>
       </article>
     </div>
   </div>
@@ -188,6 +218,169 @@ import agenticBuilder from "../../assets/generated/ai-agentic-builder.optimized.
     color: #fff;
     font-size: clamp(1.35rem, 2.6vw, 2.1rem);
     line-height: 1.05;
+  }
+
+  .project-preview small {
+    margin-bottom: 0.35rem;
+    color: color-mix(in srgb, #fff 78%, transparent);
+    font-size: 0.68rem;
+    font-weight: 850;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .project-preview__art {
+    position: absolute;
+    inset: 0;
+    display: block;
+    overflow: hidden;
+  }
+
+  .project-preview__art--beat {
+    color: #f5fbff;
+    background:
+      radial-gradient(circle at 50% 44%, color-mix(in srgb, var(--ai-azure) 66%, transparent), transparent 24%),
+      linear-gradient(138deg, #0d2537 0%, #174a68 50%, #102739 100%);
+  }
+
+  .beat-art__topline,
+  .beat-art__track,
+  .signal-art__case,
+  .signal-art__status {
+    position: absolute;
+    z-index: 1;
+    font-size: clamp(0.58rem, 1.1vw, 0.72rem);
+    font-weight: 800;
+    letter-spacing: 0.1em;
+  }
+
+  .beat-art__topline {
+    inset: 1.1rem 1.15rem auto;
+    display: flex;
+    justify-content: space-between;
+    color: color-mix(in srgb, #fff 82%, transparent);
+  }
+
+  .beat-art__orb {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: grid;
+    width: clamp(8rem, 17vw, 14rem);
+    aspect-ratio: 1;
+    place-items: center;
+    border: 1px solid color-mix(in srgb, #fff 38%, transparent);
+    border-radius: 50%;
+    box-shadow: 0 0 0 1.5rem color-mix(in srgb, var(--ai-azure) 13%, transparent), 0 0 5rem color-mix(in srgb, var(--ai-azure) 40%, transparent);
+    transform: translate(-50%, -50%);
+  }
+
+  .beat-art__orb::before,
+  .beat-art__orb::after,
+  .beat-art__orb i {
+    position: absolute;
+    width: 52%;
+    height: 1px;
+    border-radius: 999px;
+    background: color-mix(in srgb, #fff 86%, transparent);
+    content: "";
+  }
+
+  .beat-art__orb::before { transform: rotate(0deg); }
+  .beat-art__orb::after { transform: rotate(60deg); }
+  .beat-art__orb i:nth-child(1) { transform: rotate(120deg); }
+  .beat-art__orb i:nth-child(2) { width: 23%; height: 23%; border-radius: 50%; background: var(--ai-coral); box-shadow: 0 0 1.8rem color-mix(in srgb, var(--ai-coral) 72%, transparent); }
+  .beat-art__orb i:nth-child(n + 3) { display: none; }
+
+  .beat-art__grid {
+    position: absolute;
+    inset: auto 1.1rem 1.35rem;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 0.34rem;
+    height: 1.65rem;
+    align-items: end;
+  }
+
+  .beat-art__grid i {
+    display: block;
+    height: var(--bar-height, 45%);
+    border-radius: 999px;
+    background: color-mix(in srgb, #fff 72%, transparent);
+  }
+
+  .beat-art__grid i:nth-child(2n) { --bar-height: 100%; background: var(--ai-coral); }
+  .beat-art__grid i:nth-child(3n) { --bar-height: 68%; }
+  .beat-art__grid i:nth-child(5n) { --bar-height: 30%; }
+
+  .beat-art__track {
+    top: 50%;
+    left: 50%;
+    color: #fff;
+    font-size: clamp(1rem, 2.3vw, 1.65rem);
+    line-height: 1.1;
+    text-align: center;
+    text-shadow: 0 0.2rem 1.2rem rgba(0, 0, 0, 0.28);
+    transform: translate(-50%, -50%);
+  }
+
+  .project-preview__art--signal {
+    color: var(--ai-fg);
+    background:
+      radial-gradient(circle at 50% 55%, color-mix(in srgb, var(--ai-azure) 18%, transparent), transparent 22%),
+      linear-gradient(145deg, var(--ai-paper) 0%, color-mix(in srgb, var(--ai-bg) 78%, var(--ai-azure)) 100%);
+  }
+
+  .signal-art__case {
+    top: 1.1rem;
+    left: 1.15rem;
+    color: var(--ai-azure);
+  }
+
+  .signal-art__room {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: min(16rem, 54%);
+    height: 7.4rem;
+    border: 2px solid color-mix(in srgb, var(--ai-slate-base) 72%, transparent);
+    border-radius: 0.65rem;
+    background: color-mix(in srgb, var(--ai-paper) 66%, transparent);
+    box-shadow: 0 1rem 2.4rem color-mix(in srgb, var(--ai-slate-base) 13%, transparent);
+    transform: translate(-50%, -42%) perspective(30rem) rotateX(8deg);
+  }
+
+  .signal-art__room::before,
+  .signal-art__room::after,
+  .signal-art__room i,
+  .signal-art__room b {
+    position: absolute;
+    display: block;
+    border: 2px solid color-mix(in srgb, var(--ai-slate-base) 56%, transparent);
+    content: "";
+  }
+
+  .signal-art__room::before { inset: 1.15rem 27% 2.5rem; border-radius: 0.3rem; background: color-mix(in srgb, var(--ai-azure) 18%, var(--ai-paper)); }
+  .signal-art__room::after { right: 13%; bottom: 1.1rem; width: 18%; height: 0.7rem; border-radius: 999px; background: var(--ai-coral); }
+  .signal-art__room i:nth-child(1) { left: 12%; bottom: 1.1rem; width: 14%; height: 1.2rem; border-radius: 0.2rem; }
+  .signal-art__room i:nth-child(2) { left: 16%; bottom: 2.75rem; width: 5%; height: 0.4rem; border-radius: 999px; background: var(--ai-azure); }
+  .signal-art__room i:nth-child(n + 3) { display: none; }
+  .signal-art__room b { bottom: -2.2rem; left: 12%; width: 76%; height: 1.8rem; border-top: 0; transform: skewX(-35deg); }
+
+  .signal-art__trace {
+    position: absolute;
+    top: 52%;
+    left: 18%;
+    width: 64%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--ai-coral) 20%, var(--ai-coral) 80%, transparent);
+    box-shadow: 0 0 1.3rem color-mix(in srgb, var(--ai-coral) 58%, transparent);
+  }
+
+  .signal-art__status {
+    right: 1.15rem;
+    bottom: 1.2rem;
+    color: color-mix(in srgb, var(--ai-fg) 72%, transparent);
   }
 
   .project-preview:hover,

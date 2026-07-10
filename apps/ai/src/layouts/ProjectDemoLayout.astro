@@ -1,0 +1,145 @@
+---
+import BaseLayout from "@surreysocieties/ui/components/BaseLayout";
+import BrandMark from "../components/common/BrandMark.astro";
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description: string;
+  label?: string;
+}
+
+const { title, description, label = "Surrey AI project" } = Astro.props;
+const embed = Astro.url.searchParams.get("embed") === "1";
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
+---
+
+<BaseLayout
+  title={`${title} — Surrey Artificial Intelligence Society`}
+  description={description}
+  canonicalUrl={canonicalUrl}
+  bodyClass="bg-ai-bg text-ai-fg font-sans min-h-screen"
+  extraFontHrefs={[
+    "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+  ]}
+>
+  <Fragment slot="head">
+    <link rel="icon" type="image/png" href="/logos/ai-logo.png" />
+  </Fragment>
+
+  <script is:inline>
+    const savedTheme = typeof localStorage !== "undefined" ? localStorage.getItem("surrey-ai-theme") : null;
+    const projectTheme = savedTheme || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", projectTheme);
+  </script>
+
+  {!embed && (
+    <header class="project-demo-nav">
+      <a href="/#projects" class="project-demo-back" aria-label="Back to projects">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M16 10H5m4-4-4 4 4 4" /></svg>
+        <BrandMark size="small" />
+        <span>Projects</span>
+      </a>
+      <div class="project-demo-title">
+        <span>{label}</span>
+        <strong>{title}</strong>
+      </div>
+    </header>
+  )}
+
+  <main class:list={["project-demo-main", embed && "project-demo-main--embed"]}>
+    <slot />
+  </main>
+</BaseLayout>
+
+<style is:global>
+  html,
+  body {
+    margin: 0;
+    min-height: 100%;
+  }
+
+  body {
+    overflow: hidden;
+  }
+
+  .project-demo-nav {
+    display: flex;
+    min-height: 4rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.55rem 1rem;
+    border-bottom: 1px solid var(--ai-border);
+    background: color-mix(in srgb, var(--ai-surface) 94%, transparent);
+  }
+
+  .project-demo-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    color: var(--ai-fg);
+    font-size: 0.84rem;
+    font-weight: 800;
+    text-decoration: none;
+  }
+
+  .project-demo-back > svg {
+    width: 1rem;
+    height: 1rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+  }
+
+  .project-demo-back:focus-visible {
+    border-radius: 0.35rem;
+    outline: 2px solid var(--ai-azure);
+    outline-offset: 4px;
+  }
+
+  .project-demo-title {
+    display: grid;
+    min-width: 0;
+    gap: 0.05rem;
+    text-align: right;
+  }
+
+  .project-demo-title span {
+    color: var(--ai-fg-muted);
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .project-demo-title strong {
+    overflow: hidden;
+    color: var(--ai-fg);
+    font-size: 0.88rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .project-demo-main {
+    height: calc(100dvh - 4rem);
+    min-height: 0;
+  }
+
+  .project-demo-main--embed {
+    height: 100dvh;
+  }
+
+  .project-demo-main > section {
+    box-sizing: border-box;
+    height: 100%;
+  }
+
+  @media (max-width: 520px) {
+    .project-demo-title span {
+      display: none;
+    }
+  }
+</style>

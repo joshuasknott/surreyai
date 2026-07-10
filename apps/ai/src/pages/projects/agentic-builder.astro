@@ -1,0 +1,13 @@
+---
+export const prerender = false;
+import ProjectDemoLayout from "../../layouts/ProjectDemoLayout.astro";
+import AgenticWorkspace from "../../components/home/student-projects/AgenticWorkspace.astro";
+---
+
+<ProjectDemoLayout
+  title="Agentic Builder"
+  label="Live generative AI"
+  description="Describe an idea and watch a small team of AI roles plan, build, review, and preview a working web experience."
+>
+  <AgenticWorkspace />
+</ProjectDemoLayout>
