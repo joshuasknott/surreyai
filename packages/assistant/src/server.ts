@@ -50,6 +50,12 @@ const getPublicContextRef = makeFunctionReference<
   unknown
 >("assistant:getPublicContext");
 
+const consumeAssistantRateLimitRef = makeFunctionReference<
+  "mutation",
+  { key: string; serverSecret: string },
+  { allowed: boolean; remaining: number; retryAfterSeconds: number }
+>("assistantRateLimits:consume");
+
 type GeminiGenerateResult = {
   text?: unknown;
 };
@@ -172,7 +178,7 @@ export async function handleAssistantChatRequest(
   }
 
   const rateLimitKey = readRateLimitKey(request, societyKey);
-  if (!allowRequest(rateLimitKey)) {
+  if (!(await allowRequest(rateLimitKey))) {
     return jsonResponse(
       {
         source: "fallback",
@@ -649,7 +655,27 @@ function readRateLimitKey(request: Request, societyKey: SocietyKey): string {
   return `${societyKey}:${forwarded || realIp || "local"}`;
 }
 
-function allowRequest(key: string): boolean {
+async function allowRequest(key: string): Promise<boolean> {
+  if (isAIEnabled()) {
+    const serverSecret = env("ASSISTANT_RATE_LIMIT_SECRET");
+    if (!serverSecret) return false;
+
+    try {
+      const client = createConvexClient();
+      const result = await client.mutation(consumeAssistantRateLimitRef, {
+        key,
+        serverSecret,
+      });
+      return result.allowed;
+    } catch {
+      return false;
+    }
+  }
+
+  return allowLocalRequest(key);
+}
+
+function allowLocalRequest(key: string): boolean {
   const now = Date.now();
   const bucket = rateLimitBuckets.get(key);
 

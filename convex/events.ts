@@ -17,7 +17,7 @@ export const list = query({
       .query("events")
       .withIndex("by_society", (q) => q.eq("societyId", society._id))
       .order("desc")
-      .collect();
+      .take(500);
   },
 });
 

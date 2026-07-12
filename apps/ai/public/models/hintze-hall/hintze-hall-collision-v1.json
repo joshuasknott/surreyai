@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "coordinateSystem": "glTF Y-up, metres",
+  "player": {
+    "radius": 0.34,
+    "eyeHeight": 1.7,
+    "walkSpeed": 2.35,
+    "fastWalkSpeed": 3.45
+  },
+  "floorY": 0.0,
+  "walkableBounds": {
+    "minX": -4.25,
+    "maxX": 4.25,
+    "minZ": -16.8,
+    "maxZ": 4.4
+  },
+  "blockedBoxes": [
+    {
+      "id": "central-display",
+      "minX": -1.15,
+      "maxX": 1.15,
+      "minZ": -2.0,
+      "maxZ": -0.15
+    },
+    {
+      "id": "north-east-conservation-boundary",
+      "minX": 3.82,
+      "maxX": 4.25,
+      "minZ": -16.8,
+      "maxZ": -10.8
+    },
+    {
+      "id": "north-west-display-boundary",
+      "minX": -4.25,
+      "maxX": -3.82,
+      "minZ": -16.8,
+      "maxZ": -11.2
+    }
+  ],
+  "spawn": {
+    "x": 0.0,
+    "y": 1.7,
+    "z": -15.25,
+    "yaw": 3.141592653589793
+  },
+  "supportedArea": "Central ground-floor nave from the north entrance to the foot of the principal staircase; stairs, landings, side aisles, and north-east exhibit are closed."
+}

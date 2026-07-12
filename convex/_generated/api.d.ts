@@ -10,6 +10,7 @@
 
 import type * as agentBuilds from "../agentBuilds.js";
 import type * as assistant from "../assistant.js";
+import type * as assistantRateLimits from "../assistantRateLimits.js";
 import type * as auditLogs from "../auditLogs.js";
 import type * as committee from "../committee.js";
 import type * as events from "../events.js";
@@ -30,6 +31,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   agentBuilds: typeof agentBuilds;
   assistant: typeof assistant;
+  assistantRateLimits: typeof assistantRateLimits;
   auditLogs: typeof auditLogs;
   committee: typeof committee;
   events: typeof events;

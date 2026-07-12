@@ -1,49 +1,113 @@
 ---
 import { Image } from "astro:assets";
-import StudentProjectSlot from "./StudentProjectSlot.astro";
-import AgenticWorkspace from "./student-projects/AgenticWorkspace.astro";
-import racingSimulator from "../../assets/generated/ai-racing-simulator.optimized.webp";
-import agenticBuilder from "../../assets/generated/ai-agentic-builder.optimized.webp";
+import racingPreview from "../../assets/generated/ai-racing-simulator-preview-v2.png";
+import builderPreview from "../../assets/generated/ai-agentic-builder-preview-v2.png";
+import hintzeHallPreview from "../../assets/generated/ai-hintze-hall-preview.png";
 ---
 
 <section id="projects" class="ai-section student-projects" aria-labelledby="student-projects-title">
   <div class="ai-section__inner">
     <div class="ai-section__header ai-section__header--split">
       <div>
+        <p class="projects-kicker">Built by Surrey students</p>
         <h2 id="student-projects-title" class="section-title">Student projects</h2>
       </div>
       <p class="section-intro">
-        Four interactive demos, designed to be tried: build a prototype, race the circuit, compose a track, or solve a live AI mystery.
+        Four playful experiments made to be opened, tried, and shared. Pick a project to launch it without leaving the page.
       </p>
     </div>
 
     <div class="project-tools" aria-label="Interactive student projects">
-      <article class="project-tool project-tool--racing" data-project-tool="racing">
-        <button class="project-preview" type="button" data-project-start aria-label="Open Racing Simulator">
-          <Image
-            src={racingSimulator}
-            alt="Racing simulator preview with a race car on a campus-inspired track"
-            widths={[480, 720, 960]}
-            sizes="(min-width: 860px) 32vw, 100vw"
-            format="webp"
-            quality={76}
-            loading="lazy"
-          />
+      <article class="project-tool project-tool--hintze" data-project-tool="hintze-hall">
+        <button class="project-preview" type="button" data-project-start aria-label="Open Hintze Hall After Hours">
+          <span class="project-preview__media project-preview__media--hintze">
+            <Image
+              src={hintzeHallPreview}
+              alt="The captured interior of Hintze Hall with Hope the blue whale above the central staircase"
+              widths={[640, 960, 1280]}
+              sizes="(min-width: 860px) 46vw, 100vw"
+              format="webp"
+              quality={90}
+              loading="lazy"
+            />
+            <span class="hintze-preview__label">After hours / London</span>
+            <span class="project-preview__shade"></span>
+            <span class="project-preview__launch" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M8 5.5v13l10-6.5L8 5.5Z" /></svg>
+            </span>
+          </span>
           <span class="project-preview__copy">
-            <strong>Racing Simulator</strong>
+            <strong>Hintze Hall After Hours</strong>
+            <span>Walk quietly through a real photogrammetric capture beneath Hope the blue whale.</span>
           </span>
         </button>
-        <dialog class="project-modal" data-project-modal aria-label="Racing Simulator">
-          <div class="project-modal__frame">
+
+        <dialog class="project-modal" data-project-modal aria-labelledby="hintze-hall-project-title">
+          <div class="project-modal__frame" data-project-frame>
             <header class="project-modal__header">
-              <div>
-                <p>Student project</p>
-                <h3>Racing Simulator</h3>
+              <div class="project-modal__identity">
+                <span class="project-modal__dot project-modal__dot--hintze" aria-hidden="true"></span>
+                <div><p>Student project</p><h3 id="hintze-hall-project-title">Hintze Hall After Hours</h3></div>
               </div>
-              <button class="project-modal__close" type="button" data-project-close aria-label="Close Racing Simulator">Close</button>
+              <div class="project-modal__actions">
+                <button type="button" class="project-modal__icon" data-project-fullscreen aria-label="Enter full screen" title="Full screen">
+                  <svg class="icon-enter" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 4H4v4.5M15.5 4H20v4.5M20 15.5V20h-4.5M8.5 20H4v-4.5" /></svg>
+                  <svg class="icon-exit" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M20 15h-5v5M4 15h5v5" /></svg>
+                </button>
+                <button type="button" class="project-modal__icon" data-project-close aria-label="Close Hintze Hall After Hours" title="Close">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
+                </button>
+              </div>
             </header>
             <div class="project-modal__body" tabindex="-1">
-              <StudentProjectSlot />
+              <iframe data-project-embed data-src="/projects/hintze-hall?embed=1" title="Hintze Hall After Hours interactive project" loading="lazy"></iframe>
+            </div>
+          </div>
+        </dialog>
+      </article>
+
+      <article class="project-tool project-tool--racing" data-project-tool="racing">
+        <button class="project-preview" type="button" data-project-start aria-label="Open Racing Simulator">
+          <span class="project-preview__media">
+            <Image
+              src={racingPreview}
+              alt="Racing Simulator lobby with cars lined up on a night-time track"
+              widths={[640, 960, 1280]}
+              sizes="(min-width: 860px) 46vw, 100vw"
+              format="webp"
+              quality={88}
+              loading="lazy"
+            />
+            <span class="project-preview__shade"></span>
+            <span class="project-preview__launch" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M8 5.5v13l10-6.5L8 5.5Z" /></svg>
+            </span>
+          </span>
+          <span class="project-preview__copy">
+            <strong>Racing Simulator</strong>
+            <span>Race rivals with different personalities around a campus-inspired track.</span>
+          </span>
+        </button>
+
+        <dialog class="project-modal" data-project-modal aria-labelledby="racing-project-title">
+          <div class="project-modal__frame" data-project-frame>
+            <header class="project-modal__header">
+              <div class="project-modal__identity">
+                <span class="project-modal__dot project-modal__dot--racing" aria-hidden="true"></span>
+                <div><p>Student project</p><h3 id="racing-project-title">Racing Simulator</h3></div>
+              </div>
+              <div class="project-modal__actions">
+                <button type="button" class="project-modal__icon" data-project-fullscreen aria-label="Enter full screen" title="Full screen">
+                  <svg class="icon-enter" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 4H4v4.5M15.5 4H20v4.5M20 15.5V20h-4.5M8.5 20H4v-4.5" /></svg>
+                  <svg class="icon-exit" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M20 15h-5v5M4 15h5v5" /></svg>
+                </button>
+                <button type="button" class="project-modal__icon" data-project-close aria-label="Close Racing Simulator" title="Close">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
+                </button>
+              </div>
+            </header>
+            <div class="project-modal__body" tabindex="-1">
+              <iframe data-project-embed data-src="/projects/racing-simulator?embed=1" title="Racing Simulator interactive project" loading="lazy"></iframe>
             </div>
           </div>
         </dialog>
@@ -51,64 +115,95 @@ import agenticBuilder from "../../assets/generated/ai-agentic-builder.optimized.
 
       <article class="project-tool project-tool--builder" data-project-tool="builder">
         <button class="project-preview" type="button" data-project-start aria-label="Open Agentic Builder">
-          <Image
-            src={agenticBuilder}
-            alt="Agentic Builder preview with a generated app interface and workflow controls"
-            widths={[480, 720, 960]}
-            sizes="(min-width: 860px) 32vw, 100vw"
-            format="webp"
-            quality={76}
-            loading="lazy"
-          />
+          <span class="project-preview__media">
+            <Image
+              src={builderPreview}
+              alt="Agentic Builder prompt workspace ready to turn an idea into a web prototype"
+              widths={[640, 960, 1280]}
+              sizes="(min-width: 860px) 46vw, 100vw"
+              format="webp"
+              quality={90}
+              loading="lazy"
+            />
+            <span class="project-preview__shade"></span>
+            <span class="project-preview__launch" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M8 5.5v13l10-6.5L8 5.5Z" /></svg>
+            </span>
+          </span>
           <span class="project-preview__copy">
             <strong>Agentic Builder</strong>
+            <span>Describe an idea and watch a tiny AI team turn it into a prototype.</span>
           </span>
         </button>
-        <dialog class="project-modal" data-project-modal aria-label="Agentic Builder">
-          <div class="project-modal__frame">
+
+        <dialog class="project-modal" data-project-modal aria-labelledby="builder-project-title">
+          <div class="project-modal__frame" data-project-frame>
             <header class="project-modal__header">
-              <div>
-                <p>Student project</p>
-                <h3>Agentic Builder</h3>
+              <div class="project-modal__identity">
+                <span class="project-modal__dot project-modal__dot--builder" aria-hidden="true"></span>
+                <div><p>Student project</p><h3 id="builder-project-title">Agentic Builder</h3></div>
               </div>
-              <button class="project-modal__close" type="button" data-project-close aria-label="Close Agentic Builder">Close</button>
+              <div class="project-modal__actions">
+                <button type="button" class="project-modal__icon" data-project-fullscreen aria-label="Enter full screen" title="Full screen">
+                  <svg class="icon-enter" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 4H4v4.5M15.5 4H20v4.5M20 15.5V20h-4.5M8.5 20H4v-4.5" /></svg>
+                  <svg class="icon-exit" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M20 15h-5v5M4 15h5v5" /></svg>
+                </button>
+                <button type="button" class="project-modal__icon" data-project-close aria-label="Close Agentic Builder" title="Close">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
+                </button>
+              </div>
             </header>
             <div class="project-modal__body" tabindex="-1">
-              <AgenticWorkspace />
+              <iframe data-project-embed data-src="/projects/agentic-builder?embed=1" title="Agentic Builder interactive project" loading="lazy"></iframe>
             </div>
           </div>
         </dialog>
       </article>
 
-      <article class="project-tool project-tool--beat">
-        <a class="project-preview" href="/projects/neural-beat-lab" aria-label="Open Neural Beat Lab">
-          <span class="project-preview__art project-preview__art--beat" aria-hidden="true">
-            <span class="beat-art__topline"><span>NEURAL BEAT LAB</span><span>124 BPM</span></span>
-            <span class="beat-art__orb"><i></i><i></i><i></i><i></i><i></i><i></i></span>
-            <span class="beat-art__grid"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
-            <span class="beat-art__track">MIDNIGHT / MOTION</span>
+      <article class="project-tool project-tool--beat" data-project-tool="beat">
+        <button class="project-preview" type="button" data-project-start aria-label="Open Neural Beat Lab">
+          <span class="project-preview__media project-preview__media--beat" aria-hidden="true">
+            <span class="beat-preview__glow"></span>
+            <span class="beat-preview__disc"><i></i><b></b></span>
+            <span class="beat-preview__wave">
+              <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+            </span>
+            <span class="beat-preview__prompt">“sunset on campus with friends”</span>
+            <span class="project-preview__shade"></span>
+            <span class="project-preview__launch">
+              <svg viewBox="0 0 24 24"><path d="M8 5.5v13l10-6.5L8 5.5Z" /></svg>
+            </span>
           </span>
           <span class="project-preview__copy">
-            <small>AI music studio</small>
             <strong>Neural Beat Lab</strong>
+            <span>Type a feeling. Get a tiny original beat to play and remix.</span>
           </span>
-        </a>
+        </button>
+
+        <dialog class="project-modal" data-project-modal aria-labelledby="beat-project-title">
+          <div class="project-modal__frame" data-project-frame>
+            <header class="project-modal__header">
+              <div class="project-modal__identity">
+                <span class="project-modal__dot project-modal__dot--beat" aria-hidden="true"></span>
+                <div><p>Student project</p><h3 id="beat-project-title">Neural Beat Lab</h3></div>
+              </div>
+              <div class="project-modal__actions">
+                <button type="button" class="project-modal__icon" data-project-fullscreen aria-label="Enter full screen" title="Full screen">
+                  <svg class="icon-enter" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 4H4v4.5M15.5 4H20v4.5M20 15.5V20h-4.5M8.5 20H4v-4.5" /></svg>
+                  <svg class="icon-exit" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M20 15h-5v5M4 15h5v5" /></svg>
+                </button>
+                <button type="button" class="project-modal__icon" data-project-close aria-label="Close Neural Beat Lab" title="Close">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
+                </button>
+              </div>
+            </header>
+            <div class="project-modal__body" tabindex="-1">
+              <iframe data-project-embed data-src="/projects/neural-beat-lab?embed=1" title="Neural Beat Lab interactive project" loading="lazy"></iframe>
+            </div>
+          </div>
+        </dialog>
       </article>
 
-      <article class="project-tool project-tool--signal">
-        <a class="project-preview" href="/projects/signal-lost" aria-label="Open Signal Lost">
-          <span class="project-preview__art project-preview__art--signal" aria-hidden="true">
-            <span class="signal-art__case">CASE 02 / 03</span>
-            <span class="signal-art__room"><i></i><i></i><i></i><i></i><b></b></span>
-            <span class="signal-art__trace"></span>
-            <span class="signal-art__status">3 clues recovered</span>
-          </span>
-          <span class="project-preview__copy">
-            <small>Adaptive AI mystery</small>
-            <strong>Signal Lost</strong>
-          </span>
-        </a>
-      </article>
     </div>
   </div>
 </section>
@@ -117,16 +212,26 @@ import agenticBuilder from "../../assets/generated/ai-agentic-builder.optimized.
   document.querySelectorAll<HTMLElement>("[data-project-tool]").forEach((tool) => {
     const starter = tool.querySelector<HTMLButtonElement>("[data-project-start]");
     const modal = tool.querySelector<HTMLDialogElement>("[data-project-modal]");
+    const frame = tool.querySelector<HTMLElement>("[data-project-frame]");
     const closeButton = tool.querySelector<HTMLButtonElement>("[data-project-close]");
+    const fullscreenButton = tool.querySelector<HTMLButtonElement>("[data-project-fullscreen]");
     const modalBody = tool.querySelector<HTMLElement>(".project-modal__body");
+    const embed = tool.querySelector<HTMLIFrameElement>("[data-project-embed]");
+
+    const updateFullscreenButton = () => {
+      if (!fullscreenButton || !frame) return;
+      const active = document.fullscreenElement === frame;
+      fullscreenButton.dataset.active = active ? "true" : "false";
+      fullscreenButton.setAttribute("aria-label", active ? "Exit full screen" : "Enter full screen");
+      fullscreenButton.title = active ? "Exit full screen" : "Full screen";
+    };
 
     starter?.addEventListener("click", () => {
       if (!modal) return;
-      if (typeof modal.showModal === "function") {
-        modal.showModal();
-      } else {
-        modal.setAttribute("open", "");
-      }
+      if (embed && !embed.hasAttribute("src")) embed.src = embed.dataset.src || "about:blank";
+      if (typeof modal.showModal === "function") modal.showModal();
+      else modal.setAttribute("open", "");
+      document.documentElement.classList.add("project-modal-is-open");
       window.dispatchEvent(new CustomEvent("surrey-ai-project-modal-open", {
         detail: { project: tool.dataset.projectTool },
       }));
@@ -135,11 +240,28 @@ import agenticBuilder from "../../assets/generated/ai-agentic-builder.optimized.
 
     closeButton?.addEventListener("click", () => modal?.close());
 
+    fullscreenButton?.addEventListener("click", async () => {
+      if (!frame || !document.fullscreenEnabled) return;
+      try {
+        if (document.fullscreenElement === frame) await document.exitFullscreen();
+        else await frame.requestFullscreen({ navigationUI: "hide" });
+      } catch {}
+    });
+
+    if (!document.fullscreenEnabled) fullscreenButton?.setAttribute("hidden", "");
+    document.addEventListener("fullscreenchange", updateFullscreenButton);
+    updateFullscreenButton();
+
     modal?.addEventListener("click", (event) => {
       if (event.target === modal) modal.close();
     });
 
     modal?.addEventListener("close", () => {
+      const restoreFocus = () => requestAnimationFrame(() => starter?.focus({ preventScroll: true }));
+      if (frame && document.fullscreenElement === frame) document.exitFullscreen().then(restoreFocus).catch(restoreFocus);
+      else restoreFocus();
+      document.documentElement.classList.remove("project-modal-is-open");
+      if (embed) embed.removeAttribute("src");
       window.dispatchEvent(new CustomEvent("surrey-ai-project-modal-close", {
         detail: { project: tool.dataset.projectTool },
       }));
@@ -148,407 +270,417 @@ import agenticBuilder from "../../assets/generated/ai-agentic-builder.optimized.
 </script>
 
 <style>
-  .student-projects {
-    overflow: hidden;
+  .student-projects { overflow: hidden; }
+
+  .projects-kicker {
+    margin: 0 0 0.55rem;
+    color: var(--ai-coral);
+    font-size: 0.72rem;
+    font-weight: 850;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
   }
 
   .project-tools {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: clamp(1.25rem, 3vw, 2rem);
-    align-items: stretch;
+    gap: clamp(1.1rem, 2.4vw, 1.8rem);
   }
 
-  .project-tool {
-    position: relative;
-    min-height: clamp(25rem, 40vw, 34rem);
-    overflow: visible;
-    border: 0;
-    border-radius: 8px;
-    background: transparent;
-  }
+  .project-tool { min-width: 0; }
 
   .project-preview {
-    position: relative;
     display: grid;
     width: 100%;
     height: 100%;
-    min-height: 100%;
+    min-height: 0;
+    grid-template-rows: auto auto;
     padding: 0;
     overflow: hidden;
-    cursor: pointer;
     border: 1px solid var(--ai-border-strong);
-    border-radius: 8px;
-    background: var(--ai-paper);
+    border-radius: 18px;
+    background: var(--ai-surface);
     color: inherit;
+    cursor: pointer;
     font: inherit;
     text-align: left;
-    box-shadow: 0 18px 46px color-mix(in srgb, var(--ai-slate-base) 12%, transparent);
-    transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
-  }
-
-  .project-preview img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    filter: saturate(1.03) contrast(1.02);
-    transition: transform 0.35s ease;
-  }
-
-  .project-preview::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(0deg, color-mix(in srgb, var(--ai-slate-base) 72%, transparent) 0%, color-mix(in srgb, var(--ai-slate-base) 22%, transparent) 34%, transparent 68%);
-    pointer-events: none;
-  }
-
-  .project-preview__copy {
-    position: absolute;
-    inset: auto 1.35rem 1.35rem;
-    z-index: 1;
-    display: grid;
-    max-width: 30rem;
-    color: #fff;
-    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45);
-  }
-
-  .project-preview strong {
-    color: #fff;
-    font-size: clamp(1.35rem, 2.6vw, 2.1rem);
-    line-height: 1.05;
-  }
-
-  .project-preview small {
-    margin-bottom: 0.35rem;
-    color: color-mix(in srgb, #fff 78%, transparent);
-    font-size: 0.68rem;
-    font-weight: 850;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-
-  .project-preview__art {
-    position: absolute;
-    inset: 0;
-    display: block;
-    overflow: hidden;
-  }
-
-  .project-preview__art--beat {
-    color: #f5fbff;
-    background:
-      radial-gradient(circle at 50% 44%, color-mix(in srgb, var(--ai-azure) 66%, transparent), transparent 24%),
-      linear-gradient(138deg, #0d2537 0%, #174a68 50%, #102739 100%);
-  }
-
-  .beat-art__topline,
-  .beat-art__track,
-  .signal-art__case,
-  .signal-art__status {
-    position: absolute;
-    z-index: 1;
-    font-size: clamp(0.58rem, 1.1vw, 0.72rem);
-    font-weight: 800;
-    letter-spacing: 0.1em;
-  }
-
-  .beat-art__topline {
-    inset: 1.1rem 1.15rem auto;
-    display: flex;
-    justify-content: space-between;
-    color: color-mix(in srgb, #fff 82%, transparent);
-  }
-
-  .beat-art__orb {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    display: grid;
-    width: clamp(8rem, 17vw, 14rem);
-    aspect-ratio: 1;
-    place-items: center;
-    border: 1px solid color-mix(in srgb, #fff 38%, transparent);
-    border-radius: 50%;
-    box-shadow: 0 0 0 1.5rem color-mix(in srgb, var(--ai-azure) 13%, transparent), 0 0 5rem color-mix(in srgb, var(--ai-azure) 40%, transparent);
-    transform: translate(-50%, -50%);
-  }
-
-  .beat-art__orb::before,
-  .beat-art__orb::after,
-  .beat-art__orb i {
-    position: absolute;
-    width: 52%;
-    height: 1px;
-    border-radius: 999px;
-    background: color-mix(in srgb, #fff 86%, transparent);
-    content: "";
-  }
-
-  .beat-art__orb::before { transform: rotate(0deg); }
-  .beat-art__orb::after { transform: rotate(60deg); }
-  .beat-art__orb i:nth-child(1) { transform: rotate(120deg); }
-  .beat-art__orb i:nth-child(2) { width: 23%; height: 23%; border-radius: 50%; background: var(--ai-coral); box-shadow: 0 0 1.8rem color-mix(in srgb, var(--ai-coral) 72%, transparent); }
-  .beat-art__orb i:nth-child(n + 3) { display: none; }
-
-  .beat-art__grid {
-    position: absolute;
-    inset: auto 1.1rem 1.35rem;
-    display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    gap: 0.34rem;
-    height: 1.65rem;
-    align-items: end;
-  }
-
-  .beat-art__grid i {
-    display: block;
-    height: var(--bar-height, 45%);
-    border-radius: 999px;
-    background: color-mix(in srgb, #fff 72%, transparent);
-  }
-
-  .beat-art__grid i:nth-child(2n) { --bar-height: 100%; background: var(--ai-coral); }
-  .beat-art__grid i:nth-child(3n) { --bar-height: 68%; }
-  .beat-art__grid i:nth-child(5n) { --bar-height: 30%; }
-
-  .beat-art__track {
-    top: 50%;
-    left: 50%;
-    color: #fff;
-    font-size: clamp(1rem, 2.3vw, 1.65rem);
-    line-height: 1.1;
-    text-align: center;
-    text-shadow: 0 0.2rem 1.2rem rgba(0, 0, 0, 0.28);
-    transform: translate(-50%, -50%);
-  }
-
-  .project-preview__art--signal {
-    color: var(--ai-fg);
-    background:
-      radial-gradient(circle at 50% 55%, color-mix(in srgb, var(--ai-azure) 18%, transparent), transparent 22%),
-      linear-gradient(145deg, var(--ai-paper) 0%, color-mix(in srgb, var(--ai-bg) 78%, var(--ai-azure)) 100%);
-  }
-
-  .signal-art__case {
-    top: 1.1rem;
-    left: 1.15rem;
-    color: var(--ai-azure);
-  }
-
-  .signal-art__room {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: min(16rem, 54%);
-    height: 7.4rem;
-    border: 2px solid color-mix(in srgb, var(--ai-slate-base) 72%, transparent);
-    border-radius: 0.65rem;
-    background: color-mix(in srgb, var(--ai-paper) 66%, transparent);
-    box-shadow: 0 1rem 2.4rem color-mix(in srgb, var(--ai-slate-base) 13%, transparent);
-    transform: translate(-50%, -42%) perspective(30rem) rotateX(8deg);
-  }
-
-  .signal-art__room::before,
-  .signal-art__room::after,
-  .signal-art__room i,
-  .signal-art__room b {
-    position: absolute;
-    display: block;
-    border: 2px solid color-mix(in srgb, var(--ai-slate-base) 56%, transparent);
-    content: "";
-  }
-
-  .signal-art__room::before { inset: 1.15rem 27% 2.5rem; border-radius: 0.3rem; background: color-mix(in srgb, var(--ai-azure) 18%, var(--ai-paper)); }
-  .signal-art__room::after { right: 13%; bottom: 1.1rem; width: 18%; height: 0.7rem; border-radius: 999px; background: var(--ai-coral); }
-  .signal-art__room i:nth-child(1) { left: 12%; bottom: 1.1rem; width: 14%; height: 1.2rem; border-radius: 0.2rem; }
-  .signal-art__room i:nth-child(2) { left: 16%; bottom: 2.75rem; width: 5%; height: 0.4rem; border-radius: 999px; background: var(--ai-azure); }
-  .signal-art__room i:nth-child(n + 3) { display: none; }
-  .signal-art__room b { bottom: -2.2rem; left: 12%; width: 76%; height: 1.8rem; border-top: 0; transform: skewX(-35deg); }
-
-  .signal-art__trace {
-    position: absolute;
-    top: 52%;
-    left: 18%;
-    width: 64%;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--ai-coral) 20%, var(--ai-coral) 80%, transparent);
-    box-shadow: 0 0 1.3rem color-mix(in srgb, var(--ai-coral) 58%, transparent);
-  }
-
-  .signal-art__status {
-    right: 1.15rem;
-    bottom: 1.2rem;
-    color: color-mix(in srgb, var(--ai-fg) 72%, transparent);
+    box-shadow: 0 18px 50px color-mix(in srgb, var(--ai-slate-base) 10%, transparent);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s, box-shadow 0.3s;
   }
 
   .project-preview:hover,
   .project-preview:focus-visible {
-    transform: translateY(-2px);
-    border-color: color-mix(in srgb, var(--ai-azure) 38%, var(--ai-border-strong));
-    box-shadow: 0 24px 58px color-mix(in srgb, var(--ai-slate-base) 16%, transparent);
-    outline: 0;
+    border-color: color-mix(in srgb, var(--ai-azure) 55%, var(--ai-border-strong));
+    outline: none;
+    transform: translateY(-5px);
+    box-shadow: 0 28px 70px color-mix(in srgb, var(--ai-slate-base) 16%, transparent);
   }
 
-  .project-preview:hover img,
-  .project-preview:focus-visible img {
-    transform: scale(1.025);
+  .project-preview__media {
+    position: relative;
+    display: block;
+    min-height: 0;
+    aspect-ratio: 1.9;
+    overflow: hidden;
+    background: #0b1117;
+    isolation: isolate;
+  }
+
+  .project-preview__media > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    filter: saturate(0.92) contrast(1.06);
+    transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), filter 0.3s;
+  }
+
+  .project-tool--builder .project-preview__media > img { object-position: 50% 45%; }
+
+  .project-preview:hover .project-preview__media > img,
+  .project-preview:focus-visible .project-preview__media > img {
+    filter: saturate(1.05) contrast(1.05);
+    transform: scale(1.035);
+  }
+
+  .project-preview__shade {
+    position: absolute;
+    z-index: 2;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 42%, rgba(5, 10, 16, 0.44));
+    pointer-events: none;
+  }
+
+  .project-preview__launch {
+    position: absolute;
+    z-index: 3;
+    right: 1rem;
+    bottom: 1rem;
+    display: grid;
+    width: 3.25rem;
+    height: 3.25rem;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.42);
+    border-radius: 999px;
+    background: rgba(246, 249, 247, 0.9);
+    color: #142127;
+    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.22);
+    backdrop-filter: blur(12px);
+    transition: transform 0.25s, background-color 0.25s;
+  }
+
+  .project-preview__launch svg { width: 1.15rem; fill: currentColor; }
+
+  .project-preview:hover .project-preview__launch,
+  .project-preview:focus-visible .project-preview__launch {
+    background: #fff;
+    transform: scale(1.08);
+  }
+
+  .project-preview__copy {
+    display: grid;
+    gap: 0.45rem;
+    padding: 1.2rem 1.35rem 1.35rem;
+    background: var(--ai-surface);
+  }
+
+  .project-preview__copy strong {
+    color: var(--ai-fg);
+    font-size: clamp(1.45rem, 2.8vw, 2rem);
+    letter-spacing: -0.035em;
+    line-height: 1.05;
+  }
+
+  .project-preview__copy > span:last-child {
+    color: var(--ai-fg-muted);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .project-preview__media--beat {
+    background:
+      radial-gradient(circle at 25% 22%, rgba(255, 130, 118, 0.45), transparent 31%),
+      radial-gradient(circle at 77% 72%, rgba(80, 196, 204, 0.38), transparent 35%),
+      linear-gradient(145deg, #141321, #22243d 58%, #142f38);
+  }
+
+  .beat-preview__glow {
+    position: absolute;
+    inset: 12% 18%;
+    border-radius: 50%;
+    background: rgba(255, 210, 145, 0.14);
+    filter: blur(36px);
+  }
+
+  .beat-preview__disc {
+    position: absolute;
+    top: 48%;
+    left: 50%;
+    width: min(13rem, 38%);
+    aspect-ratio: 1;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    background:
+      repeating-radial-gradient(circle, transparent 0 9px, rgba(255,255,255,.08) 10px 11px),
+      conic-gradient(from 35deg, #ed8a7d, #ddb66b, #65b7bc, #937dbf, #ed8a7d);
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35), inset 0 0 0 1.1rem rgba(7, 13, 20, 0.34);
+    transform: translate(-50%, -50%) rotate(-8deg);
+  }
+
+  .beat-preview__disc i {
+    position: absolute;
+    inset: 39%;
+    border-radius: 50%;
+    background: #f2f0e8;
+    box-shadow: 0 0 0 5px rgba(10, 17, 23, 0.32);
+  }
+
+  .beat-preview__disc b {
+    position: absolute;
+    inset: 47%;
+    border-radius: 50%;
+    background: #162028;
+  }
+
+  .beat-preview__wave {
+    position: absolute;
+    inset: auto 8% 18%;
+    display: flex;
+    height: 4rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.42rem;
+  }
+
+  .beat-preview__wave i {
+    display: block;
+    width: 0.3rem;
+    height: calc(18% + (var(--bar, 4) * 9%));
+    border-radius: 999px;
+    background: rgba(255,255,255,.7);
+  }
+
+  .beat-preview__wave i:nth-child(2n) { --bar: 7; background: #ffad83; }
+  .beat-preview__wave i:nth-child(3n) { --bar: 2; }
+  .beat-preview__wave i:nth-child(5n) { --bar: 5; background: #82d3d0; }
+
+  .beat-preview__prompt {
+    position: absolute;
+    top: 1.25rem;
+    left: 1.25rem;
+    color: rgba(255,255,255,.74);
+    font-size: 0.72rem;
+    font-weight: 750;
+    letter-spacing: 0.04em;
+  }
+
+  .project-preview__media--hintze { background: #201812; }
+  .project-preview__media--hintze::after {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(13,9,6,.03), rgba(13,9,6,.14));
+    content: "";
+    pointer-events: none;
+  }
+  .hintze-preview__label {
+    position: absolute;
+    z-index: 3;
+    top: 1.2rem;
+    left: 1.2rem;
+    padding: .45rem .65rem;
+    border: 1px solid rgba(255,255,255,.22);
+    border-radius: 999px;
+    background: rgba(20,14,10,.64);
+    color: rgba(255,255,255,.82);
+    font-size: .62rem;
+    font-weight: 850;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    backdrop-filter: blur(10px);
   }
 
   .project-modal {
     position: fixed;
     inset: 50% auto auto 50%;
-    width: min(92rem, calc(100vw - 2rem));
+    width: min(94rem, calc(100vw - 2rem));
     max-width: none;
-    height: min(52rem, calc(100dvh - 2rem));
+    height: min(56rem, calc(100dvh - 2rem));
     max-height: none;
     margin: 0;
     padding: 0;
     overflow: visible;
     border: 0;
-    border-radius: 8px;
+    border-radius: 20px;
     background: transparent;
     color: var(--ai-fg);
-    box-shadow: none;
     transform: translate(-50%, -50%);
   }
 
   .project-modal::backdrop {
-    background: color-mix(in srgb, var(--ai-slate-base) 62%, transparent);
-    backdrop-filter: blur(10px);
+    background: color-mix(in srgb, var(--ai-slate-base) 68%, transparent);
+    backdrop-filter: blur(12px) saturate(0.75);
   }
 
   .project-modal__frame {
-    position: relative;
-    display: block;
+    display: grid;
+    width: 100%;
     height: 100%;
-    min-height: 0;
+    grid-template-rows: 3.65rem minmax(0, 1fr);
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--ai-border-strong) 74%, transparent);
+    border-radius: 20px;
+    background: var(--ai-surface);
+    box-shadow: 0 36px 100px rgba(4, 11, 16, 0.38);
+  }
+
+  .project-modal__frame:fullscreen {
+    width: 100vw;
+    height: 100dvh;
+    border: 0;
+    border-radius: 0;
   }
 
   .project-modal__header {
-    position: absolute;
-    z-index: 20;
-    top: 0.75rem;
-    right: 0.75rem;
-    display: block;
-    padding: 0;
-    border: 0;
-    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.45rem 0.55rem 0.45rem 1rem;
+    border-bottom: 1px solid var(--ai-border);
+    background: color-mix(in srgb, var(--ai-surface) 94%, transparent);
+    backdrop-filter: blur(18px);
   }
 
-  .project-modal__header > div {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    white-space: nowrap;
+  .project-modal__identity,
+  .project-modal__actions { display: flex; align-items: center; }
+  .project-modal__identity { min-width: 0; gap: 0.7rem; }
+  .project-modal__actions { gap: 0.4rem; }
+
+  .project-modal__dot {
+    width: 0.72rem;
+    height: 0.72rem;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    background: var(--ai-azure);
+    box-shadow: 0 0 0 0.3rem color-mix(in srgb, var(--ai-azure) 12%, transparent);
   }
 
-  .project-modal__header p {
-    margin: 0 0 0.2rem;
-    color: var(--ai-coral);
-    font-size: 0.68rem;
+  .project-modal__dot--hintze { background: #c99a5f; box-shadow: 0 0 0 .3rem rgba(201,154,95,.14); }
+  .project-modal__dot--builder { background: var(--ai-sage); box-shadow: 0 0 0 .3rem color-mix(in srgb, var(--ai-sage) 12%, transparent); }
+  .project-modal__dot--beat { background: var(--ai-coral); box-shadow: 0 0 0 .3rem color-mix(in srgb, var(--ai-coral) 12%, transparent); }
+
+  .project-modal__identity p {
+    margin: 0 0 0.08rem;
+    color: var(--ai-fg-muted);
+    font-size: 0.56rem;
     font-weight: 850;
     letter-spacing: 0.1em;
     text-transform: uppercase;
   }
 
-  .project-modal__header h3 {
+  .project-modal__identity h3 {
     margin: 0;
+    overflow: hidden;
     color: var(--ai-fg);
-    font-size: clamp(1.25rem, 2vw, 1.75rem);
+    font-size: 0.9rem;
     font-weight: 850;
-    letter-spacing: -0.02em;
-    line-height: 1.1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
-  .project-modal__close {
-    min-height: 2.4rem;
-    padding: 0.55rem 0.9rem;
-    border: 1px solid color-mix(in srgb, var(--ai-border-strong) 76%, transparent);
-    border-radius: 6px;
-    background: color-mix(in srgb, var(--ai-paper) 90%, transparent);
+  .project-modal__icon {
+    display: grid;
+    width: 2.65rem;
+    height: 2.65rem;
+    place-items: center;
+    padding: 0;
+    border: 1px solid var(--ai-border);
+    border-radius: 10px;
+    background: var(--ai-paper);
     color: var(--ai-fg);
     cursor: pointer;
-    font: inherit;
-    font-size: 0.78rem;
-    font-weight: 850;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    box-shadow: 0 12px 32px color-mix(in srgb, var(--ai-slate-base) 18%, transparent);
-    backdrop-filter: blur(14px);
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s, transform 0.2s;
   }
 
-  .project-modal__close:hover,
-  .project-modal__close:focus-visible {
+  .project-modal__icon:hover,
+  .project-modal__icon:focus-visible {
+    border-color: var(--ai-fg);
     background: var(--ai-fg);
     color: var(--ai-bg);
     outline: none;
+    transform: translateY(-1px);
   }
+
+  .project-modal__icon svg {
+    width: 1.15rem;
+    height: 1.15rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+  }
+
+  .project-modal__icon .icon-exit,
+  .project-modal__icon[data-active="true"] .icon-enter { display: none; }
+  .project-modal__icon[data-active="true"] .icon-exit { display: block; }
 
   .project-modal__body {
-    height: 100%;
     min-height: 0;
     overflow: hidden;
-    border-radius: 0;
-    background: transparent;
+    background: var(--ai-bg);
   }
 
-  .project-modal__body:focus {
-    outline: none;
-  }
+  .project-modal__body:focus { outline: none; }
 
-  .project-modal__body :global(.drift-lab-section) {
-    padding: 0;
-    background: transparent;
-  }
-
-  .project-modal__body :global(.drift-lab-inner) {
-    max-width: none;
-  }
-
-  .project-modal__body :global(.drift-lab-header),
-  .project-modal__body :global(.drift-lab-note) {
-    display: none;
-  }
-
-  .project-modal__body :global(.drift-lab-game) {
-    max-height: none;
+  .project-modal__body > iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
     border: 0;
-    border-radius: 0;
-    box-shadow: none;
+    background: var(--ai-bg);
   }
 
   @media (max-width: 860px) {
     .project-tools {
-      grid-template-columns: 1fr;
+      grid-template-columns: none;
+      grid-auto-columns: minmax(17rem, 86vw);
+      grid-auto-flow: column;
+      margin-inline: -1.25rem;
+      padding: 0.25rem 1.25rem 1.1rem;
+      overflow-x: auto;
+      overscroll-behavior-inline: contain;
+      scroll-padding-inline: 1.25rem;
+      scroll-snap-type: inline mandatory;
+      scrollbar-width: thin;
     }
 
-    .project-tool {
-      min-height: 24rem;
-    }
+    .project-tool { scroll-snap-align: start; }
+  }
 
+  @media (max-width: 640px) {
     .project-modal {
-      width: calc(100vw - 1rem);
-      height: calc(100dvh - 1rem);
+      width: calc(100vw - 0.5rem);
+      height: calc(100dvh - 0.5rem);
+      border-radius: 14px;
     }
 
-    .project-modal__header {
-      top: 0.5rem;
-      right: 0.5rem;
-    }
+    .project-modal__frame { grid-template-rows: 3.4rem minmax(0, 1fr); border-radius: 14px; }
+    .project-modal__header { padding-left: 0.8rem; }
+    .project-modal__identity p { display: none; }
+    .project-modal__icon { width: 2.45rem; height: 2.45rem; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .project-preview {
-      transition: none;
-    }
-
+    .project-preview,
+    .project-preview__media > img,
+    .project-preview__launch,
+    .project-modal__icon { transition: none; }
     .project-preview:hover,
-    .project-preview:focus-visible {
-      transform: none;
-    }
+    .project-preview:focus-visible { transform: none; }
   }
+</style>
+
+<style is:global>
+  html.project-modal-is-open { overflow: hidden; }
 </style>

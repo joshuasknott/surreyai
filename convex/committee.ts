@@ -16,7 +16,7 @@ export const list = query({
     return await ctx.db
       .query("committeeMembers")
       .withIndex("by_society", (q) => q.eq("societyId", society._id))
-      .collect();
+      .take(500);
   },
 });
 
@@ -88,7 +88,7 @@ export const create = mutation({
     const existing = await ctx.db
       .query("committeeMembers")
       .withIndex("by_society", (q) => q.eq("societyId", society._id))
-      .collect();
+      .take(500);
 
     const displayOrder = input.displayOrder ?? existing.length + 1;
 

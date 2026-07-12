@@ -18,7 +18,7 @@ export const getSettings = query({
       .withIndex("by_society_key", (q) =>
         q.eq("societyId", society._id)
       )
-      .collect();
+      .take(100);
 
     const settingsMap: Record<string, string> = {};
     for (const s of settings) {

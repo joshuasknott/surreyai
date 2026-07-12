@@ -81,10 +81,11 @@ A monorepo containing three University of Surrey society websites, built with As
    GEMINI_API_KEY=...
    AI_FEATURES_ENABLED=true
    AI_MODEL=gemini-3.1-flash-lite
-   AI_FALLBACK_MODEL=gemini-3.1-flash-lite
+  AI_FALLBACK_MODEL=gemini-3.1-flash-lite
+  ASSISTANT_RATE_LIMIT_SECRET=replace-with-a-second-stable-random-secret
    ```
 
-   `GEMINI_API_KEY` and `CLERK_SECRET_KEY` must stay server-side only. If `GEMINI_API_KEY` is missing, the assistant falls back to non-generative responses.
+   `GEMINI_API_KEY`, `CLERK_SECRET_KEY`, and `ASSISTANT_RATE_LIMIT_SECRET` must stay server-side only. Set the same assistant rate-limit secret in the Astro deployment and Convex so generative requests use the shared durable limiter. If `GEMINI_API_KEY` is missing, the assistant falls back to non-generative responses.
 
 ### Development
 
@@ -110,6 +111,14 @@ npm run test:e2e
 ```
 
 Playwright starts the three dev servers on ports 4321, 4322, and 4323. The E2E suite checks public routes, mobile navigation, membership links, assistant placement, 404 states, and blocked admin access.
+
+### Unit tests
+
+```bash
+npm test
+```
+
+Vitest covers public Convex reads, admin authorization, invitation/content mutations, assistant request validation, fallback behavior, and rate limiting.
 
 ## Deployment
 

@@ -60,7 +60,9 @@ for (const site of sites) {
 
         const response = await page.goto(url(site.origin, route), { waitUntil: 'domcontentloaded' });
         expect(response?.status(), `${site.name} ${route} status`).toBe(200);
+        await expect(page.locator('main')).toHaveCount(1);
         await expect(page.locator('main')).toBeVisible();
+        await expect(page.locator('h1')).toHaveCount(1);
         await expect(page.locator('body')).toContainText(/Surrey|Committee|Events|Member|Join|About/i);
 
         await expectNoBrokenPublicText(page);
@@ -68,6 +70,18 @@ for (const site of sites) {
         await expectNoHorizontalOverflow(page);
       });
     }
+
+    test('publishes social preview metadata and a sitemap', async ({ page, request }) => {
+      await page.goto(site.origin, { waitUntil: 'domcontentloaded' });
+
+      const ogImage = page.locator('meta[property="og:image"]');
+      await expect(ogImage).toHaveAttribute('content', /^https?:\/\/.+/);
+      await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute('content', 'summary_large_image');
+
+      const sitemap = await request.get(url(site.origin, '/sitemap.xml'));
+      expect(sitemap.status()).toBe(200);
+      expect(await sitemap.text()).toContain('<urlset');
+    });
 
     test('404 renders a not-found state', async ({ page }) => {
       const response = await page.goto(url(site.origin, '/launch-e2e-not-found'), { waitUntil: 'domcontentloaded' });

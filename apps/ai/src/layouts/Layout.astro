@@ -5,6 +5,7 @@ import { ASSISTANT_CONFIGS } from '@surreysocieties/ui';
 import { getSocietyById } from '@surreysocieties/admin/config';
 import JoinCTA from '../components/home/JoinCTA.astro';
 import BrandMark from '../components/common/BrandMark.astro';
+import defaultOgImage from '../assets/generated/ai-surrey-campus-signal-sketch-hero.optimized.webp';
 
 interface Props {
   title: string;
@@ -16,6 +17,7 @@ interface Props {
 }
 
 const { title, description, ogImage, hideCTA = false } = Astro.props;
+const resolvedOgImage = ogImage ?? new URL(defaultOgImage.src, Astro.site).toString();
 
 const society = getSocietyById('ai')!;
 const assistantConfig = ASSISTANT_CONFIGS.ai;
@@ -42,7 +44,7 @@ const footerName = 'Surrey Artificial Intelligence Society';
 <BaseLayout
   title={fullTitle}
   description={description}
-  ogImage={ogImage}
+  ogImage={resolvedOgImage}
   canonicalUrl={canonicalUrl}
   htmlClass="motion-safe:scroll-smooth"
   bodyClass="bg-ai-bg text-ai-fg font-sans min-h-screen flex flex-col transition-colors duration-200"

@@ -1,0 +1,686 @@
+---
+interface Props {
+  standalone?: boolean;
+}
+
+const { standalone = false } = Astro.props;
+---
+
+<section
+  class="hintze-hall"
+  data-hintze-hall
+  data-state="idle"
+  data-standalone={standalone ? "true" : "false"}
+  aria-label="Hintze Hall After Hours walkthrough"
+>
+  <canvas
+    class="hintze-hall__canvas"
+    data-hh-canvas
+    tabindex="0"
+    aria-label="A walkable three-dimensional photogrammetric scan of Hintze Hall"
+  ></canvas>
+  <div class="hintze-hall__grade" aria-hidden="true"></div>
+
+  <header class="hintze-hall__hud" aria-label="Walkthrough controls">
+    <div class="hintze-hall__place">
+      <i aria-hidden="true"></i>
+      <span><small>Hintze Hall</small><strong data-hh-location>Central nave</strong></span>
+    </div>
+    <div class="hintze-hall__actions">
+      <span class="hintze-hall__quality" data-hh-quality>Preparing scan</span>
+      <button type="button" data-hh-info aria-label="About the Hall" title="About the Hall">Info</button>
+      <button type="button" data-hh-sound aria-pressed="false" aria-label="Turn sound on" title="Sound (M)">Sound off</button>
+      <button type="button" data-hh-pause title="Pause (Escape)">Pause</button>
+    </div>
+  </header>
+
+  <div class="hintze-hall__intro" data-hh-intro>
+    <div class="hintze-hall__intro-card">
+      <p class="hintze-hall__eyebrow">The museum, after hours</p>
+      <h2>Hintze Hall<br />After Hours</h2>
+      <p>Walk quietly beneath Hope, through David Fletcher’s real photogrammetric capture of London’s Natural History Museum.</p>
+      <button type="button" class="hintze-hall__enter" data-hh-enter>
+        <span>Enter the hall</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5" /></svg>
+      </button>
+      <p class="hintze-hall__controls">
+        <span class="hintze-hall__desktop"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or arrows to walk · Mouse to look · <kbd>Esc</kbd> pause</span>
+        <span class="hintze-hall__touch-copy">Use the left control to walk. Drag the Hall to look around.</span>
+      </p>
+    </div>
+  </div>
+
+  <div class="hintze-hall__pause-card" data-hh-paused hidden>
+    <p>Exploration paused</p>
+    <h2>The Hall will wait.</h2>
+    <button type="button" data-hh-resume>Resume exploring</button>
+  </div>
+
+  <aside class="hintze-hall__info" data-hh-info-panel hidden aria-label="About Hintze Hall">
+    <button type="button" data-hh-info-close aria-label="Close information">Close</button>
+    <p class="hintze-hall__eyebrow">Look closer</p>
+    <h2>Inside the capture</h2>
+    <dl>
+      <div><dt>Hope</dt><dd>The blue whale skeleton suspended above the Hall is 25 metres long.</dd></div>
+      <div><dt>The scan</dt><dd>David Fletcher created this model from 3,284 photographs taken in March 2023.</dd></div>
+      <div><dt>Your route</dt><dd>The central ground-floor nave is open. Stairs, side exhibits, and the incomplete north-east corner are intentionally closed.</dd></div>
+    </dl>
+  </aside>
+
+  <p class="hintze-hall__boundary" data-hh-boundary hidden>North-east exhibit unavailable in this scan</p>
+
+  <div class="hintze-hall__status hintze-hall__status--loading" data-hh-loading role="status" aria-live="polite">
+    <div class="hintze-hall__loader" aria-hidden="true"><i data-hh-progress></i></div>
+    <p data-hh-loading-copy>Preparing the Hall…</p>
+  </div>
+  <div class="hintze-hall__status" data-hh-error hidden role="alert">
+    <p class="hintze-hall__eyebrow">The Hall did not load</p>
+    <h2>Try the scan again.</h2>
+    <p data-hh-error-copy>Check your connection, then retry the model.</p>
+    <button type="button" data-hh-retry>Retry loading</button>
+  </div>
+  <div class="hintze-hall__status" data-hh-unsupported hidden role="alert">
+    <p class="hintze-hall__eyebrow">3D unavailable</p>
+    <h2>This browser cannot open the Hall.</h2>
+    <p>Try a current browser with WebGL enabled.</p>
+  </div>
+
+  <div class="hintze-hall__touch" data-hh-touch hidden>
+    <div class="hintze-hall__joystick" data-hh-joystick role="application" aria-label="Walking direction">
+      <i data-hh-joystick-thumb></i>
+    </div>
+    <span>Drag to look</span>
+  </div>
+
+  <p class="hintze-hall__credit">
+    <a href="https://sketchfab.com/3d-models/hintze-hall-45f5e56887f44075bbf283977c99541f" target="_blank" rel="noreferrer">Hintze Hall photogrammetry</a>
+    by David Fletcher / artfletch, licensed under
+    <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">Creative Commons Attribution</a>.
+  </p>
+  <noscript><p class="hintze-hall__nojs">JavaScript is required to explore the Hall.</p></noscript>
+</section>
+
+<style>
+  .hintze-hall { position: relative; width: 100%; height: 100%; min-height: 100%; overflow: hidden; isolation: isolate; background: #17130f; color: #f6f0e6; font-family: var(--font-sans, Inter, ui-sans-serif, system-ui, sans-serif); color-scheme: dark; }
+  .hintze-hall *, .hintze-hall *::before, .hintze-hall *::after { box-sizing: border-box; }
+  .hintze-hall__canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; background: radial-gradient(circle at 50% 30%, #3a3026, #15110e 72%); outline: none; touch-action: none; }
+  .hintze-hall__canvas:focus-visible { outline: 2px solid #f1d29c; outline-offset: -4px; }
+  .hintze-hall__grade { position: absolute; z-index: 1; inset: 0; background: linear-gradient(180deg, rgba(13,9,6,.1), transparent 24%, transparent 76%, rgba(10,7,5,.18)), radial-gradient(ellipse at center, transparent 62%, rgba(10,7,5,.12)); pointer-events: none; }
+  .hintze-hall__hud { position: absolute; z-index: 5; top: 0; right: 0; left: 0; display: flex; align-items: flex-start; justify-content: space-between; gap: .7rem; padding: clamp(.7rem, 2vw, 1.2rem); pointer-events: none; }
+  .hintze-hall__place, .hintze-hall__actions, .hintze-hall__boundary { border: 1px solid rgba(255,255,255,.15); background: rgba(20,15,11,.7); box-shadow: 0 14px 38px rgba(0,0,0,.22); backdrop-filter: blur(16px) saturate(.8); }
+  .hintze-hall__place { display: none; align-items: center; gap: .65rem; padding: .58rem .72rem; border-radius: 10px; }
+  .hintze-hall[data-state="exploring"] .hintze-hall__place, .hintze-hall[data-state="paused"] .hintze-hall__place { display: flex; }
+  .hintze-hall__place > i { width: .45rem; height: .45rem; border-radius: 50%; background: #d8b072; box-shadow: 0 0 0 .28rem rgba(216,176,114,.12); }
+  .hintze-hall__place span { display: grid; gap: .06rem; }
+  .hintze-hall small { color: rgba(255,255,255,.5); font-size: .51rem; font-weight: 850; letter-spacing: .11em; text-transform: uppercase; }
+  .hintze-hall strong { color: #fff; font-size: .73rem; }
+  .hintze-hall__actions { display: flex; align-items: center; gap: .35rem; padding: .3rem; border-radius: 11px; pointer-events: auto; }
+  .hintze-hall__actions button, .hintze-hall__info button, .hintze-hall__pause-card button, .hintze-hall__status button { min-height: 2.35rem; padding: .55rem .7rem; border: 1px solid rgba(255,255,255,.15); border-radius: 8px; background: rgba(255,255,255,.06); color: #fff; cursor: pointer; font: 800 .61rem/1 inherit; }
+  .hintze-hall__actions button:hover, .hintze-hall__actions button:focus-visible, .hintze-hall__info button:focus-visible, .hintze-hall__pause-card button:focus-visible, .hintze-hall__status button:focus-visible { border-color: #f1d29c; outline: 2px solid #f1d29c; outline-offset: 2px; }
+  .hintze-hall__actions [data-hh-pause] { display: none; }
+  .hintze-hall[data-state="exploring"] .hintze-hall__actions [data-hh-pause] { display: block; }
+  .hintze-hall__quality { padding: 0 .35rem; color: rgba(255,255,255,.52); font-size: .52rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+  .hintze-hall__intro { position: absolute; z-index: 4; inset: 0; display: flex; align-items: center; padding: clamp(1rem, 4vw, 3rem); background: linear-gradient(90deg, rgba(13,9,6,.91), rgba(13,9,6,.58) 43%, transparent 76%); opacity: 0; pointer-events: none; transition: opacity .35s; }
+  .hintze-hall[data-state="ready"] .hintze-hall__intro { opacity: 1; pointer-events: auto; }
+  .hintze-hall__intro-card { width: min(31rem, 92%); }
+  .hintze-hall__eyebrow { display: flex; align-items: center; gap: .55rem; margin: 0; color: #e3bc7b; font-size: .59rem; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+  .hintze-hall__eyebrow::before { width: 1.6rem; height: 1px; background: currentColor; content: ""; }
+  .hintze-hall h2 { margin: .75rem 0 .9rem; color: #fffdf8; font-family: Georgia, "Times New Roman", serif; font-size: clamp(3rem, 7vw, 6.6rem); font-weight: 500; letter-spacing: -.065em; line-height: .82; text-wrap: balance; }
+  .hintze-hall__intro-card > p:not(.hintze-hall__eyebrow):not(.hintze-hall__controls) { max-width: 31rem; margin: 0; color: rgba(255,255,255,.72); font-size: clamp(.83rem, 1.3vw, 1rem); line-height: 1.6; }
+  .hintze-hall__enter { display: flex; width: min(20rem, 100%); min-height: 3.2rem; align-items: center; gap: .7rem; margin-top: 1.25rem; padding: .8rem 1rem; border: 1px solid #e5c38b; border-radius: 8px; background: #e5c38b; color: #21170f; cursor: pointer; font: 900 .83rem/1 inherit; transition: background-color .18s, transform .18s; }
+  .hintze-hall__enter:hover { background: #fff0d4; transform: translateY(-1px); }
+  .hintze-hall__enter:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+  .hintze-hall__enter svg { width: 1.1rem; margin-left: auto; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
+  .hintze-hall__controls { margin: .8rem 0 0; color: rgba(255,255,255,.52); font-size: .58rem; line-height: 1.5; }
+  .hintze-hall kbd { display: inline-grid; min-width: 1.25rem; height: 1.25rem; place-items: center; margin-right: .1rem; border: 1px solid rgba(255,255,255,.16); border-radius: 4px; background: rgba(255,255,255,.06); color: #fff; font: 800 .53rem/1 inherit; }
+  .hintze-hall__touch-copy { display: none; }
+  .hintze-hall__pause-card, .hintze-hall__status, .hintze-hall__info { position: absolute; z-index: 9; border: 1px solid rgba(255,255,255,.17); background: rgba(18,13,9,.91); box-shadow: 0 28px 90px rgba(0,0,0,.42); backdrop-filter: blur(20px); }
+  .hintze-hall__pause-card { top: 50%; left: 50%; width: min(24rem, calc(100% - 2rem)); padding: 1.4rem; border-radius: 14px; text-align: center; transform: translate(-50%,-50%); }
+  .hintze-hall__pause-card p { margin: 0 0 .3rem; color: #e3bc7b; font-size: .6rem; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
+  .hintze-hall__pause-card h2, .hintze-hall__status h2, .hintze-hall__info h2 { margin: .25rem 0 1rem; color: #fff; font-family: Georgia, "Times New Roman", serif; font-size: 1.85rem; font-weight: 500; }
+  .hintze-hall__pause-card button, .hintze-hall__status button { background: #e5c38b; color: #21170f; }
+  .hintze-hall__info { top: 50%; right: clamp(.7rem, 2vw, 1.2rem); width: min(27rem, calc(100% - 1.4rem)); max-height: calc(100% - 7rem); overflow: auto; padding: 1.35rem; border-radius: 14px; transform: translateY(-50%); }
+  .hintze-hall__info > button { float: right; }
+  .hintze-hall__info dl { display: grid; gap: .8rem; margin: 1rem 0 0; }
+  .hintze-hall__info dl div { padding-top: .75rem; border-top: 1px solid rgba(255,255,255,.12); }
+  .hintze-hall__info dt { color: #fff; font-size: .76rem; font-weight: 850; }
+  .hintze-hall__info dd { margin: .25rem 0 0; color: rgba(255,255,255,.67); font-size: .72rem; line-height: 1.5; }
+  .hintze-hall__boundary { position: absolute; z-index: 4; right: 1rem; bottom: 5.2rem; margin: 0; padding: .55rem .7rem; border-radius: 8px; color: rgba(255,255,255,.72); font-size: .55rem; font-weight: 760; }
+  .hintze-hall__status { inset: 0; display: grid; place-content: center; justify-items: center; padding: 2rem; border: 0; border-radius: 0; text-align: center; }
+  .hintze-hall__status > p:not(.hintze-hall__eyebrow) { max-width: 30rem; margin: 0 0 1rem; color: rgba(255,255,255,.65); font-size: .78rem; line-height: 1.55; }
+  .hintze-hall__status--loading { background: #17130f; }
+  .hintze-hall__loader { width: min(18rem, 60vw); height: 2px; margin-bottom: 1rem; overflow: hidden; background: rgba(255,255,255,.1); }
+  .hintze-hall__loader i { display: block; width: var(--progress, 8%); height: 100%; background: #e5c38b; transition: width .2s; }
+  .hintze-hall__status--loading p { margin: 0; color: rgba(255,255,255,.58); font-size: .61rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
+  .hintze-hall__touch { position: absolute; z-index: 6; right: 0; bottom: 2.6rem; left: 0; display: flex; align-items: flex-end; justify-content: space-between; padding: .8rem; pointer-events: none; }
+  .hintze-hall__joystick { position: relative; width: 7rem; height: 7rem; border: 1px solid rgba(255,255,255,.19); border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,.09), rgba(17,12,9,.58)); box-shadow: 0 15px 38px rgba(0,0,0,.28); pointer-events: auto; touch-action: none; }
+  .hintze-hall__joystick::before, .hintze-hall__joystick::after { position: absolute; top: 50%; left: 50%; background: rgba(255,255,255,.13); content: ""; transform: translate(-50%,-50%); }
+  .hintze-hall__joystick::before { width: 62%; height: 1px; }.hintze-hall__joystick::after { width: 1px; height: 62%; }
+  .hintze-hall__joystick i { position: absolute; top: 50%; left: 50%; width: 2.8rem; height: 2.8rem; border: 1px solid rgba(255,255,255,.22); border-radius: 50%; background: linear-gradient(145deg,#e3bc7b,#6f5030); box-shadow: 0 10px 25px rgba(0,0,0,.35); transform: translate(-50%,-50%) translate(var(--joystick-x,0),var(--joystick-y,0)); }
+  .hintze-hall__touch > span { display: grid; width: 6rem; height: 4.5rem; place-items: center; border: 1px solid rgba(255,255,255,.13); border-radius: 50%; background: rgba(17,12,9,.34); color: rgba(255,255,255,.55); font-size: .54rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; backdrop-filter: blur(10px); }
+  .hintze-hall__credit { position: absolute; z-index: 6; right: .8rem; bottom: .55rem; left: .8rem; margin: 0; color: rgba(255,255,255,.52); font-size: clamp(.47rem, 1vw, .56rem); line-height: 1.35; text-align: right; pointer-events: none; }
+  .hintze-hall__credit a { color: rgba(255,255,255,.77); pointer-events: auto; text-underline-offset: 2px; }
+  .hintze-hall__nojs { position: absolute; z-index: 12; inset: 0; display: grid; margin: 0; place-items: center; background: #17130f; }
+  [hidden] { display: none !important; }
+  @media (max-width: 720px), (pointer: coarse) {
+    .hintze-hall__hud { align-items: flex-start; }
+    .hintze-hall__quality { display: none; }
+    .hintze-hall__actions button { min-width: 2.7rem; min-height: 2.7rem; padding: .5rem; }
+    .hintze-hall__intro { align-items: flex-end; padding: 1rem 1rem 3.5rem; background: linear-gradient(0deg, rgba(13,9,6,.96), rgba(13,9,6,.62) 62%, transparent); }
+    .hintze-hall h2 { font-size: clamp(2.8rem, 15vw, 4.8rem); }
+    .hintze-hall__desktop { display: none; }.hintze-hall__touch-copy { display: inline; }
+    .hintze-hall__place { max-width: 9rem; }
+    .hintze-hall__actions [data-hh-info] { display: none; }
+    .hintze-hall__credit { bottom: .4rem; text-align: center; }
+  }
+  @media (max-height: 600px) {
+    .hintze-hall__intro { align-items: flex-end; padding-bottom: 2.7rem; }
+    .hintze-hall h2 { font-size: clamp(2.5rem, 9vh, 4.2rem); }
+    .hintze-hall__intro-card > p:not(.hintze-hall__eyebrow):not(.hintze-hall__controls) { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hintze-hall__intro, .hintze-hall__loader i, .hintze-hall__enter { transition: none; }
+    .hintze-hall__enter:hover { transform: none; }
+  }
+</style>
+
+<script>
+  import * as THREE from "three";
+  import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+  import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
+
+  interface CollisionData {
+    player: { radius: number; eyeHeight: number; walkSpeed: number; fastWalkSpeed: number };
+    floorY: number;
+    walkableBounds: { minX: number; maxX: number; minZ: number; maxZ: number };
+    blockedBoxes: Array<{ id: string; minX: number; maxX: number; minZ: number; maxZ: number }>;
+    spawn: { x: number; y: number; z: number; yaw: number };
+  }
+
+  document.querySelectorAll<HTMLElement>("[data-hintze-hall]").forEach((root) => {
+    if (root.dataset.bound === "true") return;
+    root.dataset.bound = "true";
+    const canvas = root.querySelector<HTMLCanvasElement>("[data-hh-canvas]");
+    if (!canvas) return;
+    const loading = root.querySelector<HTMLElement>("[data-hh-loading]");
+    const loadingCopy = root.querySelector<HTMLElement>("[data-hh-loading-copy]");
+    const progress = root.querySelector<HTMLElement>("[data-hh-progress]");
+    const errorPanel = root.querySelector<HTMLElement>("[data-hh-error]");
+    const errorCopy = root.querySelector<HTMLElement>("[data-hh-error-copy]");
+    const unsupported = root.querySelector<HTMLElement>("[data-hh-unsupported]");
+    const enter = root.querySelector<HTMLButtonElement>("[data-hh-enter]");
+    const pauseButton = root.querySelector<HTMLButtonElement>("[data-hh-pause]");
+    const resume = root.querySelector<HTMLButtonElement>("[data-hh-resume]");
+    const pausedPanel = root.querySelector<HTMLElement>("[data-hh-paused]");
+    const retry = root.querySelector<HTMLButtonElement>("[data-hh-retry]");
+    const soundButton = root.querySelector<HTMLButtonElement>("[data-hh-sound]");
+    const infoButton = root.querySelector<HTMLButtonElement>("[data-hh-info]");
+    const infoPanel = root.querySelector<HTMLElement>("[data-hh-info-panel]");
+    const infoClose = root.querySelector<HTMLButtonElement>("[data-hh-info-close]");
+    const qualityLabel = root.querySelector<HTMLElement>("[data-hh-quality]");
+    const locationLabel = root.querySelector<HTMLElement>("[data-hh-location]");
+    const boundaryNote = root.querySelector<HTMLElement>("[data-hh-boundary]");
+    const touchControls = root.querySelector<HTMLElement>("[data-hh-touch]");
+    const joystick = root.querySelector<HTMLElement>("[data-hh-joystick]");
+    const joystickThumb = root.querySelector<HTMLElement>("[data-hh-joystick-thumb]");
+
+    const coarse = matchMedia("(pointer: coarse)").matches;
+    const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const deviceMemory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8;
+    const mobileTier = coarse || innerWidth < 760 || deviceMemory <= 4;
+    const modelUrl = mobileTier ? "/models/hintze-hall/hintze-hall-mobile-v1.glb" : "/models/hintze-hall/hintze-hall-desktop-v1.glb";
+    if (qualityLabel) qualityLabel.textContent = mobileTier ? "Mobile scan" : "Desktop scan";
+    root.dataset.quality = mobileTier ? "mobile" : "desktop";
+
+    let renderer: THREE.WebGLRenderer | null = null;
+    let scene: THREE.Scene | null = null;
+    let camera: THREE.PerspectiveCamera | null = null;
+    let collision: CollisionData | null = null;
+    let model: THREE.Object3D | null = null;
+    let dust: THREE.Points | null = null;
+    let loadPromise: Promise<void> | null = null;
+    let animationFrame: number | null = null;
+    let visible = root.dataset.standalone === "true";
+    let intersecting = true;
+    let active = false;
+    let entered = false;
+    let yaw = Math.PI;
+    let pitch = 0;
+    let lastTime = performance.now();
+    let walkPhase = 0;
+    let distanceSinceStep = 0;
+    const keys = new Set<string>();
+    const velocity = new THREE.Vector3();
+    const direction = new THREE.Vector3();
+    let touchMoveX = 0;
+    let touchMoveY = 0;
+    let joystickPointer: number | null = null;
+    let lookPointer: number | null = null;
+    let lastLookX = 0;
+    let lastLookY = 0;
+    let soundEnabled = false;
+    let audioContext: AudioContext | null = null;
+    let ambienceGain: GainNode | null = null;
+    let frameSamples: number[] = [];
+    let initStartedAt = 0;
+
+    const metricsWindow = window as Window & { __hintzeHallMetrics?: Record<string, unknown> };
+    const setState = (state: string) => { root.dataset.state = state; };
+    const supportsWebGL = () => {
+      try { const probe = document.createElement("canvas"); return Boolean(probe.getContext("webgl2") || probe.getContext("webgl")); }
+      catch { return false; }
+    };
+
+    const resize = () => {
+      if (!renderer || !camera) return;
+      const width = Math.max(1, root.clientWidth);
+      const height = Math.max(1, root.clientHeight);
+      renderer.setPixelRatio(Math.min(devicePixelRatio, mobileTier || reducedMotion ? 1 : 1.5));
+      renderer.setSize(width, height, false);
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      renderer.render(scene!, camera);
+    };
+
+    const addBoundary = () => {
+      if (!scene) return;
+      const group = new THREE.Group();
+      const metal = new THREE.MeshBasicMaterial({ color: 0x332a21 });
+      const rope = new THREE.MeshBasicMaterial({ color: 0x17130f });
+      for (const x of [4.22, 5.34]) {
+        const post = new THREE.Mesh(new THREE.CylinderGeometry(.045, .065, .82, 12), metal);
+        post.position.set(x, .41, -10.78);
+        group.add(post);
+      }
+      const rail = new THREE.Mesh(new THREE.CylinderGeometry(.028, .028, 1.12, 10), rope);
+      rail.rotation.z = Math.PI / 2;
+      rail.position.set(4.78, .67, -10.78);
+      group.add(rail);
+      group.name = "North-east scan boundary";
+      scene.add(group);
+    };
+
+    const addDust = () => {
+      if (!scene || reducedMotion || mobileTier) return;
+      const positions = new Float32Array(150 * 3);
+      for (let i = 0; i < 150; i++) {
+        positions[i * 3] = (Math.random() - .5) * 10;
+        positions[i * 3 + 1] = .4 + Math.random() * 9;
+        positions[i * 3 + 2] = (Math.random() - .5) * 31;
+      }
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+      dust = new THREE.Points(geometry, new THREE.PointsMaterial({ color: 0xf1d8b0, size: .024, transparent: true, opacity: .15, depthWrite: false }));
+      scene.add(dust);
+    };
+
+    const ensureRenderer = () => {
+      if (renderer) return;
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: !mobileTier, powerPreference: "high-performance" });
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.NoToneMapping;
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x17130f);
+      camera = new THREE.PerspectiveCamera(mobileTier ? 66 : 62, 1, .05, 120);
+      camera.rotation.order = "YXZ";
+      addDust();
+      addBoundary();
+      resize();
+    };
+
+    const loadModel = () => {
+      if (loadPromise) return loadPromise;
+      if (!supportsWebGL()) {
+        loading?.setAttribute("hidden", "");
+        unsupported?.removeAttribute("hidden");
+        setState("unsupported");
+        return Promise.reject(new Error("WebGL is not available"));
+      }
+      initStartedAt = performance.now();
+      setState("loading");
+      loading?.removeAttribute("hidden");
+      errorPanel?.setAttribute("hidden", "");
+      unsupported?.setAttribute("hidden", "");
+      ensureRenderer();
+      const loader = new GLTFLoader();
+      loader.setMeshoptDecoder(MeshoptDecoder);
+      loadPromise = Promise.all([
+        new Promise<Awaited<ReturnType<GLTFLoader["loadAsync"]>>>((resolve, reject) => {
+          loader.load(modelUrl, resolve, (event) => {
+            if (!event.total) return;
+            const percent = Math.max(4, Math.min(96, event.loaded / event.total * 100));
+            progress?.style.setProperty("--progress", `${percent}%`);
+            if (loadingCopy) loadingCopy.textContent = `Preparing the Hall · ${Math.round(percent)}%`;
+          }, reject);
+        }),
+        fetch("/models/hintze-hall/hintze-hall-collision-v1.json").then((response) => {
+          if (!response.ok) throw new Error(`Collision data returned ${response.status}`);
+          return response.json() as Promise<CollisionData>;
+        }),
+      ]).then(([gltf, collisionData]) => {
+        collision = collisionData;
+        model = gltf.scene;
+        let triangles = 0;
+        model.traverse((object) => {
+          if (!(object instanceof THREE.Mesh)) return;
+          const geometry = object.geometry as THREE.BufferGeometry;
+          triangles += geometry.index ? geometry.index.count / 3 : (geometry.getAttribute("position")?.count ?? 0) / 3;
+          const oldMaterials = Array.isArray(object.material) ? object.material : [object.material];
+          const basicMaterials = oldMaterials.map((material) => {
+            const source = material as THREE.MeshStandardMaterial;
+            if (source.map) {
+              source.map.colorSpace = THREE.SRGBColorSpace;
+              source.map.anisotropy = Math.min(mobileTier ? 4 : 10, renderer!.capabilities.getMaxAnisotropy());
+            }
+            const basic = new THREE.MeshBasicMaterial({ map: source.map ?? null, color: source.map ? 0xffffff : new THREE.Color(0x312b26), side: THREE.DoubleSide, toneMapped: false });
+            basic.name = source.name;
+            material.dispose();
+            return basic;
+          });
+          object.material = Array.isArray(object.material) ? basicMaterials : basicMaterials[0];
+          object.frustumCulled = true;
+        });
+        scene!.add(model);
+        resetCamera();
+        loading?.setAttribute("hidden", "");
+        setState("ready");
+        progress?.style.setProperty("--progress", "100%");
+        metricsWindow.__hintzeHallMetrics = {
+          quality: mobileTier ? "mobile" : "desktop",
+          asset: modelUrl,
+          triangles: Math.round(triangles),
+          initializationMs: Math.round(performance.now() - initStartedAt),
+          reducedMotion,
+        };
+        resize();
+        if (!reducedMotion && !mobileTier) startLoop();
+        else renderer!.render(scene!, camera!);
+        requestAnimationFrame(() => enter?.focus({ preventScroll: true }));
+      }).catch((error: unknown) => {
+        loadPromise = null;
+        loading?.setAttribute("hidden", "");
+        errorPanel?.removeAttribute("hidden");
+        if (errorCopy) errorCopy.textContent = error instanceof Error ? `${error.message}. Check your connection, then retry.` : "Check your connection, then retry the model.";
+        setState("error");
+        throw error;
+      });
+      return loadPromise;
+    };
+
+    const resetCamera = () => {
+      if (!camera || !collision) return;
+      const spawn = collision.spawn;
+      camera.position.set(spawn.x, spawn.y, spawn.z);
+      yaw = spawn.yaw;
+      pitch = .025;
+      camera.rotation.set(pitch, yaw, 0);
+      velocity.set(0, 0, 0);
+    };
+
+    const isWalkable = (x: number, z: number) => {
+      if (!collision) return false;
+      const r = collision.player.radius;
+      const b = collision.walkableBounds;
+      if (x < b.minX + r || x > b.maxX - r || z < b.minZ + r || z > b.maxZ - r) return false;
+      return !collision.blockedBoxes.some((box) => x > box.minX - r && x < box.maxX + r && z > box.minZ - r && z < box.maxZ + r);
+    };
+
+    const createAudio = async () => {
+      if (!audioContext) {
+        audioContext = new AudioContext();
+        ambienceGain = audioContext.createGain();
+        ambienceGain.gain.value = .014;
+        ambienceGain.connect(audioContext.destination);
+        const buffer = audioContext.createBuffer(1, audioContext.sampleRate * 2, audioContext.sampleRate);
+        const channel = buffer.getChannelData(0);
+        for (let i = 0; i < channel.length; i++) channel[i] = Math.random() * 2 - 1;
+        const noise = audioContext.createBufferSource();
+        noise.buffer = buffer;
+        noise.loop = true;
+        const filter = audioContext.createBiquadFilter();
+        filter.type = "lowpass";
+        filter.frequency.value = 220;
+        noise.connect(filter).connect(ambienceGain);
+        noise.start();
+        const hum = audioContext.createOscillator();
+        const humGain = audioContext.createGain();
+        hum.frequency.value = 54;
+        humGain.gain.value = .09;
+        hum.connect(humGain).connect(ambienceGain);
+        hum.start();
+      }
+      await audioContext.resume();
+    };
+
+    const setSound = async (enabled: boolean) => {
+      soundEnabled = enabled;
+      soundButton?.setAttribute("aria-pressed", String(enabled));
+      soundButton?.setAttribute("aria-label", enabled ? "Turn sound off" : "Turn sound on");
+      if (soundButton) soundButton.textContent = enabled ? "Sound on" : "Sound off";
+      if (enabled) await createAudio();
+      else if (audioContext?.state === "running") await audioContext.suspend();
+    };
+
+    const playFootstep = () => {
+      if (!soundEnabled || !audioContext || audioContext.state !== "running" || !ambienceGain) return;
+      const duration = .055;
+      const buffer = audioContext.createBuffer(1, audioContext.sampleRate * duration, audioContext.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 2);
+      const source = audioContext.createBufferSource();
+      const filter = audioContext.createBiquadFilter();
+      const gain = audioContext.createGain();
+      source.buffer = buffer;
+      filter.type = "lowpass";
+      filter.frequency.value = 520;
+      gain.gain.value = .16;
+      source.connect(filter).connect(gain).connect(audioContext.destination);
+      source.start();
+    };
+
+    const requestLook = () => {
+      if (coarse || document.pointerLockElement === canvas) return;
+      try { void canvas.requestPointerLock().catch(() => undefined); } catch { /* Pointer lock remains optional. */ }
+    };
+
+    const startWalk = () => {
+      void loadModel().then(() => {
+        if (!camera || !collision) return;
+        if (!entered) resetCamera();
+        entered = true;
+        active = true;
+        pausedPanel?.setAttribute("hidden", "");
+        infoPanel?.setAttribute("hidden", "");
+        setState("exploring");
+        canvas.focus({ preventScroll: true });
+        if (coarse) touchControls?.removeAttribute("hidden");
+        else requestLook();
+        void setSound(true);
+        startLoop();
+      }).catch(() => undefined);
+    };
+
+    const pauseWalk = (focus = true) => {
+      if (!entered) return;
+      active = false;
+      keys.clear();
+      velocity.set(0, 0, 0);
+      touchMoveX = touchMoveY = 0;
+      resetJoystick();
+      touchControls?.setAttribute("hidden", "");
+      if (document.pointerLockElement === canvas) document.exitPointerLock();
+      setState("paused");
+      pausedPanel?.removeAttribute("hidden");
+      stopLoop();
+      renderer?.render(scene!, camera!);
+      if (focus) resume?.focus({ preventScroll: true });
+    };
+
+    const closeExperience = () => {
+      active = false;
+      entered = false;
+      keys.clear();
+      resetJoystick();
+      touchControls?.setAttribute("hidden", "");
+      pausedPanel?.setAttribute("hidden", "");
+      infoPanel?.setAttribute("hidden", "");
+      if (document.pointerLockElement === canvas) document.exitPointerLock();
+      resetCamera();
+      if (model) setState("ready");
+      stopLoop();
+      if (audioContext?.state === "running") void audioContext.suspend();
+    };
+
+    const updateMovement = (dt: number) => {
+      if (!active || !camera || !collision) return;
+      const forward = (keys.has("KeyW") || keys.has("ArrowUp") ? 1 : 0) - (keys.has("KeyS") || keys.has("ArrowDown") ? 1 : 0) - touchMoveY;
+      const strafe = (keys.has("KeyD") || keys.has("ArrowRight") ? 1 : 0) - (keys.has("KeyA") || keys.has("ArrowLeft") ? 1 : 0) + touchMoveX;
+      direction.set(0, 0, 0);
+      if (forward || strafe) {
+        direction.x = -Math.sin(yaw) * forward + Math.cos(yaw) * strafe;
+        direction.z = -Math.cos(yaw) * forward - Math.sin(yaw) * strafe;
+        direction.normalize();
+      }
+      const fast = keys.has("ShiftLeft") || keys.has("ShiftRight");
+      const speed = fast ? collision.player.fastWalkSpeed : collision.player.walkSpeed;
+      const ease = Math.min(1, dt * (forward || strafe ? 7 : 10));
+      velocity.x += (direction.x * speed - velocity.x) * ease;
+      velocity.z += (direction.z * speed - velocity.z) * ease;
+      const nextX = camera.position.x + velocity.x * dt;
+      const nextZ = camera.position.z + velocity.z * dt;
+      if (isWalkable(nextX, nextZ)) { camera.position.x = nextX; camera.position.z = nextZ; }
+      else {
+        if (isWalkable(nextX, camera.position.z)) camera.position.x = nextX;
+        if (isWalkable(camera.position.x, nextZ)) camera.position.z = nextZ;
+        velocity.multiplyScalar(.18);
+      }
+      const moving = Math.hypot(velocity.x, velocity.z) > .2;
+      const distance = Math.hypot(velocity.x, velocity.z) * dt;
+      distanceSinceStep += moving ? distance : 0;
+      if (distanceSinceStep > .72) { distanceSinceStep = 0; playFootstep(); }
+      walkPhase += dt * (moving ? speed * 2.2 : .4);
+      const bob = reducedMotion || !moving ? 0 : Math.sin(walkPhase) * .012;
+      camera.position.y = collision.floorY + collision.player.eyeHeight + bob;
+      camera.rotation.set(pitch, yaw, 0);
+      if (locationLabel) locationLabel.textContent = camera.position.z < -8 ? "North entrance" : camera.position.z > 9 ? "South end" : "Central nave";
+      const nearBoundary = camera.position.z < -9.5 && camera.position.x > 2.8;
+      boundaryNote?.toggleAttribute("hidden", !nearBoundary);
+    };
+
+    const loop = (time: number) => {
+      animationFrame = null;
+      if (!renderer || !scene || !camera || !visible || !intersecting || document.hidden) return;
+      const dt = Math.min(.05, Math.max(.001, (time - lastTime) / 1000));
+      lastTime = time;
+      updateMovement(dt);
+      if (dust) dust.rotation.y += dt * .0025;
+      renderer.render(scene, camera);
+      if (active && time > 0) {
+        frameSamples.push(1 / dt);
+        if (frameSamples.length > 120) frameSamples.shift();
+        const metrics = metricsWindow.__hintzeHallMetrics;
+        if (metrics && frameSamples.length >= 30) {
+          metrics.approximateFps = Math.round(frameSamples.reduce((sum, value) => sum + value, 0) / frameSamples.length);
+          metrics.drawCalls = renderer.info.render.calls;
+          metrics.playerPosition = { x: Number(camera.position.x.toFixed(3)), y: Number(camera.position.y.toFixed(3)), z: Number(camera.position.z.toFixed(3)) };
+          metrics.playerLook = { yaw: Number(yaw.toFixed(3)), pitch: Number(pitch.toFixed(3)) };
+        }
+      }
+      if (active || (!reducedMotion && !mobileTier && root.dataset.state === "ready")) animationFrame = requestAnimationFrame(loop);
+    };
+    function startLoop() { if (animationFrame === null && visible && intersecting) { lastTime = performance.now(); animationFrame = requestAnimationFrame(loop); } }
+    function stopLoop() { if (animationFrame !== null) cancelAnimationFrame(animationFrame); animationFrame = null; }
+
+    const resetJoystick = () => {
+      joystickPointer = null;
+      touchMoveX = touchMoveY = 0;
+      joystickThumb?.style.setProperty("--joystick-x", "0px");
+      joystickThumb?.style.setProperty("--joystick-y", "0px");
+    };
+    const updateJoystick = (event: PointerEvent) => {
+      if (!joystick || !joystickThumb) return;
+      const rect = joystick.getBoundingClientRect();
+      let dx = event.clientX - (rect.left + rect.width / 2);
+      let dy = event.clientY - (rect.top + rect.height / 2);
+      const radius = rect.width * .31;
+      const length = Math.hypot(dx, dy);
+      if (length > radius) { dx = dx / length * radius; dy = dy / length * radius; }
+      touchMoveX = dx / radius;
+      touchMoveY = dy / radius;
+      joystickThumb.style.setProperty("--joystick-x", `${dx}px`);
+      joystickThumb.style.setProperty("--joystick-y", `${dy}px`);
+    };
+
+    enter?.addEventListener("click", startWalk);
+    pauseButton?.addEventListener("click", () => pauseWalk());
+    resume?.addEventListener("click", startWalk);
+    retry?.addEventListener("click", () => void loadModel().catch(() => undefined));
+    soundButton?.addEventListener("click", () => void setSound(!soundEnabled));
+    infoButton?.addEventListener("click", () => { if (entered) pauseWalk(false); infoPanel?.removeAttribute("hidden"); infoClose?.focus(); });
+    infoClose?.addEventListener("click", () => { infoPanel?.setAttribute("hidden", ""); if (entered) resume?.focus(); else enter?.focus(); });
+    canvas.addEventListener("click", () => { if (active) requestLook(); });
+    document.addEventListener("pointerlockchange", () => { if (document.pointerLockElement !== canvas && active && !coarse) pauseWalk(); });
+    document.addEventListener("mousemove", (event) => {
+      if (!active || document.pointerLockElement !== canvas) return;
+      yaw -= event.movementX * .0021;
+      pitch = THREE.MathUtils.clamp(pitch - event.movementY * .00175, -1.22, 1.22);
+    });
+    document.addEventListener("keydown", (event) => {
+      const code = event.code;
+      if (code === "KeyM" && (active || root.dataset.state === "ready" || root.dataset.state === "paused")) { event.preventDefault(); void setSound(!soundEnabled); return; }
+      if (!active) return;
+      if (code === "Escape") { event.preventDefault(); pauseWalk(); return; }
+      if (["KeyW","KeyA","KeyS","KeyD","ArrowUp","ArrowDown","ArrowLeft","ArrowRight","ShiftLeft","ShiftRight"].includes(code)) { event.preventDefault(); keys.add(code); }
+    });
+    document.addEventListener("keyup", (event) => keys.delete(event.code));
+    window.addEventListener("blur", () => keys.clear());
+    document.addEventListener("visibilitychange", () => { if (document.hidden) { if (active) pauseWalk(false); stopLoop(); } else if (visible && root.dataset.state === "ready") startLoop(); });
+
+    if (coarse) {
+      joystick?.addEventListener("pointerdown", (event) => { event.preventDefault(); joystickPointer = event.pointerId; try { joystick.setPointerCapture(event.pointerId); } catch { /* Some embedded browsers omit pointer capture. */ } updateJoystick(event); });
+      joystick?.addEventListener("pointermove", (event) => { if (joystickPointer === event.pointerId) { event.preventDefault(); updateJoystick(event); } });
+      const stopJoystick = (event: PointerEvent) => { if (joystickPointer === event.pointerId) resetJoystick(); };
+      joystick?.addEventListener("pointerup", stopJoystick);
+      joystick?.addEventListener("pointercancel", stopJoystick);
+      canvas.addEventListener("pointerdown", (event) => { if (!active || event.pointerType !== "touch") return; lookPointer = event.pointerId; lastLookX = event.clientX; lastLookY = event.clientY; try { canvas.setPointerCapture(event.pointerId); } catch { /* Drag still works without capture inside the canvas. */ } });
+      canvas.addEventListener("pointermove", (event) => { if (!active || lookPointer !== event.pointerId) return; yaw -= (event.clientX - lastLookX) * .006; pitch = THREE.MathUtils.clamp(pitch - (event.clientY - lastLookY) * .005, -1.16, 1.16); lastLookX = event.clientX; lastLookY = event.clientY; });
+      const stopLook = (event: PointerEvent) => { if (lookPointer === event.pointerId) lookPointer = null; };
+      canvas.addEventListener("pointerup", stopLook);
+      canvas.addEventListener("pointercancel", stopLook);
+    }
+
+    new ResizeObserver(resize).observe(root);
+    new IntersectionObserver(([entry]) => {
+      intersecting = entry?.isIntersecting ?? true;
+      if (!intersecting) stopLoop();
+      else if (visible && (active || root.dataset.state === "ready")) startLoop();
+    }, { threshold: .01 }).observe(root);
+
+    window.addEventListener("surrey-ai-project-modal-open", (event) => {
+      const project = event instanceof CustomEvent ? event.detail?.project : undefined;
+      if (project !== "hintze-hall") return;
+      visible = true;
+      void loadModel().then(() => { resize(); startLoop(); }).catch(() => undefined);
+    });
+    window.addEventListener("surrey-ai-project-modal-close", (event) => {
+      const project = event instanceof CustomEvent ? event.detail?.project : undefined;
+      if (project && project !== "hintze-hall") return;
+      visible = false;
+      closeExperience();
+    });
+    window.addEventListener("pagehide", () => {
+      stopLoop();
+      model?.traverse((object) => {
+        if (!(object instanceof THREE.Mesh)) return;
+        object.geometry.dispose();
+        const materials = Array.isArray(object.material) ? object.material : [object.material];
+        materials.forEach((material) => { if ("map" in material) (material.map as THREE.Texture | null)?.dispose(); material.dispose(); });
+      });
+      dust?.geometry.dispose();
+      (dust?.material as THREE.Material | undefined)?.dispose();
+      renderer?.dispose();
+      void audioContext?.close();
+    }, { once: true });
+
+    if (visible) void loadModel().then(startLoop).catch(() => undefined);
+  });
+</script>

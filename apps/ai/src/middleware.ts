@@ -1,11 +1,9 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/astro/server';
-import { createConvexClient, getSocietyById } from '@surreysocieties/admin';
+import { clerkMiddleware } from '@clerk/astro/server';
+import { createConvexClient } from '@surreysocieties/admin';
 import { api } from '../../../convex/_generated/api.js';
 
 const SOCIETY_ID = 'ai';
-const society = getSocietyById(SOCIETY_ID);
-
-const isPublicAdminRoute = createRouteMatcher([
+const publicAdminRoutes = new Set([
   '/admin/login',
   '/admin/invite/accept',
 ]);
@@ -17,7 +15,7 @@ export const onRequest = clerkMiddleware(async (auth, context, next) => {
     return next();
   }
 
-  if (isPublicAdminRoute(context.request)) {
+  if (publicAdminRoutes.has(pathname)) {
     return next();
   }
 

@@ -32,7 +32,7 @@ export const listBySociety = query({
       .withIndex("by_society_status", (q) =>
         q.eq("societyId", society._id).eq("status", "active")
       )
-      .collect();
+      .take(500);
 
     const result = [];
     for (const m of memberships) {
@@ -163,7 +163,7 @@ export const listInvitations = query({
     return await ctx.db
       .query("invitations")
       .withIndex("by_society", (q) => q.eq("societyId", society._id))
-      .collect();
+      .take(500);
   },
 });
 

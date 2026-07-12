@@ -42,7 +42,7 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
       </a>
       <div class="project-demo-title">
         <span>{label}</span>
-        <strong>{title}</strong>
+        <h1>{title}</h1>
       </div>
     </header>
   )}
@@ -115,7 +115,8 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
     text-transform: uppercase;
   }
 
-  .project-demo-title strong {
+  .project-demo-title h1 {
+    margin: 0;
     overflow: hidden;
     color: var(--ai-fg);
     font-size: 0.88rem;

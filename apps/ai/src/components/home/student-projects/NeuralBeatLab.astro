@@ -1,1236 +1,619 @@
 ---
-const steps = Array.from({ length: 16 }, (_, index) => index);
-const lanes = [
-  { id: "kick", label: "Kick", hint: "Low pulse", colour: "#79B8C9" },
-  { id: "clap", label: "Clap", hint: "Backbeat", colour: "#C18BB9" },
-  { id: "hats", label: "Hats", hint: "High rhythm", colour: "#9EBB8D" },
-  { id: "synth", label: "Pulse", hint: "Synth phrase", colour: "#E1B980" },
-] as const;
+const pulses = Array.from({ length: 16 }, (_, index) => index);
 ---
 
-<section class="nbl-root" data-neural-beat-lab data-nbl-state="setup" aria-label="Student Project: Neural Beat Lab">
+<section class="nbl-root" data-neural-beat-lab data-playing="false" aria-label="Student Project: Neural Beat Lab">
   <header class="nbl-topbar">
     <div class="nbl-brand">
-      <span class="nbl-brand-mark" aria-hidden="true">
-        <span></span><span></span><span></span><span></span>
-      </span>
-      <span>
-        <strong>Neural Beat Lab</strong>
-        <small>Prompt-to-music playground</small>
-      </span>
+      <span class="nbl-brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span><strong>Neural Beat Lab</strong><small>Make a beat from a feeling</small></span>
     </div>
-    <span class="nbl-top-status" data-nbl-top-status>Ready to compose</span>
+    <span class="nbl-top-status"><i></i> Ready to play</span>
   </header>
 
-  <div class="nbl-view nbl-setup" data-nbl-setup>
-    <div class="nbl-setup-copy">
-      <span class="nbl-eyebrow">A tiny AI music studio</span>
-      <h1>Turn a feeling into a beat.</h1>
-      <p>Give the lab a scene, choose its mood, then play the 16-step track it builds for you.</p>
+  <div class="nbl-main">
+    <div class="nbl-copy">
+      <span class="nbl-eyebrow">A tiny music toy</span>
+      <h2>What should your beat feel like?</h2>
+      <p>No timelines, knobs, or music theory. Describe a moment and the lab makes the choices for you.</p>
     </div>
 
-    <form class="nbl-form" data-nbl-form novalidate>
-      <label class="nbl-prompt-label" for="nbl-prompt">What should it feel like?</label>
-      <textarea
-        id="nbl-prompt"
-        name="prompt"
-        minlength="3"
-        maxlength="160"
-        rows="3"
-        required
-        placeholder="A late-night walk back from the library after finishing a big deadline..."
-      ></textarea>
-
-      <fieldset class="nbl-moods">
-        <legend>Mood</legend>
-        <div class="nbl-mood-options">
-          <label>
-            <input type="radio" name="mood" value="dreamy" checked />
-            <span>Dreamy</span>
-          </label>
-          <label>
-            <input type="radio" name="mood" value="focused" />
-            <span>Focused</span>
-          </label>
-          <label>
-            <input type="radio" name="mood" value="bright" />
-            <span>Bright</span>
-          </label>
-          <label>
-            <input type="radio" name="mood" value="electric" />
-            <span>Electric</span>
-          </label>
-        </div>
-      </fieldset>
-
-      <div class="nbl-energy-row">
-        <label for="nbl-energy">
-          <span>Energy</span>
-          <output for="nbl-energy" data-nbl-energy-output>3 / 5</output>
-        </label>
-        <input id="nbl-energy" name="energy" type="range" min="1" max="5" value="3" step="1" />
-        <div class="nbl-energy-scale" aria-hidden="true"><span>Slow glow</span><span>Full charge</span></div>
+    <form class="nbl-prompt" data-nbl-form novalidate>
+      <label for="nbl-prompt">Your idea</label>
+      <div class="nbl-prompt-box">
+        <textarea
+          id="nbl-prompt"
+          name="prompt"
+          rows="3"
+          minlength="3"
+          maxlength="140"
+          required
+          placeholder="A sunny walk home after the last exam..."
+        ></textarea>
+        <button type="submit" data-nbl-create>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6M4 4h4M6 2v4M16 18h4m-2-2v4" /></svg>
+          Make my beat
+        </button>
       </div>
-
-      <button class="nbl-compose-button" type="submit" data-nbl-compose>
-        <span data-nbl-compose-label>Compose my track</span>
-        <span class="nbl-compose-loader" aria-hidden="true"><i></i><i></i><i></i></span>
-      </button>
-      <p class="nbl-form-status" data-nbl-form-status aria-live="polite">Sound only starts when you press Play.</p>
+      <div class="nbl-ideas" aria-label="Example ideas">
+        <span>Try</span>
+        <button type="button" data-nbl-idea="sunset on campus with friends">sunset with friends</button>
+        <button type="button" data-nbl-idea="a rainy late-night library session">rainy library night</button>
+        <button type="button" data-nbl-surprise>surprise me</button>
+      </div>
+      <p class="nbl-status" data-nbl-status aria-live="polite">Sound starts only after you press play.</p>
     </form>
-  </div>
 
-  <div class="nbl-view nbl-player" data-nbl-player hidden aria-busy="false">
-    <div class="nbl-track-head">
-      <div>
-        <div class="nbl-track-source-row">
-          <span class="nbl-source-badge" data-nbl-source>AI arrangement</span>
-          <span class="nbl-tempo" data-nbl-tempo>112 BPM</span>
-        </div>
-        <h2 data-nbl-title>Untitled beat</h2>
-        <p data-nbl-brief></p>
+    <section class="nbl-player" data-nbl-player hidden aria-label="Your generated beat">
+      <div class="nbl-art" aria-hidden="true">
+        <span class="nbl-orbit nbl-orbit--one"></span>
+        <span class="nbl-orbit nbl-orbit--two"></span>
+        <span class="nbl-record"><i></i><b></b></span>
+        <span class="nbl-pulses">
+          {pulses.map((pulse) => <i data-nbl-pulse={pulse}></i>)}
+        </span>
       </div>
-      <div class="nbl-controls" aria-label="Playback controls">
-        <button class="nbl-play" type="button" data-nbl-play aria-label="Play track">
-          <svg class="nbl-play-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.6v12.8L18 12 8 5.6Z" /></svg>
-          <svg class="nbl-pause-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7V5Zm6 0h4v14h-4V5Z" /></svg>
-          <span data-nbl-play-label>Play</span>
+
+      <div class="nbl-track-copy">
+        <span class="nbl-now">Your tiny original</span>
+        <h2 data-nbl-title>Campus glow</h2>
+        <p data-nbl-description>Made from your idea.</p>
+      </div>
+
+      <div class="nbl-player-controls">
+        <button class="nbl-play" type="button" data-nbl-play aria-label="Play beat">
+          <svg class="nbl-icon-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10-6.5L8 5.5Z" /></svg>
+          <svg class="nbl-icon-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7V5Zm6 0h4v14h-4V5Z" /></svg>
+          <span data-nbl-play-label>Play beat</span>
         </button>
         <button type="button" data-nbl-remix>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.7 3.3 21 6.6l-3.3 3.3M3 6.6h4.8c5.4 0 5.4 10.8 10.8 10.8H21M17.7 20.7l3.3-3.3-3.3-3.3M3 17.4h4.8c1.4 0 2.4-.7 3.2-1.7" /></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 3.5 21 7l-3.5 3.5M3 7h4.5c5 0 5 10 10 10H21M17.5 20.5 21 17l-3.5-3.5M3 17h4.5c1.4 0 2.5-.8 3.3-1.8" /></svg>
           Remix
         </button>
-        <button type="button" data-nbl-reset>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 9A8 8 0 1 1 5 15M4.9 9V4.5M4.9 9h4.5" /></svg>
-          Start over
+        <button type="button" data-nbl-new>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+          New idea
         </button>
       </div>
-    </div>
-
-    <div class="nbl-visualizer" aria-hidden="true">
-      <canvas data-nbl-visualizer></canvas>
-      <div class="nbl-step-pulse">
-        {steps.map((step) => <span data-nbl-pulse={step}></span>)}
-      </div>
-    </div>
-
-    <div class="nbl-sequencer-region">
-      <div class="nbl-sequencer-heading">
-        <div>
-          <h3>Live loop</h3>
-          <p>Mute a lane or tap any step to reshape the beat.</p>
-        </div>
-        <span>16 steps</span>
-      </div>
-
-      <div class="nbl-sequencer-scroll" tabindex="0" aria-label="Scrollable 16-step music sequencer">
-        <div class="nbl-sequencer">
-          <div class="nbl-step-numbers" aria-hidden="true">
-            <span></span>
-            {steps.map((step) => <i class:list={{ "is-beat": step % 4 === 0 }}>{step + 1}</i>)}
-          </div>
-
-          {lanes.map((lane, laneIndex) => (
-            <div class="nbl-lane" data-nbl-lane={lane.id} style={`--lane: var(--nbl-c${laneIndex}, ${lane.colour})`}>
-              <button
-                class="nbl-lane-mute"
-                type="button"
-                data-nbl-mute={lane.id}
-                aria-pressed="false"
-                aria-label={`Mute ${lane.label} lane`}
-              >
-                <span class="nbl-lane-dot" aria-hidden="true"></span>
-                <span><strong>{lane.label}</strong><small>{lane.hint}</small></span>
-              </button>
-              {steps.map((step) => (
-                <button
-                  class:list={["nbl-step", { "is-beat-start": step % 4 === 0 }]}
-                  type="button"
-                  data-nbl-step={step}
-                  data-nbl-step-lane={lane.id}
-                  aria-label={`${lane.label} step ${step + 1}, off`}
-                  aria-pressed="false"
-                ><span></span></button>
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-
-    <footer class="nbl-player-footer">
-      <p data-nbl-source-note>Generated from your prompt with Gemini.</p>
-      <p data-nbl-player-status aria-live="polite">Your track is ready. Press Play when you are.</p>
-    </footer>
+    </section>
   </div>
 </section>
 
 <style>
   .nbl-root {
-    --nbl-bg: #071013;
-    --nbl-panel: #0d191d;
-    --nbl-panel-strong: #122328;
-    --nbl-line: rgba(229, 239, 234, 0.13);
-    --nbl-line-strong: rgba(229, 239, 234, 0.23);
-    --nbl-text: #f1f3eb;
-    --nbl-muted: #9eadaa;
-    --nbl-accent: #79b8c9;
-    --nbl-c0: #79b8c9;
-    --nbl-c1: #c18bb9;
-    --nbl-c2: #9ebb8d;
-    --nbl-c3: #e1b980;
+    --nbl-ink: #f7f5ee;
+    --nbl-muted: rgba(247, 245, 238, 0.66);
+    --nbl-line: rgba(255, 255, 255, 0.14);
+    --nbl-coral: #ff927f;
+    --nbl-sun: #f3ca74;
+    --nbl-aqua: #70ced0;
+    position: relative;
     box-sizing: border-box;
     display: flex;
-    flex-direction: column;
     width: 100%;
     height: 100%;
     min-height: 100%;
-    overflow: auto;
-    color: var(--nbl-text);
+    flex-direction: column;
+    overflow: hidden;
+    color: var(--nbl-ink);
     background:
-      radial-gradient(circle at 12% 8%, color-mix(in srgb, var(--nbl-c0) 14%, transparent), transparent 25rem),
-      radial-gradient(circle at 88% 92%, color-mix(in srgb, var(--nbl-c1) 10%, transparent), transparent 26rem),
-      var(--nbl-bg);
+      radial-gradient(circle at 12% 12%, rgba(255, 146, 127, 0.2), transparent 27rem),
+      radial-gradient(circle at 88% 85%, rgba(112, 206, 208, 0.16), transparent 30rem),
+      linear-gradient(145deg, #121321, #1b1d31 50%, #102a31);
     color-scheme: dark;
     font-family: var(--font-sans, Inter, ui-sans-serif, system-ui, sans-serif);
     isolation: isolate;
   }
 
-  .nbl-root *,
-  .nbl-root *::before,
-  .nbl-root *::after {
-    box-sizing: border-box;
+  .nbl-root::before {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    opacity: 0.24;
+    background-image: radial-gradient(rgba(255,255,255,.32) 0.75px, transparent 0.75px);
+    background-size: 24px 24px;
+    mask-image: linear-gradient(135deg, #000, transparent 72%);
+    content: "";
   }
+
+  .nbl-root *, .nbl-root *::before, .nbl-root *::after { box-sizing: border-box; }
 
   .nbl-topbar {
-    position: sticky;
-    top: 0;
-    z-index: 20;
     display: flex;
+    min-height: 4.4rem;
     align-items: center;
     justify-content: space-between;
-    min-height: 4.5rem;
-    padding: 0.8rem clamp(1rem, 3vw, 2rem);
+    gap: 1rem;
+    padding: 0.75rem clamp(1rem, 3vw, 2rem);
     border-bottom: 1px solid var(--nbl-line);
-    background: color-mix(in srgb, var(--nbl-bg) 88%, transparent);
-    backdrop-filter: blur(16px);
+    background: rgba(11, 13, 24, 0.44);
+    backdrop-filter: blur(18px);
   }
 
-  .nbl-brand {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-  }
-
-  .nbl-brand > span:last-child,
-  .nbl-brand strong,
-  .nbl-brand small {
-    display: block;
-  }
-
-  .nbl-brand strong {
-    color: var(--nbl-text);
-    font-size: 1rem;
-    letter-spacing: -0.01em;
-  }
-
-  .nbl-brand small {
-    margin-top: 0.15rem;
-    color: var(--nbl-muted);
-    font-size: 0.72rem;
-  }
+  .nbl-brand { display: flex; align-items: center; gap: 0.75rem; }
+  .nbl-brand > span:last-child, .nbl-brand strong, .nbl-brand small { display: block; }
+  .nbl-brand strong { font-size: 0.95rem; letter-spacing: -0.01em; }
+  .nbl-brand small { margin-top: 0.12rem; color: var(--nbl-muted); font-size: 0.68rem; }
 
   .nbl-brand-mark {
+    position: relative;
     display: grid;
-    grid-template-columns: repeat(4, 0.22rem);
-    align-items: center;
-    justify-content: center;
-    gap: 0.16rem;
-    width: 2.35rem;
-    height: 2.35rem;
-    border: 1px solid var(--nbl-line-strong);
-    border-radius: 0.72rem;
-    background: var(--nbl-panel);
+    width: 2.5rem;
+    height: 2.5rem;
+    place-items: center;
+    border: 1px solid var(--nbl-line);
+    border-radius: 50%;
+    background: conic-gradient(from 20deg, var(--nbl-coral), var(--nbl-sun), var(--nbl-aqua), var(--nbl-coral));
+    box-shadow: inset 0 0 0 0.45rem rgba(15, 18, 31, 0.7), 0 8px 26px rgba(0,0,0,.2);
   }
 
-  .nbl-brand-mark span {
-    display: block;
-    height: 0.65rem;
-    border-radius: 999px;
-    background: var(--nbl-c0);
-  }
+  .nbl-brand-mark i { position: absolute; width: 0.2rem; border-radius: 999px; background: #fff; }
+  .nbl-brand-mark i:nth-child(1) { height: 0.7rem; transform: translateX(-0.38rem); }
+  .nbl-brand-mark i:nth-child(2) { height: 1.05rem; }
+  .nbl-brand-mark i:nth-child(3) { height: 0.5rem; transform: translateX(0.38rem); }
 
-  .nbl-brand-mark span:nth-child(2) { height: 1.25rem; background: var(--nbl-c1); }
-  .nbl-brand-mark span:nth-child(3) { height: 0.9rem; background: var(--nbl-c2); }
-  .nbl-brand-mark span:nth-child(4) { height: 1.55rem; background: var(--nbl-c3); }
-
-  .nbl-top-status,
-  .nbl-source-badge,
-  .nbl-tempo {
+  .nbl-top-status {
     display: inline-flex;
     align-items: center;
-    min-height: 1.8rem;
-    padding: 0.3rem 0.65rem;
-    border: 1px solid var(--nbl-line);
-    border-radius: 999px;
-    background: var(--nbl-panel);
+    gap: 0.45rem;
     color: var(--nbl-muted);
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     font-weight: 750;
   }
 
-  .nbl-view[hidden] { display: none; }
-
-  .nbl-setup {
-    display: grid;
-    grid-template-columns: minmax(0, 0.82fr) minmax(22rem, 1fr);
-    align-items: center;
-    gap: clamp(2rem, 6vw, 6rem);
-    width: min(72rem, calc(100% - 2rem));
-    margin: auto;
-    padding: clamp(2rem, 6vh, 5rem) 0;
+  .nbl-top-status i {
+    width: 0.42rem;
+    height: 0.42rem;
+    border-radius: 50%;
+    background: var(--nbl-aqua);
+    box-shadow: 0 0 0 0.25rem rgba(112, 206, 208, 0.12);
   }
 
-  .nbl-setup-copy { max-width: 30rem; }
+  .nbl-main {
+    display: grid;
+    width: min(74rem, 100%);
+    min-height: 0;
+    flex: 1;
+    grid-template-columns: minmax(16rem, 0.8fr) minmax(22rem, 1.2fr);
+    align-content: center;
+    align-items: center;
+    gap: clamp(2rem, 6vw, 6rem);
+    margin: 0 auto;
+    padding: clamp(1.5rem, 5vw, 4rem);
+  }
 
-  .nbl-eyebrow {
-    display: block;
-    margin-bottom: 1rem;
-    color: var(--nbl-c0);
-    font-size: 0.76rem;
+  .nbl-copy { max-width: 29rem; }
+
+  .nbl-eyebrow,
+  .nbl-now {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: var(--nbl-coral);
+    font-size: 0.66rem;
     font-weight: 850;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
   }
 
-  .nbl-setup-copy h1 {
-    max-width: 8ch;
-    margin: 0;
-    color: var(--nbl-text);
-    font-size: clamp(2.8rem, 6vw, 5.8rem);
+  .nbl-eyebrow::before { width: 1.8rem; height: 1px; background: currentColor; content: ""; }
+
+  .nbl-copy h2 {
+    max-width: 10ch;
+    margin: 0.85rem 0 1rem;
+    font-size: clamp(2.4rem, 5.6vw, 5.5rem);
     font-weight: 850;
-    letter-spacing: -0.055em;
-    line-height: 0.9;
+    letter-spacing: -0.065em;
+    line-height: 0.93;
   }
 
-  .nbl-setup-copy p {
-    max-width: 29rem;
-    margin: 1.35rem 0 0;
+  .nbl-copy p {
+    max-width: 34rem;
+    margin: 0;
     color: var(--nbl-muted);
-    font-size: clamp(1rem, 1.8vw, 1.15rem);
-    line-height: 1.6;
+    font-size: clamp(0.92rem, 1.5vw, 1.08rem);
+    line-height: 1.65;
   }
 
-  .nbl-form {
+  .nbl-prompt {
+    position: relative;
     display: grid;
-    gap: 1.2rem;
-    padding: clamp(1.15rem, 3vw, 1.6rem);
-    border: 1px solid var(--nbl-line-strong);
-    border-radius: 1.2rem;
-    background: color-mix(in srgb, var(--nbl-panel) 93%, transparent);
-    box-shadow: 0 1.5rem 5rem rgba(0, 0, 0, 0.28);
+    gap: 0.85rem;
+    padding: clamp(1rem, 2.6vw, 1.5rem);
+    border: 1px solid var(--nbl-line);
+    border-radius: 24px;
+    background: rgba(246, 246, 239, 0.08);
+    box-shadow: 0 30px 90px rgba(4, 6, 16, 0.34);
+    backdrop-filter: blur(20px);
   }
 
-  .nbl-prompt-label,
-  .nbl-moods legend,
-  .nbl-energy-row label {
-    color: var(--nbl-text);
-    font-size: 0.82rem;
-    font-weight: 800;
+  .nbl-prompt > label {
+    color: var(--nbl-muted);
+    font-size: 0.7rem;
+    font-weight: 850;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 
-  .nbl-form textarea {
+  .nbl-prompt-box {
+    display: grid;
+    gap: 1rem;
+    padding: 1.15rem;
+    border: 1px solid rgba(255,255,255,.16);
+    border-radius: 18px;
+    background: rgba(249, 248, 242, 0.96);
+    box-shadow: 0 12px 34px rgba(0,0,0,.14);
+  }
+
+  .nbl-prompt-box:focus-within { border-color: var(--nbl-aqua); box-shadow: 0 14px 45px rgba(112, 206, 208, .16); }
+
+  .nbl-prompt textarea {
     width: 100%;
-    min-height: 7rem;
-    resize: vertical;
-    padding: 1rem;
-    border: 1px solid var(--nbl-line);
-    border-radius: 0.8rem;
-    outline: 0;
-    background: var(--nbl-bg);
-    color: var(--nbl-text);
-    font: inherit;
-    font-size: 0.98rem;
-    line-height: 1.55;
-    transition: border-color 160ms ease, box-shadow 160ms ease;
-  }
-
-  .nbl-form textarea::placeholder { color: color-mix(in srgb, var(--nbl-muted) 68%, transparent); }
-  .nbl-form textarea:focus { border-color: var(--nbl-c0); box-shadow: 0 0 0 3px color-mix(in srgb, var(--nbl-c0) 15%, transparent); }
-
-  .nbl-moods { min-width: 0; margin: 0; padding: 0; border: 0; }
-  .nbl-moods legend { margin-bottom: 0.65rem; }
-  .nbl-mood-options { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
-  .nbl-mood-options label { min-width: 0; cursor: pointer; }
-  .nbl-mood-options input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
-  .nbl-mood-options span {
-    display: grid;
-    min-height: 2.75rem;
-    place-items: center;
-    padding: 0.5rem;
-    border: 1px solid var(--nbl-line);
-    border-radius: 0.65rem;
-    background: var(--nbl-bg);
-    color: var(--nbl-muted);
-    font-size: 0.78rem;
-    font-weight: 750;
-    transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease;
-  }
-  .nbl-mood-options input:checked + span { border-color: var(--nbl-c0); background: color-mix(in srgb, var(--nbl-c0) 13%, var(--nbl-bg)); color: var(--nbl-text); }
-  .nbl-mood-options input:focus-visible + span { outline: 2px solid var(--nbl-c0); outline-offset: 2px; }
-
-  .nbl-energy-row { display: grid; gap: 0.65rem; }
-  .nbl-energy-row label,
-  .nbl-energy-scale { display: flex; align-items: center; justify-content: space-between; }
-  .nbl-energy-row output { color: var(--nbl-c3); font: 700 0.76rem/1 var(--font-mono, ui-monospace, monospace); }
-  .nbl-energy-row input { width: 100%; accent-color: var(--nbl-c0); cursor: pointer; }
-  .nbl-energy-scale { color: var(--nbl-muted); font-size: 0.68rem; }
-
-  .nbl-compose-button,
-  .nbl-controls button,
-  .nbl-lane-mute,
-  .nbl-step {
+    min-height: 6.8rem;
+    padding: 0;
+    resize: none;
     border: 0;
-    font: inherit;
-    cursor: pointer;
+    outline: 0;
+    background: transparent;
+    color: #172128;
+    font: 750 clamp(1.05rem, 1.8vw, 1.3rem)/1.45 inherit;
   }
 
-  .nbl-compose-button {
+  .nbl-prompt textarea::placeholder { color: rgba(23, 33, 40, 0.42); }
+
+  .nbl-prompt-box > button,
+  .nbl-play {
     display: inline-flex;
+    min-height: 3.2rem;
     align-items: center;
     justify-content: center;
-    gap: 0.75rem;
-    min-height: 3.15rem;
-    border-radius: 0.72rem;
-    background: var(--nbl-c0);
-    color: #071013;
-    font-size: 0.9rem;
-    font-weight: 850;
-    transition: transform 160ms ease, filter 160ms ease;
+    gap: 0.6rem;
+    padding: 0.75rem 1.2rem;
+    border: 0;
+    border-radius: 12px;
+    background: #172128;
+    color: #fff;
+    cursor: pointer;
+    font: 850 0.9rem/1 inherit;
+    box-shadow: 0 12px 28px rgba(23, 33, 40, .2);
+    transition: transform 0.2s, background-color 0.2s;
   }
-  .nbl-compose-button:hover { filter: brightness(1.08); transform: translateY(-1px); }
-  .nbl-compose-button:disabled { cursor: wait; filter: saturate(0.6); transform: none; }
-  .nbl-compose-loader { display: none; align-items: center; gap: 0.22rem; }
-  .nbl-compose-loader i { width: 0.3rem; height: 0.3rem; border-radius: 50%; background: currentColor; animation: nblBounce 900ms ease-in-out infinite; }
-  .nbl-compose-loader i:nth-child(2) { animation-delay: 120ms; }
-  .nbl-compose-loader i:nth-child(3) { animation-delay: 240ms; }
-  .nbl-form[aria-busy="true"] .nbl-compose-loader { display: inline-flex; }
-  .nbl-form-status { min-height: 1.2rem; margin: -0.25rem 0 0; color: var(--nbl-muted); font-size: 0.74rem; text-align: center; }
-  .nbl-form-status[data-tone="error"] { color: #ef9a8f; }
+
+  .nbl-prompt-box > button:hover,
+  .nbl-play:hover { background: #2f737b; transform: translateY(-2px); }
+
+  .nbl-prompt button svg,
+  .nbl-player-controls button svg { width: 1.1rem; height: 1.1rem; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
+
+  .nbl-ideas { display: flex; flex-wrap: wrap; align-items: center; gap: 0.42rem; }
+  .nbl-ideas > span { margin-right: 0.2rem; color: var(--nbl-muted); font-size: 0.68rem; font-weight: 750; }
+  .nbl-ideas button {
+    padding: 0.42rem 0.7rem;
+    border: 1px solid var(--nbl-line);
+    border-radius: 999px;
+    background: rgba(255,255,255,.05);
+    color: var(--nbl-muted);
+    cursor: pointer;
+    font: 750 0.68rem/1 inherit;
+  }
+  .nbl-ideas button:hover, .nbl-ideas button:focus-visible { border-color: var(--nbl-aqua); color: #fff; outline: none; }
+
+  .nbl-status { margin: 0; color: rgba(247,245,238,.48); font-size: 0.67rem; }
 
   .nbl-player {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    gap: 1.2rem;
-    width: min(80rem, calc(100% - 2rem));
-    margin: 0 auto;
-    padding: clamp(1.4rem, 3vw, 2.25rem) 0 1.5rem;
-  }
-
-  .nbl-track-head {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 1.5rem;
-  }
-  .nbl-track-source-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem; }
-  .nbl-source-badge { border-color: color-mix(in srgb, var(--nbl-c0) 45%, transparent); color: var(--nbl-c0); }
-  .nbl-track-head h2 { margin: 0.7rem 0 0; color: var(--nbl-text); font-size: clamp(2rem, 4vw, 3.7rem); letter-spacing: -0.045em; line-height: 0.95; }
-  .nbl-track-head p { max-width: 42rem; margin: 0.65rem 0 0; overflow: hidden; color: var(--nbl-muted); font-size: 0.84rem; text-overflow: ellipsis; white-space: nowrap; }
-
-  .nbl-controls { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.5rem; }
-  .nbl-controls button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.45rem;
-    min-height: 2.65rem;
-    padding: 0.55rem 0.8rem;
-    border: 1px solid var(--nbl-line-strong);
-    border-radius: 0.65rem;
-    background: var(--nbl-panel);
-    color: var(--nbl-text);
-    font-size: 0.78rem;
-    font-weight: 800;
-    transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
-  }
-  .nbl-controls button:hover { border-color: var(--nbl-c0); background: var(--nbl-panel-strong); transform: translateY(-1px); }
-  .nbl-controls button svg { width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-  .nbl-controls .nbl-play { min-width: 6.5rem; border-color: var(--nbl-c0); background: var(--nbl-c0); color: #071013; }
-  .nbl-controls .nbl-play svg { fill: currentColor; stroke: none; }
-  .nbl-pause-icon { display: none; }
-  .nbl-root[data-nbl-playing="true"] .nbl-play-icon { display: none; }
-  .nbl-root[data-nbl-playing="true"] .nbl-pause-icon { display: block; }
-
-  .nbl-visualizer {
-    position: relative;
-    min-height: clamp(6rem, 15vh, 9rem);
-    overflow: hidden;
-    border: 1px solid var(--nbl-line);
-    border-radius: 0.85rem;
-    background:
-      linear-gradient(180deg, color-mix(in srgb, var(--nbl-c0) 7%, transparent), transparent),
-      repeating-linear-gradient(90deg, transparent 0, transparent calc(6.25% - 1px), var(--nbl-line) calc(6.25% - 1px), var(--nbl-line) 6.25%),
-      var(--nbl-panel);
-  }
-  .nbl-visualizer canvas { display: block; width: 100%; height: clamp(6rem, 15vh, 9rem); }
-  .nbl-step-pulse { position: absolute; inset: auto 0 0; display: grid; grid-template-columns: repeat(16, 1fr); height: 0.25rem; }
-  .nbl-step-pulse span { background: transparent; }
-  .nbl-step-pulse span.is-current { background: var(--nbl-c3); box-shadow: 0 0 1rem var(--nbl-c3); }
-
-  .nbl-sequencer-region {
-    display: flex;
-    flex: 1;
-    min-height: 0;
-    flex-direction: column;
-    overflow: hidden;
-    border: 1px solid var(--nbl-line);
-    border-radius: 0.85rem;
-    background: color-mix(in srgb, var(--nbl-panel) 92%, transparent);
-  }
-  .nbl-sequencer-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.9rem 1rem; border-bottom: 1px solid var(--nbl-line); }
-  .nbl-sequencer-heading h3 { margin: 0; font-size: 0.92rem; }
-  .nbl-sequencer-heading p { margin: 0.2rem 0 0; color: var(--nbl-muted); font-size: 0.7rem; }
-  .nbl-sequencer-heading > span { color: var(--nbl-muted); font: 700 0.7rem/1 var(--font-mono, ui-monospace, monospace); }
-  .nbl-sequencer-scroll { flex: 1; min-height: 0; overflow: auto; padding: 0.6rem; outline: 0; }
-  .nbl-sequencer-scroll:focus-visible { box-shadow: inset 0 0 0 2px var(--nbl-c0); }
-  .nbl-sequencer { display: grid; gap: 0.4rem; min-width: 47rem; }
-  .nbl-step-numbers,
-  .nbl-lane { display: grid; grid-template-columns: 7rem repeat(16, minmax(1.8rem, 1fr)); gap: 0.3rem; align-items: center; }
-  .nbl-step-numbers i { color: color-mix(in srgb, var(--nbl-muted) 62%, transparent); font: normal 0.58rem/1 var(--font-mono, ui-monospace, monospace); text-align: center; }
-  .nbl-step-numbers i.is-beat { color: var(--nbl-text); }
-  .nbl-lane { --lane: var(--nbl-c0); }
-  .nbl-lane-mute {
-    position: sticky;
-    left: 0;
-    z-index: 3;
-    display: flex;
-    align-items: center;
-    gap: 0.55rem;
-    min-width: 0;
-    min-height: 2.45rem;
-    padding: 0.35rem 0.45rem;
-    border: 1px solid var(--nbl-line);
-    border-radius: 0.55rem;
-    background: var(--nbl-panel);
-    color: var(--nbl-text);
-    text-align: left;
-  }
-  .nbl-lane-mute > span:last-child,
-  .nbl-lane-mute strong,
-  .nbl-lane-mute small { display: block; min-width: 0; }
-  .nbl-lane-mute strong { overflow: hidden; font-size: 0.72rem; text-overflow: ellipsis; }
-  .nbl-lane-mute small { margin-top: 0.08rem; overflow: hidden; color: var(--nbl-muted); font-size: 0.58rem; text-overflow: ellipsis; white-space: nowrap; }
-  .nbl-lane-dot { flex: 0 0 auto; width: 0.55rem; height: 0.55rem; border-radius: 50%; background: var(--lane); box-shadow: 0 0 0.7rem color-mix(in srgb, var(--lane) 55%, transparent); }
-  .nbl-lane-mute[aria-pressed="true"] { opacity: 0.55; }
-  .nbl-lane-mute[aria-pressed="true"] .nbl-lane-dot { background: transparent; box-shadow: inset 0 0 0 1px var(--nbl-muted); }
-
-  .nbl-step {
     position: relative;
     display: grid;
-    width: 100%;
-    min-width: 1.8rem;
-    min-height: 2.45rem;
+    justify-items: center;
+    gap: 1.2rem;
+    text-align: center;
+  }
+  .nbl-player[hidden], .nbl-prompt[hidden] { display: none; }
+
+  .nbl-art {
+    position: relative;
+    display: grid;
+    width: min(16rem, 28vw);
+    aspect-ratio: 1;
     place-items: center;
+  }
+
+  .nbl-orbit { position: absolute; border: 1px solid rgba(255,255,255,.12); border-radius: 50%; }
+  .nbl-orbit--one { inset: 8%; }
+  .nbl-orbit--two { inset: 21%; border-style: dashed; }
+
+  .nbl-record {
+    position: relative;
+    display: block;
+    width: 55%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background:
+      repeating-radial-gradient(circle, transparent 0 7px, rgba(255,255,255,.08) 8px 9px),
+      conic-gradient(from 40deg, var(--nbl-coral), var(--nbl-sun), var(--nbl-aqua), #aa84c5, var(--nbl-coral));
+    box-shadow: 0 28px 70px rgba(0,0,0,.32), inset 0 0 0 1rem rgba(10,13,23,.34);
+  }
+
+  .nbl-record i { position: absolute; inset: 36%; border-radius: 50%; background: #f5f2e9; }
+  .nbl-record b { position: absolute; inset: 47%; border-radius: 50%; background: #172128; }
+
+  .nbl-pulses { position: absolute; inset: 0; }
+  .nbl-pulses i {
+    --angle: calc(var(--pulse) * 22.5deg);
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 0.35rem; height: 0.35rem;
+    border-radius: 50%;
+    background: rgba(255,255,255,.28);
+    transform: translate(-50%, -50%) rotate(var(--angle)) translateY(-7.15rem);
+    transition: background-color 0.1s, box-shadow 0.1s, transform 0.1s;
+  }
+
+  .nbl-pulses i:nth-child(1) { --pulse: 0; } .nbl-pulses i:nth-child(2) { --pulse: 1; }
+  .nbl-pulses i:nth-child(3) { --pulse: 2; } .nbl-pulses i:nth-child(4) { --pulse: 3; }
+  .nbl-pulses i:nth-child(5) { --pulse: 4; } .nbl-pulses i:nth-child(6) { --pulse: 5; }
+  .nbl-pulses i:nth-child(7) { --pulse: 6; } .nbl-pulses i:nth-child(8) { --pulse: 7; }
+  .nbl-pulses i:nth-child(9) { --pulse: 8; } .nbl-pulses i:nth-child(10) { --pulse: 9; }
+  .nbl-pulses i:nth-child(11) { --pulse: 10; } .nbl-pulses i:nth-child(12) { --pulse: 11; }
+  .nbl-pulses i:nth-child(13) { --pulse: 12; } .nbl-pulses i:nth-child(14) { --pulse: 13; }
+  .nbl-pulses i:nth-child(15) { --pulse: 14; } .nbl-pulses i:nth-child(16) { --pulse: 15; }
+  .nbl-pulses i.is-active { background: #fff; box-shadow: 0 0 1.2rem var(--nbl-coral); transform: translate(-50%, -50%) rotate(var(--angle)) translateY(-7.55rem) scale(1.7); }
+
+  .nbl-root[data-playing="true"] .nbl-record { animation: nblSpin 8s linear infinite; }
+  .nbl-root[data-playing="true"] .nbl-orbit--two { animation: nblSpinReverse 14s linear infinite; }
+
+  .nbl-track-copy h2 { margin: 0.45rem 0 0.35rem; font-size: clamp(1.65rem, 3.4vw, 2.55rem); letter-spacing: -0.045em; }
+  .nbl-track-copy p { margin: 0; color: var(--nbl-muted); font-size: 0.86rem; }
+
+  .nbl-player-controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.55rem; }
+  .nbl-player-controls button:not(.nbl-play) {
+    display: inline-flex;
+    min-height: 3.2rem;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1rem;
     border: 1px solid var(--nbl-line);
-    border-radius: 0.48rem;
-    background: color-mix(in srgb, var(--nbl-bg) 72%, var(--nbl-panel));
-    transition: border-color 100ms ease, background-color 100ms ease, transform 100ms ease;
+    border-radius: 12px;
+    background: rgba(255,255,255,.06);
+    color: var(--nbl-ink);
+    cursor: pointer;
+    font: 800 0.8rem/1 inherit;
   }
-  .nbl-step.is-beat-start { border-left-color: var(--nbl-line-strong); }
-  .nbl-step span { width: 0.45rem; height: 0.45rem; border-radius: 50%; background: transparent; transition: transform 100ms ease, background-color 100ms ease; }
-  .nbl-step[data-on="true"] { border-color: color-mix(in srgb, var(--lane) 62%, transparent); background: color-mix(in srgb, var(--lane) 18%, var(--nbl-bg)); }
-  .nbl-step[data-on="true"] span { background: var(--lane); box-shadow: 0 0 0.65rem color-mix(in srgb, var(--lane) 60%, transparent); }
-  .nbl-step.is-current { border-color: var(--nbl-text); transform: translateY(-1px); }
-  .nbl-step:hover { border-color: var(--lane); }
+  .nbl-player-controls button:not(.nbl-play):hover { border-color: var(--nbl-aqua); background: rgba(255,255,255,.1); }
+  .nbl-icon-pause { display: none; fill: currentColor !important; stroke: none !important; }
+  .nbl-icon-play { fill: currentColor !important; stroke: none !important; }
+  .nbl-root[data-playing="true"] .nbl-icon-play { display: none; }
+  .nbl-root[data-playing="true"] .nbl-icon-pause { display: block; }
 
-  .nbl-player-footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 1.5rem; }
-  .nbl-player-footer p { margin: 0; color: var(--nbl-muted); font-size: 0.68rem; }
-  .nbl-player-footer p:last-child { text-align: right; }
+  @keyframes nblSpin { to { transform: rotate(360deg); } }
+  @keyframes nblSpinReverse { to { transform: rotate(-360deg); } }
 
-  .nbl-root button:focus-visible,
-  .nbl-root input:focus-visible,
-  .nbl-root textarea:focus-visible {
-    outline: 2px solid var(--nbl-c0);
-    outline-offset: 2px;
-  }
-
-  @keyframes nblBounce {
-    0%, 100% { transform: translateY(0); opacity: 0.45; }
-    50% { transform: translateY(-0.2rem); opacity: 1; }
+  @media (max-width: 820px) {
+    .nbl-root { overflow: auto; }
+    .nbl-main { grid-template-columns: 1fr; align-content: start; gap: 1.7rem; padding: 1.5rem; }
+    .nbl-copy { max-width: 38rem; }
+    .nbl-copy h2 { max-width: 13ch; font-size: clamp(2.4rem, 11vw, 4rem); }
+    .nbl-art { width: min(18rem, 74vw); }
+    .nbl-pulses i { transform: translate(-50%, -50%) rotate(var(--angle)) translateY(-8rem); }
+    .nbl-pulses i.is-active { transform: translate(-50%, -50%) rotate(var(--angle)) translateY(-8.45rem) scale(1.6); }
   }
 
-  @media (max-width: 760px) {
-    .nbl-topbar { min-height: 4rem; }
+  @media (max-width: 520px) {
     .nbl-top-status { display: none; }
-    .nbl-setup { grid-template-columns: 1fr; align-content: center; gap: 1.8rem; width: min(100% - 1.4rem, 34rem); padding: 1.4rem 0 2rem; }
-    .nbl-setup-copy { text-align: center; }
-    .nbl-setup-copy h1 { max-width: 9ch; margin-inline: auto; font-size: clamp(2.7rem, 14vw, 4.2rem); }
-    .nbl-setup-copy p { margin-top: 1rem; font-size: 0.95rem; }
-    .nbl-mood-options { grid-template-columns: repeat(2, 1fr); }
-    .nbl-player { width: calc(100% - 1.2rem); gap: 0.85rem; padding-top: 1rem; }
-    .nbl-track-head { align-items: stretch; flex-direction: column; gap: 1rem; }
-    .nbl-track-head h2 { font-size: 2.25rem; }
-    .nbl-track-head p { white-space: normal; }
-    .nbl-controls { justify-content: stretch; }
-    .nbl-controls button { flex: 1; padding-inline: 0.55rem; }
-    .nbl-controls .nbl-play { flex: 1.15; }
-    .nbl-visualizer,
-    .nbl-visualizer canvas { min-height: 5.5rem; height: 5.5rem; }
-    .nbl-sequencer-heading p { display: none; }
-    .nbl-player-footer { align-items: flex-start; flex-direction: column; gap: 0.25rem; }
-    .nbl-player-footer p:last-child { text-align: left; }
-  }
-
-  @media (max-height: 700px) and (min-width: 761px) {
-    .nbl-setup { padding-block: 1.5rem; }
-    .nbl-setup-copy h1 { font-size: 4rem; }
-    .nbl-form { gap: 0.8rem; }
-    .nbl-form textarea { min-height: 5rem; }
-    .nbl-player { gap: 0.75rem; padding-top: 1rem; }
-    .nbl-visualizer,
-    .nbl-visualizer canvas { min-height: 5rem; height: 5rem; }
+    .nbl-main { padding: 1.1rem; }
+    .nbl-copy h2 { margin-top: 0.65rem; }
+    .nbl-prompt { border-radius: 18px; }
+    .nbl-prompt-box { border-radius: 14px; }
+    .nbl-player-controls { width: 100%; }
+    .nbl-player-controls button { flex: 1; justify-content: center; }
+    .nbl-play { flex-basis: 100% !important; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .nbl-root *,
-    .nbl-root *::before,
-    .nbl-root *::after {
-      scroll-behavior: auto !important;
-      animation: none !important;
-      transition: none !important;
-    }
-    .nbl-step.is-current,
-    .nbl-compose-button:hover,
-    .nbl-controls button:hover { transform: none; }
-    .nbl-step-pulse span.is-current { box-shadow: none; }
+    .nbl-root[data-playing="true"] .nbl-record,
+    .nbl-root[data-playing="true"] .nbl-orbit--two { animation: none; }
   }
 </style>
 
 <script>
-  type Mood = 'dreamy' | 'focused' | 'bright' | 'electric';
-  type LaneName = 'kick' | 'clap' | 'hats' | 'synth';
-  type BeatPatterns = Record<LaneName, number[]>;
-  type BeatArrangement = {
-    title: string;
-    tempo: number;
-    root: number;
-    palette: [string, string, string, string];
-    patterns: BeatPatterns;
-  };
-  type BeatInput = { prompt: string; mood: Mood; energy: number; remix: number };
-  type ArrangementResponse = { source: 'ai' | 'local'; arrangement: BeatArrangement };
+  const root = document.querySelector<HTMLElement>('[data-neural-beat-lab]');
+  if (root) {
+    const form = root.querySelector<HTMLFormElement>('[data-nbl-form]');
+    const prompt = root.querySelector<HTMLTextAreaElement>('#nbl-prompt');
+    const player = root.querySelector<HTMLElement>('[data-nbl-player]');
+    const title = root.querySelector<HTMLElement>('[data-nbl-title]');
+    const description = root.querySelector<HTMLElement>('[data-nbl-description]');
+    const status = root.querySelector<HTMLElement>('[data-nbl-status]');
+    const playButton = root.querySelector<HTMLButtonElement>('[data-nbl-play]');
+    const playLabel = root.querySelector<HTMLElement>('[data-nbl-play-label]');
+    const remixButton = root.querySelector<HTMLButtonElement>('[data-nbl-remix]');
+    const newButton = root.querySelector<HTMLButtonElement>('[data-nbl-new]');
+    const pulses = Array.from(root.querySelectorAll<HTMLElement>('[data-nbl-pulse]'));
 
-  const lab = document.querySelector<HTMLElement>('[data-neural-beat-lab]');
+    const surpriseIdeas = [
+      'first coffee on a bright Monday morning',
+      'cycling through campus just before sunset',
+      'the feeling after submitting a huge assignment',
+      'a cosy train ride home in the rain',
+      'friends dancing in a tiny kitchen at midnight',
+    ];
+    const scales = [
+      [130.81, 146.83, 164.81, 196, 220, 261.63],
+      [146.83, 164.81, 185, 220, 246.94, 293.66],
+      [110, 130.81, 146.83, 164.81, 196, 220],
+    ];
 
-  if (lab) {
-    const lanes: LaneName[] = ['kick', 'clap', 'hats', 'synth'];
-    const laneLabels: Record<LaneName, string> = { kick: 'Kick', clap: 'Clap', hats: 'Hats', synth: 'Pulse' };
-    const form = lab.querySelector<HTMLFormElement>('[data-nbl-form]');
-    const setupView = lab.querySelector<HTMLElement>('[data-nbl-setup]');
-    const playerView = lab.querySelector<HTMLElement>('[data-nbl-player]');
-    const promptInput = lab.querySelector<HTMLTextAreaElement>('#nbl-prompt');
-    const energyInput = lab.querySelector<HTMLInputElement>('#nbl-energy');
-    const energyOutput = lab.querySelector<HTMLOutputElement>('[data-nbl-energy-output]');
-    const composeButton = lab.querySelector<HTMLButtonElement>('[data-nbl-compose]');
-    const composeLabel = lab.querySelector<HTMLElement>('[data-nbl-compose-label]');
-    const formStatus = lab.querySelector<HTMLElement>('[data-nbl-form-status]');
-    const topStatus = lab.querySelector<HTMLElement>('[data-nbl-top-status]');
-    const titleElement = lab.querySelector<HTMLElement>('[data-nbl-title]');
-    const tempoElement = lab.querySelector<HTMLElement>('[data-nbl-tempo]');
-    const briefElement = lab.querySelector<HTMLElement>('[data-nbl-brief]');
-    const sourceElement = lab.querySelector<HTMLElement>('[data-nbl-source]');
-    const sourceNote = lab.querySelector<HTMLElement>('[data-nbl-source-note]');
-    const playerStatus = lab.querySelector<HTMLElement>('[data-nbl-player-status]');
-    const playButton = lab.querySelector<HTMLButtonElement>('[data-nbl-play]');
-    const playLabel = lab.querySelector<HTMLElement>('[data-nbl-play-label]');
-    const remixButton = lab.querySelector<HTMLButtonElement>('[data-nbl-remix]');
-    const resetButton = lab.querySelector<HTMLButtonElement>('[data-nbl-reset]');
-    const visualizer = lab.querySelector<HTMLCanvasElement>('[data-nbl-visualizer]');
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    let arrangement: BeatArrangement | null = null;
-    let arrangementSource: 'ai' | 'local' = 'local';
-    let currentInput: BeatInput | null = null;
-    let remixCount = 0;
-    let mutedLanes = new Set<LaneName>();
-    let playing = false;
-    let visibleStep = -1;
-    let schedulerStep = 0;
-    let nextStepTime = 0;
+    let audio: AudioContext | null = null;
     let schedulerTimer: number | null = null;
-    let visualFrame: number | null = null;
-    let uiTimers: number[] = [];
-    let audioContext: AudioContext | null = null;
-    let masterGain: GainNode | null = null;
-    let analyser: AnalyserNode | null = null;
-    let noiseBuffer: AudioBuffer | null = null;
-    let laneGains = {} as Record<LaneName, GainNode>;
-    let activeSources = new Set<AudioScheduledSourceNode>();
+    let playing = false;
+    let currentPrompt = '';
+    let seed = 1;
+    let tempo = 104;
+    let step = 0;
+    let nextStepAt = 0;
+    let generation = 0;
 
-    const setFormMessage = (message: string, tone = '') => {
-      if (!formStatus) return;
-      formStatus.textContent = message;
-      if (tone) formStatus.dataset.tone = tone;
-      else delete formStatus.dataset.tone;
-    };
-
-    const setPlayerMessage = (message: string) => {
-      if (playerStatus) playerStatus.textContent = message;
-    };
-
-    const setBusy = (busy: boolean, label = 'Compose my track') => {
-      if (form) form.setAttribute('aria-busy', String(busy));
-      if (playerView) playerView.setAttribute('aria-busy', String(busy));
-      if (composeButton) composeButton.disabled = busy;
-      if (remixButton) remixButton.disabled = busy;
-      if (resetButton) resetButton.disabled = busy;
-      if (composeLabel) composeLabel.textContent = busy ? 'Composing...' : label;
-      if (topStatus) topStatus.textContent = busy ? 'Shaping the loop...' : arrangement ? 'Track ready' : 'Ready to compose';
-      lab.dataset.nblState = busy ? 'loading' : arrangement ? 'player' : 'setup';
-    };
-
-    const readMood = (): Mood => {
-      const selected = form?.querySelector<HTMLInputElement>('input[name="mood"]:checked')?.value;
-      return selected === 'focused' || selected === 'bright' || selected === 'electric' ? selected : 'dreamy';
-    };
-
-    const hash = (value: string) => {
-      let result = 2166136261;
+    const hashText = (value: string) => {
+      let hash = 2166136261;
       for (let index = 0; index < value.length; index += 1) {
-        result ^= value.charCodeAt(index);
-        result = Math.imul(result, 16777619);
+        hash ^= value.charCodeAt(index);
+        hash = Math.imul(hash, 16777619);
       }
-      return result >>> 0;
+      return Math.abs(hash >>> 0);
     };
 
-    const buildOfflineArrangement = (input: BeatInput): BeatArrangement => {
-      const seed = hash(`${input.prompt}|${input.mood}|${input.energy}|${input.remix}`);
-      const paletteMap: Record<Mood, [string, string, string, string]> = {
-        dreamy: ['#79B8C9', '#C18BB9', '#9EBB8D', '#E1B980'],
-        focused: ['#79A8B8', '#A7B59A', '#D2A47E', '#90A4C2'],
-        bright: ['#67C8BE', '#F2B86B', '#E77E73', '#8CA8D8'],
-        electric: ['#63C9E6', '#A78BFA', '#F472B6', '#F6C453'],
-      };
-      const titles: Record<Mood, string[]> = {
-        dreamy: ['Velvet Orbit', 'Cloud Signals', 'Soft Afterglow'],
-        focused: ['Quiet Momentum', 'Clear Method', 'Patient Current'],
-        bright: ['Sunlit Circuit', 'Fresh Bounce', 'Golden Shortcut'],
-        electric: ['Midnight Voltage', 'Neon Relay', 'Static Rush'],
-      };
-      const baseTempo: Record<Mood, number> = { dreamy: 84, focused: 96, bright: 108, electric: 120 };
-      const kick = Array(16).fill(0);
-      const clap = Array(16).fill(0);
-      const hats = Array(16).fill(0);
-      kick[0] = 1; kick[8] = 1;
-      if (input.energy >= 2) kick[seed % 2 ? 6 : 10] = 1;
-      if (input.energy >= 3) kick[14] = 1;
-      if (input.energy >= 4) kick[seed % 3 ? 3 : 11] = 1;
-      clap[4] = 1; clap[12] = 1;
-      if (input.energy >= 5) clap[15] = 1;
-      for (let step = 0; step < 16; step += 2) hats[step] = 1;
-      if (input.energy >= 3) for (let step = 3; step < 16; step += 4) hats[step] = 1;
-      const phraseMap: Record<Mood, number[]> = {
-        dreamy: [0, -1, -1, 2, -1, -1, 4, -1, 3, -1, -1, 2, -1, 0, -1, -1],
-        focused: [0, -1, 2, -1, 3, -1, 2, -1, 0, -1, 4, -1, 3, -1, 2, -1],
-        bright: [0, -1, 2, 4, -1, 2, -1, 5, 4, -1, 2, -1, 3, 2, -1, 0],
-        electric: [0, -1, 0, 3, -1, 5, 3, -1, 0, 2, -1, 5, 4, -1, 2, 6],
-      };
-      let synth = [...phraseMap[input.mood]];
-      if (input.energy === 1) synth = synth.map((note, step) => step % 4 === 0 ? note : -1);
-      return {
-        title: titles[input.mood][seed % titles[input.mood].length],
-        tempo: Math.max(82, Math.min(148, baseTempo[input.mood] + input.energy * 4 + seed % 5 - 2)),
-        root: 45 + seed % 12,
-        palette: paletteMap[input.mood],
-        patterns: { kick, clap, hats, synth },
-      };
+    const titleFromPrompt = (value: string) => {
+      const words = value.toLowerCase().match(/[a-z0-9]+/g)?.filter((word) => word.length > 2) || ['tiny', 'moment'];
+      const picked = words.slice(0, 3).map((word) => word.charAt(0).toUpperCase() + word.slice(1));
+      return `${picked.join(' ')} Mix`;
     };
 
-    const normalizeArrangement = (value: unknown): BeatArrangement | null => {
-      if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
-      const candidate = value as Record<string, unknown>;
-      const title = typeof candidate.title === 'string' ? candidate.title.trim().slice(0, 42) : '';
-      const tempo = Number(candidate.tempo);
-      const rootNote = Number(candidate.root);
-      const palette = Array.isArray(candidate.palette) ? candidate.palette : [];
-      if (!title || !Number.isInteger(tempo) || tempo < 82 || tempo > 148) return null;
-      if (!Number.isInteger(rootNote) || rootNote < 45 || rootNote > 57) return null;
-      if (palette.length !== 4 || !palette.every(colour => typeof colour === 'string' && /^#[0-9a-f]{6}$/i.test(colour))) return null;
-      if (!candidate.patterns || typeof candidate.patterns !== 'object' || Array.isArray(candidate.patterns)) return null;
-      const rawPatterns = candidate.patterns as Record<string, unknown>;
-      const patterns = {} as BeatPatterns;
-      for (const lane of lanes) {
-        const pattern = rawPatterns[lane];
-        if (!Array.isArray(pattern) || pattern.length !== 16) return null;
-        const values = pattern.map(Number);
-        const valid = lane === 'synth'
-          ? values.every(step => Number.isInteger(step) && step >= -1 && step <= 7)
-          : values.every(step => step === 0 || step === 1);
-        if (!valid) return null;
-        patterns[lane] = values;
-      }
-      return {
-        title,
-        tempo,
-        root: rootNote,
-        palette: palette as [string, string, string, string],
-        patterns,
-      };
+    const stopPlayback = () => {
+      playing = false;
+      root.dataset.playing = 'false';
+      if (schedulerTimer !== null) window.clearTimeout(schedulerTimer);
+      schedulerTimer = null;
+      pulses.forEach((pulse) => pulse.classList.remove('is-active'));
+      if (playLabel) playLabel.textContent = 'Play beat';
+      playButton?.setAttribute('aria-label', 'Play beat');
     };
 
-    const requestArrangement = async (input: BeatInput): Promise<ArrangementResponse> => {
-      const offline = { source: 'local' as const, arrangement: buildOfflineArrangement(input) };
-      const controller = new AbortController();
-      const timeout = window.setTimeout(() => controller.abort(), 12_000);
-      try {
-        const response = await fetch('/api/ai/beat-lab', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(input),
-          signal: controller.signal,
-        });
-        if (!response.ok) return offline;
-        const payload = await response.json() as Record<string, unknown>;
-        const normalized = normalizeArrangement(payload.arrangement);
-        const source = payload.source === 'ai' ? 'ai' : 'local';
-        return normalized ? { source, arrangement: normalized } : offline;
-      } catch {
-        return offline;
-      } finally {
-        window.clearTimeout(timeout);
-      }
-    };
-
-    const updateCell = (lane: LaneName, step: number) => {
-      if (!arrangement) return;
-      const cell = lab.querySelector<HTMLButtonElement>(`[data-nbl-step-lane="${lane}"][data-nbl-step="${step}"]`);
-      if (!cell) return;
-      const value = arrangement.patterns[lane][step];
-      const on = lane === 'synth' ? value >= 0 : value === 1;
-      cell.dataset.on = String(on);
-      cell.setAttribute('aria-pressed', String(on));
-      cell.setAttribute('aria-label', `${laneLabels[lane]} step ${step + 1}, ${on ? 'on' : 'off'}`);
-    };
-
-    const setPlayhead = (step: number) => {
-      visibleStep = step;
-      lab.querySelectorAll<HTMLElement>('[data-nbl-step]').forEach(cell => {
-        cell.classList.toggle('is-current', Number(cell.dataset.nblStep) === step);
-      });
-      lab.querySelectorAll<HTMLElement>('[data-nbl-pulse]').forEach(pulse => {
-        pulse.classList.toggle('is-current', Number(pulse.dataset.nblPulse) === step);
-      });
-      if (reducedMotion) drawStaticVisualizer();
-    };
-
-    const clearPlayhead = () => {
-      visibleStep = -1;
-      lab.querySelectorAll('.is-current').forEach(element => element.classList.remove('is-current'));
-    };
-
-    const renderArrangement = (response: ArrangementResponse) => {
-      arrangement = response.arrangement;
-      arrangementSource = response.source;
-      arrangement.palette.forEach((colour, index) => lab.style.setProperty(`--nbl-c${index}`, colour));
-      if (titleElement) titleElement.textContent = arrangement.title;
-      if (tempoElement) tempoElement.textContent = `${arrangement.tempo} BPM`;
-      if (briefElement) briefElement.textContent = currentInput?.prompt || '';
-      if (sourceElement) sourceElement.textContent = response.source === 'ai' ? 'AI arrangement' : 'Local arrangement';
-      if (sourceNote) sourceNote.textContent = response.source === 'ai'
-        ? 'Generated from your prompt with Gemini.'
-        : 'Made by the lab’s built-in composer when AI is unavailable.';
-      lanes.forEach(lane => arrangement?.patterns[lane].forEach((_, step) => updateCell(lane, step)));
-      drawStaticVisualizer();
-      setPlayerMessage(response.source === 'ai'
-        ? 'Your AI arrangement is ready. Press Play when you are.'
-        : 'A local arrangement stepped in. Press Play when you are.');
-    };
-
-    const showPlayer = () => {
-      if (setupView) setupView.hidden = true;
-      if (playerView) playerView.hidden = false;
-      lab.dataset.nblState = 'player';
-      window.setTimeout(() => playButton?.focus(), 0);
-    };
-
-    const trackSource = (source: AudioScheduledSourceNode) => {
-      activeSources.add(source);
-      source.addEventListener('ended', () => activeSources.delete(source), { once: true });
-    };
-
-    const createAudio = async (): Promise<boolean> => {
-      if (audioContext) return true;
-      const AudioContextClass = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-      if (!AudioContextClass) return false;
-      try {
-        const context = new AudioContextClass();
-        const master = context.createGain();
-        const meter = context.createAnalyser();
-        meter.fftSize = 64;
-        meter.smoothingTimeConstant = 0.72;
-        master.gain.value = 0.56;
-        master.connect(meter);
-        meter.connect(context.destination);
-        const gains = {} as Record<LaneName, GainNode>;
-        lanes.forEach(lane => {
-          const gain = context.createGain();
-          gain.gain.value = mutedLanes.has(lane) ? 0 : 1;
-          gain.connect(master);
-          gains[lane] = gain;
-        });
-        const noise = context.createBuffer(1, context.sampleRate, context.sampleRate);
-        const data = noise.getChannelData(0);
-        for (let index = 0; index < data.length; index += 1) data[index] = Math.random() * 2 - 1;
-        audioContext = context;
-        masterGain = master;
-        analyser = meter;
-        laneGains = gains;
-        noiseBuffer = noise;
-        if (context.state === 'suspended') await context.resume();
-        return true;
-      } catch {
-        return false;
-      }
-    };
-
-    const playKick = (time: number) => {
-      if (!audioContext) return;
-      const oscillator = audioContext.createOscillator();
-      const gain = audioContext.createGain();
-      oscillator.type = 'sine';
-      oscillator.frequency.setValueAtTime(145, time);
-      oscillator.frequency.exponentialRampToValueAtTime(46, time + 0.2);
-      gain.gain.setValueAtTime(0.001, time);
-      gain.gain.linearRampToValueAtTime(0.95, time + 0.006);
-      gain.gain.exponentialRampToValueAtTime(0.001, time + 0.28);
+    const tone = (frequency: number, when: number, duration: number, volume: number, type: OscillatorType = 'sine') => {
+      if (!audio) return;
+      const oscillator = audio.createOscillator();
+      const gain = audio.createGain();
+      oscillator.type = type;
+      oscillator.frequency.setValueAtTime(frequency, when);
+      gain.gain.setValueAtTime(volume, when);
+      gain.gain.exponentialRampToValueAtTime(0.001, when + duration);
       oscillator.connect(gain);
-      gain.connect(laneGains.kick);
-      oscillator.start(time);
-      oscillator.stop(time + 0.3);
-      trackSource(oscillator);
+      gain.connect(audio.destination);
+      oscillator.start(when);
+      oscillator.stop(when + duration + 0.03);
     };
 
-    const playClap = (time: number) => {
-      if (!audioContext || !noiseBuffer) return;
-      const source = audioContext.createBufferSource();
-      const filter = audioContext.createBiquadFilter();
-      const gain = audioContext.createGain();
-      source.buffer = noiseBuffer;
-      filter.type = 'bandpass';
-      filter.frequency.value = 1450;
-      filter.Q.value = 0.7;
-      gain.gain.setValueAtTime(0.001, time);
-      gain.gain.linearRampToValueAtTime(0.32, time + 0.004);
-      gain.gain.exponentialRampToValueAtTime(0.001, time + 0.16);
-      source.connect(filter);
-      filter.connect(gain);
-      gain.connect(laneGains.clap);
-      source.start(time, (time * 0.37) % 0.6, 0.18);
-      source.stop(time + 0.19);
-      trackSource(source);
+    const kick = (when: number) => {
+      if (!audio) return;
+      const oscillator = audio.createOscillator();
+      const gain = audio.createGain();
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(125, when);
+      oscillator.frequency.exponentialRampToValueAtTime(42, when + 0.18);
+      gain.gain.setValueAtTime(0.22, when);
+      gain.gain.exponentialRampToValueAtTime(0.001, when + 0.22);
+      oscillator.connect(gain);
+      gain.connect(audio.destination);
+      oscillator.start(when);
+      oscillator.stop(when + 0.24);
     };
 
-    const playHat = (time: number, accent: boolean) => {
-      if (!audioContext || !noiseBuffer) return;
-      const source = audioContext.createBufferSource();
-      const filter = audioContext.createBiquadFilter();
-      const gain = audioContext.createGain();
-      source.buffer = noiseBuffer;
-      filter.type = 'highpass';
-      filter.frequency.value = 6800;
-      gain.gain.setValueAtTime(accent ? 0.13 : 0.085, time);
-      gain.gain.exponentialRampToValueAtTime(0.001, time + (accent ? 0.075 : 0.045));
-      source.connect(filter);
-      filter.connect(gain);
-      gain.connect(laneGains.hats);
-      source.start(time, (time * 0.71) % 0.8, 0.09);
-      source.stop(time + 0.1);
-      trackSource(source);
-    };
-
-    const playSynth = (time: number, degree: number, duration: number) => {
-      if (!audioContext || !arrangement || !currentInput) return;
-      const scales: Record<Mood, number[]> = {
-        dreamy: [0, 3, 5, 7, 10, 12, 15, 17],
-        focused: [0, 2, 3, 5, 7, 10, 12, 14],
-        bright: [0, 2, 4, 5, 7, 9, 11, 12],
-        electric: [0, 3, 5, 7, 10, 12, 15, 17],
-      };
-      const midi = arrangement.root + scales[currentInput.mood][degree];
-      const frequency = 440 * Math.pow(2, (midi - 69) / 12);
-      const first = audioContext.createOscillator();
-      const second = audioContext.createOscillator();
-      const filter = audioContext.createBiquadFilter();
-      const gain = audioContext.createGain();
-      first.type = currentInput.mood === 'electric' ? 'sawtooth' : 'triangle';
-      second.type = 'sine';
-      first.frequency.value = frequency;
-      second.frequency.value = frequency / 2;
-      second.detune.value = 4;
-      filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(currentInput.mood === 'electric' ? 1500 : 1050, time);
-      filter.frequency.exponentialRampToValueAtTime(420, time + duration);
-      gain.gain.setValueAtTime(0.001, time);
-      gain.gain.linearRampToValueAtTime(0.18, time + 0.018);
-      gain.gain.exponentialRampToValueAtTime(0.001, time + duration);
-      first.connect(filter);
-      second.connect(filter);
-      filter.connect(gain);
-      gain.connect(laneGains.synth);
-      first.start(time);
-      second.start(time);
-      first.stop(time + duration + 0.02);
-      second.stop(time + duration + 0.02);
-      trackSource(first);
-      trackSource(second);
-    };
-
-    const scheduleStep = (step: number, time: number) => {
-      if (!arrangement) return;
-      const duration = 60 / arrangement.tempo / 4;
-      if (arrangement.patterns.kick[step] === 1) playKick(time);
-      if (arrangement.patterns.clap[step] === 1) playClap(time);
-      if (arrangement.patterns.hats[step] === 1) playHat(time, step % 4 === 0);
-      const degree = arrangement.patterns.synth[step];
-      if (degree >= 0) playSynth(time, degree, duration * 1.7);
+    const scheduleStep = (index: number, when: number) => {
+      const scale = scales[seed % scales.length];
+      if (index % 4 === 0 || (index === 10 && seed % 2 === 0)) kick(when);
+      if (index % 8 === 4) {
+        tone(180, when, 0.08, 0.045, 'triangle');
+        tone(260, when + 0.018, 0.06, 0.025, 'square');
+      }
+      if (index % 2 === 1) tone(2100 + ((seed + index) % 5) * 260, when, 0.035, 0.012, 'square');
+      if (index % 2 === 0) {
+        const noteIndex = (seed + index / 2 + generation) % scale.length;
+        tone(scale[noteIndex], when, 0.18, 0.035, index % 4 === 0 ? 'triangle' : 'sine');
+        if (index % 8 === 0) tone(scale[noteIndex] / 2, when, 0.32, 0.04, 'sine');
+      }
+      const delay = Math.max(0, (when - (audio?.currentTime || 0)) * 1000);
+      window.setTimeout(() => {
+        pulses.forEach((pulse, pulseIndex) => pulse.classList.toggle('is-active', pulseIndex === index));
+      }, delay);
     };
 
     const scheduler = () => {
-      if (!audioContext || !arrangement || !playing) return;
-      const stepDuration = 60 / arrangement.tempo / 4;
-      while (nextStepTime < audioContext.currentTime + 0.1) {
-        const step = schedulerStep;
-        scheduleStep(step, nextStepTime);
-        const delay = Math.max(0, (nextStepTime - audioContext.currentTime) * 1000);
-        const timer = window.setTimeout(() => setPlayhead(step), delay);
-        uiTimers.push(timer);
-        nextStepTime += stepDuration;
-        schedulerStep = (schedulerStep + 1) % 16;
+      if (!playing || !audio) return;
+      const stepDuration = 60 / tempo / 2;
+      while (nextStepAt < audio.currentTime + 0.12) {
+        scheduleStep(step, nextStepAt);
+        nextStepAt += stepDuration;
+        step = (step + 1) % 16;
       }
-    };
-
-    const sizeCanvas = () => {
-      if (!visualizer) return null;
-      const width = Math.max(1, Math.round(visualizer.clientWidth));
-      const height = Math.max(1, Math.round(visualizer.clientHeight));
-      const ratio = Math.min(window.devicePixelRatio || 1, 2);
-      if (visualizer.width !== Math.round(width * ratio) || visualizer.height !== Math.round(height * ratio)) {
-        visualizer.width = Math.round(width * ratio);
-        visualizer.height = Math.round(height * ratio);
-      }
-      const context = visualizer.getContext('2d');
-      context?.setTransform(ratio, 0, 0, ratio, 0, 0);
-      return context ? { context, width, height } : null;
-    };
-
-    function drawStaticVisualizer() {
-      const sized = sizeCanvas();
-      if (!sized) return;
-      const { context, width, height } = sized;
-      context.clearRect(0, 0, width, height);
-      const colours = arrangement?.palette || ['#79B8C9', '#C18BB9', '#9EBB8D', '#E1B980'];
-      const bars = 36;
-      const gap = 3;
-      const barWidth = Math.max(2, (width - gap * (bars - 1)) / bars);
-      for (let index = 0; index < bars; index += 1) {
-        const wave = 0.22 + Math.abs(Math.sin(index * 0.57 + (visibleStep + 1) * 0.2)) * 0.42;
-        const barHeight = Math.max(3, wave * height);
-        const gradient = context.createLinearGradient(0, height, 0, height - barHeight);
-        gradient.addColorStop(0, colours[index % colours.length]);
-        gradient.addColorStop(1, `${colours[(index + 1) % colours.length]}33`);
-        context.fillStyle = gradient;
-        context.fillRect(index * (barWidth + gap), height - barHeight, barWidth, barHeight);
-      }
-    }
-
-    const drawLiveVisualizer = () => {
-      if (!playing || reducedMotion || !analyser) return;
-      const sized = sizeCanvas();
-      if (!sized) return;
-      const { context, width, height } = sized;
-      const data = new Uint8Array(analyser.frequencyBinCount);
-      analyser.getByteFrequencyData(data);
-      context.clearRect(0, 0, width, height);
-      const colours = arrangement?.palette || ['#79B8C9', '#C18BB9', '#9EBB8D', '#E1B980'];
-      const bars = data.length;
-      const gap = 4;
-      const barWidth = Math.max(3, (width - gap * (bars - 1)) / bars);
-      for (let index = 0; index < bars; index += 1) {
-        const strength = Math.max(0.04, data[index] / 255);
-        const barHeight = Math.max(3, strength * height * 0.92);
-        const gradient = context.createLinearGradient(0, height, 0, height - barHeight);
-        gradient.addColorStop(0, colours[index % colours.length]);
-        gradient.addColorStop(1, `${colours[(index + 1) % colours.length]}55`);
-        context.fillStyle = gradient;
-        context.fillRect(index * (barWidth + gap), height - barHeight, barWidth, barHeight);
-      }
-      visualFrame = window.requestAnimationFrame(drawLiveVisualizer);
-    };
-
-    const stopPlayback = (clearStep = false) => {
-      playing = false;
-      lab.dataset.nblPlaying = 'false';
-      if (schedulerTimer !== null) window.clearInterval(schedulerTimer);
-      schedulerTimer = null;
-      uiTimers.forEach(timer => window.clearTimeout(timer));
-      uiTimers = [];
-      if (visualFrame !== null) window.cancelAnimationFrame(visualFrame);
-      visualFrame = null;
-      activeSources.forEach(source => { try { source.stop(); } catch {} });
-      activeSources.clear();
-      const context = audioContext;
-      audioContext = null;
-      masterGain = null;
-      analyser = null;
-      noiseBuffer = null;
-      laneGains = {} as Record<LaneName, GainNode>;
-      if (context && context.state !== 'closed') context.close().catch(() => {});
-      if (playLabel) playLabel.textContent = 'Play';
-      if (playButton) playButton.setAttribute('aria-label', 'Play track');
-      if (clearStep) clearPlayhead();
-      drawStaticVisualizer();
+      schedulerTimer = window.setTimeout(scheduler, 45);
     };
 
     const startPlayback = async () => {
-      if (!arrangement) return;
-      const audioReady = await createAudio();
-      if (!audioReady || !audioContext) {
-        setPlayerMessage('This browser could not start the audio engine. Try a current browser.');
-        return;
-      }
+      if (!audio) audio = new AudioContext();
+      if (audio.state === 'suspended') await audio.resume();
       playing = true;
-      lab.dataset.nblPlaying = 'true';
-      schedulerStep = visibleStep >= 0 ? (visibleStep + 1) % 16 : 0;
-      nextStepTime = audioContext.currentTime + 0.05;
-      if (playLabel) playLabel.textContent = 'Pause';
-      if (playButton) playButton.setAttribute('aria-label', 'Pause track');
-      setPlayerMessage(`${arrangementSource === 'ai' ? 'AI' : 'Local'} arrangement playing. Mute lanes or change steps live.`);
+      root.dataset.playing = 'true';
+      step = 0;
+      nextStepAt = audio.currentTime + 0.06;
+      if (playLabel) playLabel.textContent = 'Pause beat';
+      playButton?.setAttribute('aria-label', 'Pause beat');
       scheduler();
-      schedulerTimer = window.setInterval(scheduler, 25);
-      if (!reducedMotion) visualFrame = window.requestAnimationFrame(drawLiveVisualizer);
-      else drawStaticVisualizer();
     };
 
-    const compose = async (input: BeatInput) => {
-      setBusy(true);
-      setFormMessage(input.remix > 0 ? 'Finding a fresh variation...' : 'Turning your idea into four musical lanes...');
-      stopPlayback(true);
-      const response = await requestArrangement(input);
-      renderArrangement(response);
-      showPlayer();
-      setBusy(false);
+    const revealTrack = (value: string, shouldPlay = false) => {
+      stopPlayback();
+      currentPrompt = value;
+      seed = hashText(`${value}-${generation}`);
+      tempo = 92 + (seed % 33);
+      if (title) title.textContent = titleFromPrompt(value);
+      if (description) description.textContent = `A ${tempo} BPM loop made from “${value}”.`;
+      form?.setAttribute('hidden', '');
+      player?.removeAttribute('hidden');
+      if (status) status.textContent = 'Your beat is ready.';
+      if (shouldPlay) startPlayback();
+      else playButton?.focus({ preventScroll: true });
     };
 
-    energyInput?.addEventListener('input', () => {
-      if (energyOutput) energyOutput.textContent = `${energyInput.value} / 5`;
-    });
-
-    form?.addEventListener('submit', async event => {
+    form?.addEventListener('submit', (event) => {
       event.preventDefault();
-      if (!promptInput || !energyInput) return;
-      const prompt = promptInput.value.replace(/\s+/g, ' ').trim();
-      if (prompt.length < 3) {
-        setFormMessage('Add a few words about the track first.', 'error');
-        promptInput.focus();
+      const value = prompt?.value.trim() || '';
+      if (value.length < 3) {
+        if (status) status.textContent = 'Give the lab a few words to work with.';
+        prompt?.focus();
         return;
       }
-      remixCount = 0;
-      currentInput = { prompt: prompt.slice(0, 160), mood: readMood(), energy: Number(energyInput.value), remix: remixCount };
-      await compose(currentInput);
+      generation = 0;
+      revealTrack(value);
     });
 
-    playButton?.addEventListener('click', async () => {
-      if (playing) {
-        stopPlayback(false);
-        setPlayerMessage('Paused. Your place in the loop is saved.');
-      } else {
-        await startPlayback();
-      }
-    });
-
-    remixButton?.addEventListener('click', async () => {
-      if (!currentInput) return;
-      remixCount = Math.min(99, remixCount + 1);
-      currentInput = { ...currentInput, remix: remixCount };
-      await compose(currentInput);
-    });
-
-    resetButton?.addEventListener('click', () => {
-      stopPlayback(true);
-      arrangement = null;
-      currentInput = null;
-      remixCount = 0;
-      mutedLanes.clear();
-      form?.reset();
-      if (energyOutput) energyOutput.textContent = '3 / 5';
-      lab.style.removeProperty('--nbl-c0');
-      lab.style.removeProperty('--nbl-c1');
-      lab.style.removeProperty('--nbl-c2');
-      lab.style.removeProperty('--nbl-c3');
-      lab.querySelectorAll<HTMLButtonElement>('[data-nbl-mute]').forEach(button => button.setAttribute('aria-pressed', 'false'));
-      if (playerView) playerView.hidden = true;
-      if (setupView) setupView.hidden = false;
-      lab.dataset.nblState = 'setup';
-      if (topStatus) topStatus.textContent = 'Ready to compose';
-      setFormMessage('Sound only starts when you press Play.');
-      window.setTimeout(() => promptInput?.focus(), 0);
-    });
-
-    lab.querySelectorAll<HTMLButtonElement>('[data-nbl-mute]').forEach(button => {
+    root.querySelectorAll<HTMLButtonElement>('[data-nbl-idea]').forEach((button) => {
       button.addEventListener('click', () => {
-        const lane = button.dataset.nblMute as LaneName | undefined;
-        if (!lane || !lanes.includes(lane)) return;
-        if (mutedLanes.has(lane)) mutedLanes.delete(lane);
-        else mutedLanes.add(lane);
-        const muted = mutedLanes.has(lane);
-        button.setAttribute('aria-pressed', String(muted));
-        button.setAttribute('aria-label', `${muted ? 'Unmute' : 'Mute'} ${laneLabels[lane]} lane`);
-        if (laneGains[lane] && audioContext) {
-          laneGains[lane].gain.setTargetAtTime(muted ? 0 : 1, audioContext.currentTime, 0.015);
-        }
-        setPlayerMessage(`${laneLabels[lane]} ${muted ? 'muted' : 'back in the mix'}.`);
+        if (!prompt) return;
+        prompt.value = button.dataset.nblIdea || '';
+        prompt.focus();
       });
     });
 
-    lab.querySelectorAll<HTMLButtonElement>('[data-nbl-step-lane]').forEach(cell => {
-      cell.addEventListener('click', () => {
-        if (!arrangement) return;
-        const lane = cell.dataset.nblStepLane as LaneName | undefined;
-        const step = Number(cell.dataset.nblStep);
-        if (!lane || !lanes.includes(lane) || !Number.isInteger(step) || step < 0 || step > 15) return;
-        const current = arrangement.patterns[lane][step];
-        arrangement.patterns[lane][step] = lane === 'synth'
-          ? current >= 0 ? -1 : (step + (currentInput?.energy || 3) + remixCount) % 8
-          : current === 1 ? 0 : 1;
-        updateCell(lane, step);
-        const updated = arrangement.patterns[lane][step];
-        const isOn = lane === 'synth' ? updated >= 0 : updated === 1;
-        setPlayerMessage(`${laneLabels[lane]} step ${step + 1} ${isOn ? 'added' : 'removed'}.`);
-      });
+    root.querySelector<HTMLButtonElement>('[data-nbl-surprise]')?.addEventListener('click', () => {
+      if (!prompt) return;
+      const idea = surpriseIdeas[Math.floor(Math.random() * surpriseIdeas.length)];
+      prompt.value = idea;
+      prompt.focus();
     });
 
-    const resizeObserver = typeof ResizeObserver !== 'undefined'
-      ? new ResizeObserver(() => { if (!playing || reducedMotion) drawStaticVisualizer(); })
-      : null;
-    if (visualizer) resizeObserver?.observe(visualizer);
-    drawStaticVisualizer();
+    playButton?.addEventListener('click', () => {
+      if (playing) stopPlayback();
+      else startPlayback();
+    });
 
-    const visibilityObserver = typeof IntersectionObserver !== 'undefined'
-      ? new IntersectionObserver(entries => {
-          if (!entries[0]?.isIntersecting && playing) stopPlayback(false);
-        }, { threshold: 0 })
-      : null;
-    visibilityObserver?.observe(lab);
+    remixButton?.addEventListener('click', () => {
+      generation += 1;
+      revealTrack(currentPrompt, playing);
+    });
 
-    window.addEventListener('surrey-ai-project-modal-close', () => stopPlayback(true));
-    window.addEventListener('pagehide', () => stopPlayback(true));
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden && playing) {
-        stopPlayback(false);
-        setPlayerMessage('Paused while this tab is away.');
+    newButton?.addEventListener('click', () => {
+      stopPlayback();
+      player?.setAttribute('hidden', '');
+      form?.removeAttribute('hidden');
+      if (prompt) {
+        prompt.value = '';
+        prompt.focus({ preventScroll: true });
       }
+      if (status) status.textContent = 'Sound starts only after you press play.';
     });
+
+    window.addEventListener('surrey-ai-project-modal-close', (event) => {
+      const project = event instanceof CustomEvent ? event.detail?.project : undefined;
+      if (!project || project === 'beat') stopPlayback();
+    });
+    document.addEventListener('visibilitychange', () => { if (document.hidden) stopPlayback(); });
   }
 </script>

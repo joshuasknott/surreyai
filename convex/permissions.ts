@@ -165,7 +165,7 @@ export async function getMembership(
     .withIndex("by_user_society", (q) =>
       q.eq("userId", userId).eq("societyId", societyId)
     )
-    .collect();
+    .take(10);
   return memberships.find((m) => m.status === "active") || null;
 }
 

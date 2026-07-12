@@ -21,6 +21,6 @@ export const getById = query({
 export const list = query({
   args: {},
   handler: async (ctx) => {
-    return await ctx.db.query("societies").collect();
+    return await ctx.db.query("societies").take(100);
   },
 });

@@ -1,5 +1,7 @@
 ---
+import { Image } from "astro:assets";
 import BrandMark from "../common/BrandMark.astro";
+import racingHero from "../../assets/generated/ai-racing-simulator.optimized.webp";
 ---
 
 <section class="drift-lab-section" aria-label="Student Project: Racing Simulator">
@@ -8,7 +10,7 @@ import BrandMark from "../common/BrandMark.astro";
       <span class="drift-lab-badge">Student Project</span>
       <h2 class="drift-lab-title">Racing Simulator</h2>
       <p class="drift-lab-subtitle">
-        A low-poly campus racer where you drift through corners while chasing AI drivers.
+        A quick campus-inspired racer where every rival has a different style.
       </p>
     </div>
 
@@ -21,36 +23,62 @@ import BrandMark from "../common/BrandMark.astro";
             <p>Surrey Artificial Intelligence Society</p>
           </div>
         </div>
+        <div class="drift-lab-launcher__specs" aria-label="Race format">
+          <span>3 laps</span><i></i><span>5 cars</span><i></i><span>1 winner</span>
+        </div>
       </header>
 
-      <main class="drift-lab-launcher__main">
-        <div class="drift-lab-launcher__instructions" aria-label="Controls">
-          <div class="drift-lab-control-card drift-lab-control-card--desktop">
-            <span class="control-card__title">Desktop controls</span>
-            <div class="control-keys" aria-hidden="true">
-              <span></span>
-              <kbd>W</kbd>
-              <span></span>
-              <kbd>A</kbd>
-              <kbd>S</kbd>
-              <kbd>D</kbd>
-            </div>
-            <p>Steer with A/D or arrows. W accelerates, S brakes.</p>
-          </div>
-          <div class="drift-lab-control-card drift-lab-control-card--mobile">
-            <span class="control-card__title">Mobile controls</span>
-            <div class="control-phone" aria-hidden="true">
-              <span class="control-phone__stick"><span></span></span>
-              <span class="control-phone__pedal control-phone__pedal--brake">Brake</span>
-              <span class="control-phone__pedal control-phone__pedal--gas">Gas</span>
-            </div>
-            <p>Drag the stick to steer. Hold gas to accelerate, brake to slow down.</p>
+      <div class="drift-lab-launcher__main">
+        <Image
+          class="drift-lab-launcher__backdrop"
+          src={racingHero}
+          alt=""
+          widths={[960, 1440, 1920]}
+          sizes="100vw"
+          format="webp"
+          quality={86}
+          loading="eager"
+          aria-hidden="true"
+        />
+        <div class="drift-lab-launcher__veil" aria-hidden="true"></div>
+
+        <div class="drift-lab-launcher__hero">
+          <span class="drift-lab-launcher__eyebrow">Campus night race</span>
+          <h2>Beat the grid.</h2>
+          <p>Five cars. Three laps. Four rivals with their own strengths&mdash;and real consequences when you make contact.</p>
+          <div class="drift-lab-launcher__features" aria-label="Game features">
+            <span><i></i> Rivals with different styles</span>
+            <span><i></i> Satisfying drifts</span>
+            <span><i></i> Crashes have consequences</span>
           </div>
         </div>
-        <button id="drift-lab-launch-btn" class="drift-lab-launch-btn" type="button">
-          Start Race
-        </button>
-      </main>
+
+        <aside class="drift-lab-lobby" aria-label="Starting grid and controls">
+          <div class="drift-lab-lobby__head">
+            <div><span>Starting grid</span><strong>You start P5</strong></div>
+            <span class="drift-lab-lobby__live"><i></i> Rivals ready</span>
+          </div>
+          <div class="drift-lab-rivals">
+            <span><i style="--rival:#38BDF8"></i><b>Nova</b><small>clean lines</small></span>
+            <span><i style="--rival:#A78BFA"></i><b>Apex</b><small>late braker</small></span>
+            <span><i style="--rival:#FBBF24"></i><b>Echo</b><small>steady racer</small></span>
+            <span><i style="--rival:#34D399"></i><b>Flux</b><small>top speed</small></span>
+          </div>
+          <div class="drift-lab-lobby__controls drift-lab-lobby__controls--desktop">
+            <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></span>
+            <p>Accelerate, brake, and steer. You can also use the arrow keys.</p>
+          </div>
+          <div class="drift-lab-lobby__controls drift-lab-lobby__controls--mobile">
+            <span class="mini-stick" aria-hidden="true"><span></span></span>
+            <p>Use the steering stick with the gas and brake pedals.</p>
+          </div>
+          <button id="drift-lab-launch-btn" class="drift-lab-launch-btn" type="button">
+            <span>Start race</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5" /></svg>
+          </button>
+          <small class="drift-lab-lobby__hint">A 3&ndash;2&ndash;1 countdown starts on the grid.</small>
+        </aside>
+      </div>
     </div>
 
     <div id="drift-lab-game" class="drift-lab-game" hidden>
@@ -60,7 +88,7 @@ import BrandMark from "../common/BrandMark.astro";
         <div class="drift-lab-overlay-inner">
           <span class="drift-lab-mode">Campus AI challenge</span>
           <h3 class="drift-lab-game-title">Racing Simulator</h3>
-          <p class="drift-lab-game-subtitle">Race three laps around a campus-inspired circuit while AI drivers chase the line beside you.</p>
+          <p class="drift-lab-game-subtitle">Race three laps around a campus-inspired track while four rivals fight you for the lead.</p>
           <button id="drift-lab-play-btn" class="drift-lab-play-btn" type="button">
             Start Race
           </button>
@@ -75,6 +103,12 @@ import BrandMark from "../common/BrandMark.astro";
             </div>
           </div>
         </div>
+      </div>
+
+      <div id="drift-lab-countdown" class="drift-lab-countdown" hidden aria-live="assertive">
+        <div class="drift-lab-start-lights" aria-hidden="true"><i></i><i></i><i></i></div>
+        <strong id="drift-lab-countdown-label">3</strong>
+        <span>Hold W to launch</span>
       </div>
 
       <div id="drift-lab-hud" class="drift-lab-hud" hidden>
@@ -93,6 +127,10 @@ import BrandMark from "../common/BrandMark.astro";
         <div class="hud-right">
           <div class="hud-time" id="drift-lab-time">0:00.00</div>
           <div class="hud-best" id="drift-lab-best">Best race: --:--.--</div>
+          <div class="hud-damage" aria-label="Car damage">
+            <span id="drift-lab-damage-label">Body 100%</span>
+            <i><b id="drift-lab-damage"></b></i>
+          </div>
         </div>
         <div class="hud-bottom">
           <button id="drift-lab-sound-btn" class="hud-sound" type="button" aria-label="Toggle sound">Sound: On</button>
@@ -102,9 +140,12 @@ import BrandMark from "../common/BrandMark.astro";
 
       <div class="drift-lab-game-actions">
         <button id="drift-lab-fullscreen-btn" class="drift-lab-fullscreen-btn" type="button" aria-label="Enter fullscreen">
-          Full screen
+          <svg class="fullscreen-enter" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 4H4v4.5M15.5 4H20v4.5M20 15.5V20h-4.5M8.5 20H4v-4.5" /></svg>
+          <svg class="fullscreen-exit" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M20 15h-5v5M4 15h5v5" /></svg>
         </button>
       </div>
+
+      <div id="drift-lab-impact" class="drift-lab-impact" hidden>Heavy contact</div>
 
       <div id="drift-lab-complete" class="drift-lab-overlay" hidden>
         <div class="drift-lab-overlay-inner">
@@ -170,13 +211,14 @@ import BrandMark from "../common/BrandMark.astro";
   }
 
   .drift-lab-launcher {
+    position: relative;
     display: flex;
     flex: 1;
     min-height: 0;
     flex-direction: column;
     border-radius: 0;
-    background: var(--ai-surface);
-    color: var(--ai-fg);
+    background: #07101b;
+    color: #f8fafc;
     overflow: hidden;
   }
 
@@ -191,9 +233,11 @@ import BrandMark from "../common/BrandMark.astro";
     gap: 1.25rem;
     min-height: 4.25rem;
     padding: 0.75rem clamp(1rem, 3vw, 2rem);
-    border-bottom: 1px solid var(--ai-border);
-    background: color-mix(in srgb, var(--ai-surface) 96%, transparent);
+    border-bottom: 1px solid rgba(255,255,255,.11);
+    background: rgba(6, 12, 21, 0.88);
     flex: 0 0 auto;
+    color: #f8fafc;
+    backdrop-filter: blur(18px);
   }
 
   .drift-lab-launcher__brand {
@@ -214,7 +258,7 @@ import BrandMark from "../common/BrandMark.astro";
 
   .drift-lab-launcher__brand h2 {
     margin: 0;
-    color: var(--ai-fg);
+    color: #f8fafc;
     font-size: 1.25rem;
     font-weight: 850;
     line-height: 1.1;
@@ -225,7 +269,7 @@ import BrandMark from "../common/BrandMark.astro";
 
   .drift-lab-launcher__brand p {
     margin: 0.15rem 0 0;
-    color: var(--ai-fg-muted);
+    color: rgba(226,232,240,.58);
     font-size: 0.78rem;
     font-weight: 700;
     overflow: hidden;
@@ -234,13 +278,189 @@ import BrandMark from "../common/BrandMark.astro";
   }
 
   .drift-lab-launcher__main {
+    position: relative;
     display: grid;
-    gap: clamp(1.2rem, 3vw, 1.8rem);
+    grid-template-columns: minmax(20rem, 1.15fr) minmax(19rem, 0.72fr);
+    gap: clamp(2rem, 5vw, 5rem);
     flex: 1;
     min-height: 0;
-    place-items: center;
-    padding: 2rem 1.5rem;
+    align-items: end;
+    padding: clamp(2rem, 5vw, 4.8rem);
+    isolation: isolate;
   }
+
+  .drift-lab-launcher__specs {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: rgba(226,232,240,.62);
+    font-size: 0.62rem;
+    font-weight: 850;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .drift-lab-launcher__specs i {
+    width: 0.22rem;
+    height: 0.22rem;
+    border-radius: 50%;
+    background: #5fd2c7;
+  }
+
+  .drift-lab-launcher__backdrop,
+  .drift-lab-launcher__veil {
+    position: absolute;
+    z-index: -2;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .drift-lab-launcher__backdrop {
+    object-fit: cover;
+    object-position: center 55%;
+    filter: saturate(.84) contrast(1.1) brightness(.56);
+    transform: scale(1.015);
+  }
+
+  .drift-lab-launcher__veil {
+    z-index: -1;
+    background:
+      linear-gradient(90deg, rgba(4,9,17,.94) 0%, rgba(4,9,17,.72) 48%, rgba(4,9,17,.44) 100%),
+      linear-gradient(0deg, rgba(4,9,17,.92), transparent 66%);
+  }
+
+  .drift-lab-launcher__hero { align-self: center; max-width: 42rem; }
+
+  .drift-lab-launcher__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: #63d8c7;
+    font-size: 0.68rem;
+    font-weight: 850;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+  }
+
+  .drift-lab-launcher__eyebrow::before {
+    width: 2rem;
+    height: 1px;
+    background: currentColor;
+    content: "";
+  }
+
+  .drift-lab-launcher__hero h2 {
+    max-width: 9ch;
+    margin: 0.8rem 0 1rem;
+    color: #f8fafc;
+    font-size: clamp(3rem, 6.2vw, 6.3rem);
+    font-weight: 900;
+    letter-spacing: -0.075em;
+    line-height: .88;
+  }
+
+  .drift-lab-launcher__hero > p {
+    max-width: 39rem;
+    margin: 0;
+    color: rgba(226,232,240,.72);
+    font-size: clamp(.9rem, 1.35vw, 1.04rem);
+    line-height: 1.65;
+  }
+
+  .drift-lab-launcher__features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem 1rem;
+    margin-top: 1.45rem;
+  }
+
+  .drift-lab-launcher__features span {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    color: rgba(241,245,249,.68);
+    font-size: .7rem;
+    font-weight: 750;
+  }
+
+  .drift-lab-launcher__features i {
+    width: .38rem;
+    height: .38rem;
+    border-radius: 50%;
+    background: #ff8a72;
+    box-shadow: 0 0 0 .22rem rgba(255,138,114,.12);
+  }
+
+  .drift-lab-lobby {
+    align-self: center;
+    display: grid;
+    gap: 1rem;
+    padding: clamp(1rem, 2.5vw, 1.45rem);
+    border: 1px solid rgba(255,255,255,.16);
+    border-radius: 18px;
+    background: rgba(7, 13, 23, .74);
+    box-shadow: 0 28px 80px rgba(0,0,0,.32);
+    backdrop-filter: blur(18px);
+  }
+
+  .drift-lab-lobby__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: .85rem;
+    border-bottom: 1px solid rgba(255,255,255,.11);
+  }
+
+  .drift-lab-lobby__head > div { display: grid; gap: .18rem; }
+  .drift-lab-lobby__head > div span { color: rgba(226,232,240,.5); font-size: .6rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
+  .drift-lab-lobby__head strong { color: #fff; font-size: 1rem; }
+
+  .drift-lab-lobby__live {
+    display: inline-flex;
+    align-items: center;
+    gap: .42rem;
+    color: #84e1d5;
+    font-size: .62rem;
+    font-weight: 800;
+  }
+
+  .drift-lab-lobby__live i { width: .4rem; height: .4rem; border-radius: 50%; background: #5ee3bd; box-shadow: 0 0 0 .24rem rgba(94,227,189,.12); }
+
+  .drift-lab-rivals { display: grid; grid-template-columns: repeat(2, 1fr); gap: .55rem; }
+
+  .drift-lab-rivals > span {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: .05rem .48rem;
+    align-items: center;
+    padding: .65rem;
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 10px;
+    background: rgba(255,255,255,.035);
+  }
+
+  .drift-lab-rivals i { grid-row: 1 / 3; width: .55rem; height: 1.65rem; border-radius: 999px; background: var(--rival); box-shadow: 0 0 .8rem color-mix(in srgb, var(--rival) 55%, transparent); }
+  .drift-lab-rivals b { color: #f8fafc; font-size: .76rem; }
+  .drift-lab-rivals small { color: rgba(226,232,240,.48); font-size: .6rem; }
+
+  .drift-lab-lobby__controls { display: grid; grid-template-columns: auto 1fr; gap: .7rem; align-items: center; }
+  .drift-lab-lobby__controls > span { display: flex; gap: .22rem; }
+  .drift-lab-lobby__controls kbd {
+    display: grid;
+    width: 1.7rem;
+    height: 1.7rem;
+    place-items: center;
+    border: 1px solid rgba(255,255,255,.19);
+    border-radius: 6px;
+    background: rgba(255,255,255,.08);
+    color: #f8fafc;
+    font: 800 .62rem/1 inherit;
+    box-shadow: 0 2px 0 rgba(255,255,255,.12);
+  }
+  .drift-lab-lobby__controls p { margin: 0; color: rgba(226,232,240,.54); font-size: .65rem; line-height: 1.4; }
+  .drift-lab-lobby__controls--mobile { display: none; }
 
   .drift-lab-launcher__instructions {
     display: grid;
@@ -359,33 +579,37 @@ import BrandMark from "../common/BrandMark.astro";
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 10rem;
-    min-height: 3rem;
+    width: 100%;
+    min-height: 3.35rem;
     padding: 0.85rem 2rem;
-    border: 1px solid var(--ai-fg);
-    border-radius: 8px;
-    background: var(--ai-fg);
-    color: var(--ai-bg);
+    border: 1px solid #ff8069;
+    border-radius: 11px;
+    background: #ff8069;
+    color: #111923;
     cursor: pointer;
     font: inherit;
     font-size: 0.95rem;
     font-weight: 850;
     transition: transform 0.2s, background-color 0.2s, color 0.2s, box-shadow 0.2s;
-    box-shadow: 0 16px 38px color-mix(in srgb, var(--ai-slate-base) 10%, transparent);
+    box-shadow: 0 16px 38px rgba(255, 99, 76, .2);
   }
+
+  .drift-lab-launch-btn svg { width: 1.15rem; height: 1.15rem; margin-left: auto; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
 
   .drift-lab-launch-btn:hover {
     transform: translateY(-1px);
-    background: var(--ai-azure);
-    border-color: var(--ai-azure);
-    color: var(--ai-accent-contrast);
-    box-shadow: 0 18px 44px color-mix(in srgb, var(--ai-azure) 20%, transparent);
+    background: #fff;
+    border-color: #fff;
+    color: #111923;
+    box-shadow: 0 18px 44px rgba(0,0,0,.24);
   }
 
   .drift-lab-launch-btn:focus-visible {
-    outline: 2px solid var(--ai-azure);
+    outline: 2px solid #fff;
     outline-offset: 3px;
   }
+
+  .drift-lab-lobby__hint { display: block; margin-top: -.35rem; color: rgba(226,232,240,.42); font-size: .59rem; text-align: center; }
 
   .drift-lab-header {
     text-align: left;
@@ -474,6 +698,71 @@ import BrandMark from "../common/BrandMark.astro";
 
   .drift-lab-overlay[hidden] {
     display: none;
+  }
+
+  .drift-lab-countdown {
+    position: absolute;
+    z-index: 12;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    color: #fff;
+    background: radial-gradient(circle at 50% 53%, rgba(4,8,15,.08), rgba(4,8,15,.52));
+    pointer-events: none;
+  }
+
+  .drift-lab-countdown[hidden] { display: none; }
+
+  .drift-lab-countdown strong {
+    min-width: 2ch;
+    color: #fff;
+    font: 900 clamp(5rem, 18vw, 10rem)/.9 var(--font-sans, Inter, sans-serif);
+    letter-spacing: -.08em;
+    text-align: center;
+    text-shadow: 0 12px 46px rgba(0,0,0,.52);
+    transform: translateX(-.04em);
+  }
+
+  .drift-lab-countdown span {
+    margin-top: .75rem;
+    color: rgba(255,255,255,.72);
+    font-size: .68rem;
+    font-weight: 850;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+  }
+
+  .drift-lab-start-lights {
+    display: flex;
+    gap: .55rem;
+    margin-bottom: 1rem;
+    padding: .55rem .7rem;
+    border: 1px solid rgba(255,255,255,.14);
+    border-radius: 999px;
+    background: rgba(3,7,13,.66);
+    box-shadow: 0 14px 40px rgba(0,0,0,.32);
+  }
+
+  .drift-lab-start-lights i {
+    width: .85rem;
+    height: .85rem;
+    border-radius: 50%;
+    background: rgba(255,255,255,.14);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
+  }
+
+  .drift-lab-countdown[data-step="3"] .drift-lab-start-lights i:nth-child(1),
+  .drift-lab-countdown[data-step="2"] .drift-lab-start-lights i:nth-child(-n + 2),
+  .drift-lab-countdown[data-step="1"] .drift-lab-start-lights i,
+  .drift-lab-countdown[data-step="go"] .drift-lab-start-lights i {
+    background: #ff5d4b;
+    box-shadow: 0 0 1.3rem rgba(255,93,75,.72);
+  }
+
+  .drift-lab-countdown[data-step="go"] .drift-lab-start-lights i {
+    background: #5ee3bd;
+    box-shadow: 0 0 1.3rem rgba(94,227,189,.75);
   }
 
   .drift-lab-overlay-inner {
@@ -614,7 +903,8 @@ import BrandMark from "../common/BrandMark.astro";
   .hud-lap,
   .hud-telemetry,
   .hud-best,
-  .hud-drift-label {
+  .hud-drift-label,
+  .hud-damage > span {
     font-size: 0.7rem;
     color: #94A3B8;
     text-transform: uppercase;
@@ -641,6 +931,34 @@ import BrandMark from "../common/BrandMark.astro";
     width: 0%;
     background: linear-gradient(90deg, #10B981, #FBBF24, #FF6B6B);
     transition: width 0.08s linear;
+  }
+
+  .hud-damage {
+    display: grid;
+    width: 7.5rem;
+    justify-items: end;
+    gap: .25rem;
+  }
+
+  .hud-damage > span { color: #cbd5e1; text-shadow: 0 2px 8px rgba(0,0,0,.6); }
+
+  .hud-damage > i {
+    display: block;
+    width: 100%;
+    height: .28rem;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 999px;
+    background: rgba(255,255,255,.09);
+  }
+
+  .hud-damage b {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #ff6658, #fbbf24 46%, #5ee3bd);
+    transition: width .2s ease;
   }
 
   .hud-bottom {
@@ -690,21 +1008,34 @@ import BrandMark from "../common/BrandMark.astro";
   }
 
   .drift-lab-fullscreen-btn {
-    min-height: 2.4rem;
-    padding: 0.55rem 0.9rem;
+    display: grid;
+    width: 2.55rem;
+    height: 2.55rem;
+    place-items: center;
+    padding: 0;
     border: 1px solid rgba(255, 255, 255, 0.16);
     border-radius: 6px;
     background: rgba(8, 12, 20, 0.72);
     color: #F8FAFC;
     cursor: pointer;
     font: inherit;
-    font-size: 0.72rem;
-    font-weight: 850;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
     backdrop-filter: blur(14px);
   }
+
+  .drift-lab-fullscreen-btn svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+  }
+
+  .drift-lab-fullscreen-btn .fullscreen-exit,
+  .drift-lab-fullscreen-btn[data-active="true"] .fullscreen-enter { display: none; }
+  .drift-lab-fullscreen-btn[data-active="true"] .fullscreen-exit { display: block; }
 
   .drift-lab-fullscreen-btn:hover,
   .drift-lab-fullscreen-btn:focus-visible {
@@ -712,6 +1043,27 @@ import BrandMark from "../common/BrandMark.astro";
     border-color: rgba(255, 255, 255, 0.28);
     outline: none;
   }
+
+  .drift-lab-impact {
+    position: absolute;
+    z-index: 11;
+    top: 22%;
+    left: 50%;
+    padding: .5rem .8rem;
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 999px;
+    background: rgba(154, 39, 31, .82);
+    color: #fff;
+    font-size: .68rem;
+    font-weight: 900;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    box-shadow: 0 12px 32px rgba(0,0,0,.25);
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .drift-lab-impact[hidden] { display: none; }
 
   .drift-lab-complete-title {
     font-size: clamp(1.5rem, 4vw, 2.5rem);
@@ -927,18 +1279,39 @@ import BrandMark from "../common/BrandMark.astro";
     flex: 0 0 auto;
   }
 
+  @media (max-width: 900px) {
+    .drift-lab-launcher__main {
+      grid-template-columns: 1fr;
+      align-items: start;
+      gap: 1.6rem;
+      overflow-y: auto;
+      padding: 2rem 1.4rem;
+    }
+
+    .drift-lab-launcher__hero { align-self: auto; }
+    .drift-lab-launcher__hero h2 { max-width: 10ch; font-size: clamp(3rem, 12vw, 5rem); }
+    .drift-lab-lobby { width: min(34rem, 100%); align-self: auto; }
+  }
+
   @media (max-width: 640px) {
     .drift-lab-section {
       padding: 0;
     }
 
     .drift-lab-launcher__main {
-      padding: 1.4rem 1rem;
+      padding: 1.35rem 1rem 2rem;
     }
 
     .drift-lab-launcher__topbar {
-      padding-right: 5.75rem;
+      padding-inline: .85rem;
     }
+
+    .drift-lab-launcher__specs { display: none; }
+    .drift-lab-launcher__hero h2 { font-size: clamp(2.75rem, 15vw, 4rem); }
+    .drift-lab-launcher__features { display: grid; gap: .6rem; }
+    .drift-lab-rivals { grid-template-columns: 1fr 1fr; }
+    .drift-lab-lobby__controls--desktop { display: none; }
+    .drift-lab-lobby__controls--mobile { display: grid; }
 
     .drift-lab-launcher__brand h2 {
       font-size: 1rem;
@@ -985,9 +1358,8 @@ import BrandMark from "../common/BrandMark.astro";
     }
 
     .drift-lab-fullscreen-btn {
-      min-height: 2.25rem;
-      padding-inline: 0.72rem;
-      font-size: 0.66rem;
+      width: 2.35rem;
+      height: 2.35rem;
     }
 
     .drift-lab-mobile {
@@ -1013,6 +1385,9 @@ import BrandMark from "../common/BrandMark.astro";
     .drift-lab-key-row--mobile {
       display: flex;
     }
+
+    .drift-lab-lobby__controls--desktop { display: none; }
+    .drift-lab-lobby__controls--mobile { display: grid; }
   }
 
   @media (max-width: 420px) and (orientation: portrait) {
@@ -1098,12 +1473,14 @@ import BrandMark from "../common/BrandMark.astro";
   const IDLE_RPM = 900;
   const REDLINE_RPM = 7800;
   const GEAR_SPEEDS = [0, 0.16, 0.31, 0.48, 0.66, 0.84, 1.01];
-  const ST = { MENU: 0, PLAY: 1, DONE: 2 };
+  const ST = { MENU: 0, COUNTDOWN: 1, PLAY: 2, DONE: 3 };
 
   const startEl = document.getElementById('drift-lab-start');
   const launcherEl = document.getElementById('drift-lab-launcher');
   const hudEl = document.getElementById('drift-lab-hud');
   const doneEl = document.getElementById('drift-lab-complete');
+  const countdownEl = document.getElementById('drift-lab-countdown');
+  const countdownLabelEl = document.getElementById('drift-lab-countdown-label');
   const mobileEl = document.getElementById('drift-lab-mobile');
   const gameEl = document.getElementById('drift-lab-game');
   const speedEl = document.getElementById('drift-lab-speed');
@@ -1114,6 +1491,9 @@ import BrandMark from "../common/BrandMark.astro";
   const positionEl = document.getElementById('drift-lab-position');
   const gripEl = document.getElementById('drift-lab-grip');
   const driftLabelEl = document.getElementById('drift-lab-drift-label');
+  const damageEl = document.getElementById('drift-lab-damage');
+  const damageLabelEl = document.getElementById('drift-lab-damage-label');
+  const impactEl = document.getElementById('drift-lab-impact');
   const resultTitleEl = document.getElementById('drift-lab-result-title');
   const finalTimeEl = document.getElementById('drift-lab-final-time');
   const finalBestEl = document.getElementById('drift-lab-final-best');
@@ -1160,6 +1540,9 @@ import BrandMark from "../common/BrandMark.astro";
   let touchSteerY = 0;
   let activeJoystickPointer = null;
   let bumpFlash = 0;
+  let countdownT = 0;
+  let countdownMark = 0;
+  let impactNoticeT = 0;
   let screenSegments = new Map();
   let chaseCamera = { x: 0, heading: 0, slide: 0 };
 
@@ -1281,22 +1664,32 @@ import BrandMark from "../common/BrandMark.astro";
       lap: 1,
       lastLap: 1,
       grip: 1,
+      damage: 0,
+      collisionLock: 0,
+      spinTimer: 0,
+      spinAngle: 0,
+      spinVelocity: 0,
       finished: false
     };
   }
 
   function resetNpcs() {
-    const colors = ['#38BDF8', '#A78BFA', '#FBBF24', '#34D399'];
-    const lanes = [-0.52, 0.48, -0.18, 0.18];
-    npcs = colors.map((color, i) => ({
-      name: 'AI-' + (i + 1),
-      color,
-      x: lanes[i],
-      lane: lanes[i],
-      distance: 440 + i * 360,
-      speed: MAX_SPEED * (0.62 + i * 0.035),
-      target: MAX_SPEED * (0.70 + i * 0.025),
-      finished: false
+    const profiles = [
+      { name: 'Nova', color: '#38BDF8', lane: -0.46, distance: 2000, pace: 0.84, cornerSkill: 0.94, aggression: 0.24 },
+      { name: 'Apex', color: '#A78BFA', lane: 0.42, distance: 1700, pace: 0.865, cornerSkill: 0.78, aggression: 0.92 },
+      { name: 'Echo', color: '#FBBF24', lane: -0.16, distance: 1400, pace: 0.825, cornerSkill: 0.86, aggression: 0.48 },
+      { name: 'Flux', color: '#34D399', lane: 0.18, distance: 1100, pace: 0.9, cornerSkill: 0.68, aggression: 0.64 },
+    ];
+    npcs = profiles.map((profile, index) => ({
+      ...profile,
+      x: profile.lane,
+      homeLane: profile.lane,
+      targetLane: profile.lane,
+      speed: MAX_SPEED * (0.48 + profile.pace * 0.12),
+      target: MAX_SPEED * profile.pace,
+      collisionLock: 0,
+      lanePhase: index * 1.73 + 0.4,
+      finished: false,
     }));
   }
 
@@ -1307,6 +1700,11 @@ import BrandMark from "../common/BrandMark.astro";
     lapTimes = [];
     lapStartT = 0;
     bumpFlash = 0;
+    countdownT = 0;
+    countdownMark = 0;
+    impactNoticeT = 0;
+    countdownEl?.setAttribute('hidden', '');
+    impactEl?.setAttribute('hidden', '');
     lastF = 0;
     clearKeys();
     updHUD();
@@ -1360,7 +1758,7 @@ import BrandMark from "../common/BrandMark.astro";
   }
 
   function playTone(freq, dur, vol, type) {
-    if (!audioCtx || !soundOn || !visible || (state !== ST.PLAY && state !== ST.DONE)) return;
+    if (!audioCtx || !soundOn || !visible || (state !== ST.COUNTDOWN && state !== ST.PLAY && state !== ST.DONE)) return;
     try {
       const o = audioCtx.createOscillator();
       const g = audioCtx.createGain();
@@ -1418,8 +1816,9 @@ import BrandMark from "../common/BrandMark.astro";
   function updateFullscreenLabel() {
     if (!fullscreenBtn) return;
     const isFull = document.fullscreenElement === gameEl;
-    fullscreenBtn.textContent = isFull ? 'Exit full screen' : 'Full screen';
+    fullscreenBtn.dataset.active = isFull ? 'true' : 'false';
     fullscreenBtn.setAttribute('aria-label', isFull ? 'Exit fullscreen' : 'Enter fullscreen');
+    fullscreenBtn.title = isFull ? 'Exit full screen' : 'Full screen';
   }
 
   function toggleFullscreen() {
@@ -1448,11 +1847,15 @@ import BrandMark from "../common/BrandMark.astro";
       }
     }
     resetRace();
-    state = ST.PLAY;
+    state = ST.COUNTDOWN;
+    countdownT = 3.35;
+    countdownMark = 4;
+    countdownEl?.removeAttribute('hidden');
+    if (countdownEl) countdownEl.dataset.step = '3';
+    if (countdownLabelEl) countdownLabelEl.textContent = '3';
     startEl.setAttribute('hidden', '');
     doneEl.setAttribute('hidden', '');
     hudEl.removeAttribute('hidden');
-    enterMobileFullscreen();
   }
 
   function toMenu() {
@@ -1465,6 +1868,8 @@ import BrandMark from "../common/BrandMark.astro";
     startEl.removeAttribute('hidden');
     doneEl.setAttribute('hidden', '');
     hudEl.setAttribute('hidden', '');
+    countdownEl?.setAttribute('hidden', '');
+    impactEl?.setAttribute('hidden', '');
   }
 
   function silenceAudio() {
@@ -1503,6 +1908,8 @@ import BrandMark from "../common/BrandMark.astro";
     startEl.removeAttribute('hidden');
     doneEl.setAttribute('hidden', '');
     hudEl.setAttribute('hidden', '');
+    countdownEl?.setAttribute('hidden', '');
+    impactEl?.setAttribute('hidden', '');
     if (document.fullscreenElement === gameEl) {
       document.exitFullscreen().catch(() => {});
     }
@@ -1520,6 +1927,8 @@ import BrandMark from "../common/BrandMark.astro";
     startEl.removeAttribute('hidden');
     doneEl.setAttribute('hidden', '');
     hudEl.setAttribute('hidden', '');
+    countdownEl?.setAttribute('hidden', '');
+    impactEl?.setAttribute('hidden', '');
     launchBtn?.focus({ preventScroll: true });
   }
 
@@ -1549,6 +1958,35 @@ import BrandMark from "../common/BrandMark.astro";
     bestEl.textContent = bestRaceT < Infinity ? 'Best race: ' + fmtT(bestRaceT) : 'Best race: --:--.--';
     gripEl.style.width = Math.round(player.drift * 100) + '%';
     driftLabelEl.textContent = player.drift > 0.18 ? 'Auto drift +' + Math.round(player.driftScore) : 'Grip limit';
+    const body = Math.max(0, Math.round(100 - player.damage));
+    if (damageEl) damageEl.style.width = body + '%';
+    if (damageLabelEl) damageLabelEl.textContent = 'Body ' + body + '%';
+  }
+
+  function updateCountdown(dt) {
+    countdownT -= dt;
+    const nextMark = countdownT > 2.35 ? 3 : countdownT > 1.35 ? 2 : countdownT > 0.35 ? 1 : 0;
+    if (nextMark !== countdownMark) {
+      countdownMark = nextMark;
+      if (nextMark > 0) {
+        if (countdownEl) countdownEl.dataset.step = String(nextMark);
+        if (countdownLabelEl) countdownLabelEl.textContent = String(nextMark);
+        playTone(330 + (3 - nextMark) * 55, 0.09, 0.055, 'square');
+      } else {
+        if (countdownEl) countdownEl.dataset.step = 'go';
+        if (countdownLabelEl) countdownLabelEl.textContent = 'GO';
+        playTone(660, 0.18, 0.07, 'square');
+      }
+    }
+
+    if (countdownT <= 0) {
+      state = ST.PLAY;
+      player.raceT = 0;
+      lapStartT = 0;
+      window.setTimeout(() => {
+        if (state === ST.PLAY) countdownEl?.setAttribute('hidden', '');
+      }, 620);
+    }
   }
 
   function finishRace() {
@@ -1604,14 +2042,14 @@ import BrandMark from "../common/BrandMark.astro";
       return;
     }
 
-    if (state === ST.PLAY && gk.has(e.code)) e.preventDefault();
-    if (kmap[e.code]) keys[kmap[e.code]] = true;
+    if ((state === ST.PLAY || state === ST.COUNTDOWN) && gk.has(e.code)) e.preventDefault();
+    if ((state === ST.PLAY || state === ST.COUNTDOWN) && kmap[e.code]) keys[kmap[e.code]] = true;
     if (e.code === 'Space') {
       e.preventDefault();
       if (launched && (state === ST.MENU || state === ST.DONE)) startGame();
     }
-    if (e.code === 'KeyR' && state === ST.PLAY) resetRace();
-    if (e.code === 'Escape' && state === ST.PLAY) toMenu();
+    if (e.code === 'KeyR' && (state === ST.PLAY || state === ST.COUNTDOWN)) startGame(false);
+    if (e.code === 'Escape' && (state === ST.PLAY || state === ST.COUNTDOWN)) toMenu();
     if (e.code === 'KeyM') toggleSound();
   });
 
@@ -1708,7 +2146,7 @@ import BrandMark from "../common/BrandMark.astro";
 
   launchBtn.addEventListener('click', () => startGame());
   playBtn.addEventListener('click', () => startGame());
-  restartBtn.addEventListener('click', resetRace);
+  restartBtn.addEventListener('click', () => startGame(false));
   againBtn.addEventListener('click', () => startGame());
   soundBtn.addEventListener('click', toggleSound);
   fullscreenBtn?.addEventListener('click', toggleFullscreen);
@@ -1740,9 +2178,12 @@ import BrandMark from "../common/BrandMark.astro";
 
   function updatePlayer(dt) {
     const seg = segmentAtDistance(player.distance);
+    player.collisionLock = Math.max(0, player.collisionLock - dt);
+    const spinning = player.spinTimer > 0;
+    const controlFactor = spinning ? 0.16 : 1;
     const keyboardSteer = (keys.left ? -1 : 0) + (keys.right ? 1 : 0);
-    const steer = Math.abs(touchSteer) > 0.03 ? touchSteer : keyboardSteer;
-    const targetThrottle = keys.up || touchSteerY < -0.58 ? 1 : 0;
+    const steer = (Math.abs(touchSteer) > 0.03 ? touchSteer : keyboardSteer) * controlFactor;
+    const targetThrottle = (keys.up || touchSteerY < -0.58 ? 1 : 0) * (spinning ? 0.18 : 1);
     const targetBrake = keys.down || touchSteerY > 0.68 ? 1 : 0;
 
     player.throttle += (targetThrottle - player.throttle) * Math.min(1, dt * 5.8);
@@ -1757,7 +2198,9 @@ import BrandMark from "../common/BrandMark.astro";
     const torqueCurve = Math.sin((0.18 + gearPct * 0.82) * Math.PI);
     player.rpm += ((IDLE_RPM + gearPct * (REDLINE_RPM - IDLE_RPM) + player.throttle * 500) - player.rpm) * Math.min(1, dt * 10);
 
-    const engineForce = ACCEL * player.throttle * (0.42 + torqueCurve * 0.92) * (1 - speedPctBefore * 0.28);
+    const healthFactor = 1 - player.damage / 100;
+    const effectiveMaxSpeed = MAX_SPEED * (1 - player.damage * 0.0018);
+    const engineForce = ACCEL * player.throttle * (0.42 + torqueCurve * 0.92) * (1 - speedPctBefore * 0.28) * (0.82 + healthFactor * 0.18);
     const brakeForce = BRAKE * player.brake * (0.9 + speedPctBefore * 0.5);
     const coastForce = DECEL * (1 - player.throttle) * (0.42 + speedPctBefore * 0.8);
 
@@ -1771,7 +2214,7 @@ import BrandMark from "../common/BrandMark.astro";
       player.slide *= Math.pow(0.82, dt * 60);
     }
 
-    player.speed = clamp(player.speed, 0, MAX_SPEED);
+    player.speed = clamp(player.speed, 0, effectiveMaxSpeed);
     const speedPct = player.speed / MAX_SPEED;
     const curveLoad = Math.abs(seg.curve) * speedPct * 1.12;
     const steerLoad = Math.abs(player.steerInput) * speedPct * (0.82 + speedPct * 0.62);
@@ -1789,6 +2232,18 @@ import BrandMark from "../common/BrandMark.astro";
     const steeringResponse = 8.5 - speedPct * 3.2 - player.drift * 2.1;
     player.heading += (targetHeading - player.heading) * Math.min(1, dt * Math.max(2.6, steeringResponse));
 
+    if (player.spinTimer > 0) {
+      player.spinTimer = Math.max(0, player.spinTimer - dt);
+      player.spinAngle += player.spinVelocity * dt;
+      player.spinVelocity *= Math.pow(0.975, dt * 60);
+      player.heading += Math.sin(player.spinAngle) * dt * 1.8;
+      player.slide += Math.sin(player.spinAngle) * dt * 2.4;
+      player.speed = Math.max(0, player.speed - MAX_SPEED * dt * 0.34);
+    } else {
+      player.spinAngle += (0 - player.spinAngle) * Math.min(1, dt * 2.8);
+      player.spinVelocity *= Math.pow(0.8, dt * 60);
+    }
+
     const tireGrip = 9.4 - player.drift * 6.5;
     const desiredLateral =
       player.heading * (0.95 + speedPct * 2.65) -
@@ -1805,7 +2260,7 @@ import BrandMark from "../common/BrandMark.astro";
     }
 
     player.speed -= Math.pow(player.drift, 1.35) * DRIFT_DRAG * dt;
-    player.speed = clamp(player.speed, 0, MAX_SPEED);
+    player.speed = clamp(player.speed, 0, effectiveMaxSpeed);
 
     const slip = Math.min(1, gripLoad * 0.72 + player.drift * 0.68);
     player.grip += ((1 - slip) - player.grip) * Math.min(1, dt * 8);
@@ -1838,35 +2293,88 @@ import BrandMark from "../common/BrandMark.astro";
   function updateNpcs(dt) {
     for (const npc of npcs) {
       if (npc.finished) continue;
+      npc.collisionLock = Math.max(0, npc.collisionLock - dt);
       const seg = segmentAtDistance(npc.distance);
       const gap = player.distance - npc.distance;
-      const rubber = clamp(gap / 5200, -0.14, 0.18);
-      const cornerPenalty = Math.abs(seg.curve) * 0.12;
-      npc.target = MAX_SPEED * (0.72 + rubber - cornerPenalty);
-      npc.speed += (npc.target - npc.speed) * Math.min(1, dt * 1.8);
+      const rubber = clamp(gap / 6200, -0.045, 0.075);
+      const cornerPenalty = Math.abs(seg.curve) * (0.15 - npc.cornerSkill * 0.075);
+      const pacePulse = Math.sin(npc.distance / 1850 + npc.lanePhase) * (0.006 + npc.aggression * 0.006);
+      npc.target = MAX_SPEED * (npc.pace + rubber + pacePulse - cornerPenalty);
+      npc.speed += (npc.target - npc.speed) * Math.min(1, dt * (1.15 + npc.aggression * 0.75));
       npc.distance += npc.speed * dt;
-      npc.x += (npc.lane - npc.x) * Math.min(1, dt * 2.4);
-      npc.x += Math.sin((npc.distance / 900) + npc.lane * 3) * dt * 0.04;
+
+      const racingLine = -seg.curve * 0.12 * npc.cornerSkill;
+      npc.targetLane = clamp(npc.homeLane * 0.72 + racingLine + Math.sin(npc.distance / 1500 + npc.lanePhase) * 0.055, -0.72, 0.72);
+      const playerGap = npc.distance - player.distance;
+      if (Math.abs(playerGap) < 820 && Math.abs(npc.x - player.x) < 0.38) {
+        const passSide = npc.homeLane >= player.x ? 1 : -1;
+        const space = playerGap < 0 ? 0.5 : 0.34;
+        npc.targetLane = clamp(player.x + passSide * space, -0.78, 0.78);
+      }
+
+      for (const other of npcs) {
+        if (other === npc) continue;
+        const rivalGap = other.distance - npc.distance;
+        if (rivalGap > 0 && rivalGap < 430 && Math.abs(other.x - npc.x) < 0.28) {
+          npc.targetLane = clamp(npc.targetLane + (npc.x <= other.x ? -0.28 : 0.28), -0.8, 0.8);
+        }
+      }
+
+      npc.x += (npc.targetLane - npc.x) * Math.min(1, dt * (1.15 + npc.aggression * 0.72));
       if (npc.distance >= raceDistance) npc.finished = true;
     }
   }
 
   function updateCollisions(dt) {
+    impactNoticeT = Math.max(0, impactNoticeT - dt);
+    if (impactNoticeT <= 0) impactEl?.setAttribute('hidden', '');
+
     for (const npc of npcs) {
       const dz = npc.distance - player.distance;
-      if (Math.abs(dz) < 220 && Math.abs(npc.x - player.x) < 0.27) {
-        player.speed *= 0.86;
-        npc.speed *= 0.96;
-        player.x += (player.x < npc.x ? -1 : 1) * 0.22;
-        player.slide *= -0.35;
-        player.heading *= -0.2;
-        bumpFlash = 0.18;
+      const lateralGap = Math.abs(npc.x - player.x);
+      if (player.collisionLock > 0 || npc.collisionLock > 0 || Math.abs(dz) >= 155 || lateralGap >= 0.205) continue;
+
+      const closingSpeed = Math.abs(player.speed - npc.speed) / MAX_SPEED;
+      const overlap = 1 - lateralGap / 0.205;
+      const impact = clamp(0.4 + closingSpeed * 0.95 + overlap * 0.34, 0.42, 1);
+      const side = Math.abs(player.x - npc.x) > 0.025
+        ? (player.x < npc.x ? -1 : 1)
+        : (npc.homeLane >= 0 ? -1 : 1);
+      const damage = (lateralGap < 0.1 ? 13 : 7) + impact * (lateralGap < 0.1 ? 18 : 11);
+
+      player.damage = clamp(player.damage + damage, 0, 100);
+      player.speed *= 0.78 - impact * 0.2;
+      player.spinTimer = Math.max(player.spinTimer, 0.42 + impact * 0.62);
+      player.spinVelocity = side * (4.8 + impact * 4.2);
+      player.slide = side * (0.58 + impact * 0.65);
+      player.heading += side * (0.2 + impact * 0.26);
+      player.x = clamp(player.x + side * (0.15 + impact * 0.09), -1.7, 1.7);
+      npc.x = clamp(npc.x - side * 0.09, -0.86, 0.86);
+      npc.targetLane = clamp(npc.targetLane - side * 0.18, -0.82, 0.82);
+      npc.speed *= 0.82;
+
+      if (dz >= 0) player.distance = Math.min(player.distance, npc.distance - 158);
+      else npc.distance = Math.min(npc.distance, player.distance - 158);
+      player.z = ((player.distance % trackLength) + trackLength) % trackLength;
+      player.collisionLock = 0.72;
+      npc.collisionLock = 0.82;
+      bumpFlash = 0.3;
+      impactNoticeT = 1.2;
+      if (impactEl) {
+        impactEl.textContent = (impact > 0.72 ? 'Spin out' : 'Car contact') + ' · body ' + Math.round(100 - player.damage) + '%';
+        impactEl.removeAttribute('hidden');
       }
+      break;
     }
     bumpFlash = Math.max(0, bumpFlash - dt);
   }
 
   function physics(dt) {
+    if (state === ST.COUNTDOWN) {
+      updateCountdown(dt);
+      updHUD();
+      return;
+    }
     if (state !== ST.PLAY) return;
     updatePlayer(dt);
     if (state !== ST.PLAY) return;
@@ -2079,21 +2587,60 @@ import BrandMark from "../common/BrandMark.astro";
   function drawNpcCar(npc) {
     const s = screenAtDistance(npc.distance, npc.x);
     if (!s || s.y < 120 || s.y > H + 60) return;
-    const carW = clamp(s.w * 0.18, 8, 160);
-    const carH = carW * 0.62;
+    const carW = clamp(s.w * 0.185, 9, 164);
+    const carH = carW * 0.68;
     const x = s.x;
     const y = s.y;
+    const yaw = clamp((npc.targetLane - npc.x) * 0.22, -0.08, 0.08);
+
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(yaw);
     ctx.fillStyle = 'rgba(0,0,0,0.32)';
     ctx.beginPath();
-    ctx.ellipse(x, y + carH * 0.08, carW * 0.5, carH * 0.18, 0, 0, Math.PI * 2);
+    ctx.ellipse(0, carH * 0.08, carW * 0.56, carH * 0.2, 0, 0, Math.PI * 2);
     ctx.fill();
-    drawPoly([[x - carW * 0.5, y], [x + carW * 0.5, y], [x + carW * 0.34, y - carH * 0.72], [x - carW * 0.34, y - carH * 0.72]], npc.color);
-    drawPoly([[x - carW * 0.25, y - carH * 0.42], [x + carW * 0.25, y - carH * 0.42], [x + carW * 0.14, y - carH * 0.78], [x - carW * 0.14, y - carH * 0.78]], 'rgba(15,23,42,0.72)');
-    ctx.fillStyle = '#EF4444';
-    ctx.fillRect(x - carW * 0.42, y - carH * 0.12, carW * 0.16, carH * 0.08);
-    ctx.fillRect(x + carW * 0.26, y - carH * 0.12, carW * 0.16, carH * 0.08);
-    ctx.fillStyle = 'rgba(255,255,255,0.18)';
-    ctx.fillRect(x - carW * 0.48, y - carH * 0.32, carW * 0.96, carH * 0.05);
+
+    ctx.fillStyle = '#05080d';
+    ctx.fillRect(-carW * 0.53, -carH * 0.42, carW * 0.14, carH * 0.5);
+    ctx.fillRect(carW * 0.39, -carH * 0.42, carW * 0.14, carH * 0.5);
+    ctx.fillStyle = '#121826';
+    ctx.fillRect(-carW * 0.55, -carH * 0.24, carW * 0.16, carH * 0.19);
+    ctx.fillRect(carW * 0.39, -carH * 0.24, carW * 0.16, carH * 0.19);
+
+    drawPoly([
+      [-carW * 0.5, 0], [carW * 0.5, 0], [carW * 0.44, -carH * 0.4],
+      [carW * 0.25, -carH * 0.82], [-carW * 0.25, -carH * 0.82], [-carW * 0.44, -carH * 0.4]
+    ], npc.color);
+    drawPoly([[-carW * 0.5, 0], [-carW * 0.44, -carH * 0.4], [-carW * 0.31, -carH * 0.64], [-carW * 0.38, -carH * 0.05]], 'rgba(15,23,42,0.34)');
+    drawPoly([[carW * 0.5, 0], [carW * 0.44, -carH * 0.4], [carW * 0.31, -carH * 0.64], [carW * 0.38, -carH * 0.05]], 'rgba(255,255,255,0.1)');
+    drawPoly([[-carW * 0.27, -carH * 0.49], [carW * 0.27, -carH * 0.49], [carW * 0.17, -carH * 0.81], [-carW * 0.17, -carH * 0.81]], 'rgba(4,10,19,0.84)');
+    drawPoly([[-carW * 0.22, -carH * 0.54], [carW * 0.22, -carH * 0.54], [carW * 0.14, -carH * 0.75], [-carW * 0.14, -carH * 0.75]], 'rgba(125,170,190,0.28)');
+
+    ctx.fillStyle = '#111827';
+    ctx.fillRect(-carW * 0.48, -carH * 0.08, carW * 0.96, carH * 0.13);
+    ctx.fillStyle = '#ef4444';
+    ctx.fillRect(-carW * 0.4, -carH * 0.12, carW * 0.2, Math.max(2, carH * 0.075));
+    ctx.fillRect(carW * 0.2, -carH * 0.12, carW * 0.2, Math.max(2, carH * 0.075));
+    ctx.fillStyle = 'rgba(255,255,255,0.58)';
+    ctx.fillRect(-carW * 0.1, -carH * 0.1, carW * 0.2, Math.max(1, carH * 0.045));
+    ctx.fillStyle = 'rgba(255,255,255,0.16)';
+    ctx.fillRect(-carW * 0.39, -carH * 0.43, carW * 0.78, Math.max(1, carH * 0.035));
+
+    ctx.fillStyle = '#05080d';
+    ctx.fillRect(-carW * 0.48, -carH * 0.88, carW * 0.96, Math.max(2, carH * 0.065));
+    ctx.fillRect(-carW * 0.42, -carH * 0.85, carW * 0.06, carH * 0.13);
+    ctx.fillRect(carW * 0.36, -carH * 0.85, carW * 0.06, carH * 0.13);
+
+    if (carW > 34) {
+      ctx.fillStyle = 'rgba(5,10,18,.76)';
+      ctx.fillRect(-carW * 0.27, -carH * 1.08, carW * 0.54, carH * 0.17);
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = '800 ' + Math.max(7, carW * 0.075) + 'px Inter, system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(npc.name.toUpperCase(), 0, -carH * 0.95);
+    }
+    ctx.restore();
   }
 
   function playerScreen() {
@@ -2147,7 +2694,7 @@ import BrandMark from "../common/BrandMark.astro";
 
     ctx.save();
     ctx.translate(car.x + shake, car.y);
-    ctx.rotate(yaw);
+    ctx.rotate(yaw + player.spinAngle);
 
     ctx.fillStyle = 'rgba(0,0,0,0.38)';
     ctx.beginPath();
@@ -2177,6 +2724,11 @@ import BrandMark from "../common/BrandMark.astro";
     poly([[-24, -38], [24, -38], [17, -64], [-17, -64]], 'rgba(148,163,184,0.32)');
     poly([[-52, 50], [52, 50], [48, 26], [-48, 26]], '#7F1D1D');
 
+    poly([[-43, 19], [-31, -38], [-19, -38], [-27, 24]], 'rgba(255,255,255,.12)');
+    poly([[43, 19], [31, -38], [19, -38], [27, 24]], 'rgba(15,23,42,.24)');
+    ctx.fillStyle = 'rgba(255,255,255,.12)';
+    ctx.fillRect(-3, -65, 6, 88);
+
     ctx.fillStyle = brakeGlow > 0.08 ? 'rgba(248,113,113,' + (0.5 + brakeGlow * 0.5) + ')' : '#EF4444';
     ctx.fillRect(-47, 31, 18, 7);
     ctx.fillRect(29, 31, 18, 7);
@@ -2186,6 +2738,25 @@ import BrandMark from "../common/BrandMark.astro";
     ctx.fillRect(-48, -74, 96, 7);
     ctx.fillRect(-58, -71, 12, 14);
     ctx.fillRect(46, -71, 12, 14);
+    ctx.fillStyle = '#020617';
+    ctx.fillRect(-42, 45, 25, 7);
+    ctx.fillRect(17, 45, 25, 7);
+    ctx.fillStyle = '#cbd5e1';
+    ctx.fillRect(-13, 42, 26, 7);
+    ctx.fillStyle = '#17202a';
+    ctx.font = '800 6px Inter, system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('AI 01', 0, 48);
+
+    if (player.damage > 18) {
+      ctx.strokeStyle = 'rgba(22, 9, 12,' + clamp(player.damage / 90, .25, .85) + ')';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(-38, 11); ctx.lineTo(-12, -2); ctx.lineTo(-31, -15);
+      if (player.damage > 48) { ctx.moveTo(42, 5); ctx.lineTo(18, -13); ctx.lineTo(34, -29); }
+      if (player.damage > 76) { ctx.moveTo(-7, 28); ctx.lineTo(8, 10); ctx.lineTo(2, -8); }
+      ctx.stroke();
+    }
 
     if (player.throttle > 0.75 && player.rpm > REDLINE_RPM * 0.72 && player.drift < 0.55) {
       poly([[-10, 53], [0, 70 + Math.random() * 10], [10, 53]], '#F97316');

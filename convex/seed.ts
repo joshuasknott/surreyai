@@ -96,7 +96,7 @@ export const seedSocieties = mutation({
   handler: async (ctx, { setupSecret }) => {
     requireSetupSecret(setupSecret);
 
-    const existing = await ctx.db.query("societies").collect();
+    const existing = await ctx.db.query("societies").take(100);
     if (existing.length > 0) {
       return "Societies already seeded; run syncCanonicalSocietyMetadata as an authenticated owner to update metadata";
     }
@@ -277,7 +277,7 @@ export const seedOwnerMemberships = mutation({
       owner = await ctx.db.get(ownerId);
     }
 
-    const societies = await ctx.db.query("societies").collect();
+    const societies = await ctx.db.query("societies").take(100);
     let changed = 0;
 
     for (const society of societies) {
