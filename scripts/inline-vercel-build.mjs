@@ -31,9 +31,15 @@ for (const [publicPath, mimeType] of images) {
   javascript = javascript.replaceAll(publicPath, dataUri);
 }
 
+// Inline scripts must not contain a literal closing script tag. Using a
+// replacement callback also prevents `$&` and other `$` sequences in the
+// minified bundle from being interpreted as String.replace patterns.
+const inlineJavascript = javascript.replaceAll("</script", "<\\/script");
+const inlineCss = css.replaceAll("</style", "<\\/style");
+
 html = html
-  .replace(scriptMatch[0], `<script type="module">${javascript}</script>`)
-  .replace(styleMatch[0], `<style>${css}</style>`);
+  .replace(scriptMatch[0], () => `<script type="module">${inlineJavascript}</script>`)
+  .replace(styleMatch[0], () => `<style>${inlineCss}</style>`);
 
 await mkdir(outputRoot, { recursive: true });
 await writeFile(path.join(outputRoot, "index.html"), html);
