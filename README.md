@@ -15,6 +15,9 @@ npm run dev
 npm run build
 ```
 
+The repository includes `vercel.json`, so importing it into Vercel will use the
+correct Vite build command and publish directory.
+
 The current waitlist is an interactive front-end prototype. Connect the form to the chosen mailing-list or database provider before collecting real registrations.
 
 ## Design direction
