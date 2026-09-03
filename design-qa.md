@@ -3,54 +3,61 @@
 ## Source visual truth
 
 - Selected Product Design direction: `/workspace/scratch/476c2b4e255d/generated_images/exec-3ff32dde-baf5-408b-840b-95b9efc56a49.png`
-- Source pixels: 864 × 1821.
-- Approved identity: `public/images/surrey-ai-hack-logo.png`.
+- Source pixels: 864 × 1821 at 1× density.
+- Approved event identity: `public/images/surrey-ai-hack-logo.png`.
 
-## Browser evidence
+## Browser-rendered implementation evidence
 
-- Desktop CSS viewport: 1363 × 936 at 1× device scale.
-- Captures: `docs/implementation-option-3-hero.jpg`, `docs/implementation-option-3-tools.jpg`, and `docs/implementation-option-3-sponsors.jpg`.
-- Same-input comparison boards: `docs/comparison-option-3-hero.jpg`, `docs/comparison-option-3-tools.jpg`, and `docs/comparison-option-3-sponsors.jpg`. Each board places the selected direction on the left and the browser implementation on the right.
-- Full-page browser capture exceeded the browser protocol timeout, so three overlapping viewport captures were used to cover the full experience.
+- CSS viewport: 1363 × 936 at 1× device scale.
+- Implementation captures: `docs/implementation-polish-hero.jpg`, `docs/implementation-polish-tools.jpg`, and `docs/implementation-polish-sponsors.jpg`.
+- Capture pixels: 1348 × 926. The difference from the CSS viewport is browser scrollbar/chrome exclusion.
+- Same-input comparison boards: `docs/comparison-polish-hero.jpg`, `docs/comparison-polish-tools.jpg`, and `docs/comparison-polish-sponsors.jpg`. Each places the source direction on the left and browser implementation on the right.
+- State: default participant view for visual captures. Partner, validation-error, and success states were tested separately.
 
-## Fidelity review
+## Findings
 
-- Hero: event mark, lean four-item navigation, oversized aubergine headline, documentary build image, concise national positioning, academic-year note, and dual CTAs match the selected direction.
-- Manifesto: full-width petrol field, warm-white statement, yellow icon language, and three build principles preserve the target's strongest transition.
-- Audience: every requested experience level is represented beside a dedicated documentary build image.
-- Tools: the implementation expands the mockup into a useful matrix of AI assistants, coding tools, no-code/creative tools, APIs/models, and access types without implying that any product is supplied or required.
-- National section: aubergine field, large UK-wide message, supporting copy, and demo-room photograph retain the reference composition.
-- Sponsors and waitlist: support themes, sponsorship CTA, participant/partner intent switch, email validation, and success state are present without inventing partners, dates, venues, prizes, funding, or attendance.
-- Footer: event identity and lean navigation only. Surrey Artificial Intelligence Society branding and organiser copy are absent as requested.
+- No remaining P0, P1, or P2 findings.
+- [P3] The implementation intentionally omits the source mockup’s two decorative corner squares beside photographs. The simplified photography keeps the site more restrained and avoids decorative CSS art.
+- [P3] Still comparisons cannot demonstrate scroll easing, staggered entrance timing, hover depth, or the reduced-motion fallback; these were inspected directly in the live browser.
 
-## Visual tokens
+## Required fidelity surfaces
 
-- Paper `#f6f2e9`
-- Aubergine `#2b104d`
-- Petrol `#0e4e56`
-- Teal `#08747e`
-- Yellow `#ffc431`
-- Display typography uses a narrow, heavy neo-grotesk stack with compact leading; body typography stays simple and readable.
+- Fonts and typography: self-hosted Barlow Condensed gives display lines the intended editorial density and Inter Variable provides a cleaner, more optical body texture. Headline overhang and wrapping were rechecked after the font change; no clipping remains.
+- Spacing and layout rhythm: the wide two-column hero, petrol manifesto, audience split, dense tools matrix, aubergine national section, sponsor grid, waitlist band, and quiet footer preserve the selected direction’s hierarchy. The page has no horizontal overflow at the verified viewport.
+- Colors and tokens: paper `#f6f2e9`, aubergine `#2b104d`, petrol `#0e4e56`, teal `#08747e`, and yellow `#ffc431` remain consistent with the selected independent event identity.
+- Image quality and asset fidelity: all documentary photography is high-resolution and uses controlled object-positioning. Tool cards use real brand assets from Lobe Icons or recognised icon-library marks for ChatGPT/OpenAI, Claude, Gemini, Perplexity, Cursor, GitHub Copilot, Replit, VS Code, Lovable, v0/Vercel, Figma, Canva, Anthropic, Google AI, Hugging Face, and open source/GitHub.
+- Copy and content: the expanded tools and access matrix retains the no-vendor-lock-in message and makes clear that examples are neither required nor supplied. No dates, venue, sponsors, prizes, funding, or attendance figures were invented. Surrey Artificial Intelligence Society branding remains absent.
 
-## Findings and resolution history
+## Comparison history
 
-- [Resolved P1] Previous direction lacked enough practical information. Added the full tools and access matrix plus sponsor support themes.
-- [Resolved P1] Previous page carried Society identity in the header/footer. Removed all Society references and retained only the approved Surrey AI Hack identity.
-- [Resolved P2] Interest controls exposed visual state only. Added `aria-pressed` so participant/partner selection is also announced to assistive technology.
-- [Resolved P2] Potential text/image collisions. Rebuilt hero, audience, and national sections with explicit grids, overflow-safe media containers, and responsive stack rules.
-- No remaining P0, P1, or P2 fidelity findings.
+- [Resolved P1] The previous tools matrix relied mainly on text and generic category icons.
+  - Fix: added genuine product marks inside structured tool cards while keeping generic icons only for category labels.
+  - Evidence: `docs/comparison-polish-tools.jpg`.
+- [Resolved P2] The previous typography used system Arial fallbacks and felt visually coarse.
+  - Fix: self-hosted Inter Variable and Barlow Condensed, then retuned display sizes, weights, leading, and tracking.
+  - Evidence: `docs/comparison-polish-hero.jpg` and `docs/comparison-polish-sponsors.jpg`.
+- [Resolved P2] The first polished hero capture clipped the final glyph in “Build something”.
+  - Fix: reduced the responsive display scale and verified the headline’s client and scroll bounds match without page overflow.
+  - Post-fix evidence: `docs/implementation-polish-hero.jpg`.
+- [Resolved P2] Motion previously relied on basic CSS hover transitions.
+  - Fix: added spring scroll progress, staged hero entry, once-only section reveals, tool-logo stagger, image depth, button tap feedback, animated form state changes, and a complete `prefers-reduced-motion` path.
 
-## Interaction and console checks
+## Primary interactions tested
 
-- Header anchors route to The Hack, Tools, Sponsors, and Waitlist sections.
-- Hero and sponsor CTAs scroll to the correct interest state.
-- Invalid email shows an inline error.
-- Valid email shows the local success state.
-- Participant/partner selection changes the active state, heading, and email placeholder.
-- No application-origin console errors were found. The cloud browser emitted unrelated `chrome-extension://` metadata errors.
+- Smooth anchor navigation and top progress indicator.
+- Hero waitlist CTA and sponsor-interest CTA.
+- Participant/sponsor intent switch, including `aria-pressed`, heading, and placeholder changes.
+- Invalid email error state.
+- Valid email success transition and follow-up action.
+
+## Console and performance check
+
+- No application-origin browser console errors were found.
+- Motion is transform/opacity based and respects the user’s reduced-motion preference.
+- Brand marks and fonts are bundled locally, so the experience does not depend on third-party runtime requests.
 
 ## Follow-up polish
 
-- [P3] Capture a real-device mobile screenshot after launch. Responsive rules are present down to 320px; the available cloud browser exposed only a fixed desktop viewport for this QA pass.
+- [P3] A real-device mobile capture would be useful after deployment. Responsive rules remain present down to 320px; the available cloud browser exposed only a fixed desktop viewport for this pass.
 
 final result: passed

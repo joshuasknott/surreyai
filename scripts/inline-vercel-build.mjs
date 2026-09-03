@@ -15,7 +15,7 @@ if (!scriptMatch || !styleMatch) {
 }
 
 let javascript = await readFile(path.join(clientRoot, scriptMatch[1]), "utf8");
-const css = await readFile(path.join(clientRoot, styleMatch[1]), "utf8");
+let css = await readFile(path.join(clientRoot, styleMatch[1]), "utf8");
 
 const images = [
   ["/images/hero-build-space.webp", "image/webp"],
@@ -23,12 +23,37 @@ const images = [
   ["/images/notebook-prototype.webp", "image/webp"],
   ["/images/demo-room.webp", "image/webp"],
   ["/images/surrey-ai-hack-logo.png", "image/png"],
+  ["/images/tools/chatgpt.svg", "image/svg+xml"],
+  ["/images/tools/claude.svg", "image/svg+xml"],
+  ["/images/tools/gemini.svg", "image/svg+xml"],
+  ["/images/tools/perplexity.svg", "image/svg+xml"],
+  ["/images/tools/cursor.svg", "image/svg+xml"],
+  ["/images/tools/github-copilot.svg", "image/svg+xml"],
+  ["/images/tools/replit.svg", "image/svg+xml"],
+  ["/images/tools/lovable.svg", "image/svg+xml"],
+  ["/images/tools/v0.svg", "image/svg+xml"],
+  ["/images/tools/figma.svg", "image/svg+xml"],
+  ["/images/tools/openai.svg", "image/svg+xml"],
+  ["/images/tools/anthropic.svg", "image/svg+xml"],
+  ["/images/tools/google-ai.svg", "image/svg+xml"],
+  ["/images/tools/hugging-face.svg", "image/svg+xml"],
+  ["/images/tools/open-source.svg", "image/svg+xml"],
 ];
 
 for (const [publicPath, mimeType] of images) {
   const bytes = await readFile(path.join(clientRoot, publicPath));
   const dataUri = `data:${mimeType};base64,${bytes.toString("base64")}`;
   javascript = javascript.replaceAll(publicPath, dataUri);
+}
+
+const fontPaths = [...new Set(
+  [...css.matchAll(/url\((?:["']?)(\/assets\/[^)"']+\.woff2?)(?:["']?)\)/g)].map((match) => match[1]),
+)];
+
+for (const publicPath of fontPaths) {
+  const bytes = await readFile(path.join(clientRoot, publicPath));
+  const mimeType = publicPath.endsWith(".woff2") ? "font/woff2" : "font/woff";
+  css = css.replaceAll(publicPath, `data:${mimeType};base64,${bytes.toString("base64")}`);
 }
 
 // Inline scripts must not contain a literal closing script tag. Using a
