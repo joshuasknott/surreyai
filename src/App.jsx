@@ -17,18 +17,6 @@ function EventMark() {
   );
 }
 
-function SocietyMark({ footer = false }) {
-  return (
-    <div className={`society-mark${footer ? " society-mark--footer" : ""}`} aria-label="Surrey Artificial Intelligence Society">
-      <span>{footer ? "Created by" : "Organised by"}</span>
-      <span className="society-mark__crop">
-        <img src="/images/surrey-ai-society-mark.png" alt="" />
-        <span className="society-mark__name">Surrey<br />Artificial Intelligence<br />Society</span>
-      </span>
-    </div>
-  );
-}
-
 export function App() {
   const [email, setEmail] = useState("");
   const [intent, setIntent] = useState("participant");
@@ -55,13 +43,11 @@ export function App() {
       <header className="site-header shell">
         <EventMark />
         <nav aria-label="Main navigation">
-          <a href="#about">About</a>
-          <a href="#people">Who it’s for</a>
-          <a href="#tools">What to expect</a>
-          <button type="button" onClick={() => moveToWaitlist("partner")}>Partner with us</button>
-          <a href="#faq">FAQ</a>
+          <a href="#about">The hack</a>
+          <a href="#tools">Tools</a>
+          <button type="button" onClick={() => moveToWaitlist("partner")}>Sponsors</button>
+          <button type="button" onClick={() => moveToWaitlist()}>Join the waitlist</button>
         </nav>
-        <SocietyMark />
       </header>
 
       <section className="hero shell" aria-labelledby="hero-title">
@@ -173,8 +159,8 @@ export function App() {
       </section>
 
       <footer className="site-footer shell">
-        <SocietyMark footer />
-        <p>Created by Surrey Artificial Intelligence Society.<br />Surrey AI Hack is an independent student-led event.</p>
+        <EventMark />
+        <p>Surrey AI Hack 2027<br />A national UK student AI hackathon.</p>
       </footer>
     </main>
   );
