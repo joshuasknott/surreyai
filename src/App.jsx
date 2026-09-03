@@ -2,9 +2,6 @@ import { useState } from "react";
 import { AnimatePresence, motion, useReducedMotion, useScroll, useSpring } from "motion/react";
 import { SiCanva } from "react-icons/si";
 import { VscVscode } from "react-icons/vsc";
-import "@fontsource/barlow-condensed/latin-700.css";
-import "@fontsource/barlow-condensed/latin-800.css";
-import "@fontsource/barlow-condensed/latin-900.css";
 import {
   AsteriskSimple,
   Code,
