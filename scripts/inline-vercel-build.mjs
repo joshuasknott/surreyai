@@ -22,7 +22,8 @@ const images = [
   ["/images/builder-portrait.webp", "image/webp"],
   ["/images/notebook-prototype.webp", "image/webp"],
   ["/images/demo-room.webp", "image/webp"],
-  ["/images/surrey-ai-society.png", "image/png"],
+  ["/images/surrey-ai-hack-logo.png", "image/png"],
+  ["/images/surrey-ai-society-mark.png", "image/png"],
 ];
 
 for (const [publicPath, mimeType] of images) {

@@ -12,22 +12,18 @@ const people = [
 function EventMark() {
   return (
     <a className="event-mark" href="#top" aria-label="Surrey AI Hack 2027 home">
-      <span className="event-mark__square" aria-hidden="true" />
-      <span className="event-mark__type">
-        <span>Surrey</span>
-        <span>AI Hack</span>
-        <span>/2027</span>
-      </span>
+      <img src="/images/surrey-ai-hack-logo.png" alt="Surrey AI Hack 2027" />
     </a>
   );
 }
 
 function SocietyMark({ footer = false }) {
   return (
-    <div className={`society-mark${footer ? " society-mark--footer" : ""}`}>
+    <div className={`society-mark${footer ? " society-mark--footer" : ""}`} aria-label="Surrey Artificial Intelligence Society">
       <span>{footer ? "Created by" : "Organised by"}</span>
       <span className="society-mark__crop">
-        <img src="/images/surrey-ai-society.png" alt="Surrey Artificial Intelligence Society" />
+        <img src="/images/surrey-ai-society-mark.png" alt="" />
+        <span className="society-mark__name">Surrey<br />Artificial Intelligence<br />Society</span>
       </span>
     </div>
   );
