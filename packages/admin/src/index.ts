@@ -10,3 +10,9 @@ export { validateSocietySettingsInput } from './validation/settings.js';
 export { generateCsrfToken, verifyCsrfToken } from './csrf.js';
 export { requireAdmin, requireAdminRole } from './actionGuard.js';
 export type { AdminActionContext, AdminGuardResult } from './actionGuard.js';
+export {
+  fetchUnionCommitteeOfficers,
+  parseUnionCommitteeOfficers,
+  UNION_OFFICER_ROLES,
+} from './unionCommittee.js';
+export type { UnionCommitteeOfficer, UnionOfficerRole } from './unionCommittee.js';

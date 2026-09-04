@@ -11,17 +11,8 @@ const loading = size === "small" ? "lazy" : "eager";
 
 <span class:list={["brand-mark", `brand-mark--${size}`]} aria-hidden="true">
   <img
-    class="brand-mark__img brand-mark__img--light"
-    src="/logos/surrey-ai-ds-logo.png"
-    alt=""
-    width={pixelSize}
-    height={pixelSize}
-    loading={loading}
-    decoding="async"
-  />
-  <img
-    class="brand-mark__img brand-mark__img--dark"
-    src="/logos/surrey-ai-ds-logo-dark.png"
+    class="brand-mark__img"
+    src="/logos/brand/surrey-ai-avatar-light.png"
     alt=""
     width={pixelSize}
     height={pixelSize}
@@ -54,18 +45,7 @@ const loading = size === "small" ? "lazy" : "eager";
     width: 100%;
     height: 100%;
     object-fit: contain;
-    filter: drop-shadow(0 8px 16px color-mix(in srgb, var(--ai-slate-base) 10%, transparent));
+    border-radius: 0.4rem;
   }
 
-  .brand-mark__img--dark {
-    display: none;
-  }
-
-  :global(:root[data-theme="dark"]) .brand-mark__img--light {
-    display: none;
-  }
-
-  :global(:root[data-theme="dark"]) .brand-mark__img--dark {
-    display: block;
-  }
 </style>

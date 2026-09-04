@@ -32,7 +32,7 @@ if (token && userId) {
     await client.mutation('memberships:acceptInvitation', { token, societySlug: SOCIETY_ID });
     state = 'success';
     title = 'Invitation accepted';
-    message = 'Your admin access is ready. Redirecting you to the dashboard.';
+    message = 'Your admin access is ready. Redirecting you to the admin tools.';
   } catch (error) {
     state = classifyInviteError(error);
   }
@@ -43,7 +43,7 @@ const stateCopy: Record<InviteState, { title: string; message: string; alert: st
   success: { title, message, alert: 'alert alert-success' },
   expired: { title: 'Invitation expired', message: 'This invitation has expired. Ask an existing admin to send a new invite.', alert: 'alert alert-error' },
   revoked: { title: 'Invitation revoked', message: 'This invitation has been revoked and can no longer be accepted.', alert: 'alert alert-error' },
-  accepted: { title: 'Invitation already accepted', message: 'This invitation has already been used. If you have access, go to the admin dashboard.', alert: 'alert alert-success' },
+  accepted: { title: 'Invitation already accepted', message: 'This invitation has already been used. If you have access, go to the admin tools.', alert: 'alert alert-success' },
   invalid: { title: 'Invalid invitation', message: 'The invite token is missing, invalid, or does not belong to this society.', alert: 'alert alert-error' },
   mismatch: { title: 'Email mismatch', message: 'You are signed in with a different email address than the one that was invited.', alert: 'alert alert-error' },
   error: { title: 'Could not accept invitation', message: 'Something went wrong while accepting the invitation. Please try again or ask an admin for a new invite.', alert: 'alert alert-error' },
@@ -58,7 +58,7 @@ const fallbackRedirectUrl = `/admin/invite/accept?token=${encodeURIComponent(tok
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex, nofollow" />
-    <link rel="icon" type="image/png" href="/logos/ai-logo.png" />
+    <link rel="icon" type="image/png" href="/logos/brand/surrey-ai-avatar-light.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -68,7 +68,7 @@ const fallbackRedirectUrl = `/admin/invite/accept?token=${encodeURIComponent(tok
     <div class="login-container">
       <div style="display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 440px; gap: 1rem;">
         <div class="login-logo" style="margin-bottom: 0;">
-          <img src={society?.logo || '/logos/ai-logo.png'} alt="" />
+          <img src="/logos/brand/surrey-ai-avatar-light.png" alt="" />
           <h1>{society?.shortName || 'Admin'}</h1>
           <p>Admin Invitation</p>
         </div>

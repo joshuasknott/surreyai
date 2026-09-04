@@ -1,55 +1,100 @@
 ---
-import BrandMark from "../common/BrandMark.astro";
+import { getSocietyById } from "@surreysocieties/admin/config";
+
+const society = getSocietyById("ai")!;
 ---
 
-<section class="ai-section join-strip" aria-labelledby="join-strip-title">
-  <div class="ai-section__inner join-strip__inner">
+<section id="join" class="join-strip" aria-labelledby="join-strip-title">
+  <div class="join-strip__inner">
     <div class="join-strip__copy">
-      <BrandMark size="small" />
-      <h2 id="join-strip-title" class="section-title">Become a member</h2>
-      <p class="section-intro">
-        Become part of a student community for artificial intelligence learning, events, resources, responsible discussion, and careers activity.
-      </p>
+      <p class="section-number section-number--ink" aria-hidden="true">04</p>
+      <h2 id="join-strip-title">Learn, build and help shape what comes next.</h2>
+      <span>Join us for beginner-friendly workshops, collaborative projects, talks, challenges and socials. Come with experience, curiosity or simply a question you want to explore.</span>
     </div>
-    <a href="/join" class="btn-primary">Join via Students' Union</a>
+    <div class="join-strip__actions">
+      <a href={`mailto:${society.contactEmail}`} class="join-strip__primary">Ask us a question</a>
+      <a href={society.membershipUrl} target="_blank" rel="noopener noreferrer" class="join-strip__secondary">Join through Students&apos; Union</a>
+    </div>
   </div>
 </section>
 
 <style>
   .join-strip {
-    position: relative;
-    border-top: 1px solid var(--ai-border);
-    overflow: clip;
-  }
-
-  .join-strip::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(115deg, transparent 0 28%, color-mix(in srgb, var(--ai-azure) 10%, transparent) 28.2% 28.6%, transparent 28.8% 100%),
-      linear-gradient(132deg, transparent 0 55%, color-mix(in srgb, var(--ai-sage) 12%, transparent) 55.2% 55.6%, transparent 55.8% 100%);
-    pointer-events: none;
+    padding: clamp(2rem, 4vw, 3.75rem) 1.25rem;
+    border-top: 1px solid rgba(17, 17, 17, 0.18);
+    background: #ff4a00;
+    color: #111111;
   }
 
   .join-strip__inner {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 2rem;
-  }
-
-  .join-strip__copy {
     display: grid;
-    gap: 0.9rem;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: center;
+    width: min(100%, 82rem);
+    margin: 0 auto;
   }
 
-  @media (max-width: 760px) {
-    .join-strip__inner {
-      align-items: flex-start;
-      flex-direction: column;
-    }
+  .join-strip__copy > .section-number {
+    margin: 0 0 0.65rem;
+  }
+
+  .join-strip__copy h2 {
+    margin: 0;
+    color: #111111;
+    font-size: clamp(2.1rem, 4vw, 3.6rem);
+    font-weight: 850;
+    letter-spacing: -0.055em;
+    line-height: 1;
+  }
+
+  .join-strip__copy span {
+    display: block;
+    max-width: 38rem;
+    margin-top: 0.9rem;
+    color: rgba(17, 17, 17, 0.72);
+    line-height: 1.55;
+  }
+
+  .join-strip__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+  }
+
+  .join-strip__actions a {
+    display: inline-flex;
+    min-height: 3.15rem;
+    align-items: center;
+    justify-content: center;
+    padding: 0.9rem 1.35rem;
+    border: 1px solid #111111;
+    border-radius: 0.2rem;
+    font-size: 0.88rem;
+    font-weight: 850;
+    text-decoration: none;
+    transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .join-strip__actions a:hover,
+  .join-strip__actions a:focus-visible { transform: translateY(-2px); }
+
+  .join-strip__primary { background: #111111; color: #faf8f3; }
+  .join-strip__secondary { background: #faf8f3; color: #111111; }
+
+  @media (max-width: 840px) {
+    .join-strip__inner { grid-template-columns: 1fr; }
+    .join-strip__actions { width: 100%; }
+  }
+
+  @media (max-width: 540px) {
+    .join-strip__actions { display: grid; }
+    .join-strip__actions a { width: 100%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .join-strip__actions a { transition: none; }
+    .join-strip__actions a:hover,
+    .join-strip__actions a:focus-visible { transform: none; }
   }
 </style>

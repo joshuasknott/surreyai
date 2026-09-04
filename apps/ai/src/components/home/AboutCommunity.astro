@@ -1,0 +1,132 @@
+---
+import { getSocietyById } from "@surreysocieties/admin/config";
+
+const society = getSocietyById("ai")!;
+
+const commitments = [
+  ["Open to every discipline", "You do not need a computing degree or previous AI experience to take part."],
+  ["Practical before performative", "We favour useful workshops, real projects, and honest experimentation over hype."],
+  ["Responsible by default", "Bias, privacy, accessibility, data quality, and human impact stay in the conversation."],
+];
+---
+
+<section id="about" class="about-community" aria-labelledby="about-community-title">
+  <div class="about-community__inner">
+    <div class="about-community__lead">
+      <p class="section-kicker">About Surrey AI</p>
+      <h2 id="about-community-title">A place to understand AI by making things together.</h2>
+      <p>
+        Surrey Artificial Intelligence Society is a student-led community for people who want to learn how AI works, build with it, question it, and meet others doing the same.
+      </p>
+      <div class="about-community__links">
+        <a href={`mailto:${society.contactEmail}`}>Email the committee</a>
+        <a href={society.socials.instagram} target="_blank" rel="noopener noreferrer">Follow on Instagram</a>
+      </div>
+    </div>
+
+    <div class="about-community__commitments" aria-label="What members can expect">
+      {commitments.map(([title, text], index) => (
+        <article>
+          <span>{String(index + 1).padStart(2, "0")}</span>
+          <div>
+            <h3>{title}</h3>
+            <p>{text}</p>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .about-community {
+    padding: clamp(4.5rem, 8vw, 7.5rem) 1.25rem;
+    background: #FAF8F3;
+    color: #111111;
+  }
+
+  .about-community__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(24rem, 0.82fr);
+    gap: clamp(3rem, 8vw, 7rem);
+    align-items: start;
+    width: min(100%, 82rem);
+    margin: 0 auto;
+  }
+
+  .about-community__lead {
+    border-left: 0.3rem solid #FF4A00;
+    padding-left: clamp(1.25rem, 3vw, 2.25rem);
+  }
+
+  .about-community__lead h2 {
+    max-width: 13ch;
+    margin: 0.65rem 0 0;
+    font-size: clamp(2.45rem, 5vw, 4.6rem);
+    font-weight: 900;
+    letter-spacing: -0.06em;
+    line-height: 0.98;
+  }
+
+  .about-community__lead > p:last-of-type {
+    max-width: 39rem;
+    margin: 1.5rem 0 0;
+    color: #5B5752;
+    font-size: 1.05rem;
+    line-height: 1.7;
+  }
+
+  .about-community__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    margin-top: 1.75rem;
+  }
+
+  .about-community__links a {
+    color: #111111;
+    font-size: 0.82rem;
+    font-weight: 850;
+    text-decoration-color: #FF4A00;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.35rem;
+  }
+
+  .about-community__commitments {
+    border-top: 1px solid #BDB5A9;
+  }
+
+  .about-community__commitments article {
+    display: grid;
+    grid-template-columns: 2.4rem minmax(0, 1fr);
+    gap: 1rem;
+    padding: 1.65rem 0;
+    border-bottom: 1px solid #DED8CE;
+  }
+
+  .about-community__commitments span {
+    color: #FF4A00;
+    font-size: 0.74rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+  }
+
+  .about-community__commitments h3 {
+    margin: 0;
+    font-size: 1.12rem;
+    font-weight: 850;
+    letter-spacing: -0.02em;
+  }
+
+  .about-community__commitments p {
+    margin: 0.5rem 0 0;
+    color: #5B5752;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 820px) {
+    .about-community__inner { grid-template-columns: 1fr; }
+    .about-community__lead h2 { max-width: 16ch; }
+  }
+</style>

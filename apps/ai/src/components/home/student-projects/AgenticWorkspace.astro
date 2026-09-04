@@ -1,5 +1,6 @@
 ---
 import BrandMark from "../../common/BrandMark.astro";
+import { ArrowUp, BookOpen, CalendarDays, ChevronDown, Paperclip, UsersRound } from "lucide-astro";
 ---
 
 <section data-agentic-workspace class="aw-root" data-aw-state="initial" aria-label="Student Project: Agentic Builder">
@@ -32,19 +33,20 @@ import BrandMark from "../../common/BrandMark.astro";
 
   <!-- 1. INITIAL STATE: Minimalist Prompt UI -->
   <div class="aw-initial-view">
+    <div class="aw-showcase-brand">
+      <img
+        src="/logos/brand/surrey-ai-logo-transparent.png"
+        alt="Surrey Artificial Intelligence Society"
+        width="1320"
+        height="360"
+        loading="eager"
+        decoding="async"
+      />
+    </div>
+
     <div class="aw-hero">
-      <span class="aw-eyebrow">Idea in. Prototype out.</span>
-      <h2>Build something with a tiny AI team.</h2>
-      <p>Describe an app, page, tool, or experiment. Four specialist roles will shape the idea and return a working preview.</p>
-      <div class="aw-team-preview" aria-hidden="true">
-        <span><i>01</i><b>Plan</b></span>
-        <em></em>
-        <span><i>02</i><b>Explore</b></span>
-        <em></em>
-        <span><i>03</i><b>Build</b></span>
-        <em></em>
-        <span><i>04</i><b>Polish</b></span>
-      </div>
+      <h2>What should we build?</h2>
+      <p>Describe an app, page, tool, or experiment.</p>
     </div>
 
     <form data-aw-form class="aw-chat-box-form" novalidate>
@@ -53,7 +55,7 @@ import BrandMark from "../../common/BrandMark.astro";
           id="aw-task"
           name="task"
           maxlength="600"
-          placeholder="A calm study timer that celebrates each focus session with a tiny garden..."
+          placeholder="A calm study timer that grows a tiny garden..."
           required
         ></textarea>
 
@@ -64,28 +66,26 @@ import BrandMark from "../../common/BrandMark.astro";
 
         <div class="aw-chat-controls">
           <div class="aw-left-controls">
-            <!-- Mock File Upload Button (Now positioned first) -->
             <button type="button" id="aw-attach-btn" class="aw-control-btn aw-attach-icon-btn" aria-label="Add files or photos">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-              </svg>
+              <Paperclip aria-hidden="true" />
             </button>
             <input type="file" id="aw-file-input" style="display: none;" multiple />
 
-            <span class="aw-model-pill" aria-label="Model preset">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" />
-              </svg>
-              Gemini 3.5 Flash
+            <label class="aw-sr-only" for="aw-model-select">AI model</label>
+            <span class="aw-model-pill">
+              <select id="aw-model-select" name="model" aria-label="AI model">
+                <option value="gemini37">Gemini 3.7 Flash</option>
+                <option value="gemini31lite">Gemini 3.1 Flash Lite</option>
+              </select>
+              <ChevronDown class="aw-model-chevron" aria-hidden="true" />
             </span>
           </div>
 
           <div class="aw-right-controls">
             <span class="aw-char-count"><span id="aw-count">0</span>/600</span>
             <button type="submit" id="aw-submit-btn" class="aw-send-btn" data-aw-submit aria-label="Start build">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5L12 3m0 0l7.5 7.5M12 3v18" />
-              </svg>
+              <span class="aw-send-icon" aria-hidden="true"><ArrowUp /></span>
+              <span>Build prototype</span>
             </button>
           </div>
         </div>
@@ -93,56 +93,24 @@ import BrandMark from "../../common/BrandMark.astro";
     </form>
 
     <div class="aw-examples-row">
-      <span>Quick examples:</span>
+      <span>Try an example</span>
       <div class="aw-examples" aria-label="Example prompts">
-        <button type="button" data-aw-example="An event planner for my society that lets people browse events, RSVP, and get reminders.">
-          Event planner
+        <button type="button" data-tone="coral" data-aw-example="An event planner for my society that lets people browse events, RSVP, and get reminders.">
+          <span class="aw-example-icon" aria-hidden="true"><CalendarDays /></span>
+          <span>Event planner</span>
         </button>
-        <button type="button" data-aw-example="A revision tracker that helps students plan topics, track confidence, and review weak areas.">
-          Study tracker
+        <button type="button" data-tone="sage" data-aw-example="A revision tracker that helps students plan topics, track confidence, and review weak areas.">
+          <span class="aw-example-icon" aria-hidden="true"><BookOpen /></span>
+          <span>Study tracker</span>
         </button>
-        <button type="button" data-aw-example="A simple club landing page with events, committee details, and a join call to action.">
-          Club page
+        <button type="button" data-tone="azure" data-aw-example="A simple club landing page with events, committee details, and a join call to action.">
+          <span class="aw-example-icon" aria-hidden="true"><UsersRound /></span>
+          <span>Club page</span>
         </button>
       </div>
     </div>
 
-    <div class="aw-footer">
-      <button type="button" class="aw-help-link" data-aw-help-open>How this works</button>
-    </div>
     <p class="aw-status-text aw-sr-only" data-aw-status aria-live="polite">Builds in moments. Your prompt stays on this page.</p>
-  </div>
-
-  <div class="aw-help-modal" data-aw-help-modal role="dialog" aria-modal="true" aria-labelledby="aw-help-title" hidden>
-    <div class="aw-help-panel">
-      <div class="aw-help-header">
-        <h3 id="aw-help-title">How this works</h3>
-        <button type="button" class="aw-help-close" data-aw-help-close aria-label="Close help">x</button>
-      </div>
-      <ol class="aw-help-steps">
-        <li>
-          <span>1</span>
-          <div>
-            <strong>Describe your idea</strong>
-            <p>Tell the builder what you want the prototype to do.</p>
-          </div>
-        </li>
-        <li>
-          <span>2</span>
-          <div>
-            <strong>Agents plan and build</strong>
-            <p>The workflow turns your brief into a working draft.</p>
-          </div>
-        </li>
-        <li>
-          <span>3</span>
-          <div>
-            <strong>Preview, copy, or share</strong>
-            <p>Open the result, copy the HTML, download it, or share a link.</p>
-          </div>
-        </li>
-      </ol>
-    </div>
   </div>
 
   <!-- 2. WORKING STATE: Impressive Agent Collaborative Visualization -->
@@ -315,12 +283,21 @@ import BrandMark from "../../common/BrandMark.astro";
     content: "";
   }
 
+  .aw-root[data-aw-state="initial"] {
+    background:
+      radial-gradient(circle at 55% 60%, color-mix(in srgb, var(--aw-coral) 8%, transparent), transparent 30rem),
+      linear-gradient(145deg, #fdfbf7, #fff8f3);
+  }
+
   /* ── State visibility rules ── */
   .aw-root[data-aw-state="initial"] .aw-topbar .aw-top-actions {
     display: none;
   }
+  .aw-root[data-aw-state="initial"] .aw-topbar {
+    display: none;
+  }
   .aw-root[data-aw-state="initial"] .aw-initial-view {
-    display: grid;
+    display: flex;
   }
   .aw-root[data-aw-state="initial"] .aw-working-view,
   .aw-root[data-aw-state="initial"] .aw-canvas {
@@ -488,132 +465,112 @@ import BrandMark from "../../common/BrandMark.astro";
     color: var(--aw-button-text);
   }
 
-  /* ── INITIAL STATE: Minimalist Prompt UI styling ── */
+  /* ── INITIAL STATE: Society showcase canvas ── */
   .aw-initial-view {
-    display: grid;
-    grid-template-columns: minmax(17rem, 0.82fr) minmax(24rem, 1.18fr);
-    grid-template-rows: auto auto auto;
+    position: relative;
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     flex: 1;
     min-height: 0;
     width: 100%;
-    max-width: 76rem;
     margin: 0 auto;
-    padding: clamp(1.5rem, 4vw, 3.75rem);
-    column-gap: clamp(2rem, 5vw, 5rem);
-    row-gap: 1rem;
+    padding: clamp(10.5rem, 23.25vh, 15.35rem) clamp(1.5rem, 5vw, 5rem) clamp(2.5rem, 7vh, 5rem);
+    overflow-y: auto;
+    isolation: isolate;
+  }
+
+  .aw-initial-view::before {
+    position: absolute;
+    z-index: -1;
+    inset: 16% 18% 6%;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 48% 48%, color-mix(in srgb, var(--aw-coral) 7%, transparent), transparent 44%),
+      radial-gradient(circle at 60% 56%, color-mix(in srgb, #f6b884 10%, transparent), transparent 56%);
+    filter: blur(22px);
+    content: "";
+    pointer-events: none;
+  }
+
+  .aw-showcase-brand {
+    position: absolute;
+    top: clamp(1.5rem, 3vw, 2.5rem);
+    left: clamp(1.5rem, 3vw, 3rem);
+    width: clamp(13rem, 20vw, 19.5rem);
+  }
+
+  .aw-showcase-brand img {
+    display: block;
+    width: 100%;
+    height: auto;
   }
 
   .aw-hero {
-    grid-row: 1 / 4;
-    text-align: left;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 0;
-  }
-
-  .aw-eyebrow {
-    display: inline-flex;
     align-items: center;
-    gap: 0.55rem;
-    color: var(--aw-coral);
-    font-size: 0.66rem;
-    font-weight: 850;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+    text-align: center;
   }
-
-  .aw-eyebrow::before { width: 1.8rem; height: 1px; background: currentColor; content: ""; }
 
   .aw-hero h2 {
-    max-width: 10ch;
-    font-size: clamp(2.45rem, 5vw, 5rem);
-    font-weight: 850;
+    margin: 0;
     color: var(--aw-text);
-    margin: 0.9rem 0 1.1rem;
-    letter-spacing: -0.065em;
-    line-height: 0.94;
+    font-size: clamp(3rem, 4.9vw, 5rem);
+    font-weight: 850;
+    letter-spacing: -0.068em;
+    line-height: 0.96;
   }
 
   .aw-hero p {
-    font-size: 1.05rem;
-    color: var(--aw-muted);
-    margin: 0;
-    max-width: 39rem;
-    line-height: 1.62;
-  }
-
-  .aw-team-preview {
-    display: flex;
-    width: 100%;
-    align-items: center;
-    margin-top: 2rem;
-  }
-
-  .aw-team-preview span {
-    display: grid;
-    min-width: 3.7rem;
-    gap: 0.2rem;
-    padding: 0.65rem 0.45rem;
-    border: 1px solid var(--aw-line);
-    border-radius: 12px;
-    background: color-mix(in srgb, var(--aw-surface) 72%, transparent);
-    text-align: center;
-    box-shadow: 0 10px 28px color-mix(in srgb, var(--ai-slate-base) 7%, transparent);
-    backdrop-filter: blur(12px);
-  }
-
-  .aw-team-preview i { color: var(--aw-muted); font-size: 0.52rem; font-style: normal; font-weight: 800; }
-  .aw-team-preview b { color: var(--aw-text); font-size: 0.66rem; }
-  .aw-team-preview em { position: relative; flex: 1; height: 1px; background: var(--aw-line-strong); }
-  .aw-team-preview em::after {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    width: 0.38rem;
-    height: 0.38rem;
-    border-radius: 50%;
-    background: var(--aw-coral);
-    transform: translateY(-50%);
-    animation: awIdeaFlow 2.6s linear infinite;
-    content: "";
+    margin: 1.25rem 0 0;
+    color: color-mix(in srgb, var(--aw-muted) 90%, var(--aw-text));
+    font-size: clamp(1.05rem, 1.55vw, 1.35rem);
+    line-height: 1.45;
   }
 
   .aw-chat-box-form {
-    width: 100%;
+    width: min(100%, 58rem);
+    margin-top: 2rem;
   }
 
   .aw-chat-container {
     width: 100%;
-    background: var(--aw-surface);
-    border: 1px solid var(--aw-line-strong);
-    border-radius: 20px;
-    box-shadow: 0 26px 70px color-mix(in srgb, var(--ai-slate-base) 14%, transparent);
-    padding: 1.35rem;
+    padding: 0.55rem;
+    border: 1px solid color-mix(in srgb, var(--aw-coral) 26%, var(--aw-line));
+    border-radius: 24px;
+    background: color-mix(in srgb, var(--aw-surface) 94%, transparent);
+    box-shadow:
+      0 28px 76px color-mix(in srgb, var(--ai-slate-base) 14%, transparent),
+      0 8px 28px color-mix(in srgb, var(--aw-coral) 10%, transparent),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0;
     transition: border-color 0.2s, box-shadow 0.2s;
+    backdrop-filter: blur(18px);
   }
 
   .aw-chat-container:focus-within {
-    border-color: var(--aw-blue);
-    box-shadow: 0 30px 80px color-mix(in srgb, var(--ai-azure) 14%, transparent);
+    border-color: color-mix(in srgb, var(--aw-coral) 66%, var(--aw-line));
+    box-shadow:
+      0 30px 84px color-mix(in srgb, var(--ai-slate-base) 15%, transparent),
+      0 10px 32px color-mix(in srgb, var(--aw-coral) 18%, transparent),
+      0 0 0 4px color-mix(in srgb, var(--aw-coral) 8%, transparent);
   }
 
   .aw-chat-container textarea {
     width: 100%;
-    min-height: 8rem;
-    max-height: 12rem;
+    min-height: 11.5rem;
+    max-height: 13rem;
+    padding: 1.55rem 1.45rem 1.25rem;
     border: 0;
     background: transparent;
     color: var(--aw-text);
     font: inherit;
-    font-size: 1.08rem;
+    font-size: 1.2rem;
     line-height: 1.5;
-    padding: 0;
     resize: none;
     outline: none;
   }
@@ -628,8 +585,9 @@ import BrandMark from "../../common/BrandMark.astro";
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    border-top: 1px solid var(--aw-line);
-    padding-top: 0.85rem;
+    margin: 0 0.55rem 0.15rem;
+    padding: 0.95rem 0.3rem 0.25rem;
+    border-top: 1px solid color-mix(in srgb, var(--aw-line) 90%, transparent);
   }
 
   .aw-left-controls {
@@ -644,7 +602,7 @@ import BrandMark from "../../common/BrandMark.astro";
     align-items: center;
     gap: 0.4rem;
     padding: 0.45rem 0.8rem;
-    border-radius: 0.5rem;
+    border-radius: 12px;
     border: 1px solid var(--aw-line);
     background: var(--aw-surface);
     color: var(--aw-text);
@@ -656,44 +614,94 @@ import BrandMark from "../../common/BrandMark.astro";
   }
 
   .aw-control-btn:hover {
-    background: var(--aw-surface-soft);
-    border-color: var(--aw-text);
+    border-color: var(--aw-coral);
+    background: color-mix(in srgb, var(--aw-coral) 6%, var(--aw-surface));
+    color: var(--aw-coral);
   }
 
   .aw-attach-icon-btn {
-    width: 2.2rem;
-    height: 2.2rem;
+    width: 3.5rem;
+    height: 3.5rem;
     padding: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 10px;
+    border-radius: 12px;
   }
 
   .aw-attach-icon-btn svg {
-    width: 1.15rem;
-    height: 1.15rem;
+    width: 1.18rem;
+    height: 1.18rem;
+    stroke-width: 1.9;
   }
 
   .aw-model-pill {
+    position: relative;
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
-    min-height: 2.2rem;
-    padding: 0.45rem 0.8rem;
+    min-width: 14rem;
+    min-height: 3.5rem;
+    padding: 0;
     border: 1px solid var(--aw-line);
-    border-radius: 10px;
+    border-radius: 12px;
     background: var(--aw-surface);
     color: var(--aw-text);
     font-size: 0.82rem;
     font-weight: 750;
     white-space: nowrap;
+    transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
+  }
+
+  .aw-model-pill:hover {
+    border-color: color-mix(in srgb, var(--aw-coral) 45%, var(--aw-line));
+    background: color-mix(in srgb, var(--aw-coral) 4%, var(--aw-surface));
+  }
+
+  .aw-model-pill:focus-within {
+    border-color: var(--aw-coral);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--aw-coral) 12%, transparent);
+  }
+
+  .aw-model-pill select {
+    width: 100%;
+    min-width: 0;
+    min-height: 3.4rem;
+    padding: 0.55rem 2.35rem 0.55rem 1rem;
+    border: 0;
+    border-radius: inherit;
+    outline: 0;
+    appearance: none;
+    background: transparent;
+    color: var(--aw-text);
+    cursor: pointer;
+    font: inherit;
+    font-weight: 750;
+  }
+
+  .aw-model-pill select:disabled {
+    cursor: wait;
+    opacity: 0.66;
+  }
+
+  .aw-model-pill option {
+    background: var(--aw-surface);
+    color: var(--aw-text);
   }
 
   .aw-model-pill svg {
-    width: 1rem;
-    height: 1rem;
+    width: 1.05rem;
+    height: 1.05rem;
     flex: 0 0 auto;
+    stroke-width: 1.9;
+  }
+
+  .aw-model-pill .aw-model-chevron {
+    position: absolute;
+    right: 0.9rem;
+    width: 0.86rem;
+    height: 0.86rem;
+    color: var(--aw-muted);
+    pointer-events: none;
   }
 
   .aw-attachments-area {
@@ -752,93 +760,120 @@ import BrandMark from "../../common/BrandMark.astro";
   }
 
   .aw-send-btn {
-    width: 2.65rem;
-    height: 2.65rem;
+    min-width: 14.5rem;
+    min-height: 3.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 12px;
+    gap: 0.65rem;
+    padding: 0.45rem 1.35rem 0.45rem 0.55rem;
+    border-radius: 13px;
     border: 0;
-    background: var(--aw-blue);
-    color: var(--aw-button-text);
+    background: linear-gradient(135deg, #ff6338 0%, var(--aw-coral) 54%, #df2e09 100%);
+    color: #fff;
     cursor: pointer;
-    transition: transform 0.2s, background-color 0.2s;
+    font: inherit;
+    font-size: 1rem;
+    font-weight: 820;
+    white-space: nowrap;
+    box-shadow: 0 10px 24px color-mix(in srgb, var(--aw-coral) 30%, transparent);
+    transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
   }
 
   .aw-send-btn:hover {
-    transform: scale(1.05);
-    background: color-mix(in srgb, var(--aw-text) 92%, var(--aw-bg));
+    transform: translateY(-2px);
+    filter: saturate(1.08);
+    box-shadow: 0 14px 30px color-mix(in srgb, var(--aw-coral) 38%, transparent);
   }
 
-  .aw-send-btn svg {
-    width: 1.1rem;
-    height: 1.1rem;
+  .aw-send-btn:focus-visible,
+  .aw-control-btn:focus-visible,
+  .aw-examples button:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--aw-coral) 34%, transparent);
+    outline-offset: 3px;
+  }
+
+  .aw-send-icon {
+    display: grid;
+    width: 2.25rem;
+    height: 2.25rem;
+    place-items: center;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+  }
+
+  .aw-send-icon svg {
+    width: 1.15rem;
+    height: 1.15rem;
+    stroke-width: 2.2;
   }
 
   .aw-examples-row {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 0.6rem;
-    width: 100%;
-    margin-top: 0.25rem;
+    align-items: center;
+    gap: 0.85rem;
+    width: min(100%, 58rem);
+    margin-top: clamp(2rem, 4vh, 2.7rem);
   }
 
   .aw-examples-row > span {
-    font-size: 0.75rem;
+    font-size: 0.88rem;
     color: var(--aw-muted);
-    font-weight: 600;
+    font-weight: 700;
   }
 
   .aw-examples {
     display: flex;
-    justify-content: flex-start;
+    justify-content: center;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 0.75rem;
   }
 
   .aw-examples button {
-    border: 1px solid var(--aw-line);
-    border-radius: 0.5rem;
-    background: transparent;
-    color: var(--aw-muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-width: 13.6rem;
+    min-height: 3.35rem;
+    padding: 0.45rem 1rem 0.45rem 0.55rem;
+    border: 1px solid color-mix(in srgb, var(--aw-coral) 20%, var(--aw-line));
+    border-radius: 13px;
+    background: color-mix(in srgb, var(--aw-surface) 82%, transparent);
+    color: var(--aw-text);
     cursor: pointer;
-    font-size: 0.78rem;
-    font-weight: 500;
-    padding: 0.4rem 0.75rem;
+    font: inherit;
+    font-size: 0.95rem;
+    font-weight: 650;
+    box-shadow: 0 9px 24px color-mix(in srgb, var(--ai-slate-base) 7%, transparent);
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .aw-examples button:hover {
-    border-color: var(--aw-blue);
-    color: var(--aw-blue);
-    background: color-mix(in srgb, var(--aw-blue) 4%, transparent);
+    border-color: color-mix(in srgb, var(--aw-coral) 50%, var(--aw-line));
+    background: var(--aw-surface);
+    transform: translateY(-2px);
+    box-shadow: 0 13px 30px color-mix(in srgb, var(--ai-slate-base) 11%, transparent);
   }
 
-  .aw-footer {
-    display: flex;
-    justify-content: flex-start;
-    width: 100%;
+  .aw-example-icon {
+    display: grid;
+    width: 2.25rem;
+    height: 2.25rem;
+    place-items: center;
+    border-radius: 10px;
   }
 
-  .aw-help-link {
-    border: 0;
-    background: transparent;
-    color: var(--aw-muted);
-    cursor: pointer;
-    font: inherit;
-    font-size: 0.84rem;
-    font-weight: 800;
-    padding: 0.35rem 0.2rem;
-    text-decoration: underline;
-    text-underline-offset: 0.25rem;
+  .aw-example-icon svg {
+    width: 1.18rem;
+    height: 1.18rem;
+    stroke-width: 1.9;
   }
 
-  .aw-help-link:hover,
-  .aw-help-link:focus-visible {
-    color: var(--aw-text);
-    outline: none;
-  }
+  .aw-examples button[data-tone="coral"] .aw-example-icon { background: color-mix(in srgb, var(--aw-coral) 12%, var(--aw-surface)); color: var(--aw-coral); }
+  .aw-examples button[data-tone="sage"] .aw-example-icon { background: color-mix(in srgb, #79a95f 17%, var(--aw-surface)); color: #5d8c49; }
+  .aw-examples button[data-tone="azure"] .aw-example-icon { background: color-mix(in srgb, #4d9ee8 15%, var(--aw-surface)); color: #2d80c7; }
 
   .aw-status-text {
     font-size: 0.8rem;
@@ -857,113 +892,6 @@ import BrandMark from "../../common/BrandMark.astro";
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
-  }
-
-  .aw-help-modal {
-    position: absolute;
-    inset: 0;
-    z-index: 40;
-    display: grid;
-    place-items: center;
-    padding: 1rem;
-    background: color-mix(in srgb, var(--ai-slate-base) 32%, transparent);
-  }
-
-  .aw-help-modal[hidden] {
-    display: none;
-  }
-
-  .aw-help-panel {
-    width: min(28rem, 100%);
-    border: 1px solid var(--aw-line-strong);
-    border-radius: 8px;
-    background: var(--aw-surface);
-    box-shadow: 0 28px 70px color-mix(in srgb, var(--ai-slate-base) 18%, transparent);
-    padding: 1rem;
-  }
-
-  .aw-help-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid var(--aw-line);
-  }
-
-  .aw-help-header h3 {
-    margin: 0;
-    color: var(--aw-text);
-    font-size: 1rem;
-    font-weight: 850;
-  }
-
-  .aw-help-close {
-    width: 2rem;
-    height: 2rem;
-    border: 1px solid var(--aw-line);
-    border-radius: 8px;
-    background: var(--aw-surface);
-    color: var(--aw-text);
-    cursor: pointer;
-    font: inherit;
-    font-size: 1.15rem;
-    line-height: 1;
-  }
-
-  .aw-help-close:hover,
-  .aw-help-close:focus-visible {
-    background: var(--aw-text);
-    color: var(--aw-button-text);
-    outline: none;
-  }
-
-  .aw-help-steps {
-    display: grid;
-    gap: 0;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .aw-help-steps li {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 0.85rem;
-    padding: 0.95rem 0;
-    border-bottom: 1px solid var(--aw-line);
-  }
-
-  .aw-help-steps li:last-child {
-    border-bottom: 0;
-    padding-bottom: 0;
-  }
-
-  .aw-help-steps span {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 1.6rem;
-    height: 1.6rem;
-    border: 1px solid var(--aw-line-strong);
-    border-radius: 8px;
-    color: var(--aw-text);
-    font-size: 0.72rem;
-    font-weight: 850;
-  }
-
-  .aw-help-steps strong {
-    display: block;
-    color: var(--aw-text);
-    font-size: 0.9rem;
-    font-weight: 850;
-  }
-
-  .aw-help-steps p {
-    margin: 0.18rem 0 0;
-    color: var(--aw-muted);
-    font-size: 0.84rem;
-    line-height: 1.45;
   }
 
   /* ── WORKING STATE: Visualization styling ── */
@@ -1384,31 +1312,63 @@ import BrandMark from "../../common/BrandMark.astro";
     .aw-topbar {
       padding: 0.5rem 1rem;
     }
+    .aw-root[data-aw-state="complete"] .aw-topbar {
+      flex-wrap: wrap;
+    }
+    .aw-root[data-aw-state="complete"] .aw-brand {
+      flex: 1 1 100%;
+    }
     .aw-ready { display: none; }
     .aw-root[data-aw-state="initial"] .aw-initial-view {
-      grid-template-columns: 1fr;
-      grid-template-rows: auto;
-      align-content: start;
-      padding: 1.25rem;
-      gap: 1.4rem;
+      justify-content: flex-start;
+      padding: 6.8rem 1rem 2rem;
     }
-    .aw-hero { grid-row: auto; }
+    .aw-showcase-brand {
+      top: 1.25rem;
+      left: 1.15rem;
+      width: min(12.5rem, calc(100% - 7.5rem));
+    }
     .aw-hero h2 {
-      max-width: 12ch;
-      font-size: clamp(2.2rem, 10.5vw, 3.7rem);
+      max-width: 10ch;
+      font-size: clamp(2.55rem, 11vw, 3.7rem);
     }
-    .aw-team-preview { margin-top: 1.35rem; }
-    .aw-team-preview span { min-width: 3.2rem; }
-    .aw-examples-row,
-    .aw-footer { align-items: flex-start; justify-content: flex-start; }
+    .aw-hero p { max-width: 24rem; font-size: 1rem; }
+    .aw-chat-box-form { margin-top: 1.8rem; }
+    .aw-chat-container { border-radius: 19px; }
+    .aw-chat-container textarea {
+      min-height: 7.5rem;
+      padding: 1.25rem 1rem 1rem;
+      font-size: 0.97rem;
+    }
     .aw-chat-controls {
+      align-items: flex-end;
       gap: 0.65rem;
+      margin-inline: 0.35rem;
+      padding-inline: 0;
     }
+    .aw-left-controls { gap: 0.4rem; }
     .aw-model-pill {
-      max-width: min(10.5rem, 48vw);
-      overflow: hidden;
-      text-overflow: ellipsis;
+      min-width: 0;
+      width: 8.8rem;
+      max-width: none;
+      flex: 0 0 auto;
     }
+    .aw-model-pill select {
+      min-height: 2.75rem;
+      padding: 0.45rem 1.75rem 0.45rem 0.65rem;
+      font-size: 0.72rem;
+    }
+    .aw-model-pill .aw-model-chevron { right: 0.58rem; }
+    .aw-right-controls { gap: 0.45rem; }
+    .aw-char-count { display: none; }
+    .aw-attach-icon-btn { width: 2.65rem; height: 2.85rem; }
+    .aw-model-pill { min-height: 2.85rem; }
+    .aw-send-btn { min-width: 0; min-height: 2.85rem; padding-right: 0.6rem; font-size: 0.78rem; }
+    .aw-send-icon { width: 1.85rem; height: 2rem; }
+    .aw-examples-row { margin-top: 1.65rem; }
+    .aw-examples { width: 100%; gap: 0.55rem; }
+    .aw-examples button { min-width: 0; min-height: 3rem; padding-right: 0.75rem; font-size: 0.8rem; }
+    .aw-example-icon { width: 2rem; height: 2rem; }
     .aw-agents-grid {
       flex-direction: column;
       gap: 0.75rem;
@@ -1427,7 +1387,9 @@ import BrandMark from "../../common/BrandMark.astro";
       animation: awLineFlowVertical 1.5s linear infinite;
     }
     .aw-top-actions {
-      max-width: 68vw;
+      width: 100%;
+      max-width: 100%;
+      padding-bottom: 0.15rem;
       overflow-x: auto;
       scrollbar-width: none;
     }
@@ -1444,8 +1406,7 @@ import BrandMark from "../../common/BrandMark.astro";
   @media (prefers-reduced-motion: reduce) {
     .aw-spinner,
     .aw-agent-node[data-state="active"] .aw-node-icon,
-    .aw-agent-node[data-state="active"] + .aw-node-connector .aw-connector-pulse,
-    .aw-team-preview em::after {
+    .aw-agent-node[data-state="active"] + .aw-node-connector .aw-connector-pulse {
       animation: none;
     }
   }
@@ -1483,6 +1444,7 @@ import BrandMark from "../../common/BrandMark.astro";
     const count = root.querySelector<HTMLElement>('#aw-count');
     const submit = root.querySelector<HTMLButtonElement>('[data-aw-submit]');
     const status = root.querySelector<HTMLElement>('[data-aw-status]');
+    const modelSelect = root.querySelector<HTMLSelectElement>('#aw-model-select');
     const tabs = root.querySelectorAll<HTMLButtonElement>('[data-aw-tab]');
     const views = root.querySelectorAll<HTMLElement>('[data-aw-view]');
     const previewIframe = root.querySelector<HTMLIFrameElement>('[data-aw-preview-iframe]');
@@ -1496,9 +1458,6 @@ import BrandMark from "../../common/BrandMark.astro";
 
     const attachBtn = root.querySelector<HTMLButtonElement>('#aw-attach-btn');
     const attachmentsArea = root.querySelector<HTMLElement>('#aw-attachments');
-    const helpModal = root.querySelector<HTMLElement>('[data-aw-help-modal]');
-    const helpOpenButton = root.querySelector<HTMLButtonElement>('[data-aw-help-open]');
-    const helpCloseButton = root.querySelector<HTMLButtonElement>('[data-aw-help-close]');
 
     // Terminal log selector
     const consoleLog = root.querySelector<HTMLElement>('#aw-console-log');
@@ -1512,13 +1471,27 @@ import BrandMark from "../../common/BrandMark.astro";
 
     let workflowData: WorkflowData | null = null;
     let currentBuildId: string | null = null;
-    let selectedModelKey = 'gemini35';
+    const modelNames: Record<string, string> = {
+      gemini37: 'Gemini 3.7 Flash',
+      gemini31lite: 'Gemini 3.1 Flash Lite',
+    };
+
+    let selectedModelKey = modelSelect?.value || 'gemini37';
     let attachedFiles: File[] = [];
 
-    const selectedModelName = () => 'Gemini 3.5 Flash';
+    const selectedModelName = () => modelNames[selectedModelKey] || modelNames.gemini37;
 
     const setAwState = (state: 'initial' | 'working' | 'complete') => {
       root.setAttribute('data-aw-state', state);
+      root.setAttribute('aria-busy', String(state === 'working'));
+
+      const initialView = root.querySelector<HTMLElement>('.aw-initial-view');
+      const workingView = root.querySelector<HTMLElement>('.aw-working-view');
+      const completeView = root.querySelector<HTMLElement>('.aw-canvas');
+
+      if (initialView) initialView.hidden = state !== 'initial';
+      if (workingView) workingView.hidden = state !== 'working';
+      if (completeView) completeView.hidden = state !== 'complete';
 
       const spinner = root.querySelector('.aw-spinner');
       const sparkle = root.querySelector('.aw-brand-logo-svg');
@@ -1549,8 +1522,8 @@ import BrandMark from "../../common/BrandMark.astro";
     };
 
     const setLoading = (loading: boolean) => {
-      if (!submit) return;
-      submit.disabled = loading;
+      if (submit) submit.disabled = loading;
+      if (modelSelect) modelSelect.disabled = loading;
     };
 
     const switchView = (viewName: string) => {
@@ -1875,28 +1848,9 @@ import BrandMark from "../../common/BrandMark.astro";
     });
 
     textarea?.addEventListener('input', updateCount);
-
-    const openHelpModal = () => {
-      if (!helpModal) return;
-      helpModal.hidden = false;
-      helpCloseButton?.focus();
-    };
-
-    const closeHelpModal = () => {
-      if (!helpModal) return;
-      helpModal.hidden = true;
-      helpOpenButton?.focus();
-    };
-
-    helpOpenButton?.addEventListener('click', openHelpModal);
-    helpCloseButton?.addEventListener('click', closeHelpModal);
-    helpModal?.addEventListener('click', (event) => {
-      if (event.target === helpModal) closeHelpModal();
-    });
-
-    document.addEventListener('keydown', (event) => {
-      if (event.key !== 'Escape') return;
-      if (helpModal && !helpModal.hidden) closeHelpModal();
+    modelSelect?.addEventListener('change', () => {
+      selectedModelKey = modelSelect.value;
+      setStatus(`${selectedModelName()} selected.`);
     });
 
     // Mock file input listener for actual file picking

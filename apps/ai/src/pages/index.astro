@@ -1,29 +1,20 @@
 ---
 export const prerender = false;
 import Layout from "../layouts/Layout.astro";
-import { queryPublicConvex } from "@surreysocieties/admin";
-import { api } from "../../../../convex/_generated/api.js";
 import "../styles/global.css";
 
 import HomeHero from "../components/home/HomeHero.astro";
 import AreasWeExplore from "../components/home/AreasWeExplore.astro";
 import StudentProjects from "../components/home/StudentProjects.astro";
-import EventsPreview from "../components/home/EventsPreview.astro";
 
-const SOCIETY_ID = "ai";
 Astro.response.headers.set("Cache-Control", "public, s-maxage=300, stale-while-revalidate=3600");
-
-const events: any[] = (
-  await queryPublicConvex(api.events.listPublished, { societySlug: SOCIETY_ID }, [])
-);
 ---
 
 <Layout
   title="Home"
-  description="Surrey Artificial Intelligence Society - a student-led University of Surrey community for artificial intelligence workshops, machine learning, data science, careers activity, and responsible discussion."
+  description="Surrey Artificial Intelligence Society is a student-led community for anyone curious about artificial intelligence, machine learning and data science, whatever their degree or experience."
 >
   <HomeHero />
   <AreasWeExplore />
   <StudentProjects />
-  <EventsPreview events={events} />
 </Layout>

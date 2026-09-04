@@ -13,6 +13,7 @@ import type * as assistant from "../assistant.js";
 import type * as assistantRateLimits from "../assistantRateLimits.js";
 import type * as auditLogs from "../auditLogs.js";
 import type * as committee from "../committee.js";
+import type * as crons from "../crons.js";
 import type * as events from "../events.js";
 import type * as memberships from "../memberships.js";
 import type * as permissions from "../permissions.js";
@@ -34,6 +35,7 @@ declare const fullApi: ApiFromModules<{
   assistantRateLimits: typeof assistantRateLimits;
   auditLogs: typeof auditLogs;
   committee: typeof committee;
+  crons: typeof crons;
   events: typeof events;
   memberships: typeof memberships;
   permissions: typeof permissions;

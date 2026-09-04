@@ -24,14 +24,8 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
   ]}
 >
   <Fragment slot="head">
-    <link rel="icon" type="image/png" href="/logos/ai-logo.png" />
+    <link rel="icon" type="image/png" href="/logos/brand/surrey-ai-avatar-light.png" />
   </Fragment>
-
-  <script is:inline>
-    const savedTheme = typeof localStorage !== "undefined" ? localStorage.getItem("surrey-ai-theme") : null;
-    const projectTheme = savedTheme || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-    document.documentElement.setAttribute("data-theme", projectTheme);
-  </script>
 
   {!embed && (
     <header class="project-demo-nav">

@@ -130,4 +130,58 @@ describe("admin authorization", () => {
     const storedInvitation = await t.run((ctx) => ctx.db.get(invitation.invitationId));
     expect(storedInvitation?.invitedBy).toBe(membershipId);
   });
+
+  it("refreshes exactly the three Union officers and keeps dashboard records editable", async () => {
+    const t = convexTest(schema, modules);
+    const societyId = await insertSociety(t, "ai");
+    const tokenIdentifier = "https://issuer.example.test|committee-admin";
+
+    await t.run(async (ctx) => {
+      const userId = await ctx.db.insert("users", {
+        email: "committee-admin@example.test",
+        name: "Committee Admin",
+        clerkId: tokenIdentifier,
+      });
+      await ctx.db.insert("memberships", {
+        userId,
+        societyId,
+        role: "admin",
+        status: "active",
+      });
+      await ctx.db.insert("committeeMembers", {
+        societyId,
+        name: "Outgoing Social Secretary",
+        role: "Social Secretary",
+        displayOrder: 1,
+        isActive: true,
+      });
+    });
+
+    const authed = t.withIdentity({
+      subject: "committee-admin",
+      issuer: "https://issuer.example.test",
+      tokenIdentifier,
+      email: "committee-admin@example.test",
+      name: "Committee Admin",
+    });
+
+    await authed.mutation(api.committee.syncOfficers, {
+      societySlug: "ai",
+      officers: [
+        { name: "Josh Knott", role: "President" },
+        { name: "Poppy Holmes", role: "Vice President" },
+        { name: "Vinayak Manojkumar Vadhera", role: "Treasurer" },
+      ],
+    });
+
+    const active = await t.query(api.committee.listActive, { societySlug: "ai" });
+    expect(active.map(({ name, role }) => ({ name, role }))).toEqual([
+      { name: "Josh Knott", role: "President" },
+      { name: "Poppy Holmes", role: "Vice President" },
+      { name: "Vinayak Manojkumar Vadhera", role: "Treasurer" },
+    ]);
+
+    const allMembers = await authed.query(api.committee.list, { societySlug: "ai" });
+    expect(allMembers.find((member) => member.role === "Social Secretary")?.isActive).toBe(false);
+  });
 });

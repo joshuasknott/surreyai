@@ -10,14 +10,14 @@ export const SOCIETIES: Record<string, Society> = {
     publicBasePath: '/',
     domain: 'surreyaisociety.org',
     establishedYear: 2025,
-    logo: '/logos/ai-logo.png',
+    logo: '/logos/brand/surrey-ai-avatar-light.png',
     contactEmail: 'ussu.aianddatascience@surrey.ac.uk',
     socials: {
       instagram: 'https://www.instagram.com/surreyaisociety/',
       email: 'ussu.aianddatascience@surrey.ac.uk',
     },
     membershipUrl: 'https://surreyunion.org/shop/ai-and-data-science-society/293e762b-01b8-46f4-a541-2260e4d9ec4f',
-    studentsUnionUrl: 'https://surreyunion.org/your-activity/clubs-and-societies-a-z/ai-and-data-science-society',
+    studentsUnionUrl: 'https://surreyunion.org/your-activity/clubs-and-societies-a-z/artificial-intelligence-society',
   },
   neurotech: {
     id: 'neurotech',
@@ -28,7 +28,7 @@ export const SOCIETIES: Record<string, Society> = {
     publicBasePath: '/',
     domain: 'surreyneurotechsociety.org',
     establishedYear: 2024,
-    logo: '/logos/neurotech-logo.png',
+    logo: '/logos/brand/surrey-neurotech-logo.png',
     contactEmail: 'ussu.neurotechsoc@surrey.ac.uk',
     socials: {
       instagram: 'https://www.instagram.com/surreyneurotech/',

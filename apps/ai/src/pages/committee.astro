@@ -52,6 +52,7 @@ const operatingModel = [
 ];
 
 ---
+return Astro.redirect('/#join', 302);
 
 <Layout
   title="Committee"
@@ -141,7 +142,7 @@ const operatingModel = [
                 )}
               </div>
               <div>
-                <h2>{member.name || "Pending confirmation"}</h2>
+                <h3>{member.name || "Pending confirmation"}</h3>
                 <p>{member.role}</p>
               </div>
             </article>
@@ -168,7 +169,7 @@ const operatingModel = [
                       )}
                     </div>
                     <div>
-                      <h2>{member.name || "Pending confirmation"}</h2>
+                      <h3>{member.name || "Pending confirmation"}</h3>
                       <p>{member.role}</p>
                     </div>
                   </article>
@@ -281,7 +282,7 @@ const operatingModel = [
     object-fit: cover;
   }
 
-  .person-card h2 {
+  .person-card h3 {
     margin: 0 0 0.25rem;
     color: var(--ai-fg);
     font-size: 1.1rem;

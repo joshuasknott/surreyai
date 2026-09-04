@@ -13,16 +13,25 @@ const deleted = Astro.url.searchParams.get('deleted');
 
 const actionResult = Astro.getActionResult(actions.admin.deleteCommitteeMember);
 const actionDeleted = actionResult && !actionResult.error;
+const syncResult = Astro.getActionResult(actions.admin.syncCommitteeFromUnion);
 ---
 <AdminLayout title="Committee" societyId={SOCIETY_ID} currentPath="/admin/committee">
 
   <div class="admin-page-header">
     <h1 class="admin-page-title">Committee Members</h1>
-    <a href="/admin/committee/new" class="btn btn-primary">+ Add Member</a>
+    <div class="table-actions">
+      <form method="POST" action={actions.admin.syncCommitteeFromUnion}>
+        <input type="hidden" name="_csrf" value={csrfToken} />
+        <button type="submit" class="btn btn-outline">Refresh from Students' Union</button>
+      </form>
+      <a href="/admin/committee/new" class="btn btn-primary">+ Add Member</a>
+    </div>
   </div>
 
   {success && <div class="alert alert-success">Committee member saved.</div>}
   {(deleted || actionDeleted) && <div class="alert alert-success">Committee member removed.</div>}
+  {syncResult && !syncResult.error && <div class="alert alert-success">President, Vice President and Treasurer refreshed from the Students' Union.</div>}
+  {syncResult?.error && <div class="alert alert-error">{syncResult.error.message}</div>}
 
   {members.length === 0 ? (
     <div class="admin-table-wrapper">

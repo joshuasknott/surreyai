@@ -1,4 +1,5 @@
 ---
+return Astro.redirect('/#about', 302);
 export const prerender = false;
 import { Image } from "astro:assets";
 import Layout from "../layouts/Layout.astro";
@@ -256,14 +257,6 @@ const programmeFormats = [
     background: color-mix(in srgb, var(--ai-bg) 74%, var(--ai-surface));
     color: var(--ai-fg);
     font-weight: 850;
-  }
-
-  .calendar-empty__board span:nth-child(2) {
-    transform: translateX(1rem);
-  }
-
-  .calendar-empty__board span:nth-child(3) {
-    transform: translateX(2rem);
   }
 
   .event-directory {

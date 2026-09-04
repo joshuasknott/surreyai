@@ -145,7 +145,7 @@ surreysocieties/
 
 ## Admin Dashboard
 
-Each site has its own admin dashboard at `/admin`, protected by Clerk authentication and Convex membership checks.
+Each site has its own focused admin tools, protected by Clerk authentication and Convex membership checks. `/admin` opens the event manager directly.
 
 ### Role Model
 
@@ -192,7 +192,7 @@ This script requires `CLERK_SECRET_KEY` plus `OWNER_ADMIN_INITIAL_PASSWORD`, `AI
 
 ### Society Isolation
 
-Each dashboard is completely isolated. A user for one society cannot access another society's admin area. This is enforced in Convex functions via `ctx.auth.getUserIdentity()` and membership lookups, and in Astro middleware via Convex `memberships:getMyMembership`.
+Each admin area is completely isolated. A user for one society cannot access another society's admin area. This is enforced in Convex functions via `ctx.auth.getUserIdentity()` and membership lookups, and in Astro middleware via Convex `memberships:getMyMembership`.
 
 ## Shared Code
 

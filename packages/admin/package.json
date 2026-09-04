@@ -7,6 +7,7 @@
     ".": "./src/index.ts",
     "./validation": "./src/validation/index.ts",
     "./config": "./src/config.ts",
+    "./unionCommittee": "./src/unionCommittee.ts",
     "./types": "./src/types.ts",
     "./csrf": "./src/csrf.ts",
     "./actionGuard": "./src/actionGuard.ts"

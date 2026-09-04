@@ -14,7 +14,6 @@ const user = Astro.locals.user;
 const society = getSocietyById(societyId);
 
 const navItems = [
-  { href: '/admin', label: 'Dashboard', icon: 'grid' },
   { href: '/admin/events', label: 'Events', icon: 'calendar' },
   { href: '/admin/committee', label: 'Committee', icon: 'users' },
   { href: '/admin/past-committee', label: 'Past Committee', icon: 'users' },
@@ -23,7 +22,6 @@ const navItems = [
 ];
 
 function isActive(href: string): boolean {
-  if (href === '/admin') return currentPath === '/admin' || currentPath === '/admin/';
   return currentPath.startsWith(href);
 }
 ---
@@ -33,7 +31,7 @@ function isActive(href: string): boolean {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex, nofollow" />
-    <link rel="icon" type="image/png" href="/logos/ai-logo.png" />
+    <link rel="icon" type="image/png" href="/logos/brand/surrey-ai-avatar-light.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -43,7 +41,7 @@ function isActive(href: string): boolean {
     <div class="admin-layout">
       <aside class="admin-sidebar" id="admin-sidebar">
         <div class="admin-sidebar-logo">
-          <img src={society?.logo || '/logos/ai-logo.png'} alt="" />
+          <img src="/logos/brand/surrey-ai-avatar-light.png" alt="" />
           <span>{society?.shortName || 'Admin'}</span>
           <button id="admin-sidebar-close" class="admin-sidebar-close" type="button" aria-label="Close menu">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 1.25rem; height: 1.25rem;">

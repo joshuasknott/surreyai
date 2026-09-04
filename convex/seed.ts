@@ -30,7 +30,31 @@ type CanonicalMetadataPatch = {
   socials?: SocietySocials;
 };
 
+type CanonicalCommitteeMember = {
+  name: string;
+  role: 'President' | 'Vice President' | 'Treasurer';
+  displayOrder: number;
+};
+
 const SETUP_SECRET_ENV = "SURREY_SETUP_SECRET";
+
+const canonicalCommitteeData: Record<string, CanonicalCommitteeMember[]> = {
+  ai: [
+    { name: "Josh Knott", role: "President", displayOrder: 1 },
+    { name: "Poppy Holmes", role: "Vice President", displayOrder: 2 },
+    { name: "Vinayak Manojkumar Vadhera", role: "Treasurer", displayOrder: 3 },
+  ],
+  business: [
+    { name: "Meerab Zahoor", role: "President", displayOrder: 1 },
+    { name: "Anjika Gurung", role: "Vice President", displayOrder: 2 },
+    { name: "Aleenah Akhtar", role: "Treasurer", displayOrder: 3 },
+  ],
+  neurotech: [
+    { name: "Poppy Holmes", role: "President", displayOrder: 1 },
+    { name: "Josh Knott", role: "Vice President", displayOrder: 2 },
+    { name: "Anna Zamojska", role: "Treasurer", displayOrder: 3 },
+  ],
+};
 
 const canonicalSocietyData: CanonicalSocietyData[] = [
   {
@@ -48,7 +72,7 @@ const canonicalSocietyData: CanonicalSocietyData[] = [
     membershipUrl:
       "https://surreyunion.org/shop/ai-and-data-science-society/293e762b-01b8-46f4-a541-2260e4d9ec4f",
     studentsUnionUrl:
-      "https://surreyunion.org/your-activity/clubs-and-societies-a-z/ai-and-data-science-society",
+      "https://surreyunion.org/your-activity/clubs-and-societies-a-z/artificial-intelligence-society",
   },
   {
     name: "Surrey Business Society",
@@ -134,6 +158,21 @@ export const seedSocieties = mutation({
           societyId,
           role: "protectedAdmin",
           status: "active",
+        });
+      }
+
+
+      for (const member of canonicalCommitteeData[data.slug] ?? []) {
+        await ctx.db.insert("committeeMembers", {
+          societyId,
+          name: member.name,
+          role: member.role,
+          bio: "",
+          image: "",
+          email: "",
+          linkedIn: "",
+          displayOrder: member.displayOrder,
+          isActive: true,
         });
       }
     }

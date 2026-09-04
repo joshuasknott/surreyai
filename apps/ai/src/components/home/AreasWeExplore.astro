@@ -1,53 +1,70 @@
 ---
-import CutoutVisual from "../common/CutoutVisual.astro";
-import learningToolkitCutout from "../../assets/generated/ai-learning-toolkit-cutout.optimized.webp";
-
-const routes = [
+const pathways = [
   {
     label: "01",
-    title: "Learn the basics",
-    text: "Join workshops, beginner sessions, and practical activities that make artificial intelligence easier to understand.",
+    title: "Learn",
+    text: "Build confidence through beginner-friendly workshops, tutorials and practical sessions covering AI, machine learning and data science.",
   },
   {
     label: "02",
-    title: "Meet other builders",
-    text: "Come to build nights, challenges, talks, and socials with students working on similar ideas.",
+    title: "Build",
+    text: "Collaborate on projects, enter challenges and competitions, and turn ideas into something you can test, share and add to your portfolio.",
   },
   {
     label: "03",
-    title: "Use AI responsibly",
-    text: "Discuss data quality, bias, accessibility, careers, and the real impact of AI tools.",
+    title: "Connect",
+    text: "Meet students from across the University and learn from academics, researchers, startups and industry professionals.",
   },
+  {
+    label: "04",
+    title: "Question",
+    text: "Explore responsibility, bias, privacy, accessibility and the wider effects AI has on people and society.",
+  },
+];
+
+const principles = [
+  ["Bias and fairness", "Who is represented in the data, and who might be excluded?"],
+  ["Privacy and responsibility", "When should data and AI systems be used, and when should they not?"],
+  ["Accessibility", "How can AI benefit more people without creating new barriers?"],
+  ["Human impact", "What could AI change across work, education, healthcare, creativity and society?"],
 ];
 ---
 
-<section id="explore" class="ai-section ai-section--tinted explore-section" aria-labelledby="explore-title">
+<section id="about" class="ai-section pathway-section" aria-labelledby="pathways-title">
   <div class="ai-section__inner">
-    <div class="ai-section__header ai-section__header--split">
+    <div class="pathway-heading">
       <div>
-      <h2 id="explore-title" class="section-title">What members can do</h2>
+        <p class="section-number" aria-hidden="true">01</p>
+        <h2 id="pathways-title" class="section-title">Explore AI practically, critically and together.</h2>
       </div>
       <p class="section-intro">
-        Join practical sessions, meet other students, and explore how AI systems are built and used.
+        Surrey Artificial Intelligence Society brings together students who want to understand AI, experiment with modern tools and meet others interested in where the technology is heading. You do not need a technical background or any previous experience to take part.
       </p>
     </div>
 
-    <div class="explore-grid">
-      <CutoutVisual
-        compact
-        image={learningToolkitCutout}
-        alt="Artificial intelligence learning toolkit with a whiteboard tablet, notebook, data cards, calculator, and headphones"
-        title="Start where you are."
-        body="Find events, projects, learning routes, and the official joining link in one place."
-      />
-      <div class="impact-routes">
-        {routes.map((route) => (
-          <article class="impact-route">
-            <span class="impact-route__label">{route.label}</span>
-            <div>
-              <h3>{route.title}</h3>
-              <p>{route.text}</p>
-            </div>
+    <div class="pathway-grid">
+      {pathways.map((pathway) => (
+        <article>
+          <span>{pathway.label}</span>
+          <h3>{pathway.title}</h3>
+          <p>{pathway.text}</p>
+        </article>
+      ))}
+    </div>
+  </div>
+
+  <div class="responsible-band">
+    <div class="responsible-band__inner">
+      <div class="responsible-band__lead">
+        <p class="section-number" aria-hidden="true">02</p>
+        <h2>Understand what AI changes, not only what it can do.</h2>
+        <span>Learning about AI also means questioning it. We discuss how data is collected, whose interests systems serve, where bias appears, and how AI affects privacy, accessibility, work and everyday life.</span>
+      </div>
+      <div class="responsible-band__principles">
+        {principles.map(([title, text]) => (
+          <article>
+            <h3>{title}</h3>
+            <p>{text}</p>
           </article>
         ))}
       </div>
@@ -56,57 +73,151 @@ const routes = [
 </section>
 
 <style>
-  .explore-section {
-    overflow: clip;
+  .pathway-section {
+    padding-bottom: 0;
   }
 
-  .explore-grid {
+  .pathway-heading {
     display: grid;
-    grid-template-columns: minmax(0, 1.08fr) minmax(20rem, 0.82fr);
-    gap: clamp(1.5rem, 4vw, 3rem);
-    align-items: center;
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.72fr);
+    gap: 2rem;
+    align-items: end;
+    margin-bottom: clamp(2.5rem, 5vw, 4rem);
   }
 
-  .impact-routes {
+  .pathway-grid {
     display: grid;
-    gap: clamp(1.2rem, 3vw, 1.8rem);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-top: 1px solid var(--ai-border-strong);
   }
 
-  .impact-route {
-    display: grid;
-    grid-template-columns: 3.5rem 1fr;
-    gap: 1rem;
-    padding-bottom: clamp(1.2rem, 3vw, 1.8rem);
-    border-bottom: 1px solid var(--ai-border);
+  .pathway-grid article {
+    min-width: 0;
+    padding: clamp(1.4rem, 3vw, 2.25rem) clamp(1rem, 2.4vw, 1.8rem) clamp(2rem, 4vw, 3rem) 0;
+    border-right: 1px solid var(--ai-border);
   }
 
-  .impact-route__label {
-    color: var(--ai-azure);
-    font-size: 1rem;
-    font-weight: 850;
-    line-height: 1.2;
+  .pathway-grid article + article {
+    padding-left: clamp(1rem, 2.4vw, 1.8rem);
   }
 
-  .impact-route h3 {
-    margin: 0 0 0.45rem;
+  .pathway-grid article:last-child { border-right: 0; }
+
+  .pathway-grid span {
+    color: var(--ai-accent);
+    font-size: 0.85rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+  }
+
+  .pathway-grid h3 {
+    margin: 1.6rem 0 0.6rem;
     color: var(--ai-fg);
-    font-size: 1.15rem;
-    letter-spacing: 0;
+    font-size: clamp(1.55rem, 2.5vw, 2.15rem);
+    letter-spacing: -0.045em;
+    line-height: 1;
   }
 
-  .impact-route p {
+  .pathway-grid p {
     margin: 0;
     color: var(--ai-fg-muted);
+    font-size: 0.93rem;
     line-height: 1.6;
   }
 
-  @media (max-width: 860px) {
-    .explore-grid {
-      grid-template-columns: 1fr;
-    }
+  .responsible-band {
+    margin-top: clamp(3rem, 6vw, 5rem);
+    background: #111111;
+    color: #faf8f3;
+  }
 
-    .impact-route {
-      grid-template-columns: 2.75rem 1fr;
+  .responsible-band__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 0.82fr) minmax(24rem, 1.18fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    width: min(100%, 82rem);
+    margin: 0 auto;
+    padding: clamp(3rem, 6vw, 5.5rem) 1.25rem;
+  }
+
+  .responsible-band__lead {
+    border-left: 0.3rem solid #ff4a00;
+    padding-left: clamp(1.2rem, 2.5vw, 2rem);
+  }
+
+  .responsible-band__lead > .section-number {
+    margin: 0 0 1rem;
+    color: #ff4a00;
+  }
+
+  .responsible-band__lead h2 {
+    max-width: 14ch;
+    margin: 0;
+    color: #faf8f3;
+    font-size: clamp(2rem, 4vw, 3.6rem);
+    font-weight: 850;
+    letter-spacing: -0.055em;
+    line-height: 0.98;
+  }
+
+  .responsible-band__lead span {
+    display: block;
+    max-width: 34rem;
+    margin-top: 1.3rem;
+    color: rgba(250, 248, 243, 0.68);
+    line-height: 1.65;
+  }
+
+  .responsible-band__principles {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-top: 1px solid rgba(250, 248, 243, 0.2);
+  }
+
+  .responsible-band__principles article {
+    padding: 1.35rem 1.2rem 1.35rem 0;
+    border-bottom: 1px solid rgba(250, 248, 243, 0.2);
+  }
+
+  .responsible-band__principles article:nth-child(even) {
+    padding-left: 1.2rem;
+    border-left: 1px solid rgba(250, 248, 243, 0.2);
+  }
+
+  .responsible-band__principles h3 {
+    margin: 0 0 0.45rem;
+    color: #faf8f3;
+    font-size: 1rem;
+  }
+
+  .responsible-band__principles p {
+    margin: 0;
+    color: rgba(250, 248, 243, 0.62);
+    font-size: 0.85rem;
+    line-height: 1.55;
+  }
+
+  @media (max-width: 820px) {
+    .pathway-heading,
+    .responsible-band__inner { grid-template-columns: 1fr; }
+    .pathway-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .pathway-grid article:nth-child(2) { border-right: 0; }
+    .pathway-grid article:nth-child(3),
+    .pathway-grid article:nth-child(4) { border-top: 1px solid var(--ai-border); }
+  }
+
+  @media (max-width: 520px) {
+    .pathway-grid,
+    .responsible-band__principles { grid-template-columns: 1fr; }
+    .pathway-grid article,
+    .pathway-grid article + article {
+      padding: 1.4rem 0 1.8rem;
+      border-right: 0;
+      border-bottom: 1px solid var(--ai-border);
+    }
+    .responsible-band__principles article:nth-child(even) {
+      padding-left: 0;
+      border-left: 0;
     }
   }
 </style>

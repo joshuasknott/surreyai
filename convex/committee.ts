@@ -1,5 +1,7 @@
-import { query, mutation } from "./_generated/server";
+import { query, mutation, internalAction, internalMutation, type MutationCtx } from "./_generated/server";
+import { internal } from "./_generated/api";
 import { v } from "convex/values";
+import { fetchUnionCommitteeOfficers } from "@surreysocieties/admin/unionCommittee";
 import { requireContentEditor, requireExistingMembership, logAction } from "./permissions";
 
 export const list = query({
@@ -115,6 +117,170 @@ export const create = mutation({
       input.name
     );
     return memberId;
+  },
+});
+
+const officerValidator = v.object({
+  name: v.string(),
+  role: v.union(
+    v.literal("President"),
+    v.literal("Vice President"),
+    v.literal("Treasurer")
+  ),
+});
+
+const OFFICER_ROLES = ["President", "Vice President", "Treasurer"] as const;
+
+type Officer = {
+  name: string;
+  role: (typeof OFFICER_ROLES)[number];
+};
+
+async function applyOfficerSync(
+  ctx: MutationCtx,
+  societySlug: string,
+  officers: Officer[]
+) {
+  const society = await ctx.db
+    .query("societies")
+    .withIndex("by_slug", (q) => q.eq("slug", societySlug))
+    .first();
+  if (!society) throw new Error("Society not found");
+
+  const byRole = new Map(officers.map((officer) => [officer.role, officer]));
+  if (
+    officers.length !== OFFICER_ROLES.length ||
+    OFFICER_ROLES.some((role) => !byRole.has(role))
+  ) {
+    throw new Error("Exactly one President, Vice President and Treasurer are required");
+  }
+
+  const existing = await ctx.db
+    .query("committeeMembers")
+    .withIndex("by_society", (q) => q.eq("societyId", society._id))
+    .take(500);
+
+  const retainedIds = new Set<string>();
+  for (const [index, role] of OFFICER_ROLES.entries()) {
+    const officer = byRole.get(role)!;
+    const matching = existing.filter(
+      (member) => member.role.trim().toLowerCase() === role.toLowerCase()
+    );
+    const primary = matching[0];
+
+    if (primary) {
+      retainedIds.add(primary._id);
+      await ctx.db.patch(primary._id, {
+        name: officer.name.trim(),
+        role,
+        displayOrder: index + 1,
+        isActive: true,
+      });
+    } else {
+      const memberId = await ctx.db.insert("committeeMembers", {
+        societyId: society._id,
+        name: officer.name.trim(),
+        role,
+        bio: "",
+        image: "",
+        email: "",
+        linkedIn: "",
+        displayOrder: index + 1,
+        isActive: true,
+      });
+      retainedIds.add(memberId);
+    }
+  }
+
+  for (const member of existing) {
+    if (member.isActive && !retainedIds.has(member._id)) {
+      await ctx.db.patch(member._id, { isActive: false });
+    }
+  }
+
+  return { society, count: officers.length };
+}
+
+export const syncOfficers = mutation({
+  args: {
+    societySlug: v.string(),
+    officers: v.array(officerValidator),
+  },
+  handler: async (ctx, { societySlug, officers }) => {
+    const society = await ctx.db
+      .query("societies")
+      .withIndex("by_slug", (q) => q.eq("slug", societySlug))
+      .first();
+    if (!society) throw new Error("Society not found");
+    const { user } = await requireContentEditor(ctx, society._id);
+    const result = await applyOfficerSync(ctx, societySlug, officers);
+
+    await logAction(
+      ctx,
+      result.society._id,
+      user._id,
+      "sync_union_committee_officers",
+      undefined,
+      "committeeMember",
+      officers.map((officer) => `${officer.role}: ${officer.name}`).join("; ")
+    );
+
+    return result.count;
+  },
+});
+
+export const syncOfficersInternal = internalMutation({
+  args: {
+    societySlug: v.string(),
+    officers: v.array(officerValidator),
+  },
+  handler: async (ctx, { societySlug, officers }) => {
+    const result = await applyOfficerSync(ctx, societySlug, officers);
+    return result.count;
+  },
+});
+
+const UNION_COMMITTEE_SOURCES = [
+  {
+    societySlug: "ai",
+    url: "https://surreyunion.org/your-activity/clubs-and-societies-a-z/artificial-intelligence-society",
+  },
+  {
+    societySlug: "business",
+    url: "https://surreyunion.org/your-activity/clubs-and-societies-a-z/business-society",
+  },
+  {
+    societySlug: "neurotech",
+    url: "https://surreyunion.org/your-activity/clubs-and-societies-a-z/neurotech-society",
+  },
+] as const;
+
+export const refreshOfficersFromUnion = internalAction({
+  args: {},
+  handler: async (ctx) => {
+    const results: Array<{ societySlug: string; updated: boolean; error?: string }> = [];
+
+    for (const source of UNION_COMMITTEE_SOURCES) {
+      try {
+        const officers = await fetchUnionCommitteeOfficers(source.url);
+        await ctx.runMutation(internal.committee.syncOfficersInternal, {
+          societySlug: source.societySlug,
+          officers,
+        });
+        results.push({ societySlug: source.societySlug, updated: true });
+      } catch (error) {
+        results.push({
+          societySlug: source.societySlug,
+          updated: false,
+          error: error instanceof Error ? error.message : "Unknown refresh error",
+        });
+      }
+    }
+
+    if (!results.some((result) => result.updated)) {
+      throw new Error(`All Union committee refreshes failed: ${JSON.stringify(results)}`);
+    }
+    return results;
   },
 });
 

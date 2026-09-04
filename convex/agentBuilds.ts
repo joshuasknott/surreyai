@@ -116,6 +116,37 @@ export const consumeRateLimit = mutation({
   },
 });
 
+export const refundRateLimit = mutation({
+  args: {
+    key: v.string(),
+    serverSecret: v.string(),
+  },
+  handler: async (ctx, args) => {
+    requireServerSecret(args.serverSecret);
+
+    const key = limit(args.key, 120) || "unknown";
+    const existing = await ctx.db
+      .query("agentRateLimits")
+      .withIndex("by_scope_and_key", (q) =>
+        q.eq("scope", BUILDER_RATE_LIMIT_SCOPE).eq("key", key)
+      )
+      .unique();
+
+    if (!existing) return { refunded: false };
+
+    if (existing.count <= 1) {
+      await ctx.db.delete(existing._id);
+    } else {
+      await ctx.db.patch(existing._id, {
+        count: existing.count - 1,
+        updatedAt: Date.now(),
+      });
+    }
+
+    return { refunded: true };
+  },
+});
+
 function requireServerSecret(secret: string): void {
   const expectedSecret = process.env[SERVER_SECRET_ENV];
   if (!expectedSecret) {

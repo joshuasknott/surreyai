@@ -2,7 +2,8 @@ import type { APIRoute } from "astro";
 import { createConvexClient } from "@surreysocieties/admin";
 import { api } from "../../../../../../convex/_generated/api.js";
 import {
-  GEMINI_3_5_FLASH_MODEL,
+  GEMINI_3_FLASH_LITE_MODEL,
+  GEMINI_3_7_FLASH_MODEL,
   generateContent,
   isAIEnabled,
   type GeminiResponseSchema,
@@ -33,9 +34,10 @@ const MAX_FILE_SIZE_B64 = 5_600_000;
 const AGENT_BUILDS_SERVER_SECRET_ENV = "AGENT_BUILDS_SERVER_SECRET";
 
 const MODEL_MAP: Record<string, string> = {
-  gemini35: GEMINI_3_5_FLASH_MODEL,
+  gemini37: GEMINI_3_7_FLASH_MODEL,
+  gemini31lite: GEMINI_3_FLASH_LITE_MODEL,
 };
-const DEFAULT_MODEL_KEY = "gemini35";
+const DEFAULT_MODEL_KEY = "gemini37";
 
 type AttachedFile = { mimeType: string; data: string };
 
@@ -59,7 +61,8 @@ export const POST: APIRoute = async ({ request, url, clientAddress }) => {
   const parsed = await parseTaskRequest(request);
   if ("response" in parsed) return parsed.response;
 
-  const limit = await consumeBuilderRun(readClientKey(request, clientAddress));
+  const clientKey = readClientKey(request, clientAddress);
+  const limit = await consumeBuilderRun(clientKey);
   if (!limit.verified) {
     return jsonResponse(
       {
@@ -86,6 +89,7 @@ export const POST: APIRoute = async ({ request, url, clientAddress }) => {
   if (!stream) {
     const result = await runWorkflow(parsed.task, parsed.model, parsed.files);
     if (!result.ok) {
+      await refundBuilderRun(clientKey);
       return jsonResponse({ error: result.error, code: result.code }, result.status);
     }
     return jsonResponse({
@@ -108,6 +112,7 @@ export const POST: APIRoute = async ({ request, url, clientAddress }) => {
       try {
         const result = await runWorkflow(parsed.task, parsed.model, parsed.files, send);
         if (!result.ok) {
+          await refundBuilderRun(clientKey);
           send({ type: "error", error: result.error, code: result.code });
         } else {
           send({
@@ -119,6 +124,7 @@ export const POST: APIRoute = async ({ request, url, clientAddress }) => {
           });
         }
       } catch {
+        await refundBuilderRun(clientKey);
         send({
           type: "error",
           error: "Agentic Builder could not finish the workflow right now.",
@@ -414,8 +420,23 @@ async function consumeBuilderRun(
   }
 }
 
+async function refundBuilderRun(key: string): Promise<void> {
+  try {
+    const serverSecret = getAgentBuildsServerSecret();
+    if (!serverSecret) return;
+
+    const client = createConvexClient();
+    await client.mutation(api.agentBuilds.refundRateLimit, { key, serverSecret });
+  } catch {
+    // A failed refund must not mask the original workflow error.
+  }
+}
+
 function getAgentBuildsServerSecret(): string | null {
-  return process.env[AGENT_BUILDS_SERVER_SECRET_ENV]?.trim() || null;
+  const metaValue = (import.meta.env as Record<string, string | undefined>)[
+    AGENT_BUILDS_SERVER_SECRET_ENV
+  ];
+  return metaValue?.trim() || process.env[AGENT_BUILDS_SERVER_SECRET_ENV]?.trim() || null;
 }
 
 function normalizeAgent(value: unknown, codeOutput: boolean): AgentExecution | null {

@@ -1,36 +1,36 @@
 ---
 import { Image } from "astro:assets";
-import racingPreview from "../../assets/generated/ai-racing-simulator-preview-v2.png";
-import builderPreview from "../../assets/generated/ai-agentic-builder-preview-v2.png";
-import hintzeHallPreview from "../../assets/generated/ai-hintze-hall-preview.png";
+import racingPreview from "../../assets/generated/ai-racing-cover-v2.png";
+import builderPreview from "../../assets/generated/ai-agentic-builder-cover-v2.png";
+import hintzeHallPreview from "../../assets/generated/ai-hintze-cover-v2.png";
+import beatPreview from "../../assets/generated/ai-neural-beat-cover-v2.png";
 ---
 
 <section id="projects" class="ai-section student-projects" aria-labelledby="student-projects-title">
   <div class="ai-section__inner">
     <div class="ai-section__header ai-section__header--split">
       <div>
-        <p class="projects-kicker">Built by Surrey students</p>
-        <h2 id="student-projects-title" class="section-title">Student projects</h2>
+        <p class="section-number" aria-hidden="true">03</p>
+        <h2 id="student-projects-title" class="section-title">Explore student projects</h2>
       </div>
       <p class="section-intro">
-        Four playful experiments made to be opened, tried, and shared. Pick a project to launch it without leaving the page.
+        Try interactive projects created by Surrey students. They show how ideas can become experiments, prototypes and portfolio work, as well as the practical experience members can develop together.
       </p>
     </div>
 
     <div class="project-tools" aria-label="Interactive student projects">
       <article class="project-tool project-tool--hintze" data-project-tool="hintze-hall">
         <button class="project-preview" type="button" data-project-start aria-label="Open Hintze Hall After Hours">
-          <span class="project-preview__media project-preview__media--hintze">
+          <span class="project-preview__media">
             <Image
               src={hintzeHallPreview}
-              alt="The captured interior of Hintze Hall with Hope the blue whale above the central staircase"
+              alt="A photogrammetric point-cloud reconstruction of a natural-history hall beneath a blue whale skeleton"
               widths={[640, 960, 1280]}
               sizes="(min-width: 860px) 46vw, 100vw"
               format="webp"
               quality={90}
               loading="lazy"
             />
-            <span class="hintze-preview__label">After hours / London</span>
             <span class="project-preview__shade"></span>
             <span class="project-preview__launch" aria-hidden="true">
               <svg viewBox="0 0 24 24"><path d="M8 5.5v13l10-6.5L8 5.5Z" /></svg>
@@ -38,7 +38,8 @@ import hintzeHallPreview from "../../assets/generated/ai-hintze-hall-preview.png
           </span>
           <span class="project-preview__copy">
             <strong>Hintze Hall After Hours</strong>
-            <span>Walk quietly through a real photogrammetric capture beneath Hope the blue whale.</span>
+            <span class="project-preview__description">Walk quietly through a real photogrammetric capture beneath Hope the blue whale.</span>
+            <span class="project-preview__action">Open project</span>
           </span>
         </button>
 
@@ -71,7 +72,7 @@ import hintzeHallPreview from "../../assets/generated/ai-hintze-hall-preview.png
           <span class="project-preview__media">
             <Image
               src={racingPreview}
-              alt="Racing Simulator lobby with cars lined up on a night-time track"
+              alt="Four autonomous race cars following an orange racing line around a night circuit"
               widths={[640, 960, 1280]}
               sizes="(min-width: 860px) 46vw, 100vw"
               format="webp"
@@ -85,7 +86,8 @@ import hintzeHallPreview from "../../assets/generated/ai-hintze-hall-preview.png
           </span>
           <span class="project-preview__copy">
             <strong>Racing Simulator</strong>
-            <span>Race rivals with different personalities around a campus-inspired track.</span>
+            <span class="project-preview__description">Race rivals with different personalities around a campus-inspired track.</span>
+            <span class="project-preview__action">Open project</span>
           </span>
         </button>
 
@@ -118,7 +120,7 @@ import hintzeHallPreview from "../../assets/generated/ai-hintze-hall-preview.png
           <span class="project-preview__media">
             <Image
               src={builderPreview}
-              alt="Agentic Builder prompt workspace ready to turn an idea into a web prototype"
+              alt="Four connected AI work areas collaboratively assembling a web interface"
               widths={[640, 960, 1280]}
               sizes="(min-width: 860px) 46vw, 100vw"
               format="webp"
@@ -132,7 +134,8 @@ import hintzeHallPreview from "../../assets/generated/ai-hintze-hall-preview.png
           </span>
           <span class="project-preview__copy">
             <strong>Agentic Builder</strong>
-            <span>Describe an idea and watch a tiny AI team turn it into a prototype.</span>
+            <span class="project-preview__description">Describe an idea and watch a tiny AI team turn it into a prototype.</span>
+            <span class="project-preview__action">Open project</span>
           </span>
         </button>
 
@@ -154,7 +157,12 @@ import hintzeHallPreview from "../../assets/generated/ai-hintze-hall-preview.png
               </div>
             </header>
             <div class="project-modal__body" tabindex="-1">
-              <iframe data-project-embed data-src="/projects/agentic-builder?embed=1" title="Agentic Builder interactive project" loading="lazy"></iframe>
+              <div class="project-modal__loading" data-project-loading role="status" aria-live="polite">
+                <span class="project-modal__loading-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+                <strong>Opening Agentic Builder</strong>
+                <span>Preparing the interactive workspace…</span>
+              </div>
+              <iframe data-project-embed data-src="/projects/agentic-builder?embed=1" title="Agentic Builder interactive project" loading="eager"></iframe>
             </div>
           </div>
         </dialog>
@@ -162,13 +170,16 @@ import hintzeHallPreview from "../../assets/generated/ai-hintze-hall-preview.png
 
       <article class="project-tool project-tool--beat" data-project-tool="beat">
         <button class="project-preview" type="button" data-project-start aria-label="Open Neural Beat Lab">
-          <span class="project-preview__media project-preview__media--beat" aria-hidden="true">
-            <span class="beat-preview__glow"></span>
-            <span class="beat-preview__disc"><i></i><b></b></span>
-            <span class="beat-preview__wave">
-              <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-            </span>
-            <span class="beat-preview__prompt">“sunset on campus with friends”</span>
+          <span class="project-preview__media">
+            <Image
+              src={beatPreview}
+              alt="A black vinyl record transforming into an orange and warm-white audio waveform"
+              widths={[640, 960, 1280]}
+              sizes="(min-width: 1180px) 23vw, (min-width: 860px) 46vw, 100vw"
+              format="webp"
+              quality={90}
+              loading="lazy"
+            />
             <span class="project-preview__shade"></span>
             <span class="project-preview__launch">
               <svg viewBox="0 0 24 24"><path d="M8 5.5v13l10-6.5L8 5.5Z" /></svg>
@@ -176,7 +187,8 @@ import hintzeHallPreview from "../../assets/generated/ai-hintze-hall-preview.png
           </span>
           <span class="project-preview__copy">
             <strong>Neural Beat Lab</strong>
-            <span>Type a feeling. Get a tiny original beat to play and remix.</span>
+            <span class="project-preview__description">Type a feeling. Get a tiny original beat to play and remix.</span>
+            <span class="project-preview__action">Open project</span>
           </span>
         </button>
 
@@ -217,6 +229,29 @@ import hintzeHallPreview from "../../assets/generated/ai-hintze-hall-preview.png
     const fullscreenButton = tool.querySelector<HTMLButtonElement>("[data-project-fullscreen]");
     const modalBody = tool.querySelector<HTMLElement>(".project-modal__body");
     const embed = tool.querySelector<HTMLIFrameElement>("[data-project-embed]");
+    const loadingState = tool.querySelector<HTMLElement>("[data-project-loading]");
+
+    const setEmbedReady = (ready: boolean) => {
+      tool.dataset.projectReady = ready ? "true" : "false";
+      modalBody?.setAttribute("aria-busy", ready ? "false" : "true");
+      if (loadingState) loadingState.hidden = ready;
+    };
+
+    const ensureEmbedLoaded = () => {
+      if (!embed || embed.hasAttribute("src")) return;
+      setEmbedReady(false);
+      embed.src = embed.dataset.src || "about:blank";
+    };
+
+    embed?.addEventListener("load", () => {
+      if (!embed.hasAttribute("src")) return;
+      setEmbedReady(true);
+    });
+
+    if (tool.dataset.projectTool === "builder") {
+      starter?.addEventListener("pointerenter", ensureEmbedLoaded, { once: true });
+      starter?.addEventListener("focus", ensureEmbedLoaded, { once: true });
+    }
 
     const updateFullscreenButton = () => {
       if (!fullscreenButton || !frame) return;
@@ -228,9 +263,9 @@ import hintzeHallPreview from "../../assets/generated/ai-hintze-hall-preview.png
 
     starter?.addEventListener("click", () => {
       if (!modal) return;
-      if (embed && !embed.hasAttribute("src")) embed.src = embed.dataset.src || "about:blank";
       if (typeof modal.showModal === "function") modal.showModal();
       else modal.setAttribute("open", "");
+      ensureEmbedLoaded();
       document.documentElement.classList.add("project-modal-is-open");
       window.dispatchEvent(new CustomEvent("surrey-ai-project-modal-open", {
         detail: { project: tool.dataset.projectTool },
@@ -261,7 +296,10 @@ import hintzeHallPreview from "../../assets/generated/ai-hintze-hall-preview.png
       if (frame && document.fullscreenElement === frame) document.exitFullscreen().then(restoreFocus).catch(restoreFocus);
       else restoreFocus();
       document.documentElement.classList.remove("project-modal-is-open");
-      if (embed) embed.removeAttribute("src");
+      if (embed) {
+        embed.removeAttribute("src");
+        setEmbedReady(false);
+      }
       window.dispatchEvent(new CustomEvent("surrey-ai-project-modal-close", {
         detail: { project: tool.dataset.projectTool },
       }));
@@ -272,18 +310,9 @@ import hintzeHallPreview from "../../assets/generated/ai-hintze-hall-preview.png
 <style>
   .student-projects { overflow: hidden; }
 
-  .projects-kicker {
-    margin: 0 0 0.55rem;
-    color: var(--ai-coral);
-    font-size: 0.72rem;
-    font-weight: 850;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-
   .project-tools {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: clamp(1.1rem, 2.4vw, 1.8rem);
   }
 
@@ -298,8 +327,8 @@ import hintzeHallPreview from "../../assets/generated/ai-hintze-hall-preview.png
     padding: 0;
     overflow: hidden;
     border: 1px solid var(--ai-border-strong);
-    border-radius: 18px;
-    background: var(--ai-surface);
+    border-radius: 6px;
+    background: #111111;
     color: inherit;
     cursor: pointer;
     font: inherit;
@@ -320,7 +349,7 @@ import hintzeHallPreview from "../../assets/generated/ai-hintze-hall-preview.png
     position: relative;
     display: block;
     min-height: 0;
-    aspect-ratio: 1.9;
+    aspect-ratio: 1.12;
     overflow: hidden;
     background: #0b1117;
     isolation: isolate;
@@ -347,7 +376,7 @@ import hintzeHallPreview from "../../assets/generated/ai-hintze-hall-preview.png
     position: absolute;
     z-index: 2;
     inset: 0;
-    background: linear-gradient(180deg, transparent 42%, rgba(5, 10, 16, 0.44));
+    background: linear-gradient(180deg, transparent 48%, rgba(17, 17, 17, 0.56));
     pointer-events: none;
   }
 
@@ -362,8 +391,8 @@ import hintzeHallPreview from "../../assets/generated/ai-hintze-hall-preview.png
     place-items: center;
     border: 1px solid rgba(255, 255, 255, 0.42);
     border-radius: 999px;
-    background: rgba(246, 249, 247, 0.9);
-    color: #142127;
+    background: #FAF8F3;
+    color: #111111;
     box-shadow: 0 12px 34px rgba(0, 0, 0, 0.22);
     backdrop-filter: blur(12px);
     transition: transform 0.25s, background-color 0.25s;
@@ -381,136 +410,46 @@ import hintzeHallPreview from "../../assets/generated/ai-hintze-hall-preview.png
     display: grid;
     gap: 0.45rem;
     padding: 1.2rem 1.35rem 1.35rem;
-    background: var(--ai-surface);
+    min-height: 10.8rem;
+    background: #111111;
   }
 
   .project-preview__copy strong {
-    color: var(--ai-fg);
-    font-size: clamp(1.45rem, 2.8vw, 2rem);
+    color: #FAF8F3;
+    font-size: clamp(1.2rem, 2vw, 1.6rem);
     letter-spacing: -0.035em;
     line-height: 1.05;
   }
 
-  .project-preview__copy > span:last-child {
-    color: var(--ai-fg-muted);
+  .project-preview__description {
+    color: #B9B2AA;
     font-size: 0.9rem;
     line-height: 1.5;
   }
 
-  .project-preview__media--beat {
-    background:
-      radial-gradient(circle at 25% 22%, rgba(255, 130, 118, 0.45), transparent 31%),
-      radial-gradient(circle at 77% 72%, rgba(80, 196, 204, 0.38), transparent 35%),
-      linear-gradient(145deg, #141321, #22243d 58%, #142f38);
-  }
-
-  .beat-preview__glow {
-    position: absolute;
-    inset: 12% 18%;
-    border-radius: 50%;
-    background: rgba(255, 210, 145, 0.14);
-    filter: blur(36px);
-  }
-
-  .beat-preview__disc {
-    position: absolute;
-    top: 48%;
-    left: 50%;
-    width: min(13rem, 38%);
-    aspect-ratio: 1;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    background:
-      repeating-radial-gradient(circle, transparent 0 9px, rgba(255,255,255,.08) 10px 11px),
-      conic-gradient(from 35deg, #ed8a7d, #ddb66b, #65b7bc, #937dbf, #ed8a7d);
-    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35), inset 0 0 0 1.1rem rgba(7, 13, 20, 0.34);
-    transform: translate(-50%, -50%) rotate(-8deg);
-  }
-
-  .beat-preview__disc i {
-    position: absolute;
-    inset: 39%;
-    border-radius: 50%;
-    background: #f2f0e8;
-    box-shadow: 0 0 0 5px rgba(10, 17, 23, 0.32);
-  }
-
-  .beat-preview__disc b {
-    position: absolute;
-    inset: 47%;
-    border-radius: 50%;
-    background: #162028;
-  }
-
-  .beat-preview__wave {
-    position: absolute;
-    inset: auto 8% 18%;
-    display: flex;
-    height: 4rem;
-    align-items: center;
-    justify-content: center;
-    gap: 0.42rem;
-  }
-
-  .beat-preview__wave i {
-    display: block;
-    width: 0.3rem;
-    height: calc(18% + (var(--bar, 4) * 9%));
-    border-radius: 999px;
-    background: rgba(255,255,255,.7);
-  }
-
-  .beat-preview__wave i:nth-child(2n) { --bar: 7; background: #ffad83; }
-  .beat-preview__wave i:nth-child(3n) { --bar: 2; }
-  .beat-preview__wave i:nth-child(5n) { --bar: 5; background: #82d3d0; }
-
-  .beat-preview__prompt {
-    position: absolute;
-    top: 1.25rem;
-    left: 1.25rem;
-    color: rgba(255,255,255,.74);
-    font-size: 0.72rem;
-    font-weight: 750;
-    letter-spacing: 0.04em;
-  }
-
-  .project-preview__media--hintze { background: #201812; }
-  .project-preview__media--hintze::after {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, rgba(13,9,6,.03), rgba(13,9,6,.14));
-    content: "";
-    pointer-events: none;
-  }
-  .hintze-preview__label {
-    position: absolute;
-    z-index: 3;
-    top: 1.2rem;
-    left: 1.2rem;
-    padding: .45rem .65rem;
-    border: 1px solid rgba(255,255,255,.22);
-    border-radius: 999px;
-    background: rgba(20,14,10,.64);
-    color: rgba(255,255,255,.82);
-    font-size: .62rem;
+  .project-preview__action {
+    margin-top: auto;
+    padding-top: 0.7rem;
+    color: #FF4A00;
+    font-size: 0.75rem;
     font-weight: 850;
-    letter-spacing: .1em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    backdrop-filter: blur(10px);
   }
+
 
   .project-modal {
     position: fixed;
     inset: 50% auto auto 50%;
-    width: min(94rem, calc(100vw - 2rem));
+    width: min(110rem, calc(100vw - 0.75rem));
     max-width: none;
-    height: min(56rem, calc(100dvh - 2rem));
+    height: calc(100dvh - 0.75rem);
     max-height: none;
     margin: 0;
     padding: 0;
     overflow: visible;
     border: 0;
-    border-radius: 20px;
+    border-radius: 8px;
     background: transparent;
     color: var(--ai-fg);
     transform: translate(-50%, -50%);
@@ -528,7 +467,7 @@ import hintzeHallPreview from "../../assets/generated/ai-hintze-hall-preview.png
     grid-template-rows: 3.65rem minmax(0, 1fr);
     overflow: hidden;
     border: 1px solid color-mix(in srgb, var(--ai-border-strong) 74%, transparent);
-    border-radius: 20px;
+    border-radius: 8px;
     background: var(--ai-surface);
     box-shadow: 0 36px 100px rgba(4, 11, 16, 0.38);
   }
@@ -549,6 +488,36 @@ import hintzeHallPreview from "../../assets/generated/ai-hintze-hall-preview.png
     border-bottom: 1px solid var(--ai-border);
     background: color-mix(in srgb, var(--ai-surface) 94%, transparent);
     backdrop-filter: blur(18px);
+  }
+
+  .project-tool--builder .project-modal__frame {
+    position: relative;
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  .project-tool--builder .project-modal__header {
+    position: absolute;
+    z-index: 4;
+    top: 1.4rem;
+    right: 1.4rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    backdrop-filter: none;
+  }
+
+  .project-tool--builder .project-modal__identity {
+    display: none;
+  }
+
+  .project-tool--builder .project-modal__icon {
+    background: color-mix(in srgb, var(--ai-paper) 88%, transparent);
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--ai-slate-base) 8%, transparent);
+    backdrop-filter: blur(14px);
+  }
+
+  .project-tool--builder .project-modal__body {
+    grid-row: 1;
   }
 
   .project-modal__identity,
@@ -626,6 +595,7 @@ import hintzeHallPreview from "../../assets/generated/ai-hintze-hall-preview.png
   .project-modal__icon[data-active="true"] .icon-exit { display: block; }
 
   .project-modal__body {
+    position: relative;
     min-height: 0;
     overflow: hidden;
     background: var(--ai-bg);
@@ -639,6 +609,69 @@ import hintzeHallPreview from "../../assets/generated/ai-hintze-hall-preview.png
     height: 100%;
     border: 0;
     background: var(--ai-bg);
+  }
+
+  .project-modal__loading {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 0.55rem;
+    padding: 2rem;
+    color: var(--ai-fg);
+    text-align: center;
+    background:
+      radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--ai-orange) 10%, transparent), transparent 32%),
+      var(--ai-bg);
+  }
+
+  .project-modal__loading[hidden] { display: none; }
+
+  .project-modal__loading strong {
+    font-family: var(--font-sans);
+    font-size: clamp(1.15rem, 2vw, 1.55rem);
+    letter-spacing: -0.025em;
+  }
+
+  .project-modal__loading > span:last-child {
+    color: var(--ai-fg-muted);
+    font-size: 0.86rem;
+  }
+
+  .project-modal__loading-mark {
+    display: flex;
+    align-items: end;
+    gap: 0.2rem;
+    height: 1.25rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .project-modal__loading-mark i {
+    width: 0.22rem;
+    height: 0.55rem;
+    background: var(--ai-orange);
+    animation: builder-loading 0.9s ease-in-out infinite alternate;
+  }
+
+  .project-modal__loading-mark i:nth-child(2) {
+    height: 0.95rem;
+    animation-delay: 0.15s;
+  }
+
+  .project-modal__loading-mark i:nth-child(3) { animation-delay: 0.3s; }
+
+  .project-tool--builder[data-project-ready="false"] .project-modal__body > iframe {
+    opacity: 0;
+  }
+
+  @keyframes builder-loading {
+    to { transform: scaleY(1.45); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .project-modal__loading-mark i { animation: none; }
   }
 
   @media (max-width: 860px) {
@@ -658,17 +691,23 @@ import hintzeHallPreview from "../../assets/generated/ai-hintze-hall-preview.png
     .project-tool { scroll-snap-align: start; }
   }
 
+  @media (min-width: 861px) and (max-width: 1179px) {
+    .project-tools { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
   @media (max-width: 640px) {
     .project-modal {
-      width: calc(100vw - 0.5rem);
-      height: calc(100dvh - 0.5rem);
-      border-radius: 14px;
+      width: 100vw;
+      height: 100dvh;
+      border-radius: 0;
     }
 
-    .project-modal__frame { grid-template-rows: 3.4rem minmax(0, 1fr); border-radius: 14px; }
+    .project-modal__frame { grid-template-rows: 3.4rem minmax(0, 1fr); border-radius: 0; }
     .project-modal__header { padding-left: 0.8rem; }
     .project-modal__identity p { display: none; }
     .project-modal__icon { width: 2.45rem; height: 2.45rem; }
+    .project-tool--builder .project-modal__frame { grid-template-rows: minmax(0, 1fr); }
+    .project-tool--builder .project-modal__header { top: 1rem; right: 1rem; }
   }
 
   @media (prefers-reduced-motion: reduce) {

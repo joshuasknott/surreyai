@@ -4,7 +4,7 @@ import AssistantWidget from '@surreysocieties/ui/components/AssistantWidget';
 import { ASSISTANT_CONFIGS } from '@surreysocieties/ui';
 import { getSocietyById } from '@surreysocieties/admin/config';
 import JoinCTA from '../components/home/JoinCTA.astro';
-import BrandMark from '../components/common/BrandMark.astro';
+import BrandLogo from '../components/common/BrandLogo.astro';
 import defaultOgImage from '../assets/generated/ai-surrey-campus-signal-sketch-hero.optimized.webp';
 
 interface Props {
@@ -27,17 +27,12 @@ const fullTitle = `${title} — ${siteName}`;
 // Canonical URL from Astro.site + current path
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
 
-const currentPath = Astro.url.pathname;
-
 const navLinks = [
-  { href: '/', label: 'Home' },
-  { href: '/about', label: 'About' },
-  { href: '/committee', label: 'Committee' },
-  { href: '/events', label: 'Events' },
-  { href: '/join', label: 'Join' },
+  { href: '/#about', label: 'About' },
+  { href: '/#projects', label: 'Projects' },
+  { href: '/#join', label: 'Join' },
 ];
 
-const displayName = 'Surrey Artificial Intelligence Society';
 const footerName = 'Surrey Artificial Intelligence Society';
 ---
 
@@ -47,23 +42,11 @@ const footerName = 'Surrey Artificial Intelligence Society';
   ogImage={resolvedOgImage}
   canonicalUrl={canonicalUrl}
   htmlClass="motion-safe:scroll-smooth"
-  bodyClass="bg-ai-bg text-ai-fg font-sans min-h-screen flex flex-col transition-colors duration-200"
+  bodyClass="bg-ai-bg text-ai-fg font-sans min-h-screen flex flex-col"
 >
   <Fragment slot="head">
-    <link rel="icon" type="image/png" href="/logos/ai-logo.png" />
+    <link rel="icon" type="image/png" href="/logos/brand/surrey-ai-avatar-light.png" />
   </Fragment>
-
-  <!-- Theme Init Script — runs before paint to prevent FOUC -->
-  <script is:inline>
-    const getTheme = () => {
-      if (typeof localStorage !== 'undefined' && localStorage.getItem('surrey-ai-theme')) {
-        return localStorage.getItem('surrey-ai-theme');
-      }
-      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    };
-    const theme = getTheme();
-    document.documentElement.setAttribute('data-theme', theme);
-  </script>
 
   <!-- Skip link -->
   <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-ai-surface focus:text-ai-fg focus:font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan shadow-lg rounded-lg">
@@ -73,52 +56,22 @@ const footerName = 'Surrey Artificial Intelligence Society';
   <!-- Navigation -->
   <header class="site-header sticky top-0 z-50 border-b border-ai-border">
     <div class="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-6">
-      <a href="/" class="flex min-w-0 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan">
-        <BrandMark />
-        <span class="hidden min-w-0 text-base font-semibold tracking-tight text-ai-fg sm:block lg:text-lg">
-          {displayName}
-        </span>
-        <span class="block max-w-40 text-sm font-semibold leading-tight tracking-tight text-ai-fg sm:hidden">
-          Surrey Artificial Intelligence
-        </span>
+      <a href="/" class="site-brand flex min-w-0 items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan" aria-label="Surrey Artificial Intelligence Society home">
+        <BrandLogo variant="dark" compact priority />
       </a>
 
       <div class="flex items-center gap-4">
         <!-- Desktop nav -->
         <nav aria-label="Primary navigation" class="hidden md:flex items-center gap-1">
-          {navLinks.map(link => {
-            const isActive = currentPath === link.href || (link.href !== '/' && currentPath.startsWith(link.href));
-            return (
-              <a
-                href={link.href}
-                aria-current={isActive ? 'page' : undefined}
-                class:list={[
-                'site-nav-link px-3.5 py-2 text-sm font-semibold border border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan transition-colors',
-                isActive
-                    ? 'is-active text-ai-azure'
-                    : 'text-ai-fg-muted hover:text-ai-fg',
-                ]}
-              >
-                {link.label}
-              </a>
-            );
-          })}
+          {navLinks.map(link => (
+            <a
+              href={link.href}
+              class="site-nav-link px-3.5 py-2 text-sm font-semibold border border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan transition-colors"
+            >
+              {link.label}
+            </a>
+          ))}
         </nav>
-
-        <!-- Theme Toggle -->
-        <button
-          type="button"
-          id="theme-toggle"
-          aria-label="Switch to dark mode"
-          class="text-ai-fg-muted hover:text-ai-fg hover:bg-ai-surface p-2 rounded-full border border-ai-border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan"
-        >
-          <svg id="theme-icon-dark" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-          </svg>
-          <svg id="theme-icon-light" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-          </svg>
-        </button>
 
         <!-- Mobile menu button -->
         <button
@@ -127,7 +80,7 @@ const footerName = 'Surrey Artificial Intelligence Society';
           aria-label="Open navigation menu"
           aria-expanded="false"
           aria-controls="ai-mobile-menu"
-          class="md:hidden text-ai-fg p-2 hover:bg-ai-surface rounded-full border border-ai-border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan"
+          class="header-icon-button inline-flex h-11 w-11 items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan md:hidden"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path id="ai-menu-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -137,25 +90,16 @@ const footerName = 'Surrey Artificial Intelligence Society';
     </div>
 
     <!-- Mobile nav -->
-    <div id="ai-mobile-menu" class="hidden md:hidden border-t border-ai-border bg-ai-paper" role="region" aria-label="Mobile navigation">
+    <div id="ai-mobile-menu" class="mobile-navigation hidden md:hidden" role="region" aria-label="Mobile navigation">
       <nav aria-label="Primary mobile navigation" class="px-6 py-3 flex flex-col gap-1">
-        {navLinks.map(link => {
-          const isActive = currentPath === link.href || (link.href !== '/' && currentPath.startsWith(link.href));
-          return (
-            <a
-              href={link.href}
-              aria-current={isActive ? 'page' : undefined}
-              class:list={[
-                'px-4 py-3 text-base font-semibold rounded-xl border border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan transition-colors',
-                isActive
-                  ? 'text-ai-azure bg-ai-azure/10 border-ai-azure/15'
-                  : 'text-ai-fg-muted hover:text-ai-fg hover:bg-ai-bg',
-              ]}
-            >
-              {link.label}
-            </a>
-          );
-        })}
+        {navLinks.map(link => (
+          <a
+            href={link.href}
+            class="px-4 py-3 text-base font-semibold rounded-xl border border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan transition-colors"
+          >
+            {link.label}
+          </a>
+        ))}
       </nav>
     </div>
   </header>
@@ -169,21 +113,20 @@ const footerName = 'Surrey Artificial Intelligence Society';
   {!hideCTA && <JoinCTA />}
 
   <!-- Footer -->
-  <footer class="bg-ai-surface text-ai-fg-muted mt-auto border-t border-ai-border">
+  <footer class="site-footer mt-auto">
     <div class="mx-auto max-w-7xl px-6 py-12">
       <div class="grid sm:grid-cols-3 gap-8 mb-8">
         <div>
-          <div class="flex items-center gap-3 mb-4">
-            <BrandMark size="small" />
-            <span class="text-ai-fg font-semibold tracking-tight">{displayName}</span>
+          <div class="footer-brand mb-5">
+            <BrandLogo variant="light" priority />
           </div>
           <p class="text-sm leading-relaxed max-w-xs">
-            A student-led society under Surrey Students&apos; Union. Find events, updates, committee information, and ways to join, with artificial intelligence learning, workshops, talks, careers activity, socials, and responsible discussion.
+            A student-led community for anyone curious about artificial intelligence, machine learning and data science, whatever their degree or experience.
           </p>
           <p class="mt-3 text-xs font-semibold uppercase tracking-widest text-ai-cyan">Established {society.establishedYear}</p>
         </div>
         <div>
-          <h4 class="text-ai-fg font-semibold mb-3 text-sm">Pages</h4>
+          <h4 class="text-ai-fg font-semibold mb-3 text-sm">Explore</h4>
           <nav aria-label="Footer navigation" class="flex flex-col gap-2">
             {navLinks.map(link => (
               <a href={link.href} class="text-sm hover:text-ai-cyan transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan w-max rounded">{link.label}</a>
@@ -210,43 +153,17 @@ const footerName = 'Surrey Artificial Intelligence Society';
   <AssistantWidget config={assistantConfig} endpoint="/api/assistant/chat" />
 
   <script>
-    // ── Theme toggle ──
-    const themeBtn = document.getElementById('theme-toggle');
-    const iconDark = document.getElementById('theme-icon-dark');
-    const iconLight = document.getElementById('theme-icon-light');
-
-    function updateThemeUI(theme: string) {
-      const isDark = theme === 'dark';
-
-      document.documentElement.setAttribute('data-theme', theme);
-
-      // Show the icon for the *opposite* mode (the icon represents what
-      // clicking will switch to)
-      iconDark?.classList.toggle('hidden', isDark);
-      iconLight?.classList.toggle('hidden', !isDark);
-
-      // Announce the available action, not the current state
-      themeBtn?.setAttribute(
-        'aria-label',
-        isDark ? 'Switch to light mode' : 'Switch to dark mode'
-      );
-    }
-
-    // Initial load — read from the data-attribute set by the inline script
-    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
-    updateThemeUI(currentTheme);
-
-    themeBtn?.addEventListener('click', () => {
-      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-      const newTheme = isDark ? 'light' : 'dark';
-      localStorage.setItem('surrey-ai-theme', newTheme);
-      updateThemeUI(newTheme);
-    });
-
     // ── Mobile menu toggle ──
     const btn = document.getElementById('ai-mobile-menu-btn');
     const menu = document.getElementById('ai-mobile-menu');
     const icon = document.getElementById('ai-menu-icon');
+
+    const closeMenu = () => {
+      menu?.classList.add('hidden');
+      btn?.setAttribute('aria-expanded', 'false');
+      btn?.setAttribute('aria-label', 'Open navigation menu');
+      if (icon) icon.setAttribute('d', 'M4 6h16M4 12h16M4 18h16');
+    };
 
     btn?.addEventListener('click', () => {
       const isExpanded = btn.getAttribute('aria-expanded') === 'true';
@@ -259,12 +176,13 @@ const footerName = 'Surrey Artificial Intelligence Society';
       );
 
       if (isExpanded) {
-        menu?.classList.add('hidden');
-        if (icon) icon.setAttribute('d', 'M4 6h16M4 12h16M4 18h16');
+        closeMenu();
       } else {
         menu?.classList.remove('hidden');
         if (icon) icon.setAttribute('d', 'M6 18L18 6M6 6l12 12');
       }
     });
+
+    menu?.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMenu));
   </script>
 </BaseLayout>

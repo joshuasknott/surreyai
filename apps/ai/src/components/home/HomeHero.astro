@@ -1,231 +1,381 @@
 ---
 import { getImage } from "astro:assets";
-import campusHero from "../../assets/generated/ai-surrey-campus-signal-sketch-hero.optimized.webp";
+import humanoidHero from "../../assets/generated/ai-humanoid-hero-centered-v2.png";
 
-const heroImage = await getImage({
-  src: campusHero,
-  width: 1800,
+const robotImage = await getImage({
+  src: humanoidHero,
+  width: 1200,
   format: "webp",
-  quality: 72,
+  quality: 88,
 });
+const robotImageMobile = await getImage({
+  src: humanoidHero,
+  width: 828,
+  format: "webp",
+  quality: 86,
+});
+
+const eventTypes = [
+  ["01", "Workshops and practical sessions", "Learn about AI tools, machine learning, coding and automation through accessible, beginner-friendly sessions."],
+  ["02", "Projects, challenges and competitions", "Work with other students, turn ideas into prototypes and build practical experience you can add to your portfolio."],
+  ["03", "Talks, careers and socials", "Meet academics, researchers, startups and industry professionals while exploring careers and connecting with the community."],
+];
 ---
 
-<section
-  class="home-hero"
-  aria-labelledby="home-hero-title"
-  style={`--home-hero-image: url(${heroImage.src})`}
->
-  <div class="home-hero__inner">
+<section class="home-hero" aria-labelledby="home-hero-title" data-ai-robot-hero>
+  <div class="home-hero__shell">
     <div class="home-hero__copy">
-      <h1 id="home-hero-title" class="home-hero__title">
-        Surrey Artificial Intelligence Society
+      <p class="home-hero__kicker" data-hero-reveal>Surrey Artificial Intelligence Society</p>
+      <h1 id="home-hero-title" class="home-hero__title" data-hero-reveal>
+        Learn it. Build it. <em>Question it.</em>
       </h1>
-      <p class="home-hero__intro">
-        Welcome to the online home for Surrey students curious about artificial intelligence, machine learning, data science, and responsible technology.
-      </p>
-      <p class="home-hero__domains">
-        Beginner-friendly learning / workshops / community updates / responsible artificial intelligence / careers
+      <p class="home-hero__intro" data-hero-reveal>
+        A student-led community for anyone curious about artificial intelligence, machine learning and data science. Whatever your degree, experience or coding ability, you are welcome here.
       </p>
 
-      <div class="home-hero__actions">
-        <a href="/join" class="btn-primary">Join the Society</a>
-        <a href="#events" class="btn-secondary">See events</a>
+      <div class="home-hero__actions" data-hero-reveal>
+        <a href="#join" class="btn-primary">Join the society</a>
+        <a href="#about" class="btn-secondary btn-secondary--dark">See what we do</a>
       </div>
+
+      <div class="home-hero__proof" aria-label="Society highlights" data-hero-reveal>
+        <span>No experience needed</span>
+        <span>Open to every degree</span>
+        <span>Practical projects</span>
+        <span>Responsible AI</span>
+      </div>
+    </div>
+
+    <div class="home-hero__stage" aria-hidden="true">
+      <canvas
+        class="home-hero__canvas"
+        id="ai-robot-head-canvas"
+        data-robot-head-src={robotImage.src}
+        data-robot-head-src-mobile={robotImageMobile.src}
+        data-engine="three.js"
+      ></canvas>
+      <picture>
+        <source media="(max-width: 880px)" srcset={robotImageMobile.src} />
+        <img
+          class="home-hero__fallback"
+          src={robotImage.src}
+          alt=""
+          width={robotImage.attributes.width}
+          height={robotImage.attributes.height}
+          loading="eager"
+          decoding="async"
+          fetchpriority="high"
+        />
+      </picture>
+    </div>
+
+    <div id="what-we-do" class="home-hero__formats" aria-labelledby="formats-title" data-hero-reveal>
+      <p class="home-hero__formats-label" id="formats-title">Society activities</p>
+      {eventTypes.map(([number, title, text]) => (
+        <article class="event-format">
+          <span>{number}</span>
+          <div>
+            <h2>{title}</h2>
+            <p>{text}</p>
+          </div>
+        </article>
+      ))}
     </div>
   </div>
 </section>
 
+<script>
+  import { animate, stagger } from "animejs";
+  import { startRobotHero } from "./robotHero.client";
+
+  const hero = document.querySelector<HTMLElement>("[data-ai-robot-hero]");
+  const canvas = document.getElementById("ai-robot-head-canvas") as HTMLCanvasElement | null;
+  const stage = canvas?.closest<HTMLElement>(".home-hero__stage") ?? null;
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (hero && canvas && stage) {
+    if (!prefersReducedMotion) {
+      animate(hero.querySelectorAll("[data-hero-reveal]"), {
+        opacity: [0, 1],
+        y: [18, 0],
+        duration: 760,
+        delay: stagger(70),
+        ease: "outCubic",
+      });
+    }
+
+    startRobotHero({ hero, canvas, stage, prefersReducedMotion });
+  }
+</script>
+
 <style>
   .home-hero {
     position: relative;
-    overflow: clip;
-    min-height: clamp(42rem, 72svh, 56rem);
-    color: var(--ai-fg);
-    background:
-      linear-gradient(90deg, color-mix(in srgb, var(--ai-paper) 98%, transparent) 0%, color-mix(in srgb, var(--ai-paper) 88%, transparent) 32%, color-mix(in srgb, var(--ai-paper) 24%, transparent) 62%, transparent 100%),
-      linear-gradient(0deg, color-mix(in srgb, var(--ai-paper) 94%, transparent) 0%, transparent 24%),
-      var(--home-hero-image) center right / cover no-repeat,
-      var(--ai-paper);
-    border-bottom: 1px solid color-mix(in srgb, var(--ai-fg) 18%, var(--ai-bg));
-    isolation: isolate;
-  }
-
-  .home-hero::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    background:
-      radial-gradient(circle at 87% 42%, color-mix(in srgb, var(--ai-azure) 16%, transparent), transparent 18rem),
-      linear-gradient(115deg, transparent 0 18%, color-mix(in srgb, var(--ai-azure) 14%, transparent) 18.08% 18.18%, transparent 18.28% 100%),
-      linear-gradient(132deg, transparent 0 74%, color-mix(in srgb, var(--ai-coral) 16%, transparent) 74.08% 74.18%, transparent 74.28% 100%);
-    opacity: 0.72;
-  }
-
-  .home-hero::after {
-    content: "";
-    position: absolute;
-    inset: auto 0 0;
-    z-index: 0;
-    height: 26%;
-    pointer-events: none;
-    background: linear-gradient(0deg, var(--ai-bg), transparent);
-  }
-
-  .home-hero__inner {
-    position: relative;
     z-index: 1;
+    overflow: clip;
+    padding: 0 0 5.3rem;
+    background: #111111;
+    color: #faf8f3;
+  }
+
+  .home-hero__shell {
+    position: relative;
     display: grid;
-    align-items: center;
-    width: min(100%, 82rem);
-    min-height: clamp(42rem, 72svh, 56rem);
+    grid-template-columns: minmax(0, 0.96fr) minmax(28rem, 1.04fr);
+    min-height: clamp(39rem, 70svh, 48rem);
+    width: min(100%, 90rem);
     margin: 0 auto;
-    padding: clamp(3.25rem, 7vw, 6.5rem) 1.25rem clamp(4rem, 7vw, 5.75rem);
   }
 
   .home-hero__copy {
-    max-width: 42.5rem;
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(4.5rem, 7vw, 7.25rem) clamp(2rem, 5vw, 5rem) clamp(6.5rem, 9vw, 8rem) clamp(1.25rem, 4vw, 3.25rem);
+    background: #111111;
+  }
+
+  .home-hero__copy::before {
+    position: absolute;
+    top: clamp(4.8rem, 7.2vw, 7.5rem);
+    bottom: clamp(6.8rem, 9vw, 8.2rem);
+    left: clamp(1.25rem, 4vw, 3.25rem);
+    width: 0.28rem;
+    background: #ff4a00;
+    content: "";
+  }
+
+  .home-hero__copy > * {
+    margin-left: clamp(1.25rem, 2.3vw, 2.2rem);
   }
 
   .home-hero__kicker {
-    margin: 0 0 1.05rem;
-    color: var(--ai-azure);
-    font-size: 0.8rem;
-    line-height: 1.25;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: #ff4a00;
+    font-size: 0.74rem;
     font-weight: 850;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.14em;
+    line-height: 1.35;
     text-transform: uppercase;
   }
 
   .home-hero__title {
-    max-width: 14ch;
-    margin: 0;
-    color: var(--ai-fg);
-    font-size: clamp(3rem, 5.4vw, 4.8rem);
-    line-height: 0.98;
-    letter-spacing: 0;
+    max-width: 10.5ch;
+    margin-top: 0;
+    margin-bottom: 0;
+    color: #faf8f3;
+    font-size: clamp(3.2rem, 5.45vw, 5.2rem);
     font-weight: 850;
+    letter-spacing: -0.055em;
+    line-height: 0.98;
     text-wrap: balance;
   }
 
-  .home-hero__intro {
-    max-width: 35rem;
-    margin: 1.35rem 0 0;
-    color: var(--ai-fg-muted);
-    font-size: clamp(1rem, 1.45vw, 1.2rem);
-    line-height: 1.62;
-    letter-spacing: 0;
+  .home-hero__title em {
+    color: #ff4a00;
+    font-style: normal;
   }
 
-  .home-hero__domains {
-    max-width: 36rem;
-    margin: 1.25rem 0 0;
-    color: color-mix(in srgb, var(--ai-sage) 78%, var(--ai-fg));
-    font-size: 1rem;
-    font-style: italic;
-    font-weight: 800;
-    line-height: 1.6;
-    letter-spacing: 0;
+  .home-hero__intro {
+    max-width: 37rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0;
+    color: rgba(250, 248, 243, 0.72);
+    font-size: clamp(1rem, 1.4vw, 1.15rem);
+    line-height: 1.65;
   }
 
   .home-hero__actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.9rem;
+    gap: 0.85rem;
     margin-top: 1.8rem;
   }
 
-  .home-hero__actions .btn-primary,
-  .home-hero__actions .btn-secondary {
+  .home-hero__actions :global(.btn-primary),
+  .home-hero__actions :global(.btn-secondary) {
     min-height: 3.15rem;
   }
 
-  :global(:root[data-theme="dark"]) .home-hero {
-    background:
-      linear-gradient(90deg, color-mix(in srgb, var(--ai-bg) 98%, transparent) 0%, color-mix(in srgb, var(--ai-bg) 90%, transparent) 36%, color-mix(in srgb, var(--ai-bg) 40%, transparent) 72%, transparent 100%),
-      linear-gradient(0deg, color-mix(in srgb, var(--ai-bg) 96%, transparent) 0%, transparent 30%),
-      var(--home-hero-image) center right / cover no-repeat,
-      var(--ai-bg);
+  .home-hero__proof {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+    max-width: 35rem;
+    margin-top: 2.2rem;
+    border-top: 1px solid rgba(250, 248, 243, 0.2);
   }
 
-  @media (max-width: 760px) {
-    .home-hero {
-      min-height: min(44rem, calc(100svh - 5rem));
-      background:
-        linear-gradient(180deg, color-mix(in srgb, var(--ai-paper) 64%, transparent) 0%, color-mix(in srgb, var(--ai-paper) 78%, transparent) 43%, var(--ai-bg) 100%),
-        linear-gradient(90deg, color-mix(in srgb, var(--ai-paper) 78%, transparent) 0%, color-mix(in srgb, var(--ai-paper) 36%, transparent) 63%, transparent 100%),
-        var(--home-hero-image) 64% top / auto 58% no-repeat,
-        var(--ai-paper);
-    }
+  .home-hero__proof span {
+    padding: 0.85rem 1rem 0.2rem 0;
+    color: rgba(250, 248, 243, 0.74);
+    font-size: 0.76rem;
+    font-weight: 700;
+    line-height: 1.35;
+  }
 
-    .home-hero__inner {
-      min-height: inherit;
-      padding: clamp(11rem, 44vw, 15rem) 1.2rem 2.35rem;
-      align-items: end;
-    }
+  .home-hero__stage {
+    position: relative;
+    min-height: clamp(39rem, 70svh, 48rem);
+    overflow: hidden;
+    background: #ff4a00;
+    isolation: isolate;
+  }
 
-    .home-hero__copy {
-      max-width: 34rem;
-      margin-inline: auto;
-      text-align: center;
-    }
+  .home-hero__stage::after {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    border-left: 1px solid rgba(250, 248, 243, 0.22);
+    box-shadow: inset 0 0 5rem rgba(17, 17, 17, 0.08);
+    content: "";
+    pointer-events: none;
+  }
 
-    .home-hero__kicker {
-      margin-bottom: 0.7rem;
-      font-size: 0.7rem;
-    }
+  .home-hero__canvas,
+  .home-hero__fallback {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
 
-    .home-hero__title {
-      max-width: 12ch;
-      margin-inline: auto;
-      font-size: clamp(2.45rem, 12vw, 3.4rem);
-      line-height: 1;
-    }
+  .home-hero__stage picture { display: contents; }
 
-    .home-hero__intro {
-      margin-top: 1rem;
-      margin-inline: auto;
-      font-size: 1rem;
-      line-height: 1.48;
-    }
+  .home-hero__canvas {
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.45s ease;
+  }
 
-    .home-hero__domains {
-      margin-top: 0.9rem;
-      margin-inline: auto;
-      font-size: 0.88rem;
-      line-height: 1.45;
-    }
+  .home-hero__fallback {
+    z-index: 0;
+    object-fit: cover;
+    object-position: center;
+    transition: opacity 0.35s ease;
+  }
 
-    .home-hero__actions {
-      margin-top: 1.2rem;
-      gap: 0.6rem;
-      justify-content: center;
-      margin-inline: auto;
-      max-width: 24rem;
-    }
+  :global(.home-hero--ready) .home-hero__canvas { opacity: 1; }
+  :global(.home-hero--ready) .home-hero__fallback { opacity: 0; }
 
-    .home-hero__actions .btn-primary,
-    .home-hero__actions .btn-secondary {
-      width: 100%;
-      min-height: 2.85rem;
-      padding: 0.85rem 1rem;
+  .home-hero__formats {
+    position: absolute;
+    z-index: 5;
+    right: clamp(1rem, 2vw, 2rem);
+    bottom: -4.2rem;
+    left: clamp(1rem, 2vw, 2rem);
+    display: grid;
+    grid-template-columns: 3.6rem repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+    min-height: 9rem;
+    overflow: hidden;
+    border: 1px solid rgba(17, 17, 17, 0.16);
+    border-radius: 0.3rem;
+    background: #faf8f3;
+    color: #111111;
+    box-shadow: 0 1.5rem 4rem rgba(17, 17, 17, 0.2);
+  }
+
+  .home-hero__formats-label {
+    display: grid;
+    place-items: center;
+    width: 3.6rem;
+    margin: 0;
+    border-right: 1px solid rgba(17, 17, 17, 0.14);
+    color: #ff4a00;
+    font-size: 0.7rem;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+  }
+
+  .event-format {
+    display: grid;
+    grid-template-columns: 2.4rem minmax(0, 1fr);
+    gap: 0.9rem;
+    align-items: center;
+    min-width: 0;
+    padding: 1.2rem 1.05rem;
+    border-right: 1px solid rgba(17, 17, 17, 0.14);
+  }
+
+  .event-format > span {
+    color: #ff4a00;
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+  }
+
+  .event-format h2 {
+    margin: 0;
+    overflow: hidden;
+    color: #111111;
+    font-size: clamp(0.95rem, 1.25vw, 1.15rem);
+    font-weight: 850;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    text-overflow: ellipsis;
+  }
+
+  .event-format p {
+    margin: 0.45rem 0 0;
+    color: rgba(17, 17, 17, 0.66);
+    font-size: 0.72rem;
+    line-height: 1.45;
+  }
+
+  [data-hero-reveal] { opacity: 1; }
+
+  @media (max-width: 1050px) {
+    .home-hero__shell { grid-template-columns: minmax(0, 1fr) minmax(23rem, 0.8fr); }
+    .home-hero__formats { grid-template-columns: 3.6rem repeat(3, minmax(0, 1fr)); }
+    .home-hero__proof { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 880px) {
+    .home-hero { padding-bottom: 0; }
+    .home-hero__shell { grid-template-columns: 1fr; }
+    .home-hero__copy { padding: 4rem 1.2rem 3rem; }
+    .home-hero__copy::before { top: 4.2rem; bottom: 3.2rem; left: 1.2rem; }
+    .home-hero__title { max-width: 11ch; }
+    .home-hero__stage { min-height: min(34rem, 88vw); }
+    .home-hero__formats {
+      position: relative;
+      right: auto;
+      bottom: auto;
+      left: auto;
+      grid-template-columns: 3.35rem minmax(0, 1fr);
+      margin: 0;
+      border-width: 0 0 1px;
+      border-radius: 0;
+      box-shadow: none;
+    }
+    .home-hero__formats-label { grid-row: 1 / span 3; width: 3.35rem; }
+    .event-format {
+      grid-column: 2;
+      grid-template-columns: 2.4rem minmax(0, 1fr);
+      border-right: 0;
+      border-bottom: 1px solid rgba(17, 17, 17, 0.14);
     }
   }
 
-  @media (max-width: 760px) {
-    :global(:root[data-theme="dark"]) .home-hero {
-      background:
-        linear-gradient(180deg, color-mix(in srgb, var(--ai-bg) 66%, transparent) 0%, color-mix(in srgb, var(--ai-bg) 80%, transparent) 48%, var(--ai-bg) 100%),
-        linear-gradient(90deg, color-mix(in srgb, var(--ai-bg) 86%, transparent) 0%, color-mix(in srgb, var(--ai-bg) 42%, transparent) 66%, transparent 100%),
-        var(--home-hero-image) 64% top / auto 58% no-repeat,
-        var(--ai-bg);
-    }
+  @media (max-width: 540px) {
+    .home-hero__title { font-size: clamp(2.8rem, 14vw, 4rem); }
+    .home-hero__actions { display: grid; }
+    .home-hero__actions :global(.btn-primary),
+    .home-hero__actions :global(.btn-secondary) { width: 100%; }
+    .home-hero__proof { grid-template-columns: 1fr 1fr; }
+    .home-hero__stage { min-height: 24rem; }
   }
 
-  @media (max-width: 380px) {
-    .home-hero__domains {
-      display: none;
-    }
+  @media (prefers-reduced-motion: reduce) {
+    .home-hero__canvas { display: none; }
+    .home-hero__fallback { opacity: 1 !important; }
   }
 </style>

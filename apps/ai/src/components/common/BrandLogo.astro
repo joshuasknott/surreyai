@@ -1,0 +1,33 @@
+---
+interface Props {
+  variant?: "light" | "dark";
+  compact?: boolean;
+  priority?: boolean;
+}
+
+const { variant = "light", compact = false } = Astro.props;
+---
+
+<span
+  class:list={[
+    "brand-logo",
+    `brand-logo--${variant}`,
+    compact && "brand-logo--compact",
+  ]}
+  role="img"
+  aria-label="Surrey Artificial Intelligence Society"
+>
+  <svg class="brand-logo__mark" viewBox="0 0 74 56" aria-hidden="true">
+    <path
+      fill="currentColor"
+      fill-rule="evenodd"
+      d="M27 2 55 54H42.5l-6.2-12H18L11.8 54H0L27 2Zm0 15.2-4.8 14.2h9.7L27 17.2Z"
+    />
+    <rect class="brand-logo__accent" x="63" y="2" width="8" height="52" />
+  </svg>
+  <span class="brand-logo__name" aria-hidden="true">
+    <span>Surrey</span>
+    <span>Artificial Intelligence</span>
+    <span>Society</span>
+  </span>
+</span>

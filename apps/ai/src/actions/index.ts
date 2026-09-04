@@ -2,6 +2,7 @@ import { defineAction, ActionError } from 'astro:actions';
 import { z } from 'astro:schema';
 import { requireAdmin, requireAdminRole } from '@surreysocieties/admin/actionGuard';
 import { verifyCsrfToken } from '@surreysocieties/admin/csrf';
+import { fetchUnionCommitteeOfficers, getSocietyById } from '@surreysocieties/admin';
 
 function assertValidCsrf(token: string, userId: string) {
   if (!verifyCsrfToken(token, userId)) {
@@ -45,6 +46,32 @@ export const server = {
           memberId: input.id,
         });
         return { success: true };
+      },
+    }),
+
+    syncCommitteeFromUnion: defineAction({
+      accept: 'form',
+      input: z.object({
+        _csrf: z.string().min(1, 'CSRF token is required'),
+      }),
+      handler: async (input, context) => {
+        const { client, societySlug, user } = requireAdminRole(context);
+        assertValidCsrf(input._csrf, user._id);
+        const society = getSocietyById(societySlug);
+        if (!society) {
+          throw new ActionError({ code: 'BAD_REQUEST', message: 'Society configuration is missing.' });
+        }
+
+        try {
+          const officers = await fetchUnionCommitteeOfficers(society.studentsUnionUrl);
+          await client.mutation('committee:syncOfficers', { societySlug, officers });
+          return { success: true, officers };
+        } catch (error) {
+          throw new ActionError({
+            code: 'BAD_REQUEST',
+            message: error instanceof Error ? error.message : "Unable to refresh the Students' Union committee.",
+          });
+        }
       },
     }),
 
