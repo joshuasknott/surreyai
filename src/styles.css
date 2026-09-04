@@ -37,6 +37,7 @@ a { color: inherit; }
 img { display: block; width: 100%; }
 ::selection { background: var(--yellow); color: var(--ink); }
 main { padding-top: 14px; }
+section[id] { scroll-margin-top: 108px; }
 .scroll-progress { position: fixed; inset: 0 0 auto; z-index: 60; height: 2px; transform-origin: 0 50%; background: var(--yellow); }
 .shell { width: min(calc(100% - 48px), 1260px); margin-inline: auto; }
 .full-stop { color: var(--yellow); }
@@ -47,7 +48,8 @@ main { padding-top: 14px; }
 
 .site-header { position: sticky; top: 14px; z-index: 40; min-height: 76px; padding: 10px 12px 10px 20px; display: grid; grid-template-columns: 236px 1fr; align-items: center; gap: 40px; border: 1px solid rgba(17,25,25,.08); border-radius: 20px; background: rgba(252,252,249,.88); box-shadow: 0 12px 44px rgba(23,42,41,.07); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
 .event-mark { display: block; width: 214px; text-decoration: none; }
-.event-mark img { width: 100%; height: auto; }
+.event-mark img { width: 100%; height: auto; transition: opacity .35s var(--ease), transform .45s var(--ease); }
+.event-mark:hover img { opacity: .86; transform: translateY(-1px); }
 .site-header nav, .site-footer nav { display: flex; align-items: center; justify-content: flex-end; gap: clamp(22px, 3vw, 44px); font-size: 12px; font-weight: 650; letter-spacing: -.01em; }
 .site-header nav a, .site-header nav button, .site-footer nav a { text-decoration: none; border: 0; background: none; color: inherit; cursor: pointer; }
 .site-header nav a { position: relative; padding: 15px 0; color: #35403f; transition: color .3s var(--ease); }
@@ -61,7 +63,7 @@ main { padding-top: 14px; }
 .hero__copy { min-width: 0; }
 .hero__eyebrow { margin-bottom: 24px; }
 .hero h1, .manifesto h2, .people h2, .tools h2, .national h2, .sponsors h2, .waitlist h2 { margin: 0; font-family: var(--body); font-weight: 610; letter-spacing: -.06em; text-wrap: balance; }
-.hero h1 { max-width: 640px; font-size: clamp(64px, 6vw, 88px); line-height: .94; }
+.hero h1 { max-width: 640px; font-size: clamp(60px, 5.5vw, 80px); line-height: .95; }
 .hero__line { display: block; overflow: hidden; padding: 0 .05em .07em 0; }
 .hero__line > span { display: block; }
 .hero__copy > p:not(.hero__meta, .hero__eyebrow) { max-width: 560px; margin: 33px 0 0; color: #465250; font-size: 18px; line-height: 1.55; font-weight: 440; letter-spacing: -.018em; }
@@ -71,6 +73,8 @@ main { padding-top: 14px; }
 .hero__image::after { content: ""; position: absolute; inset: 0; border: 1px solid rgba(255,255,255,.28); border-radius: inherit; pointer-events: none; }
 .hero__actions { margin-top: 34px; display: flex; flex-wrap: wrap; gap: 12px; }
 .button { min-height: 54px; padding: 0 25px; display: inline-flex; align-items: center; justify-content: center; gap: 10px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--ink); text-decoration: none; font-size: 13px; font-weight: 680; cursor: pointer; transition: color .35s var(--ease), background .35s var(--ease), border-color .35s var(--ease), box-shadow .35s var(--ease); }
+.button svg, .form-row > button svg { transition: transform .4s var(--ease); }
+.button:hover svg, .form-row > button:hover svg { transform: translateX(3px); }
 .button:focus-visible, .site-header a:focus-visible, .site-header button:focus-visible, .site-footer a:focus-visible, .intent-switch button:focus-visible, input:focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; }
 .button--primary { background: var(--teal); border-color: var(--teal); color: white; box-shadow: 0 12px 30px rgba(18,92,95,.17); }
 .button--primary:hover { background: var(--ink); border-color: var(--ink); box-shadow: 0 15px 36px rgba(17,25,25,.2); }
@@ -194,6 +198,7 @@ main { padding-top: 14px; }
 
 @media (max-width: 760px) {
   html { scroll-padding-top: 88px; }
+  section[id] { scroll-margin-top: 88px; }
   main { padding-top: 8px; }
   .shell { width: min(calc(100% - 24px), 640px); }
   .site-header { top: 8px; min-height: 66px; padding: 9px 9px 9px 14px; grid-template-columns: 1fr auto; gap: 10px; border-radius: 17px; }

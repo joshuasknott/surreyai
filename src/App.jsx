@@ -130,10 +130,10 @@ function Photo({ className, src, alt, position }) {
   return (
     <motion.div
       className={`${className} image-wash`}
-      initial={reducedMotion ? false : { opacity: 0, scale: 0.985 }}
-      whileInView={reducedMotion ? undefined : { opacity: 1, scale: 1 }}
+      initial={reducedMotion ? false : { opacity: 0, y: 18, scale: 0.985 }}
+      whileInView={reducedMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, amount: 0.24 }}
-      transition={{ duration: 0.9, ease }}
+      transition={{ duration: 1.05, ease }}
       whileHover={reducedMotion ? undefined : "hover"}
     >
       <motion.img
@@ -156,17 +156,17 @@ export function App() {
   const progress = useSpring(scrollYProgress, { stiffness: 110, damping: 26, mass: 0.25 });
 
   const reveal = reducedMotion ? {} : {
-    initial: { opacity: 0, y: 24 },
+    initial: { opacity: 0, y: 20 },
     whileInView: { opacity: 1, y: 0 },
     viewport: { once: true, amount: 0.24 },
-    transition: { duration: 0.72, ease },
+    transition: { duration: 0.82, ease },
   };
 
   const moveToWaitlist = (nextIntent = "participant") => {
     setIntent(nextIntent);
     setStatus("idle");
     document.querySelector("#waitlist")?.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth" });
-    window.setTimeout(() => document.querySelector("#email")?.focus(), reducedMotion ? 0 : 650);
+    window.setTimeout(() => document.querySelector("#email")?.focus({ preventScroll: true }), reducedMotion ? 0 : 650);
   };
 
   const submitInterest = (event) => {
@@ -186,7 +186,7 @@ export function App() {
         className="site-header shell"
         initial={reducedMotion ? false : { opacity: 0, y: -14 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.75, ease }}
+        transition={{ duration: 0.82, ease }}
       >
         <EventMark />
         <nav aria-label="Main navigation">
