@@ -3,10 +3,12 @@ import { AnimatePresence, motion, useReducedMotion, useScroll, useSpring } from 
 import { SiCanva } from "react-icons/si";
 import { VscVscode } from "react-icons/vsc";
 import {
+  ArrowRight,
   AsteriskSimple,
   Code,
   Cube,
   Database,
+  GlobeHemisphereWest,
   Key,
   PencilSimple,
   PresentationChart,
@@ -25,9 +27,9 @@ const people = [
 ];
 
 const principles = [
-  { icon: Cube, title: "Make a real prototype.", text: "Go from an idea to something working over one focused weekend." },
-  { icon: UsersThree, title: "Collaborate across disciplines.", text: "Build with people from different courses, skills and perspectives." },
-  { icon: PresentationChart, title: "Demo what works.", text: "Share your project, get useful feedback and learn from other teams." },
+  { icon: Cube, title: "Make it real", text: "Turn an ambitious idea into a working prototype over one focused weekend." },
+  { icon: UsersThree, title: "Build together", text: "Mix disciplines, approaches and experience levels in one genuinely collaborative room." },
+  { icon: PresentationChart, title: "Show the work", text: "Demo what you made, learn from other teams and leave with something tangible." },
 ];
 
 const toolGroups = [
@@ -86,9 +88,9 @@ const toolGroups = [
 ];
 
 const sponsorPaths = [
-  { icon: Wrench, title: "Tools & access", text: "Help students build with useful technology and practical resources." },
-  { icon: UsersThree, title: "Expertise & mentoring", text: "Share knowledge, open doors and connect with student builders." },
-  { icon: AsteriskSimple, title: "Enable participation", text: "Help make a serious national event accessible to more students." },
+  { icon: Wrench, title: "Product access", text: "Put useful technology, credits and practical resources in students’ hands." },
+  { icon: UsersThree, title: "People & expertise", text: "Share knowledge, mentor teams and meet emerging student builders." },
+  { icon: AsteriskSimple, title: "Wider participation", text: "Help make a serious national event accessible to more students." },
 ];
 
 const ease = [0.22, 1, 0.36, 1];
@@ -197,23 +199,28 @@ export function App() {
 
       <section className="hero shell" aria-labelledby="hero-title">
         <div className="hero__copy">
+          <motion.p className="hero__eyebrow" initial={reducedMotion ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.02, ease }}>A new national student AI hackathon</motion.p>
           <h1 id="hero-title">
             <span className="hero__line"><motion.span initial={reducedMotion ? false : { y: "115%" }} animate={{ y: 0 }} transition={{ duration: 0.82, delay: 0.08, ease }}>Build something</motion.span></span>
             <span className="hero__line"><motion.span initial={reducedMotion ? false : { y: "115%" }} animate={{ y: 0 }} transition={{ duration: 0.82, delay: 0.17, ease }}>worth showing<span className="full-stop">.</span></motion.span></span>
           </h1>
-          <motion.p initial={reducedMotion ? false : { opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65, delay: 0.44, ease }}>Surrey AI Hack is a national weekend for UK university students to build and demo AI projects.</motion.p>
-          <motion.p className="hero__meta" initial={reducedMotion ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.58 }}>2026/27 academic year <span>·</span> Details to be announced</motion.p>
+          <motion.p initial={reducedMotion ? false : { opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65, delay: 0.44, ease }}>A weekend for UK university students to turn ambitious AI ideas into working demos—whatever they study, whatever tools they use.</motion.p>
+          <motion.p className="hero__meta" initial={reducedMotion ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.58 }}><span>2026/27 academic year</span><span>Event details to be announced</span></motion.p>
           <motion.div className="hero__actions" initial={reducedMotion ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65, delay: 0.68, ease }}>
-            <motion.button whileHover={reducedMotion ? undefined : { y: -3 }} whileTap={reducedMotion ? undefined : { scale: 0.98 }} className="button button--primary" type="button" onClick={() => moveToWaitlist()}>Join the waitlist</motion.button>
-            <motion.a whileHover={reducedMotion ? undefined : { y: -3 }} whileTap={reducedMotion ? undefined : { scale: 0.98 }} className="button button--secondary" href="#about">Explore the hack</motion.a>
+            <motion.button whileHover={reducedMotion ? undefined : { y: -2 }} whileTap={reducedMotion ? undefined : { scale: 0.985 }} className="button button--primary" type="button" onClick={() => moveToWaitlist()}>Join the waitlist <ArrowRight size={17} aria-hidden="true" /></motion.button>
+            <motion.a whileHover={reducedMotion ? undefined : { y: -2 }} whileTap={reducedMotion ? undefined : { scale: 0.985 }} className="button button--secondary" href="#about">Explore the idea</motion.a>
           </motion.div>
         </div>
         <Photo className="hero__image" src="/images/hero-build-space.webp" alt="Students building projects together in a busy studio" position="50% center" />
       </section>
 
-      <section className="manifesto" id="about" aria-labelledby="manifesto-title">
-        <div className="shell manifesto__inner">
-          <motion.h2 id="manifesto-title" {...reveal}>AI-native.<br />Human-made.<br />Built to show<span className="full-stop">.</span></motion.h2>
+      <section className="manifesto shell" id="about" aria-labelledby="manifesto-title">
+        <div className="manifesto__inner">
+          <motion.div className="manifesto__heading" {...reveal}>
+            <p className="eyebrow">The idea</p>
+            <h2 id="manifesto-title">AI-native.<br />Human-made.<br />Built to show<span className="full-stop">.</span></h2>
+            <p>This is a build weekend, not a lecture series. Start with a problem, make something people can try, then put it in front of the room.</p>
+          </motion.div>
           <div className="principles">
             {principles.map(({ icon: Icon, title, text }, index) => (
               <motion.article className="principle" key={title} initial={reducedMotion ? false : { opacity: 0, y: 22 }} whileInView={reducedMotion ? undefined : { opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.5 }} transition={{ duration: 0.62, delay: index * 0.12, ease }}>
@@ -229,7 +236,8 @@ export function App() {
       <section className="people shell" id="people" aria-labelledby="people-title">
         <motion.div className="people__copy" {...reveal}>
           <p className="eyebrow">Who it’s for</p>
-          <h2 id="people-title" className="sr-only">Builders of every kind</h2>
+          <h2 id="people-title">You don’t need to call yourself a developer<span className="full-stop">.</span></h2>
+          <p className="people__lede">Bring curiosity, a useful point of view and the willingness to make. First build or fiftieth—you’ll find your place here.</p>
           <ul>{people.map((person, index) => <motion.li key={person} initial={reducedMotion ? false : { opacity: 0, x: -12 }} whileInView={reducedMotion ? undefined : { opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.45, delay: index * 0.055, ease }}>{person}</motion.li>)}</ul>
         </motion.div>
         <Photo className="people__image" src="/images/builder-portrait.webp" alt="A student mapping out a prototype with a team" position="center 38%" />
@@ -237,32 +245,32 @@ export function App() {
 
       <section className="tools shell" id="tools" aria-labelledby="tools-title">
         <motion.div className="tools__intro" {...reveal}>
-          <p className="eyebrow">Tools</p>
-          <h2 id="tools-title">Use what<br />helps you build<span className="full-stop">.</span></h2>
-          <p>There’s no required stack and no vendor lock-in. Use whatever AI tools help you design, build and ship your idea.</p>
-          <p>Examples only—nothing is required or supplied. Bring the tools and access you already have.</p>
+          <p className="eyebrow">Your stack, your call</p>
+          <h2 id="tools-title">Bring the tools that help you move<span className="full-stop">.</span></h2>
+          <div className="tools__copy">
+            <p>No prescribed stack. No preferred provider. Use the tools that help you think, design, build and ship.</p>
+            <p>Free plans, student subscriptions, paid accounts, API credits and open-source models are all welcome. The names below are examples, not requirements or confirmed partners.</p>
+          </div>
         </motion.div>
         <div className="tool-matrix" aria-label="Example tools and access types">
           {toolGroups.map(({ icon: Icon, label, items }, rowIndex) => (
-            <motion.div className="tool-row" key={label} initial={reducedMotion ? false : { opacity: 0, y: 16 }} whileInView={reducedMotion ? undefined : { opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.45 }} transition={{ duration: 0.58, delay: rowIndex * 0.07, ease }}>
-              <span className="tool-row__icon"><Icon size={22} weight="regular" aria-hidden="true" /></span>
-              <strong>{label}</strong>
-              <span className="tool-row__items">{items.map((item, index) => <ToolChip key={item.label} item={item} index={index} reducedMotion={reducedMotion} />)}</span>
-            </motion.div>
+            <motion.article className={`tool-group${label === "Access options" ? " tool-group--access" : ""}`} key={label} initial={reducedMotion ? false : { opacity: 0, y: 16 }} whileInView={reducedMotion ? undefined : { opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.35 }} transition={{ duration: 0.58, delay: rowIndex * 0.07, ease }}>
+              <div className="tool-group__heading"><span className="tool-group__icon"><Icon size={21} weight="regular" aria-hidden="true" /></span><strong>{label}</strong></div>
+              <div className="tool-group__items">{items.map((item, index) => <ToolChip key={item.label} item={item} index={index} reducedMotion={reducedMotion} />)}</div>
+            </motion.article>
           ))}
         </div>
       </section>
 
-      <section className="national" aria-labelledby="national-title">
-        <div className="shell national__inner">
+      <section className="national shell" aria-labelledby="national-title">
+        <div className="national__inner">
           <motion.div className="national__heading" {...reveal}>
-            <p className="eyebrow">National in scope</p>
-            <h2 id="national-title">One weekend.<br />Ideas from<br />across the UK<span className="full-stop">.</span></h2>
-          </motion.div>
-          <motion.div className="national__copy" {...reveal} transition={reducedMotion ? undefined : { duration: 0.72, delay: 0.1, ease }}>
-            <p>Students from universities across the UK come together for a serious weekend of building.</p>
-            <p>Different universities. Different disciplines. One mission: build, learn and demo something real.</p>
-            <p>Share your work, get feedback that helps, and join a community that keeps building.</p>
+            <p className="eyebrow"><GlobeHemisphereWest size={17} aria-hidden="true" /> National by design</p>
+            <h2 id="national-title">Come from anywhere. Leave with something real<span className="full-stop">.</span></h2>
+            <div className="national__copy">
+              <p>Surrey AI Hack will bring university students from across the UK into one room for a focused weekend of building, testing and demoing.</p>
+              <p>A serious, welcoming event designed to be worth the journey—across disciplines, experience levels and university borders.</p>
+            </div>
           </motion.div>
           <Photo className="national__image" src="/images/demo-room.webp" alt="Student builders presenting a prototype to an audience" position="center 45%" />
         </div>
@@ -270,11 +278,11 @@ export function App() {
 
       <section className="sponsors shell" id="sponsors" aria-labelledby="sponsors-title">
         <motion.div className="sponsors__heading" {...reveal}>
-          <p className="eyebrow">Sponsors</p>
-          <h2 id="sponsors-title">Back the next<br />generation of<br />AI builders<span className="full-stop">.</span></h2>
+          <p className="eyebrow">For future partners</p>
+          <h2 id="sponsors-title">Help make the weekend possible<span className="full-stop">.</span></h2>
+          <p className="sponsors__lede">We’re starting conversations with organisations that want to support ambitious student builders without shaping what they are required to use.</p>
         </motion.div>
         <div className="sponsors__body">
-          <motion.p className="sponsors__lede" {...reveal}>Help students turn ideas into working prototypes and shape what comes next.</motion.p>
           <div className="sponsor-paths">
             {sponsorPaths.map(({ icon: Icon, title, text }, index) => (
               <motion.article key={title} initial={reducedMotion ? false : { opacity: 0, y: 18 }} whileInView={reducedMotion ? undefined : { opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.55 }} transition={{ duration: 0.55, delay: index * 0.1, ease }}>
@@ -285,14 +293,15 @@ export function App() {
             ))}
           </div>
         </div>
-        <motion.button whileHover={reducedMotion ? undefined : { y: -3 }} whileTap={reducedMotion ? undefined : { scale: 0.98 }} className="button button--sponsor" type="button" onClick={() => moveToWaitlist("partner")}>Discuss sponsorship</motion.button>
+        <motion.button whileHover={reducedMotion ? undefined : { y: -2 }} whileTap={reducedMotion ? undefined : { scale: 0.985 }} className="button button--sponsor" type="button" onClick={() => moveToWaitlist("partner")}>Register partner interest <ArrowRight size={17} aria-hidden="true" /></motion.button>
       </section>
 
-      <section className="waitlist" id="waitlist" aria-labelledby="waitlist-title">
-        <div className="shell waitlist__inner">
+      <section className="waitlist shell" id="waitlist" aria-labelledby="waitlist-title">
+        <div className="waitlist__inner">
           <motion.div className="waitlist__heading" {...reveal}>
-            <h2 id="waitlist-title">{intent === "partner" ? "Let’s build it together." : "Be the first to know."}</h2>
-            <p>{intent === "partner" ? "Register your interest in supporting the next generation of AI builders." : "Join for announcements, early access and ways to get involved."}</p>
+            <p className="eyebrow">Stay in the loop</p>
+            <h2 id="waitlist-title">{intent === "partner" ? "Let’s make it happen." : "Get the first update."}</h2>
+            <p>{intent === "partner" ? "Tell us you’re interested in supporting the event and we’ll share partnership details when they are ready." : "Register interest for dates, applications and the first event announcements."}</p>
           </motion.div>
           <AnimatePresence mode="wait" initial={false}>
             {status === "success" ? (
@@ -306,14 +315,14 @@ export function App() {
                 <div className="form-row">
                   <label className="sr-only" htmlFor="email">Your email</label>
                   <input id="email" type="email" inputMode="email" autoComplete="email" placeholder={intent === "partner" ? "Your work email" : "Your university email"} value={email} onChange={(event) => { setEmail(event.target.value); setStatus("idle"); }} aria-invalid={status === "error"} aria-describedby={status === "error" ? "email-error" : "email-note"} />
-                  <button type="submit">Join the waitlist</button>
+                  <button type="submit">Join the waitlist <ArrowRight size={17} aria-hidden="true" /></button>
                 </div>
                 <div className="intent-switch" aria-label="Interest type">
                   <span>I’m interested as</span>
                   <button aria-pressed={intent === "participant"} className={intent === "participant" ? "is-active" : ""} type="button" onClick={() => { setIntent("participant"); setStatus("idle"); }}>Participant</button>
                   <button aria-pressed={intent === "partner"} className={intent === "partner" ? "is-active" : ""} type="button" onClick={() => { setIntent("partner"); setStatus("idle"); }}>Sponsor / partner</button>
                 </div>
-                {status === "error" ? <p id="email-error" className="form-note form-note--error">Enter a valid email address.</p> : <p id="email-note" className="form-note">Updates only. No noise.</p>}
+                {status === "error" ? <p id="email-error" className="form-note form-note--error">Enter a valid email address.</p> : <p id="email-note" className="form-note">Planning updates only. Unsubscribe whenever you like.</p>}
               </motion.form>
             )}
           </AnimatePresence>
