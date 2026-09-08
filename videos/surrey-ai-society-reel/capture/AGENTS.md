@@ -2,7 +2,7 @@
 
 Source: http://localhost:4321/
 
-To create a video from this capture, use the `website-to-video` skill.
+This is a historical capture. Use the available website-to-HyperFrames workflow when making a video from it; verify freshness before treating captured text or design as current.
 
 ## What's in This Capture
 

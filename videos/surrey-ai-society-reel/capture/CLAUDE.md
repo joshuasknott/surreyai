@@ -2,7 +2,7 @@
 
 Source: http://localhost:4321/
 
-To create a video from this capture, use the `website-to-video` skill.
+This is a historical capture. Follow AGENTS.md for the current capture workflow.
 
 ## What's in This Capture
 
