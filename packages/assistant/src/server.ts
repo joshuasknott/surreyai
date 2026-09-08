@@ -1,3 +1,4 @@
+import { normalizeMessages, parseRequestBody } from "./request";
 import { GoogleGenAI } from "@google/genai";
 import { createConvexClient, getSocietyById } from "@surreysocieties/admin";
 import { makeFunctionReference } from "convex/server";
@@ -189,7 +190,7 @@ export async function handleAssistantChatRequest(
   }
 
   const contentType = request.headers.get("content-type") || "";
-  if (!contentType.toLowerCase().includes("application/json")) {
+  if (contentType.split(";", 1)[0].trim().toLowerCase() !== "application/json") {
     return jsonResponse({ error: "Request must use application/json" }, 415);
   }
 
@@ -198,8 +199,12 @@ export async function handleAssistantChatRequest(
     return jsonResponse({ error: parsed.error }, parsed.status);
   }
 
-  const messages = normalizeMessages(parsed.body.messages);
-  if (messages.length === 0) {
+  const messages = normalizeMessages(parsed.body.messages, {
+    maxMessages: getPositiveIntEnv("AI_ASSISTANT_MAX_MESSAGES", DEFAULT_MAX_MESSAGES, 16),
+    maxInputChars: getPositiveIntEnv("AI_ASSISTANT_MAX_INPUT_CHARS", DEFAULT_MAX_INPUT_CHARS, 2000),
+    maxTotalChars: MAX_TOTAL_USER_CHARS,
+  });
+  if (!messages.some((message) => message.role === "user")) {
     return jsonResponse({ error: "At least one user message is required" }, 400);
   }
 
@@ -236,58 +241,6 @@ export async function handleAssistantChatRequest(
     source: "ai",
     message: cleanGeneratedText(aiText, 2000),
   });
-}
-
-async function parseRequestBody(
-  request: Request
-): Promise<
-  | { ok: true; body: JsonObject }
-  | { ok: false; status: number; error: string }
-> {
-  try {
-    const body = await request.json();
-    if (!isRecord(body)) {
-      return { ok: false, status: 400, error: "JSON body must be an object" };
-    }
-    return { ok: true, body };
-  } catch {
-    return { ok: false, status: 400, error: "Invalid JSON" };
-  }
-}
-
-function normalizeMessages(value: unknown): AssistantMessage[] {
-  if (!Array.isArray(value)) return [];
-
-  const maxMessages = getPositiveIntEnv(
-    "AI_ASSISTANT_MAX_MESSAGES",
-    DEFAULT_MAX_MESSAGES,
-    16
-  );
-  const maxInputChars = getPositiveIntEnv(
-    "AI_ASSISTANT_MAX_INPUT_CHARS",
-    DEFAULT_MAX_INPUT_CHARS,
-    2000
-  );
-
-  let totalChars = 0;
-  const normalized: AssistantMessage[] = [];
-
-  for (const item of value.slice(-maxMessages)) {
-    if (!isRecord(item)) continue;
-
-    const role = item.role === "assistant" ? "assistant" : item.role === "user" ? "user" : null;
-    if (!role) continue;
-
-    const content = cleanString(item.content, maxInputChars);
-    if (!content) continue;
-
-    totalChars += content.length;
-    if (totalChars > MAX_TOTAL_USER_CHARS) break;
-
-    normalized.push({ role, content });
-  }
-
-  return normalized.filter((message) => message.role === "user" || message.content.length > 0);
 }
 
 async function getPublicContext(societyKey: SocietyKey): Promise<PublicAssistantContext | null> {
@@ -713,3 +666,4 @@ function cleanString(value: unknown, maxLength: number): string {
 function isRecord(value: unknown): value is JsonObject {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
+

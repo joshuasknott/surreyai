@@ -38,6 +38,26 @@ describe("website assistant safeguards", () => {
     expect(response.status).toBe(400);
   });
 
+  it("rejects assistant-only conversations and lookalike JSON content types", async () => {
+    const assistantOnly = await handleAssistantChatRequest(request({ messages: [{ role: "assistant", content: "Hello" }] }), "business");
+    expect(assistantOnly.status).toBe(400);
+    const invalidType = await handleAssistantChatRequest(request({ messages: [{ role: "user", content: "Hello" }] }, { "content-type": "application/json-invalid" }), "business");
+    expect(invalidType.status).toBe(415);
+  });
+
+  it("answers the latest question when older messages exceed the context budget", async () => {
+    const messages = Array.from({ length: 8 }, () => ({ role: "user", content: "x".repeat(1200) }));
+    messages.push({ role: "user", content: "How do I join?" });
+    const response = await handleAssistantChatRequest(request({ messages }, { "x-forwarded-for": "198.51.100.19" }), "business");
+    expect(response.status).toBe(200);
+    expect((await response.json()).message).toContain("Membership");
+  });
+
+  it("rejects oversized JSON before accessing public context", async () => {
+    const response = await handleAssistantChatRequest(request({ messages: [], padding: "x".repeat(128 * 1024) }), "business");
+    expect(response.status).toBe(413);
+  });
+
   it("returns a safe local fallback when generative AI is disabled", async () => {
     const response = await handleAssistantChatRequest(
       request(
