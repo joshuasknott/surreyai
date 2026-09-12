@@ -6,8 +6,12 @@ import "../styles/global.css";
 import HomeHero from "../components/home/HomeHero.astro";
 import AreasWeExplore from "../components/home/AreasWeExplore.astro";
 import StudentProjects from "../components/home/StudentProjects.astro";
+import EventsPreview from "../components/home/EventsPreview.astro";
+import { queryPublicConvex } from "@surreysocieties/admin";
+import { api } from "../../../../convex/_generated/api.js";
 
 Astro.response.headers.set("Cache-Control", "public, s-maxage=300, stale-while-revalidate=3600");
+const events = await queryPublicConvex(api.events.listPublished, { societySlug: 'ai' }, []);
 ---
 
 <Layout
@@ -15,6 +19,7 @@ Astro.response.headers.set("Cache-Control", "public, s-maxage=300, stale-while-r
   description="Surrey Artificial Intelligence Society is a student-led community for anyone curious about artificial intelligence, machine learning and data science, whatever their degree or experience."
 >
   <HomeHero />
+  <EventsPreview events={events} />
   <AreasWeExplore />
   <StudentProjects />
 </Layout>

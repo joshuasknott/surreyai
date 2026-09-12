@@ -38,7 +38,7 @@ const principles = [
         <h2 id="pathways-title" class="section-title">Explore AI practically, critically and together.</h2>
       </div>
       <p class="section-intro">
-        Surrey Artificial Intelligence Society brings together students who want to understand AI, experiment with modern tools and meet others interested in where the technology is heading. You do not need a technical background or any previous experience to take part.
+        Try modern tools, make something with other students and explore where AI is heading. Start with your curiosity; we'll help you find a way in.
       </p>
     </div>
 
@@ -57,8 +57,8 @@ const principles = [
     <div class="responsible-band__inner">
       <div class="responsible-band__lead">
         <p class="section-number" aria-hidden="true">02</p>
-        <h2>Understand what AI changes, not only what it can do.</h2>
-        <span>Learning about AI also means questioning it. We discuss how data is collected, whose interests systems serve, where bias appears, and how AI affects privacy, accessibility, work and everyday life.</span>
+        <h2>Think critically about AI.</h2>
+        <span>We look beyond a model's output: how its data was collected, who it serves and what it changes for people.</span>
       </div>
       <div class="responsible-band__principles">
         {principles.map(([title, text]) => (
@@ -104,14 +104,14 @@ const principles = [
   .pathway-grid article:last-child { border-right: 0; }
 
   .pathway-grid span {
-    color: var(--ai-accent);
+    color: var(--ai-link);
     font-size: 0.85rem;
     font-weight: 900;
     letter-spacing: 0.08em;
   }
 
   .pathway-grid h3 {
-    margin: 1.6rem 0 0.6rem;
+    margin: 1.2rem 0 0.6rem;
     color: var(--ai-fg);
     font-size: clamp(1.55rem, 2.5vw, 2.15rem);
     letter-spacing: -0.045em;
@@ -126,6 +126,7 @@ const principles = [
   }
 
   .responsible-band {
+    margin-inline: -1.25rem;
     margin-top: clamp(3rem, 6vw, 5rem);
     background: #111111;
     color: #faf8f3;
@@ -156,8 +157,8 @@ const principles = [
     color: #faf8f3;
     font-size: clamp(2rem, 4vw, 3.6rem);
     font-weight: 850;
-    letter-spacing: -0.055em;
-    line-height: 0.98;
+    letter-spacing: -0.035em;
+    line-height: 1.08;
   }
 
   .responsible-band__lead span {
@@ -192,8 +193,8 @@ const principles = [
 
   .responsible-band__principles p {
     margin: 0;
-    color: rgba(250, 248, 243, 0.62);
-    font-size: 0.85rem;
+    color: rgba(250, 248, 243, 0.78);
+    font-size: 0.93rem;
     line-height: 1.55;
   }
 
@@ -207,6 +208,8 @@ const principles = [
   }
 
   @media (max-width: 520px) {
+    .pathway-heading { gap: 1.25rem; margin-bottom: 2rem; }
+    .responsible-band { margin-inline: -1.2rem; }
     .pathway-grid,
     .responsible-band__principles { grid-template-columns: 1fr; }
     .pathway-grid article,

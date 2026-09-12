@@ -9,7 +9,6 @@ interface Props {
 const { config, endpoint = '/api/assistant/chat' } = Astro.props;
 const widgetId = `society-assistant-${config.societyKey}`;
 const starterPrompts = JSON.stringify(config.starterPrompts);
-const fallbackLinks = JSON.stringify(config.fallbackLinks);
 const styleVars = [
   `--assistant-accent:${config.brand.accent}`,
   `--assistant-accent-text:${config.brand.accentText}`,
@@ -29,7 +28,6 @@ const styleVars = [
   data-short-name={config.shortName}
   data-description={config.shortDescription}
   data-starter-prompts={starterPrompts}
-  data-fallback-links={fallbackLinks}
   style={styleVars}
 >
   <button
@@ -83,6 +81,10 @@ const styleVars = [
       </div>
       <div class="assistant-starters" aria-label="Suggested questions"></div>
       <div class="assistant-messages" aria-live="polite" aria-relevant="additions"></div>
+      <nav class="assistant-recovery" aria-label="Society information" hidden>
+        <p>You can also find what you need here:</p>
+        <div>{config.fallbackLinks.map(link => <a href={link.href}>{link.label} &rarr;</a>)}</div>
+      </nav>
     </div>
 
     <form class="assistant-form">
@@ -95,7 +97,7 @@ const styleVars = [
         maxlength="1200"
         placeholder="Ask a quick question..."
       ></textarea>
-      <button type="submit" class="assistant-send">Send</button>
+      <button type="submit" class="assistant-send" disabled>Send</button>
     </form>
   </section>
 </div>
@@ -266,7 +268,7 @@ const styleVars = [
   }
 
   .assistant-reset {
-    min-height: 2rem;
+    min-height: 2.75rem;
     padding: 0 0.7rem;
     border-radius: 999px;
     font-size: 0.76rem;
@@ -274,8 +276,9 @@ const styleVars = [
   }
 
   .assistant-close {
-    width: 2rem;
-    height: 2rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    flex-shrink: 0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -291,6 +294,7 @@ const styleVars = [
     flex: 1;
     min-height: 0;
     overflow-y: auto;
+    overscroll-behavior: contain;
     padding: 0.95rem;
     background:
       radial-gradient(circle at 12% 0%, color-mix(in srgb, var(--assistant-accent) 10%, transparent), transparent 13rem),
@@ -318,6 +322,8 @@ const styleVars = [
     gap: 0.5rem;
     margin-bottom: 1rem;
   }
+
+  .assistant-starters[hidden] { display: none; }
 
   .assistant-starter {
     max-width: 100%;
@@ -400,7 +406,7 @@ const styleVars = [
 
   .assistant-send {
     align-self: end;
-    min-height: 2.55rem;
+    min-height: 2.75rem;
     padding: 0 0.95rem;
     border: 1px solid var(--assistant-accent);
     border-radius: 0.8rem;
@@ -411,11 +417,18 @@ const styleVars = [
   }
 
   .assistant-send:disabled,
+  .assistant-reset:disabled,
   .assistant-input:disabled,
   .assistant-starter:disabled {
     opacity: 0.62;
     cursor: not-allowed;
   }
+
+  .assistant-recovery { margin-top: 1rem; border-top: 1px solid var(--assistant-border); padding-top: 0.75rem; }
+  .assistant-recovery[hidden] { display: none; }
+  .assistant-recovery p { margin: 0; color: var(--assistant-muted); font-size: 0.85rem; }
+  .assistant-recovery > div { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; }
+  .assistant-recovery a { display: inline-flex; align-items: center; min-height: 2.75rem; color: var(--assistant-text); font-size: 0.85rem; font-weight: 700; text-underline-offset: 0.2em; }
 
   .sr-only {
     position: absolute;
@@ -447,15 +460,14 @@ const styleVars = [
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .assistant-toggle {
-      transition: none;
-    }
+    .society-assistant *, .society-assistant *::before, .society-assistant *::after { transition: none !important; animation: none !important; }
   }
 </style>
 
 <style is:global>
   [data-assistant-widget] .assistant-starter {
     max-width: 100%;
+    min-height: 2.75rem;
     padding: 0.6rem 0.75rem;
     border: 1px solid var(--assistant-border);
     border-radius: 0.8rem;

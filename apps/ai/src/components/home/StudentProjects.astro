@@ -14,7 +14,7 @@ import beatPreview from "../../assets/generated/ai-neural-beat-cover-v2.png";
         <h2 id="student-projects-title" class="section-title">Explore student projects</h2>
       </div>
       <p class="section-intro">
-        Try interactive projects created by Surrey students. They show how ideas can become experiments, prototypes and portfolio work, as well as the practical experience members can develop together.
+        Step inside a 3D capture, race a campus circuit or try an AI experiment. Open a project to explore it.
       </p>
     </div>
 
@@ -26,7 +26,7 @@ import beatPreview from "../../assets/generated/ai-neural-beat-cover-v2.png";
               src={hintzeHallPreview}
               alt="A photogrammetric point-cloud reconstruction of a natural-history hall beneath a blue whale skeleton"
               widths={[640, 960, 1280]}
-              sizes="(min-width: 860px) 46vw, 100vw"
+              sizes="(min-width: 1180px) 23vw, (min-width: 860px) 46vw, 86vw"
               format="webp"
               quality={90}
               loading="lazy"
@@ -74,7 +74,7 @@ import beatPreview from "../../assets/generated/ai-neural-beat-cover-v2.png";
               src={racingPreview}
               alt="Four autonomous race cars following an orange racing line around a night circuit"
               widths={[640, 960, 1280]}
-              sizes="(min-width: 860px) 46vw, 100vw"
+              sizes="(min-width: 1180px) 23vw, (min-width: 860px) 46vw, 86vw"
               format="webp"
               quality={88}
               loading="lazy"
@@ -122,7 +122,7 @@ import beatPreview from "../../assets/generated/ai-neural-beat-cover-v2.png";
               src={builderPreview}
               alt="Four connected AI work areas collaboratively assembling a web interface"
               widths={[640, 960, 1280]}
-              sizes="(min-width: 860px) 46vw, 100vw"
+              sizes="(min-width: 1180px) 23vw, (min-width: 860px) 46vw, 86vw"
               format="webp"
               quality={90}
               loading="lazy"
@@ -323,7 +323,7 @@ import beatPreview from "../../assets/generated/ai-neural-beat-cover-v2.png";
     width: 100%;
     height: 100%;
     min-height: 0;
-    grid-template-rows: auto auto;
+    grid-template-rows: auto 1fr;
     padding: 0;
     overflow: hidden;
     border: 1px solid var(--ai-border-strong);
@@ -408,6 +408,8 @@ import beatPreview from "../../assets/generated/ai-neural-beat-cover-v2.png";
 
   .project-preview__copy {
     display: grid;
+    grid-template-rows: minmax(3.4rem, auto) 1fr auto;
+    align-content: start;
     gap: 0.45rem;
     padding: 1.2rem 1.35rem 1.35rem;
     min-height: 10.8rem;
@@ -705,7 +707,7 @@ import beatPreview from "../../assets/generated/ai-neural-beat-cover-v2.png";
     .project-modal__frame { grid-template-rows: 3.4rem minmax(0, 1fr); border-radius: 0; }
     .project-modal__header { padding-left: 0.8rem; }
     .project-modal__identity p { display: none; }
-    .project-modal__icon { width: 2.45rem; height: 2.45rem; }
+    .project-modal__icon { width: 2.75rem; height: 2.75rem; }
     .project-tool--builder .project-modal__frame { grid-template-rows: minmax(0, 1fr); }
     .project-tool--builder .project-modal__header { top: 1rem; right: 1rem; }
   }

@@ -16,6 +16,7 @@ export function initSocietyAssistant(root: Element | null, options: { open?: boo
   const sendButton = root.querySelector<HTMLButtonElement>('.assistant-send');
   const messagesEl = root.querySelector<HTMLElement>('.assistant-messages');
   const startersEl = root.querySelector<HTMLElement>('.assistant-starters');
+  const recovery = root.querySelector<HTMLElement>('.assistant-recovery');
   const messages: Array<{ role: 'user' | 'assistant'; content: string }> = [];
   let lastFocus: Element | null = null;
   let isSending = false;
@@ -49,7 +50,11 @@ export function initSocietyAssistant(root: Element | null, options: { open?: boo
     }
   });
 
-  input?.addEventListener('input', autoResizeInput);
+  input?.addEventListener('input', () => {
+    autoResizeInput();
+    updateSendButton();
+  });
+  updateSendButton();
 
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && !panel?.hidden) {
@@ -87,6 +92,7 @@ export function initSocietyAssistant(root: Element | null, options: { open?: boo
   }
 
   function resetConversation() {
+    if (isSending) return;
     messages.splice(0, messages.length);
     if (messagesEl) messagesEl.textContent = '';
     if (input) {
@@ -94,6 +100,8 @@ export function initSocietyAssistant(root: Element | null, options: { open?: boo
       input.style.height = 'auto';
     }
     startersEl?.removeAttribute('hidden');
+    if (recovery) recovery.hidden = true;
+    updateSendButton();
     input?.focus();
   }
 
@@ -103,6 +111,7 @@ export function initSocietyAssistant(root: Element | null, options: { open?: boo
 
     if (panel?.hidden) openPanel();
     isSending = true;
+    if (recovery) recovery.hidden = true;
     setDisabled(true);
     if (input) {
       input.value = '';
@@ -124,6 +133,14 @@ export function initSocietyAssistant(root: Element | null, options: { open?: boo
 
       loading?.remove();
 
+      if (!response.ok) {
+        appendMessage('error', typeof data.message === 'string' && data.message.trim()
+          ? data.message.trim()
+          : 'The assistant is unavailable right now. Please try again shortly or use the site links.');
+        if (recovery) recovery.hidden = false;
+        return;
+      }
+
       if (typeof data.message === 'string') {
         const reply = data.message.trim();
         appendMessage('assistant', reply || `I could not answer that from the ${societyName} context right now.`);
@@ -135,10 +152,11 @@ export function initSocietyAssistant(root: Element | null, options: { open?: boo
     } catch {
       loading?.remove();
       appendMessage('error', 'The assistant is unavailable right now. Please try again shortly or use the site links.');
+      if (recovery) recovery.hidden = false;
     } finally {
       isSending = false;
       setDisabled(false);
-      input?.focus();
+      if (!panel?.hidden) input?.focus();
     }
   }
 
@@ -148,16 +166,22 @@ export function initSocietyAssistant(root: Element | null, options: { open?: boo
     item.className = `assistant-message ${role}`;
     item.textContent = text;
     messagesEl.appendChild(item);
-    item.scrollIntoView({ block: 'end', behavior: 'smooth' });
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    item.scrollIntoView({ block: 'end', behavior: reducedMotion ? 'instant' : 'smooth' });
     return item;
   }
 
   function setDisabled(disabled: boolean) {
     if (input) input.disabled = disabled;
-    if (sendButton) sendButton.disabled = disabled;
+    updateSendButton();
+    if (resetButton) resetButton.disabled = disabled;
     widgetRoot.querySelectorAll<HTMLButtonElement>('.assistant-starter').forEach((button) => {
       button.disabled = disabled;
     });
+  }
+
+  function updateSendButton() {
+    if (sendButton) sendButton.disabled = isSending || !input?.value.trim();
   }
 }
 

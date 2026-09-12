@@ -1,200 +1,58 @@
 ---
+import { getSocietyById } from '@surreysocieties/admin/config';
 interface Props {
-  events: {
-    _id: string;
-    title: string;
-    description?: string;
-    date?: string;
-    startTime?: string;
-    endTime?: string;
-    location?: string;
-    category?: string;
-    status: string;
-  }[];
+  events: { _id: string; title: string; date?: string; startTime?: string; location?: string }[];
 }
-
 const { events } = Astro.props;
-
-const plannedFormats = ["Welcome sessions", "Workshops", "Build nights", "Talks", "Careers activity"];
-
-const formatEventDate = (date?: string) => {
-  if (!date) return "Date not published";
-  const parsed = new Date(`${date}T00:00:00`);
-  if (Number.isNaN(parsed.getTime())) return date;
-  return parsed.toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "long",
-  });
+const society = getSocietyById('ai')!;
+const formatDate = (date?: string) => {
+  const parsed = new Date((date || '') + 'T00:00:00');
+  return Number.isNaN(parsed.getTime()) ? 'Date to be announced' : parsed.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 };
 ---
 
-<section id="events" class="ai-section ai-section--tinted" aria-labelledby="events-preview-title">
-  <div class="ai-section__inner">
-    <div class="ai-section__header ai-section__header--split">
-      <div>
-        <h2 id="events-preview-title" class="section-title">Events and updates</h2>
-        <p class="section-intro">Confirmed details appear here once the committee publishes them.</p>
+<section id="events" class="events-preview" aria-labelledby="events-preview-title">
+  <div class="events-preview__inner">
+    <div class="events-preview__heading">
+      <h2 id="events-preview-title">Meet. Learn. Make.</h2>
+      <a href="/events" class="text-link">Explore events &rarr;</a>
+    </div>
+    {events.length ? (
+      <div class="event-list">
+        {events.slice(0, 3).map(event => (
+          <a class="event-row" href={'/events#event-' + event._id}>
+            <time datetime={event.date}>{formatDate(event.date)}</time>
+            <span><strong>{event.title}</strong><span>{[event.startTime, event.location].filter(Boolean).join(' · ') || 'Details on the event page'}</span></span>
+            <span aria-hidden="true">&rarr;</span>
+          </a>
+        ))}
       </div>
-      <a href="/events" class="text-link">View all events &rarr;</a>
-    </div>
-
-    <div class="events-preview-grid">
-      {events.length === 0 ? (
-        <div class="event-empty">
-          <h3>Confirmed events will appear here once added.</h3>
-          <p>
-            Dates, locations, and joining routes will be published here once they are ready to share.
-          </p>
-          <div class="event-formats" aria-label="Society activity areas">
-            {plannedFormats.map((format) => <span>{format}</span>)}
-          </div>
-          <div class="event-empty__actions">
-            <a href="/join" class="btn-primary">Become a member</a>
-            <a href="/events" class="btn-secondary">View updates</a>
-          </div>
-        </div>
-      ) : (
-        <div class="event-list">
-          {events.slice(0, 3).map((event) => (
-            <article class="event-row">
-              <time>{formatEventDate(event.date)}</time>
-              <div>
-                <h3>{event.title}</h3>
-                <p>
-                  {[event.startTime, event.location, event.category].filter(Boolean).join(" / ") || "Details to be announced"}
-                </p>
-              </div>
-              <a href="/events">Details &rarr;</a>
-            </article>
-          ))}
-        </div>
-      )}
-    </div>
+    ) : (
+      <div class="event-empty">
+        <h3>New dates are on the way.</h3>
+        <p>Workshops, project nights, talks and socials. Follow the society for the next announcement.</p>
+        <a href={society.socials.instagram} target="_blank" rel="noopener noreferrer" class="text-link">Follow @surreyaisociety &rarr;</a>
+      </div>
+    )}
   </div>
 </section>
 
 <style>
-  .events-preview-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: clamp(1.4rem, 4vw, 2.5rem);
-    align-items: stretch;
-  }
-
-  .event-empty {
-    align-self: center;
-    max-width: 58rem;
-    padding: clamp(1.5rem, 4vw, 2.4rem);
-    border: 1px solid var(--ai-border);
-    border-radius: 8px;
-    background: color-mix(in srgb, var(--ai-surface) 84%, var(--ai-paper));
-    box-shadow: 0 18px 44px color-mix(in srgb, var(--ai-slate-base) 7%, transparent);
-  }
-
-  .event-empty h3 {
-    margin: 0 0 0.85rem;
-    color: var(--ai-fg);
-    font-size: clamp(1.9rem, 3.6vw, 3rem);
-    letter-spacing: 0;
-    line-height: 1.08;
-  }
-
-  .event-empty p {
-    color: var(--ai-fg-muted);
-    line-height: 1.65;
-  }
-
-  .event-formats {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.6rem;
-    margin-top: 1.35rem;
-    color: var(--ai-fg);
-    font-size: 0.82rem;
-    font-weight: 750;
-  }
-
-  .event-formats span {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    min-height: 2rem;
-    padding: 0.35rem 0.6rem;
-    border: 1px solid var(--ai-border);
-    border-radius: 999px;
-    background: var(--ai-bg);
-  }
-
-  .event-formats span::before {
-    content: "";
-    width: 0.42rem;
-    height: 0.42rem;
-    border-radius: 999px;
-    background: var(--ai-azure);
-  }
-
-  .event-formats span:nth-child(2)::before,
-  .event-formats span:nth-child(5)::before {
-    background: var(--ai-sage);
-  }
-
-  .event-formats span:nth-child(4)::before {
-    background: var(--ai-coral);
-  }
-
-  .event-empty__actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-top: 1.8rem;
-  }
-
-  .event-list {
-    border: 1px solid var(--ai-border);
-    border-radius: 1.35rem;
-    background: var(--ai-surface);
-    overflow: hidden;
-  }
-
-  .event-row {
-    display: grid;
-    grid-template-columns: 11rem 1fr auto;
-    gap: 1.5rem;
-    align-items: center;
-    padding: 1.35rem 1.5rem;
-  }
-
-  .event-row + .event-row {
-    border-top: 1px solid var(--ai-border);
-  }
-
-  .event-row time {
-    color: var(--ai-azure);
-    font-weight: 850;
-  }
-
-  .event-row h3 {
-    margin: 0 0 0.35rem;
-    color: var(--ai-fg);
-    font-size: 1.15rem;
-  }
-
-  .event-row p {
-    margin: 0;
-    color: var(--ai-fg-muted);
-  }
-
-  .event-row a {
-    color: var(--ai-azure);
-    font-weight: 800;
-    text-decoration: none;
-  }
-
+  .events-preview { padding: 2.5rem 1.25rem; border-bottom: 1px solid var(--ai-border); background: var(--ai-paper-soft); }
+  .events-preview__inner { display: grid; grid-template-columns: minmax(15rem, 0.55fr) minmax(0, 1fr); gap: 3rem; max-width: 82rem; margin: 0 auto; align-items: center; }
+  .events-preview__heading h2 { margin: 0 0 0.35rem; font-size: 1.65rem; font-weight: 800; letter-spacing: -0.035em; line-height: 1.2; }
+  .event-empty { border-left: 1px solid var(--ai-border-strong); padding-left: 2rem; }
+  .event-empty h3 { margin: 0 0 0.45rem; font-size: 1.1rem; font-weight: 750; }
+  .event-empty p { margin: 0 0 0.25rem; max-width: 42rem; color: var(--ai-fg-muted); line-height: 1.6; }
+  .event-row { display: grid; grid-template-columns: 6rem 1fr auto; align-items: center; gap: 1rem; padding: 1rem 0; color: var(--ai-fg); text-decoration: none; border-bottom: 1px solid var(--ai-border); }
+  .event-row time { color: var(--ai-link); font-size: 0.9rem; font-weight: 750; }
+  .event-row strong { display: block; font-weight: 750; }
+  .event-row > span > span { display: block; margin-top: 0.3rem; color: var(--ai-fg-muted); font-size: 0.9rem; }
+  .event-row:hover strong { text-decoration: underline; text-underline-offset: 0.2em; }
   @media (max-width: 720px) {
-    .event-row {
-      grid-template-columns: 1fr;
-    }
+    .events-preview { padding: 2rem 1.2rem; }
+    .events-preview__inner { grid-template-columns: 1fr; gap: 1.25rem; }
+    .event-empty { border-left: 0; border-top: 1px solid var(--ai-border-strong); padding: 1.25rem 0 0; }
+    .event-row { grid-template-columns: 4.5rem 1fr auto; gap: 0.75rem; }
   }
-
-
 </style>

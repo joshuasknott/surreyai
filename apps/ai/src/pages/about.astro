@@ -1,5 +1,4 @@
 ---
-return Astro.redirect('/#about', 302);
 export const prerender = true;
 import { Image } from "astro:assets";
 import Layout from "../layouts/Layout.astro";
@@ -60,7 +59,7 @@ const pathways = [
         <p class="ai-photo-hero__eyebrow">About the society</p>
         <h1 id="about-title">About the society</h1>
         <p>
-          Surrey AI Society is a student-led society under Surrey Students' Union. We make space for students to learn practical skills, work on data-driven projects, explore modern AI tools, and discuss how these systems affect the world around them.
+          Surrey AI Society is a student-led society under Surrey Students' Union. Come to learn practical skills, try modern AI tools, build data-driven projects, and talk with other students about how these systems shape the world around us.
         </p>
       </div>
     </div>
@@ -71,10 +70,10 @@ const pathways = [
       <div class="mission-panel">
         <h2 id="mission-title">Our mission</h2>
         <p>
-          AI literacy now reaches well beyond computing. It shapes study, work, creativity, research, and everyday decisions. We help students build enough understanding to take part with confidence, whether they are writing their first script or already experimenting with models.
+          AI now shapes study, work, creativity, research, and everyday decisions. We help students build the understanding to take part with confidence, whether they are writing their first script or already experimenting with models.
         </p>
         <p>
-          That means mixing beginner-friendly explainers with workshops, tutorials, competitions, project collaboration, career awareness, and enough ethical judgement to ask whether a system should be built at all.
+          That means combining beginner-friendly explainers with workshops, tutorials, competitions, project collaboration, career conversations, and the judgement to ask whether a system should be built at all.
         </p>
       </div>
       <div class="mission-proof" aria-label="Mission emphasis">
@@ -99,7 +98,7 @@ const pathways = [
       <div class="ai-section__header">
         <h2 id="principles-title" class="section-title">How we work</h2>
         <p class="section-intro">
-          Each activity should help students understand something, make something, meet someone, or judge a technology more clearly than before.
+          Come to learn a tool, make a prototype, meet people who share your interests, or ask better questions about the technology you use.
         </p>
       </div>
 
@@ -124,7 +123,7 @@ const pathways = [
           <h2 id="route-title" class="section-title">Ways to get involved</h2>
         </div>
         <p class="section-intro">
-          The society should be clear enough for a beginner, useful enough for a builder, relevant enough for career-minded students, and serious enough for anyone thinking about impact.
+          Start with the format that suits you: learn the foundations, build something with other students, or connect your technical interests to people and impact.
         </p>
       </div>
 
@@ -144,8 +143,8 @@ const pathways = [
 <style>
   .mission-grid {
     display: grid;
-    grid-template-columns: minmax(0, 0.82fr) minmax(18rem, 0.58fr);
-    gap: clamp(2rem, 5vw, 4rem);
+    grid-template-columns: minmax(0, 0.9fr) minmax(16rem, 0.64fr);
+    gap: clamp(2rem, 5vw, 4.5rem);
     align-items: stretch;
   }
 
@@ -158,7 +157,8 @@ const pathways = [
   .mission-panel h2 {
     margin: 0 0 1rem;
     color: var(--ai-fg);
-    font-size: clamp(1.75rem, 3.6vw, 3.1rem);
+    font-size: clamp(1.8rem, 3.2vw, 2.6rem);
+    font-weight: 800;
     letter-spacing: 0;
     line-height: 1.1;
   }
@@ -205,7 +205,7 @@ const pathways = [
 
   .mission-proof span {
     display: block;
-    color: var(--ai-azure);
+    color: var(--ai-link);
     font-size: 0.78rem;
     font-weight: 850;
     text-transform: uppercase;
@@ -225,7 +225,7 @@ const pathways = [
 
   .principle-row {
     display: grid;
-    grid-template-columns: 5rem 1fr;
+    grid-template-columns: 4rem minmax(0, 1fr);
     gap: 1.5rem;
     padding: clamp(1.4rem, 3vw, 2rem);
   }
@@ -235,7 +235,7 @@ const pathways = [
   }
 
   .principle-row > span {
-    color: var(--ai-azure);
+    color: var(--ai-link);
     font-weight: 850;
   }
 
@@ -244,6 +244,7 @@ const pathways = [
     margin: 0 0 0.45rem;
     color: var(--ai-fg);
     font-size: 1.25rem;
+    font-weight: 800;
     letter-spacing: 0;
   }
 
@@ -278,6 +279,19 @@ const pathways = [
     .principle-row,
     .route-grid {
       grid-template-columns: 1fr;
+    }
+
+    .mission-grid {
+      gap: 2rem;
+    }
+
+    .principle-row {
+      gap: 0.8rem;
+      padding-inline: 0;
+    }
+
+    .route-grid {
+      gap: 2rem;
     }
   }
 </style>

@@ -28,10 +28,12 @@ const fullTitle = `${title} — ${siteName}`;
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
 
 const navLinks = [
-  { href: '/#about', label: 'About' },
+  { href: '/about', label: 'About' },
+  { href: '/events', label: 'Events' },
   { href: '/#projects', label: 'Projects' },
-  { href: '/#join', label: 'Join' },
+  { href: '/join', label: 'Join' },
 ];
+const footerLinks = [...navLinks.slice(0, 3), { href: '/committee', label: 'Committee' }, navLinks[3]];
 
 const footerName = 'Surrey Artificial Intelligence Society';
 ---
@@ -66,7 +68,8 @@ const footerName = 'Surrey Artificial Intelligence Society';
           {navLinks.map(link => (
             <a
               href={link.href}
-              class="site-nav-link px-3.5 py-2 text-sm font-semibold border border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan transition-colors"
+              class:list={["site-nav-link px-3.5 py-2 text-sm font-semibold border border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan transition-colors", { 'is-active': Astro.url.pathname === link.href, 'site-nav-link--join': link.label === 'Join' }]}
+              aria-current={Astro.url.pathname === link.href ? 'page' : undefined}
             >
               {link.label}
             </a>
@@ -95,6 +98,7 @@ const footerName = 'Surrey Artificial Intelligence Society';
         {navLinks.map(link => (
           <a
             href={link.href}
+            aria-current={Astro.url.pathname === link.href ? 'page' : undefined}
             class="px-4 py-3 text-base font-semibold rounded-xl border border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan transition-colors"
           >
             {link.label}
@@ -115,20 +119,20 @@ const footerName = 'Surrey Artificial Intelligence Society';
   <!-- Footer -->
   <footer class="site-footer mt-auto">
     <div class="mx-auto max-w-7xl px-6 py-12">
-      <div class="grid sm:grid-cols-3 gap-8 mb-8">
-        <div>
+      <div class="site-footer__grid grid grid-cols-2 sm:grid-cols-3 gap-8 mb-8">
+        <div class="col-span-2 sm:col-span-1">
           <div class="footer-brand mb-5">
             <BrandLogo variant="light" priority />
           </div>
           <p class="text-sm leading-relaxed max-w-xs">
-            A student-led community for anyone curious about artificial intelligence, machine learning and data science, whatever their degree or experience.
+            Learn, build and question AI with students from across Surrey. Every degree and experience level welcome.
           </p>
           <p class="mt-3 text-xs font-semibold uppercase tracking-widest text-ai-cyan">Established {society.establishedYear}</p>
         </div>
         <div>
           <h4 class="text-ai-fg font-semibold mb-3 text-sm">Explore</h4>
           <nav aria-label="Footer navigation" class="flex flex-col gap-2">
-            {navLinks.map(link => (
+            {footerLinks.map(link => (
               <a href={link.href} class="text-sm hover:text-ai-cyan transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-cyan w-max rounded">{link.label}</a>
             ))}
           </nav>
@@ -157,6 +161,7 @@ const footerName = 'Surrey Artificial Intelligence Society';
     const btn = document.getElementById('ai-mobile-menu-btn');
     const menu = document.getElementById('ai-mobile-menu');
     const icon = document.getElementById('ai-menu-icon');
+    const header = btn?.closest('header');
 
     const closeMenu = () => {
       menu?.classList.add('hidden');
@@ -180,9 +185,27 @@ const footerName = 'Surrey Artificial Intelligence Society';
       } else {
         menu?.classList.remove('hidden');
         if (icon) icon.setAttribute('d', 'M6 18L18 6M6 6l12 12');
+        menu?.querySelector<HTMLAnchorElement>('a')?.focus();
       }
     });
 
     menu?.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMenu));
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && btn?.getAttribute('aria-expanded') === 'true') {
+        closeMenu();
+        btn.focus();
+      }
+    });
+    document.addEventListener('click', (event) => {
+      if (event.target instanceof Node && !header?.contains(event.target)) closeMenu();
+    });
+    header?.addEventListener('focusout', () => {
+      requestAnimationFrame(() => {
+        if (!header.contains(document.activeElement)) closeMenu();
+      });
+    });
+    window.matchMedia('(min-width: 768px)').addEventListener('change', (event) => {
+      if (event.matches) closeMenu();
+    });
   </script>
 </BaseLayout>

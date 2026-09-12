@@ -1,319 +1,94 @@
 ---
-return Astro.redirect('/#about', 302);
 export const prerender = false;
-import { Image } from "astro:assets";
-import Layout from "../layouts/Layout.astro";
-import { queryPublicConvex } from "@surreysocieties/admin";
-import { api } from "../../../../convex/_generated/api.js";
-import { getSocietyById } from "@surreysocieties/admin/config";
-import eventsHero from "../assets/generated/ai-join-campus-sketch-hero.optimized.webp";
-import "../styles/global.css";
+import { Image } from 'astro:assets';
+import Layout from '../layouts/Layout.astro';
+import { queryPublicConvex } from '@surreysocieties/admin';
+import { api } from '../../../../convex/_generated/api.js';
+import { getSocietyById } from '@surreysocieties/admin/config';
+import eventsHero from '../assets/generated/ai-join-campus-sketch-hero.optimized.webp';
+import '../styles/global.css';
 
-const SOCIETY_ID = "ai";
-Astro.response.headers.set("Cache-Control", "public, s-maxage=300, stale-while-revalidate=3600");
-const society = getSocietyById(SOCIETY_ID)!;
-const events: any[] = await queryPublicConvex(api.events.listPublished, { societySlug: SOCIETY_ID }, []);
-
-const formatEventDate = (date?: string) => {
-  if (!date) return "Date not published";
-  const parsed = new Date(`${date}T00:00:00`);
-  if (Number.isNaN(parsed.getTime())) return "Date not published";
-  return parsed.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=3600');
+const society = getSocietyById('ai')!;
+const events = await queryPublicConvex(api.events.listPublished, { societySlug: 'ai' }, []);
+const formatDate = (date?: string) => {
+  const parsed = new Date((date || '') + 'T00:00:00');
+  return Number.isNaN(parsed.getTime()) ? 'Date to be announced' : parsed.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 };
-
-const programmeFormats = [
-  {
-    title: "Workshops and tutorials",
-    text: "Hands-on sessions covering practical artificial intelligence skills, from Python and machine learning to evaluation and data analysis.",
-  },
-  {
-    title: "Challenges and project nights",
-    text: "Collaborative sessions for coding challenges, data science practice, prototypes, portfolio projects, and member demos.",
-  },
-  {
-    title: "Talks, careers, and socials",
-    text: "Guest sessions, career conversations, responsible AI discussions, quizzes, casual coding nights, and meetups for the community.",
-  },
+const formats = [
+  ['Workshops and tutorials', 'Get hands-on with AI tools, Python, machine learning and data analysis. Beginner sessions help you find a starting point.'],
+  ['Projects and challenges', 'Bring an idea, build with other students and share what you make. Try a challenge or develop a portfolio project.'],
+  ['Talks, careers and socials', 'Hear from speakers, explore the impact of AI and meet people with shared interests.'],
 ];
 ---
 
-<Layout
-  title="Events"
-  description="Upcoming artificial intelligence workshops, project sessions, competitions, talks, careers activity, and socials from Surrey Artificial Intelligence Society."
->
+<Layout title="Events" description="Discover AI workshops, project nights, talks and socials from Surrey Artificial Intelligence Society.">
   <section class="ai-photo-hero ai-photo-hero--events" aria-labelledby="events-hero-title">
-    <Image
-      src={eventsHero}
-      alt=""
-      aria-hidden="true"
-      class="ai-photo-hero__image"
-      widths={[640, 960, 1440, 1800]}
-      sizes="100vw"
-      loading="eager"
-      decoding="async"
-      fetchpriority="high"
-      format="webp"
-      quality={72}
-    />
-    <div class="ai-photo-hero__inner">
-      <div class="ai-photo-hero__copy">
-        <p class="ai-photo-hero__eyebrow">Events</p>
+    <Image src={eventsHero} alt="" aria-hidden="true" class="ai-photo-hero__image" widths={[640, 960, 1440, 1800]} sizes="100vw" loading="eager" fetchpriority="high" format="webp" quality={72} />
+    <div class="ai-photo-hero__inner"><div class="ai-photo-hero__copy">
+      <p class="ai-photo-hero__eyebrow">What's on</p>
       <h1 id="events-hero-title">Events and workshops</h1>
-      <p>
-        Confirmed sessions appear when committee members publish them. The programme is built around learning by seeing, building, testing, competing, meeting people, and debating real AI and data workflows.
-      </p>
-    </div>
+      <p>Learn something new, try an idea and meet other students. Find published dates and joining details below.</p>
+      <a href="#event-listings" class="btn-primary events-hero__link">Browse events</a>
+    </div></div>
+  </section>
+
+  <section id="event-listings" class="ai-section" aria-labelledby="events-title">
+    <div class="ai-section__inner">
+      <div class="ai-section__header ai-section__header--split">
+        <h2 id="events-title" class="section-title">Society events</h2>
+        <a href={society.socials.instagram} target="_blank" rel="noopener noreferrer" class="text-link">Follow event announcements &rarr;</a>
+      </div>
+      {events.length ? (
+        <div class="event-directory">
+          {events.map(event => (
+            <article id={'event-' + event._id} class:list={['event-entry', { 'event-entry--image': event.imageUrl }]}>
+              <time datetime={event.date}>{formatDate(event.date)}</time>
+              <div class="event-entry__body">
+                <p class="event-entry__meta">{[event.startTime && [event.startTime, event.endTime].filter(Boolean).join('–'), event.location, event.category].filter(Boolean).join(' · ') || 'More details coming soon'}</p>
+                <h3>{event.title}</h3>
+                {event.description && <p>{event.description}</p>}
+                {event.registrationUrl && <a href={event.registrationUrl} target="_blank" rel="noopener noreferrer" class="text-link">Register for this event &rarr;</a>}
+              </div>
+              {event.imageUrl && <img src={event.imageUrl} alt="" loading="lazy" />}
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div class="calendar-empty">
+          <div><h3>New dates are on the way.</h3><p>No events are listed at the moment. Follow @surreyaisociety for announcements, or join the society so you're ready for the next session.</p></div>
+          <a href="/join" class="btn-primary">Join the society</a>
+        </div>
+      )}
     </div>
   </section>
 
   <section class="ai-section ai-section--tinted" aria-labelledby="formats-title">
     <div class="ai-section__inner">
-      <div class="ai-section__header ai-section__header--split">
-        <h2 id="formats-title" class="section-title">Event formats</h2>
-        <p class="section-intro">
-          The calendar can shift each semester, but these are the types of activities the society is built to support.
-        </p>
-      </div>
-
-      <div class="format-list">
-        {programmeFormats.map((format, index) => (
-          <article>
-            <span>{String(index + 1).padStart(2, "0")}</span>
-            <div>
-              <h3>{format.title}</h3>
-              <p>{format.text}</p>
-            </div>
-          </article>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <section class="ai-section" aria-labelledby="events-title">
-    <div class="ai-section__inner">
-      <div class="ai-section__header ai-section__header--split">
-        <div>
-          <h2 id="events-title" class="section-title">Confirmed events</h2>
-          <p class="section-intro">Event listings appear once dates, locations, and joining details are confirmed.</p>
-        </div>
-        <a href={society.socials.instagram} target="_blank" rel="noopener noreferrer" class="text-link">
-          Follow updates on Instagram &rarr;
-        </a>
-      </div>
-
-      {events.length === 0 ? (
-        <div class="calendar-empty">
-          <div class="calendar-empty__copy">
-            <h3>Next events will appear here once confirmed.</h3>
-            <p>
-              Confirmed event details will appear once committee members add them. Join the society or follow the socials for verified updates.
-            </p>
-            <div class="calendar-empty__actions">
-              <a href="/join" class="btn-primary">Join the Society</a>
-              <a href={society.studentsUnionUrl} target="_blank" rel="noopener noreferrer" class="btn-secondary">Students' Union page</a>
-            </div>
-          </div>
-          <div class="calendar-empty__board" aria-label="Planned event formats">
-            <span>Workshops and tutorials</span>
-            <span>Challenges and project nights</span>
-            <span>Talks, careers, and socials</span>
-          </div>
-        </div>
-      ) : (
-        <div class="event-directory">
-          {events.map((event) => (
-            <article class="event-entry">
-              <time>{formatEventDate(event.date)}</time>
-              <div class="event-entry__body">
-                <p class="event-entry__meta">
-                  {[event.startTime, event.endTime, event.location, event.category].filter(Boolean).join(" / ") || "Details to be announced"}
-                </p>
-                <h2>{event.title}</h2>
-                <p>{event.description || "Details to be announced."}</p>
-                {event.registrationUrl && (
-                  <a href={event.registrationUrl} target="_blank" rel="noopener noreferrer" class="text-link">Register &rarr;</a>
-                )}
-              </div>
-              {event.imageUrl && (
-                <img src={event.imageUrl} alt="" loading="lazy" />
-              )}
-            </article>
-          ))}
-        </div>
-      )}
+      <div class="ai-section__header"><h2 id="formats-title" class="section-title">What to expect</h2><p class="section-intro">From a first workshop to a project of your own.</p></div>
+      <div class="format-list">{formats.map(([title, text]) => <article><h3>{title}</h3><p>{text}</p></article>)}</div>
     </div>
   </section>
 </Layout>
 
 <style>
-  .events-hero {
-    display: grid;
-    grid-template-columns: minmax(0, 0.86fr) minmax(22rem, 1fr);
-    gap: clamp(2rem, 5vw, 4rem);
-    align-items: center;
-    max-width: 82rem;
-    margin: 0 auto;
-    padding: clamp(5rem, 9vw, 8rem) 1.25rem clamp(3rem, 6vw, 5rem);
-  }
-
-  .events-hero__copy h1 {
-    margin: 0;
-    color: var(--ai-fg);
-    font-size: clamp(2.1rem, 4vw, 3.6rem);
-    font-weight: 850;
-    letter-spacing: 0;
-    line-height: 1.08;
-  }
-
-  .events-hero__copy p {
-    max-width: 42rem;
-    margin: 1.3rem 0 0;
-    color: var(--ai-fg-muted);
-    font-size: 1.12rem;
-    line-height: 1.65;
-  }
-
-  .format-list {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: clamp(1.25rem, 3vw, 2rem);
-  }
-
-  .format-list article {
-    border-top: 3px solid var(--ai-azure);
-    padding-top: 1.25rem;
-  }
-
-  .format-list article:nth-child(2) {
-    border-top-color: var(--ai-sage);
-  }
-
-  .format-list article:nth-child(3) {
-    border-top-color: var(--ai-coral);
-  }
-
-  .format-list span {
-    color: var(--ai-azure);
-    font-weight: 850;
-  }
-
-  .format-list h3 {
-    margin: 0.75rem 0 0.45rem;
-    color: var(--ai-fg);
-    font-size: 1.2rem;
-    letter-spacing: 0;
-  }
-
-  .format-list p {
-    margin: 0;
-    color: var(--ai-fg-muted);
-    line-height: 1.6;
-  }
-
-  .calendar-empty {
-    display: grid;
-    grid-template-columns: minmax(0, 0.88fr) minmax(20rem, 0.82fr);
-    gap: clamp(1.5rem, 4vw, 3rem);
-    align-items: center;
-  }
-
-  .calendar-empty h3 {
-    margin: 0 0 0.85rem;
-    color: var(--ai-fg);
-    font-size: clamp(1.9rem, 3.6vw, 3rem);
-    letter-spacing: 0;
-    line-height: 1.08;
-  }
-
-  .calendar-empty p {
-    max-width: 42rem;
-    color: var(--ai-fg-muted);
-    line-height: 1.65;
-  }
-
-  .calendar-empty__actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-top: 1.8rem;
-  }
-
-  .calendar-empty__board {
-    display: grid;
-    gap: 0.9rem;
-    padding: clamp(1.2rem, 3vw, 1.8rem);
-    border: 1px solid var(--ai-border);
-    border-radius: 1.2rem;
-    background:
-      radial-gradient(circle at 88% 10%, color-mix(in srgb, var(--ai-azure) 14%, transparent), transparent 11rem),
-      var(--ai-surface);
-  }
-
-  .calendar-empty__board span {
-    display: block;
-    padding: 1rem;
-    border: 1px solid var(--ai-border);
-    border-radius: 0.9rem;
-    background: color-mix(in srgb, var(--ai-bg) 74%, var(--ai-surface));
-    color: var(--ai-fg);
-    font-weight: 850;
-  }
-
-  .event-directory {
-    border-top: 1px solid var(--ai-border);
-  }
-
-  .event-entry {
-    display: grid;
-    grid-template-columns: 13rem 1fr minmax(9rem, 14rem);
-    gap: 2rem;
-    padding: clamp(1.5rem, 3vw, 2.25rem);
-    border-bottom: 1px solid var(--ai-border);
-  }
-
-  .event-entry time {
-    color: var(--ai-azure);
-    font-weight: 850;
-  }
-
-  .event-entry__meta {
-    color: var(--ai-fg-muted);
-    font-size: 0.9rem;
-    font-weight: 700;
-    margin: 0 0 0.55rem;
-  }
-
-  .event-entry h2 {
-    margin: 0 0 0.65rem;
-    color: var(--ai-fg);
-    font-size: clamp(1.45rem, 3vw, 2rem);
-    letter-spacing: 0;
-  }
-
-  .event-entry p {
-    color: var(--ai-fg-muted);
-    line-height: 1.65;
-  }
-
-  .event-entry img {
-    width: 100%;
-    min-height: 8rem;
-    border-radius: 1rem;
-    object-fit: cover;
-  }
-
-  @media (max-width: 900px) {
-    .events-hero,
-    .format-list,
-    .calendar-empty {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  @media (max-width: 720px) {
-    .event-entry {
-      grid-template-columns: 1fr;
-      gap: 0.75rem;
-    }
-  }
+  .events-hero__link { margin-top: 1.75rem; }
+  .calendar-empty { display: flex; justify-content: space-between; align-items: center; gap: 2rem; padding: 2rem; border: 1px solid var(--ai-border); background: var(--ai-surface); }
+  .calendar-empty h3 { margin: 0 0 0.75rem; font-size: 1.6rem; font-weight: 750; letter-spacing: -0.025em; }
+  .calendar-empty p { margin: 0; max-width: 40rem; color: var(--ai-fg-muted); line-height: 1.65; }
+  .calendar-empty a { flex-shrink: 0; }
+  .format-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2rem; }
+  .format-list article { border-top: 2px solid var(--ai-accent); padding-top: 1.25rem; }
+  .format-list h3 { margin: 0 0 0.75rem; font-weight: 750; font-size: 1.25rem; line-height: 1.3; }
+  .format-list p { margin: 0; color: var(--ai-fg-muted); line-height: 1.65; }
+  .event-directory { border-top: 1px solid var(--ai-border); }
+  .event-entry { display: grid; grid-template-columns: 12rem minmax(0, 1fr); gap: 2rem; padding: 2rem 0; border-bottom: 1px solid var(--ai-border); scroll-margin-top: 6rem; }
+  .event-entry--image { grid-template-columns: 12rem minmax(0, 1fr) 12rem; }
+  .event-entry time { color: var(--ai-link); font-weight: 750; }
+  .event-entry h3 { margin: 0 0 0.75rem; font-size: 1.6rem; font-weight: 750; line-height: 1.2; }
+  .event-entry p { color: var(--ai-fg-muted); line-height: 1.65; overflow-wrap: anywhere; }
+  .event-entry__meta { margin: 0 0 0.5rem; font-size: 0.9rem; }
+  .event-entry img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 4px; }
+  @media (max-width: 820px) { .format-list { grid-template-columns: 1fr; } .calendar-empty { align-items: flex-start; flex-direction: column; } }
+  @media (max-width: 640px) { .calendar-empty { padding: 1.25rem; } .calendar-empty a { width: 100%; } .event-entry, .event-entry--image { grid-template-columns: 1fr; gap: 0.75rem; } }
 </style>

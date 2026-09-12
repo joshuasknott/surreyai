@@ -8,12 +8,12 @@ const society = getSocietyById("ai")!;
   <div class="join-strip__inner">
     <div class="join-strip__copy">
       <p class="section-number section-number--ink" aria-hidden="true">04</p>
-      <h2 id="join-strip-title">Learn, build and help shape what comes next.</h2>
-      <span>Join us for beginner-friendly workshops, collaborative projects, talks, challenges and socials. Come with experience, curiosity or simply a question you want to explore.</span>
+      <h2 id="join-strip-title">Find your place in AI.</h2>
+      <span>Join through Surrey Students' Union, then come along to a workshop, project session or social. All degrees and experience levels welcome.</span>
     </div>
     <div class="join-strip__actions">
-      <a href={`mailto:${society.contactEmail}`} class="join-strip__primary">Ask us a question</a>
-      <a href={society.membershipUrl} target="_blank" rel="noopener noreferrer" class="join-strip__secondary">Join through Students&apos; Union</a>
+      <a href={society.membershipUrl} target="_blank" rel="noopener noreferrer" class="join-strip__primary">Join through Students&apos; Union</a>
+      <a href={`mailto:${society.contactEmail}`} class="join-strip__secondary">Ask us a question</a>
     </div>
   </div>
 </section>
@@ -44,8 +44,8 @@ const society = getSocietyById("ai")!;
     color: #111111;
     font-size: clamp(2.1rem, 4vw, 3.6rem);
     font-weight: 850;
-    letter-spacing: -0.055em;
-    line-height: 1;
+    letter-spacing: -0.035em;
+    line-height: 1.08;
   }
 
   .join-strip__copy span {
@@ -81,6 +81,7 @@ const society = getSocietyById("ai")!;
 
   .join-strip__primary { background: #111111; color: #faf8f3; }
   .join-strip__secondary { background: #faf8f3; color: #111111; }
+  .join-strip__actions a:focus-visible { outline: 3px solid #111111; outline-offset: 4px; }
 
   @media (max-width: 840px) {
     .join-strip__inner { grid-template-columns: 1fr; }

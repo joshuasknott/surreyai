@@ -1,10 +1,12 @@
 import { expect, test, type Page } from '@playwright/test';
+import { mkdir } from 'node:fs/promises';
+import { join } from 'node:path';
 
 const publicRoutes = ['/', '/about', '/committee', '/events', '/join'] as const;
 const primaryNavLinks = {
-  ai: ['About', 'Projects', 'Join'],
-  business: ['About', 'Activities', 'Join'],
-  neurotech: ['What we do', 'Updates', 'Contact'],
+  ai: ['About', 'Events', 'Projects', 'Join'],
+  business: ['About', 'Activities', 'Events', 'Join'],
+  neurotech: ['What we do', 'Events', 'About', 'Committee', 'Updates', 'Contact'],
 } as const;
 const mojibakePattern = /[âÃÂ\uFFFD]|ðŸ|ï¿½/;
 
@@ -36,6 +38,13 @@ function url(origin: string, path: string) {
   return `${origin}${path}`;
 }
 
+async function captureRefinementEvidence(page: Page, name: string, fullPage = false) {
+  const directory = process.env.REFINEMENT_EVIDENCE_DIR;
+  if (!directory) return;
+  await mkdir(directory, { recursive: true });
+  await page.screenshot({ path: join(directory, `${name}.png`), fullPage });
+}
+
 async function expectNoHorizontalOverflow(page: Page) {
   const overflow = await page.evaluate(() => ({
     html: document.documentElement.scrollWidth - window.innerWidth,
@@ -49,6 +58,7 @@ async function expectNoHorizontalOverflow(page: Page) {
 async function expectNoBrokenPublicText(page: Page) {
   const text = await page.locator('body').innerText();
   expect(text).not.toMatch(mojibakePattern);
+  expect(text).not.toContain('return Astro.redirect');
 }
 
 async function expectNoHashLinks(page: Page) {
@@ -108,6 +118,7 @@ for (const site of sites) {
 
         const response = await page.goto(url(site.origin, route), { waitUntil: 'domcontentloaded' });
         expect(response?.status(), `${site.name} ${route} status`).toBe(200);
+        expect(new URL(page.url()).pathname.replace(/\/$/, '') || '/').toBe(route);
         await expect(page.locator('main')).toHaveCount(1);
         await expect(page.locator('main')).toBeVisible();
         await expect(page.locator('main h1')).toHaveCount(1);
@@ -117,6 +128,11 @@ for (const site of sites) {
         await expectNoHashLinks(page);
         await expectNoHorizontalOverflow(page);
         await expectAccessibilityBasics(page);
+        await captureRefinementEvidence(page, `${site.key}-${route.slice(1) || 'home'}-mobile`, true);
+
+        await page.setViewportSize({ width: 1440, height: 1000 });
+        await expectNoHorizontalOverflow(page);
+        await captureRefinementEvidence(page, `${site.key}-${route.slice(1) || 'home'}-desktop`, true);
       });
     }
 
@@ -157,6 +173,24 @@ for (const site of sites) {
       for (const label of expectedLinks) {
         await expect(page.getByRole('link', { name: new RegExp(`^${label}$`, 'i') }).first()).toBeVisible();
       }
+      const menuId = await menuButton.getAttribute('aria-controls');
+      const menu = page.locator(`#${menuId}`);
+      const menuBox = await menu.boundingBox();
+      for (const link of await menu.locator('a').all()) {
+        const box = await link.boundingBox();
+        expect(box?.y ?? -1).toBeGreaterThanOrEqual(menuBox?.y ?? 0);
+        expect((box?.y ?? 0) + (box?.height ?? 0)).toBeLessThanOrEqual((menuBox?.y ?? 0) + (menuBox?.height ?? 0) + 1);
+      }
+      await captureRefinementEvidence(page, `${site.key}-mobile-menu`);
+      await page.keyboard.press('Escape');
+      await expect(menu).toBeHidden();
+      await expect(menuButton).toBeFocused();
+      await expect(menuButton).toHaveAttribute('aria-expanded', 'false');
+      await menuButton.click();
+      await page.setViewportSize({ width: 1152, height: 768 });
+      await expect(menu).toBeHidden();
+      await page.setViewportSize({ width: 320, height: 740 });
+      await expectNoHorizontalOverflow(page);
     });
 
     test('keyboard skip link and reduced-motion mode work', async ({ page }) => {
@@ -168,6 +202,7 @@ for (const site of sites) {
       const focusedElement = page.locator(':focus');
       await expect(focusedElement).toHaveAttribute('href', '#main-content');
       await expect(focusedElement).toBeVisible();
+      await captureRefinementEvidence(page, `${site.key}-keyboard-reduced-motion`);
 
       const motion = await page.evaluate(() => {
         const durationMs = (value: string) => Math.max(...value.split(',').map((duration) => {
@@ -195,6 +230,8 @@ for (const site of sites) {
       const membershipLink = page.locator(`a[href="${site.joinUrl}"]`).first();
       await expect(membershipLink).toBeVisible();
       await expect(membershipLink).toHaveAttribute('target', '_blank');
+      await membershipLink.hover();
+      await captureRefinementEvidence(page, `${site.key}-membership-hover`);
     });
 
     test('assistant opens, closes, and is usable on mobile', async ({ page }) => {
@@ -217,6 +254,64 @@ for (const site of sites) {
       await page.locator('[data-assistant-widget] .assistant-close').click();
       await expect(panel).toBeHidden();
       await expect(toggle).toBeVisible();
+    });
+
+    test('assistant handles loading, service errors, retry and reset without losing close focus', async ({ page }) => {
+      await page.setViewportSize({ width: 390, height: 844 });
+      let releaseResponse!: () => void;
+      const responseGate = new Promise<void>((resolve) => { releaseResponse = resolve; });
+      let attempts = 0;
+      await page.route('**/api/assistant/chat', async (route) => {
+        attempts += 1;
+        if (attempts === 1) {
+          await responseGate;
+          await route.fulfill({ status: 503, json: { message: 'The assistant is unavailable right now. Please try again shortly.' } });
+        } else {
+          await route.fulfill({ status: 200, json: { message: 'Find confirmed dates on the Events page.' } });
+        }
+      });
+      await page.goto(site.origin, { waitUntil: 'domcontentloaded' });
+      const widget = page.locator('[data-assistant-widget]');
+      const toggle = widget.locator('.assistant-toggle');
+      const panel = widget.locator('.assistant-panel');
+      const input = widget.locator('.assistant-input');
+      const send = widget.locator('.assistant-send');
+      const reset = widget.locator('.assistant-reset');
+      const recovery = widget.locator('.assistant-recovery');
+      await toggle.click();
+      await expect(input).toBeFocused();
+      await expect(send).toBeDisabled();
+      await input.fill('   ');
+      await expect(send).toBeDisabled();
+      await input.fill('What events are coming up?');
+      await expect(send).toBeEnabled();
+      await send.click();
+      await expect(widget.locator('.assistant-message.loading')).toBeVisible();
+      await expect(widget.locator('.assistant-starters')).toBeHidden();
+      await expect(reset).toBeDisabled();
+      await expect(input).toBeDisabled();
+      await captureRefinementEvidence(page, `${site.key}-assistant-loading`);
+      await widget.locator('.assistant-close').click();
+      await expect(toggle).toBeFocused();
+      releaseResponse();
+      await expect(widget.locator('.assistant-message.error')).toHaveText(/unavailable/);
+      await expect(panel).toBeHidden();
+      await expect(toggle).toBeFocused();
+      await toggle.click();
+      await expect(recovery).toBeVisible();
+      await expect(recovery.getByRole('link', { name: /Events/ })).toHaveAttribute('href', '/events');
+      await expect(recovery.getByRole('link', { name: /Join/ })).toHaveAttribute('href', '/join');
+      await captureRefinementEvidence(page, `${site.key}-assistant-error`);
+      await input.fill('Where are the confirmed dates?');
+      await send.click();
+      await expect(widget.locator('.assistant-message.assistant')).toContainText('Events page');
+      await expect(recovery).toBeHidden();
+      await reset.click();
+      await expect(widget.locator('.assistant-message')).toHaveCount(0);
+      await expect(widget.locator('.assistant-starters')).toBeVisible();
+      await expect(send).toBeDisabled();
+      await expect(input).toBeFocused();
+      expect(attempts).toBe(2);
     });
 
     test('admin access is blocked while login and invite states render', async ({ page }) => {
@@ -266,6 +361,27 @@ for (const site of sites) {
           }).length,
         );
         expect(hiddenContent).toBe(0);
+      });
+    }
+
+    if (site.key === 'neurotech') {
+      test('BCI diagram keeps its explanations visible on compact screens', async ({ page }) => {
+        await page.setViewportSize({ width: 390, height: 844 });
+        await page.goto(site.origin, { waitUntil: 'domcontentloaded' });
+        const diagram = page.getByRole('region', { name: 'A brain-computer interface, step by step' });
+        await diagram.scrollIntoViewIfNeeded();
+        const picture = diagram.getByRole('img');
+        await expect(picture).toBeVisible();
+        await expect.poll(() => picture.evaluate((image: HTMLImageElement) => image.naturalWidth)).toBeGreaterThan(0);
+        for (const explanation of [
+          'Measure electrical activity from the scalp.',
+          'Process signals into usable information.',
+          'Translate intent into an action.',
+        ]) {
+          await expect(diagram.getByText(explanation, { exact: true })).toBeVisible();
+        }
+        await expectNoHorizontalOverflow(page);
+        await captureRefinementEvidence(page, 'neurotech-bci-mobile');
       });
     }
 

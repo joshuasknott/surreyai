@@ -27,15 +27,15 @@ const eventTypes = [
     <div class="home-hero__copy">
       <p class="home-hero__kicker" data-hero-reveal>Surrey Artificial Intelligence Society</p>
       <h1 id="home-hero-title" class="home-hero__title" data-hero-reveal>
-        Learn it. Build it. <em>Question it.</em>
+        <span>Learn it.</span> <span>Build it.</span> <em>Question it.</em>
       </h1>
       <p class="home-hero__intro" data-hero-reveal>
-        A student-led community for anyone curious about artificial intelligence, machine learning and data science. Whatever your degree, experience or coding ability, you are welcome here.
+        Explore artificial intelligence, machine learning and data science with other Surrey students. Every degree welcome. No coding experience needed.
       </p>
 
       <div class="home-hero__actions" data-hero-reveal>
-        <a href="#join" class="btn-primary">Join the society</a>
-        <a href="#about" class="btn-secondary btn-secondary--dark">See what we do</a>
+        <a href="/join" class="btn-primary">Join the society</a>
+        <a href="/events" class="btn-secondary btn-secondary--dark">Explore events</a>
       </div>
 
       <div class="home-hero__proof" aria-label="Society highlights" data-hero-reveal>
@@ -98,8 +98,8 @@ const eventTypes = [
       animate(hero.querySelectorAll("[data-hero-reveal]"), {
         opacity: [0, 1],
         y: [18, 0],
-        duration: 760,
-        delay: stagger(70),
+        duration: 480,
+        delay: stagger(45),
         ease: "outCubic",
       });
     }
@@ -163,14 +163,14 @@ const eventTypes = [
   }
 
   .home-hero__title {
-    max-width: 10.5ch;
+    max-width: 100%;
     margin-top: 0;
     margin-bottom: 0;
     color: #faf8f3;
-    font-size: clamp(3.2rem, 5.45vw, 5.2rem);
+    font-size: clamp(3.2rem, 5vw, 4.65rem);
     font-weight: 850;
-    letter-spacing: -0.055em;
-    line-height: 0.98;
+    letter-spacing: -0.045em;
+    line-height: 1.02;
     text-wrap: balance;
   }
 
@@ -178,6 +178,9 @@ const eventTypes = [
     color: #ff4a00;
     font-style: normal;
   }
+
+  .home-hero__title span,
+  .home-hero__title em { display: inline-block; white-space: nowrap; }
 
   .home-hero__intro {
     max-width: 37rem;
@@ -326,8 +329,8 @@ const eventTypes = [
   .event-format p {
     margin: 0.45rem 0 0;
     color: rgba(17, 17, 17, 0.66);
-    font-size: 0.72rem;
-    line-height: 1.45;
+    font-size: 0.82rem;
+    line-height: 1.5;
   }
 
   [data-hero-reveal] { opacity: 1; }
@@ -341,8 +344,8 @@ const eventTypes = [
   @media (max-width: 880px) {
     .home-hero { padding-bottom: 0; }
     .home-hero__shell { grid-template-columns: 1fr; }
-    .home-hero__copy { padding: 4rem 1.2rem 3rem; }
-    .home-hero__copy::before { top: 4.2rem; bottom: 3.2rem; left: 1.2rem; }
+    .home-hero__copy { padding: 2.75rem 1.2rem 2.5rem; }
+    .home-hero__copy::before { top: 2.9rem; bottom: 2.7rem; left: 1.2rem; }
     .home-hero__title { max-width: 11ch; }
     .home-hero__stage { min-height: min(34rem, 88vw); }
     .home-hero__formats {
@@ -366,12 +369,12 @@ const eventTypes = [
   }
 
   @media (max-width: 540px) {
-    .home-hero__title { font-size: clamp(2.8rem, 14vw, 4rem); }
+    .home-hero__title { font-size: clamp(2.5rem, 12.8vw, 3.5rem); }
     .home-hero__actions { display: grid; }
     .home-hero__actions :global(.btn-primary),
     .home-hero__actions :global(.btn-secondary) { width: 100%; }
     .home-hero__proof { grid-template-columns: 1fr 1fr; }
-    .home-hero__stage { min-height: 24rem; }
+    .home-hero__stage { min-height: 20rem; }
   }
 
   @media (prefers-reduced-motion: reduce) {

@@ -1,5 +1,4 @@
 ---
-return Astro.redirect('/#join', 302);
 export const prerender = true;
 import { getSocietyById } from "@surreysocieties/admin/config";
 import { Image } from "astro:assets";
@@ -31,11 +30,11 @@ const faqs = [
 const membershipSteps = [
   {
     title: "Join through the Students' Union",
-    text: "Use the official membership page so your membership is recorded correctly.",
+    text: "Open the society's membership page and follow the Students' Union joining steps.",
   },
   {
     title: "Follow the society channels",
-    text: "Instagram and email are the confirmed routes for updates on workshops, competitions, talks, projects, and socials.",
+    text: "Follow @surreyaisociety on Instagram for new sessions and society announcements.",
   },
   {
     title: "Get involved",
@@ -68,7 +67,7 @@ const membershipSteps = [
         <p class="ai-photo-hero__eyebrow">Membership</p>
       <h1 id="join-hero-title">Join the society</h1>
       <p>
-        Membership is managed by Surrey Students' Union. Use the official membership page, then follow the society channels for event updates.
+        Meet people, learn something new and try an idea. Membership is managed by Surrey Students' Union and is open to students from every degree.
       </p>
       <div class="join-hero__actions">
         <a href={society.membershipUrl} target="_blank" rel="noopener noreferrer" class="btn-primary">Join via Students' Union</a>
@@ -83,7 +82,7 @@ const membershipSteps = [
       <div class="join-main">
         <h2 id="join-title">How to join</h2>
         <p>
-          Join if you want to learn AI, build prototypes, enter challenges, discuss impact, explore careers, or meet students working with similar tools.
+          Start with membership, then choose a session or project that interests you.
         </p>
         <div class="join-path">
           {membershipSteps.map((step, index) => (
@@ -99,28 +98,12 @@ const membershipSteps = [
       </div>
 
       <aside class="join-aside" aria-label="Society contact details">
-        <h2>Official contact routes</h2>
-        <p>Use these links for membership, updates, and society contact.</p>
+        <h2>Have a question?</h2>
+        <p>Get in touch about membership, accessibility or your first session.</p>
         <a href={`mailto:${society.contactEmail}`}>{society.contactEmail}</a>
         <a href={society.socials.instagram} target="_blank" rel="noopener noreferrer">@surreyaisociety</a>
         <a href={society.studentsUnionUrl} target="_blank" rel="noopener noreferrer">Students' Union page</a>
       </aside>
-    </div>
-  </section>
-
-  <section class="ai-section ai-section--tinted join-signal" aria-labelledby="join-signal-title">
-    <div class="ai-section__inner join-signal__inner">
-      <div>
-        <h2 id="join-signal-title" class="section-title">What members discuss</h2>
-        <p class="section-intro">
-          Sessions cover how data is made, how models behave, what outputs affect, and where human judgement still matters.
-        </p>
-      </div>
-      <div class="join-judgement" aria-label="Questions members learn to ask">
-        <span>Where did the data come from?</span>
-        <span>Who benefits from the output?</span>
-        <span>What should stay human?</span>
-      </div>
     </div>
   </section>
 
@@ -143,33 +126,6 @@ const membershipSteps = [
 </Layout>
 
 <style>
-  .join-hero {
-    display: grid;
-    grid-template-columns: minmax(0, 0.86fr) minmax(22rem, 1fr);
-    gap: clamp(2rem, 5vw, 4rem);
-    align-items: center;
-    max-width: 82rem;
-    margin: 0 auto;
-    padding: clamp(5rem, 9vw, 8rem) 1.25rem clamp(3rem, 6vw, 5rem);
-  }
-
-  .join-hero__copy h1 {
-    margin: 0;
-    color: var(--ai-fg);
-    font-size: clamp(2.1rem, 4vw, 3.6rem);
-    font-weight: 850;
-    letter-spacing: 0;
-    line-height: 1.08;
-  }
-
-  .join-hero__copy p {
-    max-width: 42rem;
-    margin: 1.3rem 0 0;
-    color: var(--ai-fg-muted);
-    font-size: 1.12rem;
-    line-height: 1.65;
-  }
-
   .join-hero__actions {
     display: flex;
     flex-wrap: wrap;
@@ -192,7 +148,8 @@ const membershipSteps = [
     margin: 0 0 1rem;
     color: var(--ai-fg);
     font-size: clamp(1.65rem, 3vw, 2.75rem);
-    letter-spacing: 0;
+    font-weight: 800;
+    letter-spacing: -0.035em;
     line-height: 1.1;
   }
 
@@ -222,7 +179,7 @@ const membershipSteps = [
   }
 
   .join-path span {
-    color: var(--ai-azure);
+    color: var(--ai-link);
     font-weight: 850;
   }
 
@@ -230,6 +187,7 @@ const membershipSteps = [
     margin: 0 0 0.35rem;
     color: var(--ai-fg);
     font-size: 1.15rem;
+    font-weight: 750;
     letter-spacing: 0;
   }
 
@@ -249,65 +207,15 @@ const membershipSteps = [
     margin: 0;
     color: var(--ai-fg);
     font-size: 1.6rem;
+    font-weight: 750;
     letter-spacing: 0;
   }
 
   .join-aside a {
-    color: var(--ai-azure);
+    color: var(--ai-link);
     font-weight: 800;
     text-decoration: none;
     word-break: break-word;
-  }
-
-  .join-signal__inner {
-    display: grid;
-    grid-template-columns: minmax(0, 0.78fr) minmax(22rem, 1fr);
-    gap: clamp(2rem, 5vw, 4rem);
-    align-items: center;
-  }
-
-  .join-judgement {
-    display: grid;
-    gap: 1rem;
-  }
-
-  .join-judgement span {
-    display: block;
-    padding: clamp(1.1rem, 3vw, 1.45rem);
-    border: 1px solid var(--ai-border);
-    border-radius: 1rem;
-    background:
-      linear-gradient(90deg, color-mix(in srgb, var(--ai-azure) 8%, transparent), transparent 46%),
-      var(--ai-bg);
-    color: var(--ai-fg);
-    font-weight: 850;
-    line-height: 1.35;
-    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.22s ease;
-  }
-
-  .join-judgement span:nth-child(2) {
-    width: calc(100% - 1.2rem);
-    background:
-      linear-gradient(90deg, color-mix(in srgb, var(--ai-sage) 8%, transparent), transparent 46%),
-      var(--ai-bg);
-    transform: translateX(1.2rem);
-  }
-
-  .join-judgement span:nth-child(3) {
-    width: calc(100% - 2.4rem);
-    background:
-      linear-gradient(90deg, color-mix(in srgb, var(--ai-coral) 8%, transparent), transparent 46%),
-      var(--ai-bg);
-    transform: translateX(2.4rem);
-  }
-
-  .join-judgement:hover span {
-    border-color: var(--ai-border-strong);
-  }
-
-  .join-judgement:hover span:nth-child(2),
-  .join-judgement:hover span:nth-child(3) {
-    transform: translateX(0);
   }
 
   .faq-list {
@@ -322,25 +230,24 @@ const membershipSteps = [
     color: var(--ai-fg);
     cursor: pointer;
     font-weight: 850;
-    list-style: none;
-    padding: 1.35rem 0;
+    list-style: disclosure-closed inside;
+    padding: 1.2rem 1rem;
+    line-height: 1.5;
+    transition: background-color 160ms ease;
   }
 
-  .faq-list summary::-webkit-details-marker {
-    display: none;
-  }
+  .faq-list details[open] summary { list-style-type: disclosure-open; }
+  .faq-list summary:hover, .faq-list details[open] summary { background: var(--ai-surface); }
 
   .faq-list p {
     margin: 0;
     color: var(--ai-fg-muted);
     line-height: 1.65;
-    padding: 0 0 1.35rem;
+    padding: 0.5rem 1rem 1.35rem;
   }
 
   @media (max-width: 820px) {
-    .join-hero,
-    .join-layout,
-    .join-signal__inner {
+    .join-layout {
       grid-template-columns: 1fr;
     }
 
@@ -351,10 +258,5 @@ const membershipSteps = [
       padding-top: 1.5rem;
     }
 
-    .join-judgement span:nth-child(2),
-    .join-judgement span:nth-child(3) {
-      transform: none;
-      width: 100%;
-    }
   }
 </style>

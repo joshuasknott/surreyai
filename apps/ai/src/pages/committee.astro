@@ -52,7 +52,6 @@ const operatingModel = [
 ];
 
 ---
-return Astro.redirect('/#join', 302);
 
 <Layout
   title="Committee"
@@ -80,32 +79,9 @@ return Astro.redirect('/#join', 302);
         <p class="ai-photo-hero__eyebrow">Committee</p>
       <h1 id="committee-hero-title">Meet the committee</h1>
       <p>
-        The committee turns student interest into workshops, tutorials, challenges, projects, discussions, socials, and clear routes into the society. Named records appear here once committee members add them.
+        Meet the students helping Surrey AI Society learn, build and question AI through practical sessions, projects, discussions, and socials.
       </p>
     </div>
-    </div>
-  </section>
-
-  <section class="ai-section ai-section--tinted" aria-labelledby="leadership-title">
-    <div class="ai-section__inner">
-      <div class="ai-section__header ai-section__header--split">
-        <h2 id="leadership-title" class="section-title">What the committee does</h2>
-        <p class="section-intro">
-          The page is less about headshots and more about the system of work: programming, inclusion, project momentum, career relevance, community, and responsible delivery.
-        </p>
-      </div>
-
-      <div class="leadership-list">
-        {operatingModel.map((item, index) => (
-          <article>
-            <span>{String(index + 1).padStart(2, "0")}</span>
-            <div>
-              <h3>{item.title}</h3>
-              <p>{item.text}</p>
-            </div>
-          </article>
-        ))}
-      </div>
     </div>
   </section>
 
@@ -114,7 +90,7 @@ return Astro.redirect('/#join', 302);
       <div class="ai-section__header ai-section__header--split">
         <div>
           <h2 id="committee-title" class="section-title">Current committee</h2>
-          <p class="section-intro">Committee records appear once the team is ready to share them publicly.</p>
+          <p class="section-intro">These are the students currently helping shape the society's programme and community.</p>
         </div>
         <a href={`mailto:${society.contactEmail}`} class="text-link">Contact the society &rarr;</a>
       </div>
@@ -181,40 +157,36 @@ return Astro.redirect('/#join', 302);
       )}
     </div>
   </section>
+
+  <section class="ai-section ai-section--tinted" aria-labelledby="leadership-title">
+    <div class="ai-section__inner">
+      <div class="ai-section__header ai-section__header--split">
+        <h2 id="leadership-title" class="section-title">How the committee works</h2>
+        <p class="section-intro">
+          The team keeps the programme useful, welcoming, practical, and thoughtful as new ideas and events take shape.
+        </p>
+      </div>
+
+      <div class="leadership-list">
+        {operatingModel.map((item, index) => (
+          <article>
+            <span>{String(index + 1).padStart(2, "0")}</span>
+            <div>
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
 </Layout>
 
 <style>
-  .committee-hero {
-    display: grid;
-    grid-template-columns: minmax(0, 0.9fr) minmax(20rem, 0.95fr);
-    gap: clamp(2rem, 5vw, 4rem);
-    align-items: center;
-    max-width: 82rem;
-    margin: 0 auto;
-    padding: clamp(5rem, 9vw, 8rem) 1.25rem clamp(3rem, 6vw, 5rem);
-  }
-
-  .committee-hero__copy h1 {
-    margin: 0;
-    color: var(--ai-fg);
-    font-size: clamp(2.1rem, 4vw, 3.6rem);
-    font-weight: 850;
-    letter-spacing: 0;
-    line-height: 1.08;
-  }
-
-  .committee-hero__copy p {
-    max-width: 42rem;
-    margin: 1.3rem 0 0;
-    color: var(--ai-fg-muted);
-    font-size: 1.12rem;
-    line-height: 1.65;
-  }
-
   .leadership-list {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: clamp(1.25rem, 3vw, 2rem);
+    gap: clamp(1.5rem, 3vw, 2.5rem);
   }
 
   .leadership-list article {
@@ -231,7 +203,7 @@ return Astro.redirect('/#join', 302);
   }
 
   .leadership-list span {
-    color: var(--ai-azure);
+    color: var(--ai-link);
     font-weight: 850;
   }
 
@@ -239,6 +211,7 @@ return Astro.redirect('/#join', 302);
     margin: 0.75rem 0 0.45rem;
     color: var(--ai-fg);
     font-size: 1.2rem;
+    font-weight: 800;
     letter-spacing: 0;
   }
 
@@ -253,6 +226,10 @@ return Astro.redirect('/#join', 302);
     grid-template-columns: 1fr;
     gap: 0;
     border-top: 1px solid var(--ai-border);
+  }
+
+  .committee-grid + .past-committee {
+    margin-top: clamp(3.5rem, 7vw, 5rem);
   }
 
   .person-card {
@@ -286,13 +263,14 @@ return Astro.redirect('/#join', 302);
     margin: 0 0 0.25rem;
     color: var(--ai-fg);
     font-size: 1.1rem;
+    font-weight: 800;
     letter-spacing: 0;
   }
 
   .person-card p {
     margin: 0;
     color: var(--ai-fg-muted);
-    font-weight: 700;
+    font-weight: 600;
   }
 
   .past-committee {
@@ -308,6 +286,7 @@ return Astro.redirect('/#join', 302);
   .past-year h3 {
     color: var(--ai-fg);
     font-size: 1.4rem;
+    font-weight: 800;
     letter-spacing: 0;
   }
 
@@ -327,6 +306,7 @@ return Astro.redirect('/#join', 302);
     margin: 0 0 0.85rem;
     color: var(--ai-fg);
     font-size: clamp(1.8rem, 3.6vw, 2.8rem);
+    font-weight: 800;
     letter-spacing: 0;
     line-height: 1.08;
   }
@@ -344,9 +324,12 @@ return Astro.redirect('/#join', 302);
   }
 
   @media (max-width: 840px) {
-    .committee-hero,
     .leadership-list {
       grid-template-columns: 1fr;
+    }
+
+    .person-card {
+      padding-block: 1.1rem;
     }
   }
 </style>

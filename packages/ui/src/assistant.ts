@@ -41,9 +41,9 @@ export const ASSISTANT_CONFIGS: Record<AssistantSocietyKey, AssistantSocietyConf
     allowedTopics: ["artificial intelligence learning", "events", "committee", "responsible artificial intelligence"],
     primaryCategories: ["Workshops", "Build nights", "Ethics", "Careers"],
     fallbackLinks: [
-      { label: "About", href: "/#about" },
+      { label: "Events", href: "/events" },
       { label: "Projects", href: "/#projects" },
-      { label: "Join", href: "/#join" },
+      { label: "Join", href: "/join" },
     ],
     logo: {
       src: "/icons/assistant/surrey-ai-terminal-bot.png",
@@ -74,9 +74,9 @@ export const ASSISTANT_CONFIGS: Record<AssistantSocietyKey, AssistantSocietyConf
     allowedTopics: ["careers", "enterprise", "startups", "networking", "events", "committee"],
     primaryCategories: ["Careers", "Enterprise", "Networking", "Skills", "Commercial awareness"],
     fallbackLinks: [
-      { label: "About", href: "/#about" },
-      { label: "Activities", href: "/#activities" },
-      { label: "Join", href: "/#join" },
+      { label: "About", href: "/about" },
+      { label: "Events", href: "/events" },
+      { label: "Join", href: "/join" },
     ],
     logo: {
       src: "/icons/assistant/business-headset-stag.png",
@@ -107,9 +107,9 @@ export const ASSISTANT_CONFIGS: Record<AssistantSocietyKey, AssistantSocietyConf
     allowedTopics: ["neurotechnology", "BCIs", "neuroscience basics", "signal processing", "ethics"],
     primaryCategories: ["Neuroscience", "Brain-computer interfaces", "Artificial intelligence", "Ethics"],
     fallbackLinks: [
-      { label: "What we do", href: "/#activities" },
-      { label: "Updates", href: "/#updates" },
-      { label: "Join", href: "/#join" },
+      { label: "About", href: "/about" },
+      { label: "Events", href: "/events" },
+      { label: "Join", href: "/join" },
     ],
     logo: {
       src: "/icons/assistant/neurotech-eeg-sensor-pod.png",
