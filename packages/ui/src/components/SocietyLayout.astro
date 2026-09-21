@@ -23,6 +23,7 @@ const socialLinks = Object.entries(socialNames).filter(([key]) => society.social
   description={description}
   canonicalUrl={new URL(Astro.url.pathname, Astro.site)}
   ogImage={ogImage ?? new URL('/social-cover.png', Astro.site).href}
+  siteName={society.name}
   bodyClass={`society-public society-${societyKey} ${bodyClass}`}
   extraFontHrefs={extraFontHrefs}
 >
