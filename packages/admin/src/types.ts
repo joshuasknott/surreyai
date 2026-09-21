@@ -12,6 +12,7 @@ export interface Society {
   socials: SocietySocials;
   membershipUrl: string;
   studentsUnionUrl: string;
+  signatories: Array<{ name: string; role: 'President' | 'Vice President' | 'Treasurer' }>;
 }
 
 export interface SocietySocials {
@@ -21,6 +22,7 @@ export interface SocietySocials {
   twitter?: string;
   discord?: string;
   whatsapp?: string;
+  linktree?: string;
   email?: string;
 }
 

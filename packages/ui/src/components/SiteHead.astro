@@ -73,15 +73,20 @@ const resolvedTwitterCard = twitterCard ?? (ogImage ? 'summary_large_image' : 's
 <meta property="og:description" content={description} />
 {resolvedCanonical && <meta property="og:url" content={resolvedCanonical} />}
 {ogImage && <meta property="og:image" content={ogImage} />}
+{ogImage && <meta property="og:image:width" content="1200" />}
+{ogImage && <meta property="og:image:height" content="630" />}
+{ogImage && <meta property="og:image:alt" content={title} />}
 
 {/* Twitter Card */}
 <meta name="twitter:card" content={resolvedTwitterCard} />
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
 {ogImage && <meta name="twitter:image" content={ogImage} />}
+{ogImage && <meta name="twitter:image:alt" content={title} />}
 
 {/* Favicon */}
-<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="icon" type="image/png" href="/favicon.png" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
 {/* Google Fonts — Inter is always loaded */}
 <link rel="preconnect" href="https://fonts.googleapis.com" />
