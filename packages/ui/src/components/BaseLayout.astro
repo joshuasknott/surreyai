@@ -17,6 +17,7 @@ interface Props {
   canonicalUrl?: URL | string;
   ogType?: string;
   twitterCard?: 'summary' | 'summary_large_image';
+  siteName?: string;
   extraFontHrefs?: string[];
   /** Additional class(es) on <html>, e.g. 'scroll-smooth'. */
   htmlClass?: string;
@@ -31,6 +32,7 @@ const {
   canonicalUrl = Astro.url,
   ogType,
   twitterCard,
+  siteName,
   extraFontHrefs,
   htmlClass,
   bodyClass,
@@ -47,6 +49,7 @@ const {
       canonicalUrl={canonicalUrl}
       ogType={ogType}
       twitterCard={twitterCard}
+      siteName={siteName}
       extraFontHrefs={extraFontHrefs}
     />
     {/* App-specific <head> additions (inline styles, extra scripts, etc.) */}

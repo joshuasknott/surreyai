@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /_actions/
 
 Sitemap: https://surreyaisociety.org/sitemap.xml
