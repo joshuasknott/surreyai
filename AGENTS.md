@@ -16,11 +16,11 @@ Use `npm run typecheck` and `npm test` for affected shared logic; `npm run test:
 
 ## Design and data
 
-- Use the selected mockup, existing assets, and current user direction. Public society pages can be expressive; admin screens should be calm and efficient. Keep events and join actions visible early.
+- Use the selected mockup, existing assets, and current user direction. Public society pages can be expressive. Keep events and join actions visible early. There is no per-site admin CMS in the public product.
 - For substantial design work, consult [.agents/skills/surreysocieties-design/SKILL.md](.agents/skills/surreysocieties-design/SKILL.md). Small fixes do not need a new design brief or reference hunt.
 - For an existing /ai robot-head hero, Three.js owns the robot; Anime.js is for scroll/reveal choreography. Preserve reduced-motion fallback.
 - Inspect affected desktop/mobile views before UI handoff. Preserve society labels, asset identity, accessible controls, and member-data privacy.
-- Authorization, roles, invites, and admin provisioning must remain enforced server-side. Confirm the intended deployment before data mutations or provisioning.
+- Confirm the intended deployment before data mutations. Public sites do not ship an admin CMS UI.
 
 <!-- convex-ai-start -->
 When changing Convex code, read convex/_generated/ai/guidelines.md and the applicable Convex skill. Keep generated files generated. A missing optional skill is not a reason to reinstall tooling or block unrelated frontend work.

@@ -441,21 +441,11 @@ for (const site of sites) {
       expect(attempts).toBe(2);
     });
 
-    test('admin access is blocked while login and invite states render', async ({ page }) => {
-      const adminResponse = await page.goto(url(site.origin, '/admin'), { waitUntil: 'domcontentloaded' });
-      const adminBlocked =
-        page.url().includes('/admin/login') ||
-        page.url().includes('clerk.accounts.dev') ||
-        [401, 403].includes(adminResponse?.status() ?? 0);
-      expect(adminBlocked).toBe(true);
-
-      const loginResponse = await page.goto(url(site.origin, '/admin/login'), { waitUntil: 'domcontentloaded' });
-      expect(loginResponse?.status()).toBeLessThan(500);
-      await expect(page.locator('body')).toContainText(/Admin Dashboard|Sign in/i);
-
-      const inviteResponse = await page.goto(url(site.origin, '/admin/invite/accept'), { waitUntil: 'domcontentloaded' });
-      expect(inviteResponse?.status()).toBeLessThan(500);
-      await expect(page.locator('body')).toContainText(/Invalid invitation|invite token is missing/i);
+    test('admin CMS routes are not available', async ({ page }) => {
+      for (const path of ['/admin', '/admin/login', '/admin/invite/accept']) {
+        const response = await page.goto(url(site.origin, path), { waitUntil: 'domcontentloaded' });
+        expect(response?.status()).toBe(404);
+      }
     });
 
     if (site.key === 'ai') {
