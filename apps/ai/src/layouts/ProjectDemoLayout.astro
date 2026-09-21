@@ -18,6 +18,8 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
   title={`${title} — Surrey Artificial Intelligence Society`}
   description={description}
   canonicalUrl={canonicalUrl}
+  siteName="Surrey Artificial Intelligence Society"
+  ogImage={new URL('/social-cover.png', Astro.site).href}
   bodyClass="bg-ai-bg text-ai-fg font-sans min-h-screen"
   extraFontHrefs={[
     "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
