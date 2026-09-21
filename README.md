@@ -196,6 +196,16 @@ Each admin area is completely isolated. A user for one society cannot access ano
 
 ## Shared Code
 
+### Public society pages and contact forms
+
+Each society homepage contains its introduction, activities, signatories, join links, and contact form. The old `/about`, `/events`, `/committee`, and `/join` URLs permanently redirect to homepage sections. Public links and Union-verified fallback signatories are in `packages/admin/src/config.ts`; a published committee member with the matching officer role takes precedence. Review both sources at committee handover. The public sitemap lists only the homepage; existing AI demo routes remain available by direct URL.
+
+The contact form works without service credentials: it prepares an email for the visitor to review and send, with a copy-message option. To enable direct delivery, set server-only `RESEND_API_KEY` and `CONTACT_FROM_EMAIL` in each app’s environment and rebuild/redeploy. The sender must be verified in Resend; the destination is always the society inbox from config, and the visitor is the reply-to address. Never use `PUBLIC_` variables for these secrets. Delivery errors retain the form and offer the prepared-email fallback. Automated delivery tests mock Resend and do not send email.
+
+The endpoint validates the origin, bounds the request size, checks fields, uses a honeypot and throttles sends per client address within each server instance. On a multi-instance deployment, use hosting-level rate limits as well if stronger spam protection is needed. Contact contents are not logged or stored by the app.
+
+Logos, favicons, Apple touch icons and 1200×630 PNG social covers are served directly from each app’s `public/` directory. Open Graph and Twitter metadata use the corresponding production domain.
+
 - **`packages/admin`** — Society config, validation helpers, Convex client factory, TypeScript types
 - **`packages/ui`** — Shared Astro components (e.g., `BaseLayout`)
 - **`convex/`** — Shared backend: schema, permissions, events, committee, memberships, audit logs, settings, seed
