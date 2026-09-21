@@ -1,0 +1,15 @@
+---
+interface Props { name: string; }
+const { name } = Astro.props;
+---
+<svg class="social-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  {name === 'instagram' && <><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.4" cy="6.6" r=".8" fill="currentColor" stroke="none" /></>}
+  {name === 'linkedin' && <><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M7.5 10v7M11.5 17v-7m0 3a3 3 0 0 1 6 0v4" /><circle cx="7.5" cy="6.8" r=".8" fill="currentColor" stroke="none" /></>}
+  {name === 'whatsapp' && <><path d="M21 11.5a9 9 0 0 1-13.3 8L3 21l1.5-4.7A9 9 0 1 1 21 11.5Z" /><path d="m8 7-1 2c.5 4 3 6.5 7 7l2-1-2-2-1.5 1c-1.5-.6-2.9-2-3.5-3.5L10 9Z" /></>}
+  {name === 'discord' && <><path d="m8 5-3 1c-2 3-3 6-3 10l4 2 2-2m8-11 3 1c2 3 3 6 3 10l-4 2-2-2M8 7a16 16 0 0 1 8 0M7 16c3 1.5 7 1.5 10 0" /><ellipse cx="8.5" cy="12" rx="1" ry="1.5" fill="currentColor" /><ellipse cx="15.5" cy="12" rx="1" ry="1.5" fill="currentColor" /></>}
+  {name === 'tiktok' && <><path d="M14 3v12.5a4.5 4.5 0 1 1-4-4.47V14a1.5 1.5 0 1 0 1 1.5V3h3c.5 3 2 4.5 5 5v3a9 9 0 0 1-5-2" /></>}
+  {name === 'linktree' && <><path d="M12 3v11M5 5l7 7 7-7M3 11h18M6 17l6-6 6 6M12 17v4" /></>}
+  {name === 'union' && <><path d="m3 8 9-5 9 5H3Zm2 3v7m5-7v7m4-7v7m5-7v7M3 21h18" /></>}
+  {name === 'email' && <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></>}
+</svg>
+<style>.social-icon { flex: 0 0 22px; }</style>

@@ -1,0 +1,128 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import AssistantWidget from './AssistantWidget.astro';
+import SocialIcon from './SocialIcon.astro';
+import { ASSISTANT_CONFIGS, type AssistantSocietyKey } from '../assistant';
+import { getSocietyById } from '@surreysocieties/admin/config';
+
+interface Props {
+  societyKey: AssistantSocietyKey;
+  title: string;
+  description: string;
+  ogImage?: string;
+  bodyClass?: string;
+  extraFontHrefs?: string[];
+}
+const { societyKey, title, description, ogImage, bodyClass = '', extraFontHrefs = [] } = Astro.props;
+const society = getSocietyById(societyKey)!;
+const socialNames: Record<string, string> = { whatsapp: 'WhatsApp', instagram: 'Instagram', linkedin: 'LinkedIn', discord: 'Discord', tiktok: 'TikTok' };
+const socialLinks = Object.entries(socialNames).filter(([key]) => society.socials[key as keyof typeof society.socials]);
+---
+<BaseLayout
+  title={title === 'Home' ? society.name : `${title} | ${society.name}`}
+  description={description}
+  canonicalUrl={new URL(Astro.url.pathname, Astro.site)}
+  ogImage={ogImage ?? new URL('/social-cover.png', Astro.site).href}
+  bodyClass={`society-public society-${societyKey} ${bodyClass}`}
+  extraFontHrefs={extraFontHrefs}
+>
+  <a class="society-skip" href="#main-content">Skip to content</a>
+  <header class="society-header">
+    <div class="society-header__inner">
+      <a class="society-brand" href="/" aria-label={`${society.name} home`}>
+        <img src={society.logo} alt="" width="56" height="56" fetchpriority="high" />
+        <span>{society.name}</span>
+      </a>
+      <details class="society-join-menu" data-join-menu>
+        <summary class="society-nav-join">Join us <svg class="society-join-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg></summary>
+        <nav class="society-join-panel" aria-label="Join and follow the society">
+          <a class="society-join-featured" href={society.studentsUnionUrl} target="_blank" rel="noopener noreferrer"><SocialIcon name="union" /><span>Join the society</span><span class="society-join-arrow" aria-hidden="true">↗</span></a>
+          <a class="society-join-featured society-join-linktree" href={society.socials.linktree} target="_blank" rel="noopener noreferrer"><SocialIcon name="linktree" /><span>Linktree</span><span class="society-join-arrow" aria-hidden="true">↗</span></a>
+          <div class="society-join-socials">
+            {socialLinks.map(([key, label]) => <a href={society.socials[key as keyof typeof society.socials]} target="_blank" rel="noopener noreferrer"><SocialIcon name={key} /><span>{label}</span></a>)}
+          </div>
+          <a class="society-join-email" href={`mailto:${society.contactEmail}`}><SocialIcon name="email" /><span>Email us</span><span class="society-join-arrow" aria-hidden="true">↗</span></a>
+        </nav>
+      </details>
+    </div>
+  </header>
+  <main id="main-content" tabindex="-1"><slot /></main>
+  <footer class="society-footer">
+    <div>
+      <a class="society-brand" href="/"><img src={society.logo} alt="" width="44" height="44" loading="lazy" /><span>{society.shortName}</span></a>
+      <a href={society.studentsUnionUrl} target="_blank" rel="noopener noreferrer">Surrey Students’ Union ↗</a>
+      <p>© {new Date().getFullYear()} {society.shortName}</p>
+    </div>
+  </footer>
+  <AssistantWidget config={ASSISTANT_CONFIGS[societyKey]} endpoint="/api/assistant/chat" />
+</BaseLayout>
+
+<script>
+  document.querySelectorAll<HTMLDetailsElement>('[data-join-menu]').forEach(menu => {
+    const trigger = menu.querySelector('summary')!;
+    document.addEventListener('pointerdown', event => {
+      if (event.target instanceof Node && !menu.contains(event.target)) menu.open = false;
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && menu.open) {
+        menu.open = false;
+        trigger.focus();
+      }
+    });
+    menu.addEventListener('focusout', () => {
+      requestAnimationFrame(() => {
+        if (!menu.contains(document.activeElement)) menu.open = false;
+      });
+    });
+    menu.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
+      menu.open = false;
+      trigger.focus();
+    }));
+  });
+</script>
+
+<style is:global>
+  .society-public { --society-ink: #111; --society-paper: #faf8f3; --society-accent: #ff6b28; --society-muted: #5b5752; --society-line: #ddd8d0; }
+  .society-business { --society-ink: #071a2d; --society-paper: #fffcf6; --society-accent: #edc76e; --society-muted: #526172; --society-line: #dcd7ce; }
+  .society-neurotech { --society-ink: #0c2549; --society-paper: #f5f7fa; --society-accent: #f0d17e; --society-muted: #455974; --society-line: #d7dfe8; }
+  .society-public section[id], .society-public [id="activities"] { scroll-margin-top: 6rem; }
+  .society-public [data-hero-actions] a { gap: 8px; }
+  .society-public .society-skip { position: fixed; top: -6rem; left: 1rem; padding: 1rem; z-index: 100; background: white; color: #111; }
+  .society-public .society-skip:focus { top: 1rem; }
+  .society-header { background: var(--society-ink); color: #fffaf1; position: sticky; top: 0; z-index: 50; border-bottom: 1px solid #ffffff26; }
+  .society-header__inner { width: min(100%, 1280px); margin: auto; padding: 12px 28px; display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 84px; }
+  .society-brand { display: inline-flex; align-items: center; gap: 12px; color: inherit; text-decoration: none; font-size: 17px; font-weight: 600; line-height: 1.3; min-width: 0; }
+  .society-brand img { flex-shrink: 0; object-fit: contain; border-radius: 50%; }
+  .society-ai .society-brand img { border-radius: 7px; }
+  .society-brand span { text-wrap: balance; }
+  .society-join-menu { position: relative; flex-shrink: 0; }
+  .society-public .society-nav-join { background: var(--society-accent); color: var(--society-ink); display: flex; align-items: center; gap: 20px; min-height: 48px; padding: 12px 20px; border-radius: 6px; font-weight: 700; font-size: 16px; white-space: nowrap; list-style: none; cursor: pointer; }
+  .society-nav-join::-webkit-details-marker { display: none; }
+  .society-join-menu[open] .society-join-chevron { transform: rotate(180deg); }
+  .society-join-panel { position: absolute; top: calc(100% + 14px); right: 0; width: min(352px, calc(100vw - 32px)); max-height: calc(100dvh - 100px); overflow-y: auto; overscroll-behavior: contain; padding: 12px; border: 1px solid var(--society-line); border-radius: 14px; background: var(--society-paper); color: var(--society-ink); box-shadow: 0 16px 48px #0003; }
+  .society-public .society-join-panel a { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 12px; border-radius: 7px; color: var(--society-ink); font-size: 16px; font-weight: 550; line-height: 1.4; text-decoration: none; }
+  .society-join-arrow { margin-left: auto; }
+  .society-public .society-join-panel .society-join-featured { background: var(--society-accent); font-weight: 650; }
+  .society-public .society-join-panel .society-join-linktree { background: #fff; border: 1px solid var(--society-line); margin-top: 8px; }
+  .society-join-socials { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; padding-block: 12px; }
+  .society-join-email { border-top: 1px solid var(--society-line); }
+  .society-public .society-join-panel a:hover { background: color-mix(in srgb, var(--society-accent) 22%, white); }
+  .society-public .society-header .society-join-panel a:focus-visible { outline: 2px solid var(--society-ink); outline-offset: -2px; }
+  .society-footer { background: var(--society-ink); color: #fffaf1; padding: 32px 28px 100px; }
+  .society-footer > div { max-width: 1224px; margin: auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px; }
+  .society-footer p, .society-footer > div > a { font-size: 15px; }
+  .society-public :is(.society-header, .society-footer) :is(a, button, summary):focus-visible { outline: 3px solid var(--society-accent); outline-offset: 5px; }
+  @media (max-width: 540px) {
+    .society-header__inner { padding: 10px 16px; gap: 10px; min-height: 76px; }
+    .society-brand { gap: 9px; font-size: 14px; }
+    .society-brand img { width: 42px; height: 42px; }
+    .society-public .society-nav-join { padding: 12px; gap: 8px; font-size: 15px; }
+    .society-join-panel { top: calc(100% + 12px); }
+    .society-join-socials a { padding-inline: 8px; }
+    .society-footer > div { flex-direction: column; align-items: start; }
+  }
+  @media (max-width: 359px) {
+    .society-header .society-brand { font-size: 13px; gap: 8px; }
+    .society-header .society-brand img { width: 36px; height: 36px; }
+  }
+</style>

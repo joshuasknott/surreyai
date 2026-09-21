@@ -274,11 +274,11 @@ function buildVerifiedContext(
     domain: societyConfig?.domain || publicSociety?.domain || "",
     establishedYear: societyConfig?.establishedYear ?? publicSociety?.establishedYear ?? null,
     contactEmail: societyConfig?.contactEmail || publicSociety?.contactEmail || null,
-    membershipUrl: societyConfig?.membershipUrl || publicSociety?.membershipUrl || null,
+    membershipUrl: societyConfig ? societyConfig.membershipUrl || null : publicSociety?.membershipUrl || null,
     studentsUnionUrl: societyConfig?.studentsUnionUrl || publicSociety?.studentsUnionUrl || null,
     socials: {
       instagram: configSocials?.instagram || publicSociety?.socials?.instagram || null,
-      linkedin: societyKey === "ai" ? null : configSocials?.linkedin || publicSociety?.socials?.linkedin || null,
+      linkedin: configSocials?.linkedin || publicSociety?.socials?.linkedin || null,
       email: configSocials?.email || publicSociety?.socials?.email || societyConfig?.contactEmail || null,
     },
   };
@@ -286,7 +286,7 @@ function buildVerifiedContext(
   return {
     society,
     events: publicContext?.events ?? [],
-    committee: publicContext?.committee ?? [],
+    committee: (publicContext?.committee ?? []).map(member => ({ ...member, name: member.name === 'Josh Knott' ? 'Joshua Knott' : member.name })),
   };
 }
 
@@ -474,7 +474,7 @@ function buildGuardedFallback(
 function buildEventsFallback(publicContext: PublicAssistantContext): string {
   const events = publicContext.events;
   if (events.length === 0) {
-    return `There are no published events for ${publicContext.society.name} right now. Confirmed events will appear once committee members add them. Check the Events page or ${contactText(publicContext.society)} for verified updates.`;
+    return `There are no published events for ${publicContext.society.name} right now. Confirmed events will appear once committee members add them. Check the society’s social channels or ${contactText(publicContext.society)} for verified updates.`;
   }
 
   const summary = events
@@ -485,25 +485,29 @@ function buildEventsFallback(publicContext: PublicAssistantContext): string {
       return `${event.title}${when}${where}`;
     })
     .join("; ");
-  return `Published events I can verify: ${summary}. Check the Events page for the latest details and registration links.`;
+  return `Published events I can verify: ${summary}. Check the society’s social channels for the latest details and registration links.`;
 }
 
 function buildCommitteeFallback(publicContext: PublicAssistantContext): string {
   const committee = publicContext.committee;
   if (committee.length === 0) {
-    return `I do not have verified public committee details for ${publicContext.society.name} right now. Committee details will appear once committee members add them. Check the Committee page or ${contactText(publicContext.society)}.`;
+    return `I do not have verified public committee details for ${publicContext.society.name} right now. Committee details will appear once committee members add them. Check the committee section of the homepage or ${contactText(publicContext.society)}.`;
   }
 
   const summary = committee
     .slice(0, 6)
     .map((member) => `${member.name} (${member.role})`)
     .join(", ");
-  return `Verified committee members include ${summary}. Check the Committee page for the full public list.`;
+  return `Verified committee members include ${summary}. Check the committee section of the homepage for the full public list.`;
 }
 
 function buildMembershipFallback(society: SocietyLinkFacts): string {
+  if (!society.membershipUrl) {
+    const whatsapp = getSocietyById(society.slug)?.socials.whatsapp;
+    return `Membership checkout is not currently listed for ${society.name}. Join the community${whatsapp ? ` on WhatsApp: ${whatsapp}` : ' through the join section of the homepage'}.`;
+  }
   const parts = [
-    society.membershipUrl ? `join at ${society.membershipUrl}` : "use the Join page",
+    society.membershipUrl ? `join at ${society.membershipUrl}` : "use the join section of the homepage",
     society.studentsUnionUrl ? `Students' Union page: ${society.studentsUnionUrl}` : null,
   ].filter(Boolean);
   return `Membership for ${society.name} is handled through Surrey Students' Union. You can ${parts.join("; ")}.`;
@@ -525,7 +529,7 @@ function buildNoVerifiedDetailsFallback(
   topic: string,
   destination: "contact" | "Events"
 ): string {
-  const nextStep = destination === "Events" ? "check the Events page" : contactText(society);
+  const nextStep = destination === "Events" ? "check the society’s social channels" : contactText(society);
   return `I do not have verified public ${topic} for ${society.name} right now. Please ${nextStep} for confirmation.`;
 }
 
@@ -569,7 +573,7 @@ function buildFlexibleFallback(
         return `${event.title}${when}${where}`;
       })
       .join("; ");
-    return `Published events I can verify: ${summary}. Check the Events page for the latest details and registration links.`;
+    return `Published events I can verify: ${summary}. Check the society’s social channels for the latest details and registration links.`;
   }
 
   if (latest.includes("committee") || latest.includes("who runs") || latest.includes("team") || latest.includes("who")) {
@@ -580,7 +584,7 @@ function buildFlexibleFallback(
       .slice(0, 6)
       .map((member) => `${member.name} (${member.role})`)
       .join(", ");
-    return `Verified committee members include ${summary}. Check the Committee page for the full public list.`;
+    return `Verified committee members include ${summary}. Check the committee section of the homepage for the full public list.`;
   }
 
   if (latest.includes("join") || latest.includes("involved") || latest.includes("member") || latest.includes("sign up")) {

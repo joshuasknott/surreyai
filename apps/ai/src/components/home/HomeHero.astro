@@ -1,5 +1,6 @@
 ---
 import { getImage } from "astro:assets";
+import { getSocietyById } from '@surreysocieties/admin/config';
 import humanoidHero from "../../assets/generated/ai-humanoid-hero-centered-v2.png";
 
 const robotImage = await getImage({
@@ -15,17 +16,12 @@ const robotImageMobile = await getImage({
   quality: 86,
 });
 
-const eventTypes = [
-  ["01", "Workshops and practical sessions", "Learn about AI tools, machine learning, coding and automation through accessible, beginner-friendly sessions."],
-  ["02", "Projects, challenges and competitions", "Work with other students, turn ideas into prototypes and build practical experience you can add to your portfolio."],
-  ["03", "Talks, careers and socials", "Meet academics, researchers, startups and industry professionals while exploring careers and connecting with the community."],
-];
+const society = getSocietyById('ai')!;
 ---
 
 <section class="home-hero" aria-labelledby="home-hero-title" data-ai-robot-hero>
   <div class="home-hero__shell">
     <div class="home-hero__copy">
-      <p class="home-hero__kicker" data-hero-reveal>Surrey Artificial Intelligence Society</p>
       <h1 id="home-hero-title" class="home-hero__title" data-hero-reveal>
         <span>Learn it.</span> <span>Build it.</span> <em>Question it.</em>
       </h1>
@@ -33,17 +29,11 @@ const eventTypes = [
         Explore artificial intelligence, machine learning and data science with other Surrey students. Every degree welcome. No coding experience needed.
       </p>
 
-      <div class="home-hero__actions" data-hero-reveal>
-        <a href="/join" class="btn-primary">Join the society</a>
-        <a href="/events" class="btn-secondary btn-secondary--dark">Explore events</a>
+      <div class="home-hero__actions" data-hero-reveal data-hero-actions>
+        <a href={society.studentsUnionUrl} target="_blank" rel="noopener noreferrer" class="btn-primary">Join the society <span aria-hidden="true">↗</span></a>
+        <a href={society.socials.linktree} target="_blank" rel="noopener noreferrer" class="btn-secondary btn-secondary--dark">Linktree <span aria-hidden="true">↗</span></a>
       </div>
 
-      <div class="home-hero__proof" aria-label="Society highlights" data-hero-reveal>
-        <span>No experience needed</span>
-        <span>Open to every degree</span>
-        <span>Practical projects</span>
-        <span>Responsible AI</span>
-      </div>
     </div>
 
     <div class="home-hero__stage" aria-hidden="true">
@@ -69,18 +59,6 @@ const eventTypes = [
       </picture>
     </div>
 
-    <div id="what-we-do" class="home-hero__formats" aria-labelledby="formats-title" data-hero-reveal>
-      <p class="home-hero__formats-label" id="formats-title">Society activities</p>
-      {eventTypes.map(([number, title, text]) => (
-        <article class="event-format">
-          <span>{number}</span>
-          <div>
-            <h2>{title}</h2>
-            <p>{text}</p>
-          </div>
-        </article>
-      ))}
-    </div>
   </div>
 </section>
 
@@ -113,7 +91,7 @@ const eventTypes = [
     position: relative;
     z-index: 1;
     overflow: clip;
-    padding: 0 0 5.3rem;
+    padding: 0;
     background: #111111;
     color: #faf8f3;
   }
@@ -151,18 +129,7 @@ const eventTypes = [
     margin-left: clamp(1.25rem, 2.3vw, 2.2rem);
   }
 
-  .home-hero__kicker {
-    margin-top: 0;
-    margin-bottom: 1rem;
-    color: #ff4a00;
-    font-size: 0.74rem;
-    font-weight: 850;
-    letter-spacing: 0.14em;
-    line-height: 1.35;
-    text-transform: uppercase;
-  }
-
-  .home-hero__title {
+.home-hero__title {
     max-width: 100%;
     margin-top: 0;
     margin-bottom: 0;
@@ -201,23 +168,6 @@ const eventTypes = [
   .home-hero__actions :global(.btn-primary),
   .home-hero__actions :global(.btn-secondary) {
     min-height: 3.15rem;
-  }
-
-  .home-hero__proof {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0;
-    max-width: 35rem;
-    margin-top: 2.2rem;
-    border-top: 1px solid rgba(250, 248, 243, 0.2);
-  }
-
-  .home-hero__proof span {
-    padding: 0.85rem 1rem 0.2rem 0;
-    color: rgba(250, 248, 243, 0.74);
-    font-size: 0.76rem;
-    font-weight: 700;
-    line-height: 1.35;
   }
 
   .home-hero__stage {
@@ -265,80 +215,10 @@ const eventTypes = [
   :global(.home-hero--ready) .home-hero__canvas { opacity: 1; }
   :global(.home-hero--ready) .home-hero__fallback { opacity: 0; }
 
-  .home-hero__formats {
-    position: absolute;
-    z-index: 5;
-    right: clamp(1rem, 2vw, 2rem);
-    bottom: -4.2rem;
-    left: clamp(1rem, 2vw, 2rem);
-    display: grid;
-    grid-template-columns: 3.6rem repeat(3, minmax(0, 1fr));
-    align-items: stretch;
-    min-height: 9rem;
-    overflow: hidden;
-    border: 1px solid rgba(17, 17, 17, 0.16);
-    border-radius: 0.3rem;
-    background: #faf8f3;
-    color: #111111;
-    box-shadow: 0 1.5rem 4rem rgba(17, 17, 17, 0.2);
-  }
-
-  .home-hero__formats-label {
-    display: grid;
-    place-items: center;
-    width: 3.6rem;
-    margin: 0;
-    border-right: 1px solid rgba(17, 17, 17, 0.14);
-    color: #ff4a00;
-    font-size: 0.7rem;
-    font-weight: 900;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    writing-mode: vertical-rl;
-    transform: rotate(180deg);
-  }
-
-  .event-format {
-    display: grid;
-    grid-template-columns: 2.4rem minmax(0, 1fr);
-    gap: 0.9rem;
-    align-items: center;
-    min-width: 0;
-    padding: 1.2rem 1.05rem;
-    border-right: 1px solid rgba(17, 17, 17, 0.14);
-  }
-
-  .event-format > span {
-    color: #ff4a00;
-    font-size: 0.72rem;
-    font-weight: 900;
-    letter-spacing: 0.08em;
-  }
-
-  .event-format h2 {
-    margin: 0;
-    overflow: hidden;
-    color: #111111;
-    font-size: clamp(0.95rem, 1.25vw, 1.15rem);
-    font-weight: 850;
-    letter-spacing: -0.025em;
-    line-height: 1.1;
-    text-overflow: ellipsis;
-  }
-
-  .event-format p {
-    margin: 0.45rem 0 0;
-    color: rgba(17, 17, 17, 0.66);
-    font-size: 0.82rem;
-    line-height: 1.5;
-  }
-
   [data-hero-reveal] { opacity: 1; }
 
   @media (max-width: 1050px) {
     .home-hero__shell { grid-template-columns: minmax(0, 1fr) minmax(23rem, 0.8fr); }
-    .home-hero__formats { grid-template-columns: 3.6rem repeat(3, minmax(0, 1fr)); }
-    .home-hero__proof { grid-template-columns: 1fr; }
   }
 
   @media (max-width: 880px) {
@@ -348,24 +228,6 @@ const eventTypes = [
     .home-hero__copy::before { top: 2.9rem; bottom: 2.7rem; left: 1.2rem; }
     .home-hero__title { max-width: 11ch; }
     .home-hero__stage { min-height: min(34rem, 88vw); }
-    .home-hero__formats {
-      position: relative;
-      right: auto;
-      bottom: auto;
-      left: auto;
-      grid-template-columns: 3.35rem minmax(0, 1fr);
-      margin: 0;
-      border-width: 0 0 1px;
-      border-radius: 0;
-      box-shadow: none;
-    }
-    .home-hero__formats-label { grid-row: 1 / span 3; width: 3.35rem; }
-    .event-format {
-      grid-column: 2;
-      grid-template-columns: 2.4rem minmax(0, 1fr);
-      border-right: 0;
-      border-bottom: 1px solid rgba(17, 17, 17, 0.14);
-    }
   }
 
   @media (max-width: 540px) {
@@ -373,7 +235,6 @@ const eventTypes = [
     .home-hero__actions { display: grid; }
     .home-hero__actions :global(.btn-primary),
     .home-hero__actions :global(.btn-secondary) { width: 100%; }
-    .home-hero__proof { grid-template-columns: 1fr 1fr; }
     .home-hero__stage { min-height: 20rem; }
   }
 
