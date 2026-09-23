@@ -2,72 +2,32 @@
 import type { Society } from '@surreysocieties/admin/types';
 interface Props { society: Society; }
 const { society } = Astro.props;
-const directDelivery = Boolean(import.meta.env.RESEND_API_KEY && import.meta.env.CONTACT_FROM_EMAIL);
 ---
-<form class="contact-form" method="post" action="/api/contact" data-contact-form data-email={society.contactEmail} data-society={society.shortName} data-direct={String(directDelivery)}>
+<form class="contact-form" data-contact-form data-email={society.contactEmail} data-society={society.shortName}>
   <div class="contact-form__row">
     <div><label for="contact-name">Your name</label><input id="contact-name" name="name" autocomplete="name" required maxlength="100" /></div>
     <div><label for="contact-email">Your email</label><input id="contact-email" name="email" type="email" autocomplete="email" required maxlength="254" /></div>
   </div>
-  <div><label for="contact-message">Your message</label><textarea id="contact-message" name="message" required minlength="10" maxlength="4000" rows="5"></textarea></div>
-  <div class="contact-form__trap" aria-hidden="true"><label for="contact-website">Leave this field empty</label><input id="contact-website" name="website" tabindex="-1" autocomplete="off" /></div>
-  <p class="contact-form__note">{directDelivery ? 'Your details will only be used to reply to your message.' : 'We’ll prepare your message for you to send from your email app.'}</p>
-  <button class="community-button" type="submit">{directDelivery ? 'Send message' : 'Prepare email'} <span aria-hidden="true">↗</span></button>
-  <p class="contact-form__status" role="status" aria-live="polite" tabindex="-1"></p>
-  <div class="contact-form__draft" hidden>
-    <a class="contact-form__open" href={`mailto:${society.contactEmail}`}>Open email app ↗</a>
-    <button class="contact-form__copy" type="button">Copy message</button>
-    <p>You can also paste your message into an email to <a href={`mailto:${society.contactEmail}`}>{society.contactEmail}</a>.</p>
-  </div>
+  <div><label for="contact-message">Your message</label><textarea id="contact-message" name="message" required maxlength="4000" rows="5"></textarea></div>
+  <button class="community-button" type="submit">Open email app <span aria-hidden="true">↗</span></button>
+  <p class="contact-form__note">Your email app will open with the message ready for you to send.</p>
+  <a class="contact-form__mailto" href={`mailto:${society.contactEmail}`} hidden aria-hidden="true" tabindex="-1"></a>
   <noscript><p>Email us directly at <a href={`mailto:${society.contactEmail}`}>{society.contactEmail}</a>. Enable JavaScript to use this form.</p></noscript>
 </form>
 
 <script>
   document.querySelectorAll<HTMLFormElement>('[data-contact-form]').forEach(form => {
-    const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
-    const status = form.querySelector<HTMLElement>('.contact-form__status')!;
-    const draft = form.querySelector<HTMLElement>('.contact-form__draft')!;
-    const open = form.querySelector<HTMLAnchorElement>('.contact-form__open')!;
-    const copy = form.querySelector<HTMLButtonElement>('.contact-form__copy')!;
-    let body = '';
-    const prepare = () => {
+    const emailLink = form.querySelector<HTMLAnchorElement>('.contact-form__mailto')!;
+    const emailHref = () => {
       const data = new FormData(form);
-      body = `${String(data.get('message')).trim()}\n\nFrom: ${String(data.get('name')).trim()}\nReply to: ${String(data.get('email')).trim()}`;
-      open.href = `mailto:${form.dataset.email}?subject=${encodeURIComponent(`Enquiry for ${form.dataset.society}`)}&body=${encodeURIComponent(body)}`;
+      const body = `${String(data.get('message')).trim()}\n\nFrom: ${String(data.get('name')).trim()}\nReply to: ${String(data.get('email')).trim()}`;
+      return `mailto:${form.dataset.email}?subject=${encodeURIComponent(`Enquiry for ${form.dataset.society}`)}&body=${encodeURIComponent(body)}`;
     };
-    form.addEventListener('input', () => {
-      if (!draft.hidden) prepare();
-    });
-    copy.addEventListener('click', async () => {
-      try { await navigator.clipboard.writeText(body); status.textContent = 'Message copied. Paste it into your email and send it to us.'; }
-      catch { status.textContent = 'Copy your message from the form and email it to us.'; }
-    });
-    form.addEventListener('submit', async event => {
+    form.addEventListener('submit', event => {
       event.preventDefault();
       if (!form.reportValidity()) return;
-      prepare();
-      if (form.dataset.direct !== 'true') {
-        draft.hidden = false;
-        status.textContent = 'Your email is ready. Open your email app to review and send it.';
-        open.focus();
-        return;
-      }
-      submit.disabled = true;
-      draft.hidden = true;
-      status.textContent = 'Sending your message…';
-      try {
-        const data = new FormData(form);
-        const response = await fetch('/api/contact', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(Object.fromEntries(data)), signal: AbortSignal.timeout(15000),
-        });
-        if (!response.ok) throw new Error('Delivery unavailable');
-        status.textContent = 'Thanks — your message has been sent to the committee.';
-        form.reset();
-      } catch {
-        status.textContent = 'We couldn’t confirm delivery. You can send your message from your email app instead.';
-        draft.hidden = false;
-      } finally { submit.disabled = false; }
+      emailLink.href = emailHref();
+      emailLink.click();
     });
   });
 </script>
@@ -78,13 +38,7 @@ const directDelivery = Boolean(import.meta.env.RESEND_API_KEY && import.meta.env
   .contact-form label { display: block; margin-bottom: 8px; font-size: 16px; font-weight: 600; }
   .contact-form input, .contact-form textarea { box-sizing: border-box; width: 100%; border: 1px solid #84909b; border-radius: 0; padding: 12px; color: var(--society-ink); background: #fff; font: inherit; font-size: 16px; line-height: 1.5; }
   .contact-form textarea { resize: vertical; min-height: 144px; }
-  .contact-form__trap { display: none; }
-  .contact-form .contact-form__note, .contact-form .contact-form__status, .contact-form__draft p { font-size: 15px; line-height: 1.6; margin: 0; }
+  .contact-form .contact-form__note { margin: -12px 0 0; font-size: 15px; line-height: 1.6; }
   .contact-form .community-button { justify-self: start; min-width: 200px; }
-  .contact-form__status:empty { display: none; }
-  .contact-form__draft { padding: 20px; border: 1px solid var(--society-line); }
-  .contact-form__draft[hidden] { display: none; }
-  .contact-form__draft a { overflow-wrap: anywhere; text-underline-offset: 4px; }
-  .contact-form__open, .contact-form__copy { display: inline-block; padding: 10px 0; margin-right: 24px; color: var(--society-ink); text-decoration: underline; font: inherit; cursor: pointer; background: none; border: 0; }
   @media (max-width: 540px) { .contact-form__row { grid-template-columns: 1fr; } }
 </style>

@@ -73,6 +73,8 @@ e2e/                           # Playwright
 
 `packages/admin` is a public-safe shared helpers package (society config, contact delivery, Convex client helpers). It no longer ships a CMS.
 
+Each contact form opens a prefilled message in the visitor’s email app with one click. The visitor reviews and sends it there; the website never claims to have sent it. A separate `/api/contact` endpoint supports server-side delivery if needed later, but the public form does not call it. The endpoint requires server-only `RESEND_API_KEY` and `CONTACT_FROM_EMAIL`; never use `PUBLIC_` variables for these secrets.
+
 ## Deploy
 
 Vercel: from repo root run `node scripts/build-vercel.mjs ai|business|neurotech` → `.vercel/output`. Point each domain at its app and deploy Convex to the same project as `CONVEX_URL`.

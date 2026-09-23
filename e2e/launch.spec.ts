@@ -145,55 +145,48 @@ for (const site of sites) {
         expect(response.headers()['content-type']).toContain('image/png');
       }
       const sitemap = await (await request.get(`${site.origin}/sitemap.xml`)).text();
-      expect(sitemap.match(/<loc>/g)).toHaveLength(1);
+      expect(sitemap.match(/<loc>/g)).toHaveLength(site.key === 'ai' ? 6 : 1);
       for (const width of [320, 390, 768, 1440]) {
         await page.setViewportSize({ width, height: 900 });
         await expectNoHorizontalOverflow(page);
         if (width === 390 || width === 1440) {
+          await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+          await captureRefinementEvidence(page, `${site.key}-home-${width}`);
           await page.locator('#committee').scrollIntoViewIfNeeded();
           await captureRefinementEvidence(page, `${site.key}-committee-${width}`);
         }
       }
     });
 
-    test('contact form prepares an encoded email without pretending to send', async ({ page }) => {
+    test('contact form opens one prefilled email from a single click', async ({ page }) => {
+      await page.addInitScript(() => {
+        document.addEventListener('click', event => {
+          const link = (event.target as Element).closest('.contact-form__mailto') as HTMLAnchorElement | null;
+          if (!link) return;
+          (window as typeof window & { openedContactEmail?: string }).openedContactEmail = link.href;
+          event.preventDefault();
+        }, true);
+      });
       await page.goto(site.origin);
       const form = page.locator('[data-contact-form]');
-      await expect(form).toHaveAttribute('data-direct', 'false');
       await form.getByLabel('Your name').fill('Test & Visitor');
       await form.getByLabel('Your email').fill('visitor@example.test');
       await form.getByLabel('Your message').fill('Hello & thanks! Can I join from another course?');
-      await form.getByRole('button', { name: 'Prepare email' }).click();
-      await expect(form.getByRole('status')).toContainText('Your email is ready');
-      const draft = form.getByRole('link', { name: 'Open email app' });
-      const href = (await draft.getAttribute('href'))!;
+      for (const width of [390, 1440]) {
+        await page.setViewportSize({ width, height: 900 });
+        await form.scrollIntoViewIfNeeded();
+        await expectNoHorizontalOverflow(page);
+        await captureRefinementEvidence(page, `${site.key}-contact-${width}`);
+      }
+      await form.getByRole('button', { name: 'Open email app' }).click();
+      const href = await page.evaluate(() => (window as typeof window & { openedContactEmail?: string }).openedContactEmail);
+      expect(href).toBeTruthy();
       expect(href).toContain(`mailto:${await form.getAttribute('data-email')}?subject=`);
-      expect(new URL(href).searchParams.get('body')).toContain('Hello & thanks!');
-      await expect(form.getByRole('status')).not.toContainText('has been sent');
-      await form.getByLabel('Your message').fill('Updated message for the society committee.');
-      expect(new URL((await draft.getAttribute('href'))!).searchParams.get('body')).toContain('Updated message');
-    });
-
-    test('direct contact delivery shows success or preserves the message on failure', async ({ page }) => {
-      await page.route(site.origin + '/', async route => {
-        const response = await route.fetch();
-        const html = (await response.text()).replace('data-direct="false"', 'data-direct="true"');
-        await route.fulfill({ response, body: html });
-      });
-      let attempts = 0;
-      await page.route('**/api/contact', route => route.fulfill({ status: ++attempts === 1 ? 502 : 200, json: { message: attempts === 1 ? 'Unavailable' : 'Sent' } }));
-      await page.goto(site.origin);
-      const form = page.locator('[data-contact-form]');
-      await form.getByLabel('Your name').fill('Test Visitor');
-      await form.getByLabel('Your email').fill('visitor@example.test');
-      await form.getByLabel('Your message').fill('A test message that should stay available after an error.');
-      await form.locator('button[type="submit"]').click();
-      await expect(form.getByRole('status')).toContainText('couldn’t confirm delivery');
-      await expect(form.getByLabel('Your message')).toHaveValue(/should stay available/);
-      await expect(form.getByRole('link', { name: 'Open email app' })).toBeVisible();
-      await form.locator('button[type="submit"]').click();
-      await expect(form.getByRole('status')).toContainText('has been sent');
-      await expect(form.getByLabel('Your message')).toHaveValue('');
+      expect(new URL(href!).searchParams.get('subject')).toBe(`Enquiry for ${await form.getAttribute('data-society')}`);
+      expect(new URL(href!).searchParams.get('body')).toContain('Hello & thanks!');
+      expect(new URL(href!).searchParams.get('body')).toContain('Test & Visitor');
+      expect(new URL(href!).searchParams.get('body')).toContain('visitor@example.test');
+      await expect(form.locator('.contact-form__draft, .contact-form__status')).toHaveCount(0);
     });
 
     for (const route of publicRoutes) {
