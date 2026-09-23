@@ -87,7 +87,7 @@ const GUARDED_TOPIC_TERMS = {
   sponsorPartner: ["sponsor", "sponsorship", "partner", "partnership", "collaborator"],
   access: ["equipment", "lab", "laboratory", "research access", "dataset", "hardware", "eeg", "bci"],
   outcome: ["outcome", "guarantee", "certificate", "certification", "internship", "placement", "job", "funding"],
-  socials: ["instagram", "linkedin", "social media", "socials", "contact", "email", "reach"],
+  socials: ["instagram", "linkedin", "social media", "socials", "follow", "online", "contact", "email", "reach"],
   membership: ["join", "member", "membership", "sign up", "students' union", "student union", "surrey union", "ussu"],
 };
 
@@ -410,6 +410,7 @@ Guidelines:
 - Only reference events, committee members, sponsors, partners, speakers, equipment access, lab access, research access, outcomes, or links when they explicitly appear in Public context. Do not invent or infer any of them.
 - The categories and description are themes only; they are not proof that a programme, project, lab, research opportunity, equipment access, sponsor, partner, speaker, certificate, internship, funding, or outcome exists.
 - If the verified context does not answer the question, say there are no verified public details available and suggest one relevant verified contact or page link.
+- When a verified URL helps answer the question, include it as a concise Markdown link using the exact URL from Public context, for example [Instagram](https://example.com). The site can render these links. Never invent or alter a URL.
 - For Surrey Artificial Intelligence Society, LinkedIn is unavailable unless Public context has a non-null LinkedIn URL. Never create or guess one.
 - For Business Society and Neurotech Society, do not imply public artificial intelligence features beyond this website assistant unless Public context explicitly says so.
 - Never reveal private admin data, secrets, or implementation details.
@@ -420,7 +421,7 @@ ${contextPayload}
 Conversation:
 ${conversation}
 
-Respond as the ${societyName} assistant. Return only your reply as plain text.`;
+Respond as the ${societyName} assistant. Return only your reply as text with optional inline Markdown links.`;
 }
 
 function buildGuardedFallback(
@@ -433,7 +434,7 @@ function buildGuardedFallback(
   if (!latest) return null;
 
   if (hasAnyTerm(latest, GUARDED_TOPIC_TERMS.socials)) {
-    return buildSocialFallback(societyKey, publicContext.society);
+    return buildSocialFallback(societyKey, publicContext.society, hasAnyTerm(latest, ["instagram", "linkedin", "social media", "socials", "follow", "online"]));
   }
 
   if (hasAnyTerm(latest, GUARDED_TOPIC_TERMS.speaker)) {
@@ -465,7 +466,7 @@ function buildGuardedFallback(
   }
 
   if (latest.includes("about") || latest.includes("what is") || latest.includes("what do")) {
-    return `${publicContext.society.name}: ${staticContext.shortDescription} For verified details, use the Join, Events, Committee, or Students' Union links.`;
+    return `${publicContext.society.name}: ${staticContext.shortDescription} [About the society](/#about).`;
   }
 
   return null;
@@ -491,37 +492,41 @@ function buildEventsFallback(publicContext: PublicAssistantContext): string {
 function buildCommitteeFallback(publicContext: PublicAssistantContext): string {
   const committee = publicContext.committee;
   if (committee.length === 0) {
-    return `I do not have verified public committee details for ${publicContext.society.name} right now. Committee details will appear once committee members add them. Check the committee section of the homepage or ${contactText(publicContext.society)}.`;
+    return `I do not have verified public committee details for ${publicContext.society.name} right now. Check [the committee section](/#committee) or ${contactText(publicContext.society)}.`;
   }
 
   const summary = committee
     .slice(0, 6)
     .map((member) => `${member.name} (${member.role})`)
     .join(", ");
-  return `Verified committee members include ${summary}. Check the committee section of the homepage for the full public list.`;
+  return `Verified committee members include ${summary}. [Meet the committee](/#committee) for the full public list.`;
 }
 
 function buildMembershipFallback(society: SocietyLinkFacts): string {
   if (!society.membershipUrl) {
     const whatsapp = getSocietyById(society.slug)?.socials.whatsapp;
-    return `Membership checkout is not currently listed for ${society.name}. Join the community${whatsapp ? ` on WhatsApp: ${whatsapp}` : ' through the join section of the homepage'}.`;
+    return `Membership checkout is not currently listed for ${society.name}. ${whatsapp ? `[Join the community on WhatsApp](${whatsapp}).` : 'Use [the join section](/#join).'}`;
   }
   const parts = [
-    society.membershipUrl ? `join at ${society.membershipUrl}` : "use the join section of the homepage",
-    society.studentsUnionUrl ? `Students' Union page: ${society.studentsUnionUrl}` : null,
+    society.membershipUrl ? `[Join through Surrey Students' Union](${society.membershipUrl})` : "use [the join section](/#join)",
+    society.studentsUnionUrl ? `[Society page](${society.studentsUnionUrl})` : null,
   ].filter(Boolean);
-  return `Membership for ${society.name} is handled through Surrey Students' Union. You can ${parts.join("; ")}.`;
+  return `Membership for ${society.name} is handled through Surrey Students' Union. ${parts.join("; ")}.`;
 }
 
-function buildSocialFallback(societyKey: SocietyKey, society: SocietyLinkFacts): string {
+function buildSocialFallback(societyKey: SocietyKey, society: SocietyLinkFacts, socialsOnly = false): string {
+  const socialLinks = [
+    society.socials.instagram ? `[Instagram](${society.socials.instagram})` : null,
+    society.socials.linkedin ? `[LinkedIn](${society.socials.linkedin})` : null,
+  ].filter(Boolean);
+  if (socialsOnly && socialLinks.length > 0) return `Follow ${society.name} on ${socialLinks.join(" or ")}.`;
   const links = [
-    society.contactEmail ? `email: ${society.contactEmail}` : null,
-    society.socials.instagram ? `Instagram: ${society.socials.instagram}` : null,
-    society.socials.linkedin ? `LinkedIn: ${society.socials.linkedin}` : null,
-    society.studentsUnionUrl ? `Students' Union: ${society.studentsUnionUrl}` : null,
+    ...socialLinks,
+    society.contactEmail ? `[Email us](mailto:${society.contactEmail})` : null,
+    society.studentsUnionUrl ? `[Students' Union](${society.studentsUnionUrl})` : null,
   ].filter(Boolean);
   const linkedinNote = societyKey === "ai" && !society.socials.linkedin ? " LinkedIn is not currently listed for Surrey Artificial Intelligence Society." : "";
-  return `${society.name} verified contacts: ${links.join("; ") || contactText(society)}.${linkedinNote}`;
+  return `Find ${society.name} through ${links.join(", ") || contactText(society)}.${linkedinNote}`;
 }
 
 function buildNoVerifiedDetailsFallback(
@@ -559,7 +564,6 @@ function buildFlexibleFallback(
   const societyName = society.name;
   const events = publicContext.events;
   const committee = publicContext.committee;
-  const links = staticContext.fallbackLinks.map((l) => l.label).join(", ");
 
   if (latest.includes("event")) {
     if (events.length === 0) {
@@ -584,7 +588,7 @@ function buildFlexibleFallback(
       .slice(0, 6)
       .map((member) => `${member.name} (${member.role})`)
       .join(", ");
-    return `Verified committee members include ${summary}. Check the committee section of the homepage for the full public list.`;
+    return `Verified committee members include ${summary}. [Meet the committee](/#committee) for the full public list.`;
   }
 
   if (latest.includes("join") || latest.includes("involved") || latest.includes("member") || latest.includes("sign up")) {
@@ -600,7 +604,7 @@ function buildFlexibleFallback(
   }
 
   if (latest.includes("about") || latest.includes("what is") || latest.includes("what do")) {
-    return `${societyName}: ${staticContext.shortDescription} I can only confirm details from verified public pages like ${links} and Students' Union links.`;
+    return `${societyName}: ${staticContext.shortDescription} [About the society](/#about).`;
   }
 
   return `I'm the ${societyName} assistant. Ask me about verified public events, committee, membership, or contact links.`;

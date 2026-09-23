@@ -6,7 +6,6 @@ export function initSocietyAssistant(root: Element | null, options: { open?: boo
   const endpoint = root.dataset.endpoint || '/api/assistant/chat';
   const societyName = root.dataset.societyName || 'the society';
   const shortName = root.dataset.shortName || societyName;
-  const starters = readJsonArray(root.dataset.starterPrompts);
   const toggle = root.querySelector<HTMLButtonElement>('.assistant-toggle');
   const panel = root.querySelector<HTMLElement>('.assistant-panel');
   const closeButton = root.querySelector<HTMLButtonElement>('.assistant-close');
@@ -14,20 +13,17 @@ export function initSocietyAssistant(root: Element | null, options: { open?: boo
   const form = root.querySelector<HTMLFormElement>('.assistant-form');
   const input = root.querySelector<HTMLTextAreaElement>('.assistant-input');
   const sendButton = root.querySelector<HTMLButtonElement>('.assistant-send');
+  const body = root.querySelector<HTMLElement>('.assistant-body');
   const messagesEl = root.querySelector<HTMLElement>('.assistant-messages');
+  const welcome = root.querySelector<HTMLElement>('.assistant-welcome');
   const startersEl = root.querySelector<HTMLElement>('.assistant-starters');
   const recovery = root.querySelector<HTMLElement>('.assistant-recovery');
   const messages: Array<{ role: 'user' | 'assistant'; content: string }> = [];
   let lastFocus: Element | null = null;
   let isSending = false;
 
-  starters.forEach((prompt) => {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'assistant-starter';
-    button.textContent = prompt;
-    button.addEventListener('click', () => submitMessage(prompt));
-    startersEl?.appendChild(button);
+  startersEl?.querySelectorAll<HTMLButtonElement>('.assistant-starter').forEach((button) => {
+    button.addEventListener('click', () => submitMessage(button.dataset.prompt || ''));
   });
 
   toggle?.addEventListener('click', () => {
@@ -100,6 +96,7 @@ export function initSocietyAssistant(root: Element | null, options: { open?: boo
       input.style.height = 'auto';
     }
     startersEl?.removeAttribute('hidden');
+    if (welcome) welcome.hidden = false;
     if (recovery) recovery.hidden = true;
     updateSendButton();
     input?.focus();
@@ -120,7 +117,6 @@ export function initSocietyAssistant(root: Element | null, options: { open?: boo
 
     appendMessage('user', text);
     messages.push({ role: 'user', content: text });
-    startersEl?.setAttribute('hidden', '');
     const loading = appendMessage('loading', `${shortName} assistant is thinking...`);
 
     try {
@@ -164,10 +160,10 @@ export function initSocietyAssistant(root: Element | null, options: { open?: boo
     if (!messagesEl) return null;
     const item = document.createElement('div');
     item.className = `assistant-message ${role}`;
-    item.textContent = text;
+    if (role === 'assistant') appendLinkedText(item, text);
+    else item.textContent = text;
     messagesEl.appendChild(item);
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    item.scrollIntoView({ block: 'end', behavior: reducedMotion ? 'instant' : 'smooth' });
+    if (body) body.scrollTop = body.scrollHeight;
     return item;
   }
 
@@ -185,11 +181,60 @@ export function initSocietyAssistant(root: Element | null, options: { open?: boo
   }
 }
 
-function readJsonArray(value: string | undefined) {
+const LINK_PATTERN = /\[([^\]\n]{1,100})\]\((https?:\/\/[^\s)]+|mailto:[^\s)]+|\/#[-\w]+)\)|(https?:\/\/[^\s<>()]+)|([\w.+-]+@[\w.-]+\.[a-z]{2,})/gi;
+
+function appendLinkedText(container: HTMLElement, text: string) {
+  let previousEnd = 0;
+  for (const match of text.matchAll(LINK_PATTERN)) {
+    const start = match.index ?? 0;
+    container.append(document.createTextNode(text.slice(previousEnd, start)));
+
+    const markdownLabel = match[1];
+    const rawLink = match[2] || match[3] || match[4] || '';
+    const href = match[4] ? `mailto:${rawLink}` : rawLink.replace(/[.,;!?]+$/, '');
+    const trailing = rawLink.slice(match[4] ? rawLink.length : href.length);
+    const safeHref = getSafeHref(href);
+
+    if (safeHref) {
+      const anchor = document.createElement('a');
+      anchor.href = safeHref;
+      anchor.textContent = markdownLabel || getLinkLabel(href);
+      if (safeHref.startsWith('http')) {
+        anchor.target = '_blank';
+        anchor.rel = 'noopener noreferrer';
+      }
+      container.append(anchor);
+    } else {
+      container.append(document.createTextNode(match[0]));
+    }
+    if (trailing) container.append(document.createTextNode(trailing));
+    previousEnd = start + match[0].length;
+  }
+  container.append(document.createTextNode(text.slice(previousEnd)));
+}
+
+function getSafeHref(href: string): string | null {
+  if (/^\/#[-\w]+$/.test(href)) return href;
   try {
-    const parsed = JSON.parse(value || '[]');
-    return Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === 'string') : [];
+    const url = new URL(href);
+    return ['https:', 'http:', 'mailto:'].includes(url.protocol) ? url.href : null;
   } catch {
-    return [];
+    return null;
+  }
+}
+
+function getLinkLabel(href: string): string {
+  if (href.startsWith('mailto:')) return `${href.slice(7)} ↗`;
+  try {
+    const host = new URL(href).hostname.replace(/^www\./, '');
+    const names: Record<string, string> = {
+      'instagram.com': 'Instagram',
+      'linkedin.com': 'LinkedIn',
+      'surreyunion.org': "Surrey Students' Union",
+      'chat.whatsapp.com': 'WhatsApp',
+    };
+    return `${names[host] || host} ↗`;
+  } catch {
+    return href;
   }
 }

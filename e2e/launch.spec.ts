@@ -360,12 +360,16 @@ for (const site of sites) {
 
       const toggle = page.locator('[data-assistant-widget] .assistant-toggle');
       await expect(toggle).toBeVisible();
+      const siteLogo = await page.locator('.society-header .society-brand img').getAttribute('src');
+      await expect(toggle.locator('img')).toHaveAttribute('src', siteLogo || '');
       await toggle.click();
 
       const panel = page.locator('[data-assistant-widget] .assistant-panel');
       await expect(panel).toBeVisible();
       await expect(page.locator('[data-assistant-widget] textarea[name="message"]')).toBeVisible();
       await expect(page.locator('[data-assistant-widget] .assistant-send')).toBeVisible();
+      await expect(page.locator('[data-assistant-widget] .assistant-starter')).toHaveCount(3);
+      await expect(page.locator('[data-assistant-widget] .assistant-starter').first()).toContainText('About');
 
       const box = await panel.boundingBox();
       expect(box?.x ?? -1).toBeGreaterThanOrEqual(0);
@@ -407,7 +411,7 @@ for (const site of sites) {
       await expect(send).toBeEnabled();
       await send.click();
       await expect(widget.locator('.assistant-message.loading')).toBeVisible();
-      await expect(widget.locator('.assistant-starters')).toBeHidden();
+      await expect(widget.locator('.assistant-starters')).toBeVisible();
       await expect(reset).toBeDisabled();
       await expect(input).toBeDisabled();
       await captureRefinementEvidence(page, `${site.key}-assistant-loading`);
@@ -431,7 +435,35 @@ for (const site of sites) {
       await expect(widget.locator('.assistant-starters')).toBeVisible();
       await expect(send).toBeDisabled();
       await expect(input).toBeFocused();
-      expect(attempts).toBe(2);
+      const starter = widget.locator('.assistant-starter').first();
+      const suggestedPrompt = await starter.getAttribute('data-prompt');
+      await starter.click();
+      await expect(widget.locator('.assistant-message.user')).toHaveText(suggestedPrompt || '');
+      await expect(widget.locator('.assistant-message.assistant')).toContainText('Events page');
+      expect(attempts).toBe(3);
+    });
+
+    test('assistant renders verified reply links as safe, clickable anchors', async ({ page }) => {
+      await page.route('**/api/assistant/chat', async (route) => {
+        await route.fulfill({
+          status: 200,
+          json: { message: 'Join through [Surrey Students’ Union](https://surreyunion.org/shop/test). See [the committee](/#committee). Follow https://www.instagram.com/surreyaisociety/. [Unsafe](javascript:alert(1))' },
+        });
+      });
+      await page.goto(site.origin, { waitUntil: 'domcontentloaded' });
+      const widget = page.locator('[data-assistant-widget]');
+      await widget.locator('.assistant-toggle').click();
+      await widget.locator('.assistant-input').fill('Where can I find you?');
+      await widget.locator('.assistant-send').click();
+
+      const reply = widget.locator('.assistant-message.assistant');
+      const membership = reply.getByRole('link', { name: 'Surrey Students’ Union' });
+      await expect(membership).toHaveAttribute('href', 'https://surreyunion.org/shop/test');
+      await expect(membership).toHaveAttribute('target', '_blank');
+      await expect(membership).toHaveAttribute('rel', 'noopener noreferrer');
+      await expect(reply.getByRole('link', { name: 'the committee' })).toHaveAttribute('href', '/#committee');
+      await expect(reply.getByRole('link', { name: 'Instagram ↗' })).toHaveAttribute('href', 'https://www.instagram.com/surreyaisociety/');
+      await expect(reply.getByRole('link', { name: 'Unsafe' })).toHaveCount(0);
     });
 
     test('admin CMS routes are not available', async ({ page }) => {

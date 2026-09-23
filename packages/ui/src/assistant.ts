@@ -6,14 +6,12 @@ export type AssistantSocietyConfig = {
   shortName: string;
   shortDescription: string;
   tone: string;
-  starterPrompts: string[];
+  greeting: string;
+  intro: string;
+  starterPrompts: Array<{ label: string; prompt: string }>;
   allowedTopics: string[];
   primaryCategories: string[];
   fallbackLinks: Array<{ label: string; href: string }>;
-  logo: {
-    src: string;
-    alt: string;
-  };
   brand: {
     accent: string;
     accentText: string;
@@ -32,11 +30,12 @@ export const ASSISTANT_CONFIGS: Record<AssistantSocietyKey, AssistantSocietyConf
     shortDescription:
       "Ask about joining, upcoming activities, beginner workshops, projects, careers or responsible AI at Surrey.",
     tone: "clear, practical, beginner-friendly, responsible, and curious",
+    greeting: "How can I help?",
+    intro: "Ask about our society, people, or community.",
     starterPrompts: [
-      "What is Surrey Artificial Intelligence Society about?",
-      "What events are coming up?",
-      "I am new to artificial intelligence. Where should I start?",
-      "How can I get involved?",
+      { label: "About the society", prompt: "What is the AI Society about?" },
+      { label: "Our socials", prompt: "Where can I find the AI Society on social media?" },
+      { label: "Who leads us?", prompt: "Who leads the AI Society?" },
     ],
     allowedTopics: ["artificial intelligence learning", "events", "committee", "responsible artificial intelligence"],
     primaryCategories: ["Workshops", "Build nights", "Ethics", "Careers"],
@@ -45,10 +44,6 @@ export const ASSISTANT_CONFIGS: Record<AssistantSocietyKey, AssistantSocietyConf
       { label: "Committee", href: "/#committee" },
       { label: "Join", href: "/#join" },
     ],
-    logo: {
-      src: "/icons/assistant/surrey-ai-terminal-bot.png",
-      alt: "Surrey Artificial Intelligence Society",
-    },
     brand: {
       accent: "#FF4A00",
       accentText: "#111111",
@@ -65,11 +60,12 @@ export const ASSISTANT_CONFIGS: Record<AssistantSocietyKey, AssistantSocietyConf
     shortDescription:
       "A student-led professional network for careers, enterprise, commercial awareness, networking, and practical workplace skills.",
     tone: "professional, concise, supportive, commercially aware, and accessible",
+    greeting: "How can we help?",
+    intro: "Explore the people and purpose behind our society.",
     starterPrompts: [
-      "What is Surrey Business Society about?",
-      "What events are coming up?",
-      "How can I get involved?",
-      "I am interested in startups. Where should I start?",
+      { label: "About the society", prompt: "What is Surrey Business Society about?" },
+      { label: "Find our socials", prompt: "Where are Surrey Business Society's social media links?" },
+      { label: "Meet the committee", prompt: "Who leads Surrey Business Society?" },
     ],
     allowedTopics: ["careers", "enterprise", "startups", "networking", "events", "committee"],
     primaryCategories: ["Careers", "Enterprise", "Networking", "Skills", "Commercial awareness"],
@@ -78,14 +74,10 @@ export const ASSISTANT_CONFIGS: Record<AssistantSocietyKey, AssistantSocietyConf
       { label: "Activities", href: "/#activities" },
       { label: "Join", href: "/#join" },
     ],
-    logo: {
-      src: "/icons/assistant/business-headset-stag.png",
-      alt: "Surrey Business Society headset stag assistant",
-    },
     brand: {
-      accent: "#C9A84C",
+      accent: "#D7A845",
       accentText: "#0F172A",
-      surface: "#FFFFFF",
+      surface: "#FFFCF6",
       text: "#0F172A",
       mutedText: "#475569",
       border: "#DDD9D1",
@@ -98,11 +90,12 @@ export const ASSISTANT_CONFIGS: Record<AssistantSocietyKey, AssistantSocietyConf
     shortDescription:
       "A student-led society exploring neuroscience, brain-computer interfaces, signal processing, artificial intelligence, ethics, and human-centred innovation.",
     tone: "friendly, accessible, thoughtful, technically grounded, and ethics-aware",
+    greeting: "How can we help?",
+    intro: "Meet the society, its community, and its leaders.",
     starterPrompts: [
-      "What is Surrey Neurotech Society about?",
-      "What events are coming up?",
-      "I am new to neurotech. Where should I start?",
-      "What topics can I explore?",
+      { label: "About neurotech", prompt: "What is Surrey Neurotech Society about?" },
+      { label: "Our socials", prompt: "Where can I find Surrey Neurotech Society on social media?" },
+      { label: "Who leads us?", prompt: "Who leads Surrey Neurotech Society?" },
     ],
     allowedTopics: ["neurotechnology", "BCIs", "neuroscience basics", "signal processing", "ethics"],
     primaryCategories: ["Neuroscience", "Brain-computer interfaces", "Artificial intelligence", "Ethics"],
@@ -111,17 +104,13 @@ export const ASSISTANT_CONFIGS: Record<AssistantSocietyKey, AssistantSocietyConf
       { label: "Activities", href: "/#activities" },
       { label: "Join", href: "/#join" },
     ],
-    logo: {
-      src: "/icons/assistant/neurotech-eeg-sensor-pod.png",
-      alt: "Surrey Neurotech Society EEG sensor assistant",
-    },
     brand: {
-      accent: "#FFCB05",
-      accentText: "#082F2A",
-      surface: "#FFFDF8",
-      text: "#082F2A",
-      mutedText: "#5D625A",
-      border: "#D8D2C7",
+      accent: "#D4AF37",
+      accentText: "#102856",
+      surface: "#FFFFFF",
+      text: "#0C2549",
+      mutedText: "#455974",
+      border: "#D7DFE8",
     },
   },
 };

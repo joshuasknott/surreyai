@@ -73,6 +73,34 @@ describe("website assistant safeguards", () => {
     expect(body.message).toContain("verified public website context");
   });
 
+  it("includes the verified membership destination in a link", async () => {
+    const response = await handleAssistantChatRequest(
+      request({ messages: [{ role: "user", content: "How do I join?" }] }, { "x-forwarded-for": "198.51.100.28" }),
+      "ai"
+    );
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.message).toContain("[Join through Surrey Students' Union](https://surreyunion.org/shop/artificial-intelligence-society/");
+  });
+
+  it("returns social and committee links for the new starter questions", async () => {
+    const socials = await handleAssistantChatRequest(
+      request({ messages: [{ role: "user", content: "Where are the society's social media links?" }] }, { "x-forwarded-for": "198.51.100.29" }),
+      "business"
+    );
+    const committee = await handleAssistantChatRequest(
+      request({ messages: [{ role: "user", content: "Who leads the society?" }] }, { "x-forwarded-for": "198.51.100.30" }),
+      "neurotech"
+    );
+    const socialBody = await socials.json();
+    const committeeBody = await committee.json();
+
+    expect(socialBody.message).toContain("[Instagram](https://www.instagram.com/surreybusinesssociety)");
+    expect(socialBody.message).toContain("[LinkedIn](https://www.linkedin.com/company/surreybusinesssociety/)");
+    expect(committeeBody.message).toContain("[the committee section](/#committee)");
+  });
+
   it("rate limits repeated fallback requests from the same address", async () => {
     let response: Response | undefined;
     for (let index = 0; index < 25; index += 1) {
