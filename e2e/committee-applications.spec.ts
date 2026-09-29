@@ -56,3 +56,23 @@ test('Committee cards and forms fit a narrow phone viewport', async ({ page }) =
     }
   }
 });
+
+test('Committee banner stays below the header while scrolling', async ({ page }) => {
+  for (const width of [390, 1280]) {
+    await page.setViewportSize({ width, height: 740 });
+    await page.goto(origin, { waitUntil: 'domcontentloaded' });
+    await page.evaluate(() => {
+      document.documentElement.style.scrollBehavior = 'auto';
+      window.scrollTo(0, 900);
+    });
+    const positions = await page.evaluate(() => {
+      const header = document.querySelector('.society-header')!.getBoundingClientRect();
+      const banner = document.querySelector('.society-committee-banner')!.getBoundingClientRect();
+      return { scrollY: window.scrollY, headerTop: Math.round(header.top), gap: Math.round(banner.top - header.bottom) };
+    });
+    expect(positions.scrollY).toBeGreaterThan(100);
+    expect(positions.headerTop).toBe(0);
+    expect(Math.abs(positions.gap)).toBeLessThanOrEqual(1);
+    await expect(page.locator('.society-committee-banner').getByRole('link', { name: 'Apply' })).toBeInViewport();
+  }
+});

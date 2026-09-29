@@ -130,13 +130,14 @@ const socialLinks = Object.entries(socialNames).filter(([key]) => society.social
   .society-business { --society-ink: #071a2d; --society-paper: #fffcf6; --society-accent: #edc76e; --society-muted: #526172; --society-line: #dcd7ce; }
   .society-neurotech { --society-ink: #0c2549; --society-paper: #f5f7fa; --society-accent: #f0d17e; --society-muted: #455974; --society-line: #d7dfe8; }
   .society-public section[id], .society-public [id="activities"] { scroll-margin-top: 6rem; }
+  .society-ai section[id], .society-ai [id="activities"], .society-neurotech section[id], .society-neurotech [id="activities"] { scroll-margin-top: 11rem; }
   .society-public [data-hero-actions] a { gap: 8px; }
   .society-public .society-skip { position: fixed; top: -6rem; left: 1rem; padding: 1rem; z-index: 100; background: white; color: #111; }
   .society-public .society-skip:focus { top: 1rem; }
   .society-header { background: var(--society-ink); color: #fffaf1; position: sticky; top: 0; z-index: 50; border-bottom: 1px solid #ffffff26; }
   .society-header__inner { width: min(100%, 1280px); margin: auto; padding: 12px 28px; display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 84px; }
   .society-header__actions { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
-  .society-committee-banner { display: block; width: 100%; color: #111; background: #ff4a00; }
+  .society-committee-banner { display: block; position: sticky; top: 84px; z-index: 49; width: 100%; color: #111; background: #ff4a00; }
   .society-neurotech .society-committee-banner { background: #e5bb52; color: #071a39; }
   .society-committee-banner__inner { width: min(100%, 1280px); min-height: 66px; margin: auto; padding: 9px 28px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
   .society-committee-banner strong { font-size: clamp(17px, 1.65vw, 22px); line-height: 1.2; }
@@ -174,6 +175,8 @@ const socialLinks = Object.entries(socialNames).filter(([key]) => society.social
   .society-footer p, .society-footer > div > a { font-size: 15px; }
   .society-public :is(.society-header, .society-footer) :is(a, button, summary):focus-visible { outline: 3px solid var(--society-accent); outline-offset: 5px; }
   @media (max-width: 540px) {
+    .society-committee-banner { top: 76px; }
+    .society-ai section[id], .society-ai [id="activities"], .society-neurotech section[id], .society-neurotech [id="activities"] { scroll-margin-top: 14rem; }
     .society-header__inner { padding: 10px 16px; gap: 10px; min-height: 76px; }
     .society-brand { gap: 9px; font-size: 14px; }
     .society-brand img { width: 42px; height: 42px; }
