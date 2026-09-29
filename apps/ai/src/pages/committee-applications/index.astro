@@ -2,10 +2,12 @@
 export const prerender = false;
 import Layout from '../../layouts/Layout.astro';
 import { committeeRoles } from '../../data/committeeRoles';
+import { committeeApplicationsClosed } from '@surreysocieties/ui/committeeDeadline';
 import '../../styles/global.css';
 import '../../styles/committeeApplications.css';
 
-const applicationsOpen = Boolean(import.meta.env.RESEND_API_KEY && import.meta.env.COMMITTEE_FROM_EMAIL);
+const applicationsClosed = committeeApplicationsClosed();
+const applicationsOpen = !applicationsClosed && Boolean(import.meta.env.RESEND_API_KEY && import.meta.env.COMMITTEE_FROM_EMAIL);
 ---
 
 <Layout
@@ -27,7 +29,7 @@ const applicationsOpen = Boolean(import.meta.env.RESEND_API_KEY && import.meta.e
           <span class="committee-card-copy"><strong>{role.title}</strong><span>{role.summary}</span></span>
         </a>)}
       </div>
-      {!applicationsOpen && <p class="committee-status" role="status">Applications are being prepared. You can explore the roles now; submissions will open once email delivery is connected.</p>}
+      {!applicationsOpen && <p class="committee-status" role="status">{applicationsClosed ? 'Applications have closed. You can still explore the role briefs.' : 'Applications are being prepared. You can explore the roles now; submissions will open once email delivery is connected.'}</p>}
     </section>
   </div>
 </Layout>

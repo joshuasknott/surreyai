@@ -4,8 +4,10 @@ const origin = 'http://127.0.0.1:4321';
 
 test('AI Society header leads to six distinct committee applications', async ({ page }) => {
   await page.goto(origin, { waitUntil: 'domcontentloaded' });
-  const cta = page.locator('.society-header').getByRole('link', { name: /Committee applications/i });
+  const cta = page.locator('.society-committee-banner');
   await expect(cta).toHaveAttribute('href', '/committee-applications');
+  await expect(cta).toContainText('Committee applications are out!');
+  await expect(cta.locator('[data-seconds]')).toHaveText(/^\d{2}$/);
   await cta.click();
 
   await expect(page).toHaveURL(`${origin}/committee-applications`);

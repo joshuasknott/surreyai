@@ -53,6 +53,7 @@ const socialLinks = Object.entries(socialNames).filter(([key]) => society.social
   {(societyKey === 'ai' || societyKey === 'neurotech') && <a class="society-committee-banner" href="/committee-applications" data-committee-deadline={COMMITTEE_APPLICATIONS_CLOSE_AT}>
     <span class="society-committee-banner__inner">
       <strong>Committee applications are out!</strong>
+      <span class="society-committee-banner__label">Closes in</span>
       <span class="society-committee-banner__countdown" aria-label="Applications close in" data-committee-countdown>
         <span><b data-days>07</b><small>days</small></span>
         <span><b data-hours>00</b><small>hours</small></span>
@@ -137,6 +138,7 @@ const socialLinks = Object.entries(socialNames).filter(([key]) => society.social
   .society-neurotech .society-committee-banner { background: #e5bb52; color: #071a39; }
   .society-committee-banner__inner { width: min(100%, 1280px); min-height: 66px; margin: auto; padding: 9px 28px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
   .society-committee-banner strong { font-size: clamp(17px, 1.65vw, 22px); line-height: 1.2; }
+  .society-committee-banner__label { font-size: 15px; font-weight: 650; white-space: nowrap; margin-left: auto; }
   .society-committee-banner__countdown { display: flex; align-items: center; justify-content: center; gap: clamp(10px, 2vw, 24px); margin-left: auto; }
   .society-committee-banner__countdown > span { display: flex; align-items: baseline; gap: 5px; white-space: nowrap; }
   .society-committee-banner__countdown b { font-size: 21px; font-variant-numeric: tabular-nums; }
@@ -173,6 +175,7 @@ const socialLinks = Object.entries(socialNames).filter(([key]) => society.social
     .society-header__inner { padding: 10px 16px; gap: 10px; min-height: 76px; }
     .society-brand { gap: 9px; font-size: 14px; }
     .society-brand img { width: 42px; height: 42px; }
+    .society-ai .society-header .society-brand span { display: none; }
     .society-public .society-nav-join { min-height: 44px; }
     .society-public .society-nav-join { padding: 12px; gap: 8px; font-size: 15px; }
     .society-join-panel { top: calc(100% + 12px); }
@@ -182,6 +185,7 @@ const socialLinks = Object.entries(socialNames).filter(([key]) => society.social
   @media (max-width: 760px) {
     .society-committee-banner__inner { flex-wrap: wrap; gap: 5px 14px; padding: 12px 16px; }
     .society-committee-banner strong { width: 100%; font-size: 17px; }
+    .society-committee-banner__label { margin-left: 0; font-size: 14px; }
     .society-committee-banner__countdown { margin-left: 0; justify-content: start; gap: 12px; }
     .society-committee-banner__countdown b { font-size: 17px; }
     .society-committee-banner__countdown small { font-size: 12px; }

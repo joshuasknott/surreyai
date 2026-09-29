@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { handleUpload, type HandleUploadBody } from '@vercel/blob/client';
+import { committeeApplicationsClosed } from '@surreysocieties/ui/committeeDeadline';
 
 export const prerender = false;
 const recentTokens = new Map<string, { count: number; until: number }>();
@@ -10,6 +11,7 @@ const respond = (status: number, message: string) => new Response(JSON.stringify
 });
 
 export const POST: APIRoute = async ({ request, clientAddress }) => {
+  if (committeeApplicationsClosed()) return respond(410, 'Committee applications have closed.');
   if (!import.meta.env.RESEND_API_KEY || !import.meta.env.COMMITTEE_FROM_EMAIL) return respond(503, 'Applications are temporarily unavailable.');
   if (!request.headers.get('content-type')?.startsWith('application/json')) return respond(415, 'Invalid upload request.');
   if (Number(request.headers.get('content-length')) > 20_000) return respond(413, 'Invalid upload request.');

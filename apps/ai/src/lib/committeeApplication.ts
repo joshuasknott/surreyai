@@ -1,5 +1,6 @@
 import { getCommitteeRole } from '../data/committeeRoles';
 import { del, get } from '@vercel/blob';
+import { committeeApplicationsClosed } from '@surreysocieties/ui/committeeDeadline';
 
 type DeliveryConfig = { apiKey?: string; fromEmail?: string };
 type Upload = { filename: string; content: string };
@@ -28,6 +29,7 @@ function fileType(bytes: Uint8Array): { extension: string; mime: string } | null
 }
 
 export async function handleCommitteeApplication(request: Request, config: DeliveryConfig, clientAddress = 'unknown'): Promise<Response> {
+  if (committeeApplicationsClosed()) return reply(410, 'Committee applications have closed.');
   if (request.headers.get('origin') !== new URL(request.url).origin) return reply(403, 'Please use the application form on our website.');
   if (!request.headers.get('content-type')?.startsWith('multipart/form-data')) return reply(415, 'Please use the application form.');
   const statedLength = Number(request.headers.get('content-length'));

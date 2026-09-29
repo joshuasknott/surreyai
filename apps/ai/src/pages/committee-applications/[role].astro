@@ -2,12 +2,14 @@
 export const prerender = false;
 import Layout from '../../layouts/Layout.astro';
 import { getCommitteeRole } from '../../data/committeeRoles';
+import { committeeApplicationsClosed } from '@surreysocieties/ui/committeeDeadline';
 import '../../styles/global.css';
 import '../../styles/committeeApplications.css';
 
 const role = getCommitteeRole(Astro.params.role ?? '');
 if (!role) return Astro.redirect('/committee-applications', 302);
-const applicationsOpen = Boolean(import.meta.env.RESEND_API_KEY && import.meta.env.COMMITTEE_FROM_EMAIL);
+const applicationsClosed = committeeApplicationsClosed();
+const applicationsOpen = !applicationsClosed && Boolean(import.meta.env.RESEND_API_KEY && import.meta.env.COMMITTEE_FROM_EMAIL);
 const social = role.slug === 'social-media-content';
 ---
 
@@ -57,7 +59,7 @@ const social = role.slug === 'social-media-content';
             <p id="committee-form-message" class="committee-form-message" role="alert" aria-live="polite" hidden></p>
           </form>
           <div id="committee-form-success" class="committee-success" role="status" hidden><p class="committee-eyebrow">Application sent</p><h2>Thank you for applying.</h2><p>Your application has been sent to the reviewer. Keep a copy of your work for your records.</p><a href="/committee-applications">Explore other roles →</a></div>
-        </> : <div class="committee-unavailable" role="status"><p class="committee-eyebrow">Applications opening soon</p><h2 id="apply-title">Thanks for your interest.</h2><p>Submissions will open when secure email delivery is connected. Please check back shortly.</p><a href="/committee-applications">Explore all roles →</a></div>}
+        </> : <div class="committee-unavailable" role="status"><h2 id="apply-title">{applicationsClosed ? 'Applications have closed.' : 'Thanks for your interest.'}</h2><p>{applicationsClosed ? 'The seven-day application window has ended.' : 'Submissions will open when secure email delivery is connected. Please check back shortly.'}</p><a href="/committee-applications">Explore all roles →</a></div>}
       </section>
     </div>
   </div>

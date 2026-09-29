@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { del, get } from '@vercel/blob';
 import { handleCommitteeApplication } from './committeeApplication';
+import { COMMITTEE_APPLICATIONS_CLOSE_AT } from '@surreysocieties/ui/committeeDeadline';
 
 vi.mock('@vercel/blob', () => ({ get: vi.fn(), del: vi.fn() }));
 
@@ -21,9 +22,16 @@ function request(role = 'workshops-learning', extras: Record<string, string> = {
 
 const send = (req = request(), options: { apiKey?: string; fromEmail?: string } = config) => handleCommitteeApplication(req, options, String(++address));
 
-afterEach(() => { vi.unstubAllGlobals(); vi.clearAllMocks(); });
+afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals(); vi.clearAllMocks(); });
 
 describe('committee application email delivery', () => {
+  it('stops accepting applications when the countdown ends', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(COMMITTEE_APPLICATIONS_CLOSE_AT));
+    const fetch = vi.fn(); vi.stubGlobal('fetch', fetch);
+    expect((await send()).status).toBe(410);
+    expect(fetch).not.toHaveBeenCalled();
+  });
   it('sends the selected role and answers only to the reviewer inbox', async () => {
     const fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify({ id: 'sent-1' })));
     vi.stubGlobal('fetch', fetch);
