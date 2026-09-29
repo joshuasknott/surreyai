@@ -50,7 +50,7 @@ const socialLinks = Object.entries(socialNames).filter(([key]) => society.social
       </div>
     </div>
   </header>
-  {(societyKey === 'ai' || societyKey === 'neurotech') && <a class="society-committee-banner" href="/committee-applications" data-committee-deadline={COMMITTEE_APPLICATIONS_CLOSE_AT}>
+  {(societyKey === 'ai' || societyKey === 'neurotech') && <aside class="society-committee-banner" aria-label="Committee applications" data-committee-deadline={COMMITTEE_APPLICATIONS_CLOSE_AT}>
     <span class="society-committee-banner__inner">
       <strong>Committee applications are out!</strong>
       <span class="society-committee-banner__label">Closes in</span>
@@ -60,9 +60,9 @@ const socialLinks = Object.entries(socialNames).filter(([key]) => society.social
         <span><b data-minutes>00</b><small>minutes</small></span>
         <span><b data-seconds>00</b><small>seconds</small></span>
       </span>
-      <span class="society-committee-banner__arrow" aria-hidden="true">↗</span>
+      <a class="society-committee-banner__apply" href="/committee-applications" data-committee-apply>Apply</a>
     </span>
-  </a>}
+  </aside>}
   <main id="main-content" tabindex="-1"><slot /></main>
   <footer class="society-footer">
     <div>
@@ -83,6 +83,8 @@ const socialLinks = Object.entries(socialNames).filter(([key]) => society.social
       const secondsLeft = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
       if (secondsLeft === 0) {
         banner.querySelector('strong')!.textContent = 'Committee applications have closed';
+        const applyLink = banner.querySelector<HTMLElement>('[data-committee-apply]');
+        if (applyLink) applyLink.textContent = 'View roles';
       }
       const values: Record<string, number> = {
         days: Math.floor(secondsLeft / 86400),
@@ -134,7 +136,7 @@ const socialLinks = Object.entries(socialNames).filter(([key]) => society.social
   .society-header { background: var(--society-ink); color: #fffaf1; position: sticky; top: 0; z-index: 50; border-bottom: 1px solid #ffffff26; }
   .society-header__inner { width: min(100%, 1280px); margin: auto; padding: 12px 28px; display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 84px; }
   .society-header__actions { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
-  .society-committee-banner { display: block; width: 100%; color: #111; background: #ff4a00; text-decoration: none; }
+  .society-committee-banner { display: block; width: 100%; color: #111; background: #ff4a00; }
   .society-neurotech .society-committee-banner { background: #e5bb52; color: #071a39; }
   .society-committee-banner__inner { width: min(100%, 1280px); min-height: 66px; margin: auto; padding: 9px 28px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
   .society-committee-banner strong { font-size: clamp(17px, 1.65vw, 22px); line-height: 1.2; }
@@ -143,9 +145,9 @@ const socialLinks = Object.entries(socialNames).filter(([key]) => society.social
   .society-committee-banner__countdown > span { display: flex; align-items: baseline; gap: 5px; white-space: nowrap; }
   .society-committee-banner__countdown b { font-size: 21px; font-variant-numeric: tabular-nums; }
   .society-committee-banner__countdown small { font-size: 14px; font-weight: 650; }
-  .society-committee-banner__arrow { font-size: 24px; line-height: 1; }
-  .society-committee-banner:hover { filter: brightness(1.06); }
-  .society-committee-banner:focus-visible { outline: 3px solid var(--society-ink); outline-offset: -4px; }
+  .society-public .society-committee-banner__apply { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; min-height: 44px; padding: 9px 20px; background: var(--society-ink); color: #fffaf1; border: 1px solid var(--society-ink); border-radius: 4px; font-size: 15px; font-weight: 750; line-height: 1.2; text-decoration: none; white-space: nowrap; }
+  .society-public .society-committee-banner__apply:hover { background: transparent; color: var(--society-ink); }
+  .society-public .society-committee-banner__apply:focus-visible { outline: 3px solid var(--society-ink); outline-offset: 3px; }
   .society-ai.committee-page .society-header { background: #faf8f3; color: #111; border-bottom-color: #ded8ce; }
   .society-ai.committee-page .society-nav-join { background: transparent; color: #111; border: 1px solid #ded8ce; }
   .society-neurotech.committee-page .society-header { background: #fdfbf6; color: #071a39; border-bottom-color: #cdd2d7; }
@@ -183,15 +185,16 @@ const socialLinks = Object.entries(socialNames).filter(([key]) => society.social
     .society-footer > div { flex-direction: column; align-items: start; }
   }
   @media (max-width: 760px) {
-    .society-committee-banner__inner { flex-wrap: wrap; gap: 5px 14px; padding: 12px 16px; }
-    .society-committee-banner strong { width: 100%; font-size: 17px; }
-    .society-committee-banner__label { margin-left: 0; font-size: 14px; }
-    .society-committee-banner__countdown { margin-left: 0; justify-content: start; gap: 12px; }
+    .society-committee-banner__inner { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; padding: 12px 16px; }
+    .society-committee-banner strong { grid-column: 1 / -1; font-size: 17px; }
+    .society-committee-banner__label { grid-column: 1; grid-row: 2; margin-left: 0; font-size: 14px; }
+    .society-committee-banner__countdown { grid-column: 1 / -1; grid-row: 3; margin-left: 0; justify-content: start; gap: 8px; }
     .society-committee-banner__countdown b { font-size: 17px; }
     .society-committee-banner__countdown small { font-size: 12px; }
-    .society-committee-banner__arrow { margin-left: auto; }
+    .society-committee-banner__apply { grid-column: 2; grid-row: 2; align-self: center; }
   }
   @media (max-width: 359px) {
+    .society-committee-banner__countdown { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .society-header .society-brand { font-size: 13px; gap: 8px; }
     .society-header .society-brand img { width: 36px; height: 36px; }
   }

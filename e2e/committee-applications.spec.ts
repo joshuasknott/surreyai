@@ -5,10 +5,12 @@ const origin = 'http://127.0.0.1:4321';
 test('AI Society header leads to six distinct committee applications', async ({ page }) => {
   await page.goto(origin, { waitUntil: 'domcontentloaded' });
   const cta = page.locator('.society-committee-banner');
-  await expect(cta).toHaveAttribute('href', '/committee-applications');
   await expect(cta).toContainText('Committee applications are out!');
   await expect(cta.locator('[data-seconds]')).toHaveText(/^\d{2}$/);
-  await cta.click();
+  const apply = cta.getByRole('link', { name: 'Apply' });
+  await expect(apply).toHaveAttribute('href', '/committee-applications');
+  await expect(apply).toBeVisible();
+  await apply.click();
 
   await expect(page).toHaveURL(`${origin}/committee-applications`);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(/Join the committee\s*2026–27/);
@@ -41,9 +43,16 @@ test('Social Media application includes brand assets and a 15 MB mock post uploa
 
 test('Committee cards and forms fit a narrow phone viewport', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 740 });
-  for (const path of ['/committee-applications', '/committee-applications/social-media-content']) {
+  for (const path of ['', '/committee-applications', '/committee-applications/social-media-content']) {
     await page.goto(`${origin}${path}`, { waitUntil: 'domcontentloaded' });
     const overflow = await page.evaluate(() => Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - window.innerWidth);
     expect(overflow).toBeLessThanOrEqual(1);
+    if (!path) {
+      const banner = page.locator('.society-committee-banner');
+      const apply = await banner.getByRole('link', { name: 'Apply' }).boundingBox();
+      const countdown = await banner.locator('.society-committee-banner__countdown').boundingBox();
+      expect(apply!.height).toBeGreaterThanOrEqual(44);
+      expect(countdown!.y).toBeGreaterThanOrEqual(apply!.y + apply!.height);
+    }
   }
 });

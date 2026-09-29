@@ -5,10 +5,12 @@ const origin = 'http://127.0.0.1:4323';
 test('Neurotech header leads to four role applications', async ({ page }) => {
   await page.goto(origin, { waitUntil: 'domcontentloaded' });
   const cta = page.locator('.society-committee-banner');
-  await expect(cta).toHaveAttribute('href', '/committee-applications');
   await expect(cta).toContainText('Committee applications are out!');
   await expect(cta.locator('[data-seconds]')).toHaveText(/^\d{2}$/);
-  await cta.click();
+  const apply = cta.getByRole('link', { name: 'Apply' });
+  await expect(apply).toHaveAttribute('href', '/committee-applications');
+  await expect(apply).toBeVisible();
+  await apply.click();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Join the committee.');
   await expect(page.locator('.committee-role-card')).toHaveCount(4);
 
@@ -32,5 +34,26 @@ test('Cards and form fit a narrow phone viewport', async ({ page }) => {
     await page.goto(`${origin}${path}`, { waitUntil: 'domcontentloaded' });
     const overflow = await page.evaluate(() => Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - window.innerWidth);
     expect(overflow).toBeLessThanOrEqual(1);
+  }
+});
+
+test('Homepage banner and activity layout fit phone and wide desktop', async ({ page }) => {
+  for (const width of [320, 390, 1920]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto(origin, { waitUntil: 'domcontentloaded' });
+    const apply = page.locator('.society-committee-banner').getByRole('link', { name: 'Apply' });
+    await expect(apply).toBeVisible();
+    const button = await apply.boundingBox();
+    expect(button?.height).toBeGreaterThanOrEqual(44);
+    if (width < 760) {
+      const countdown = await page.locator('.society-committee-banner__countdown').boundingBox();
+      expect(countdown!.y).toBeGreaterThanOrEqual(button!.y + button!.height);
+    }
+    const overflow = await page.evaluate(() => Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - window.innerWidth);
+    expect(overflow).toBeLessThanOrEqual(1);
+    if (width === 1920) {
+      const widths = await page.locator('.nt-activity__image').evaluateAll(images => images.map(image => Math.round(image.getBoundingClientRect().width)));
+      expect(new Set(widths).size).toBe(1);
+    }
   }
 });
