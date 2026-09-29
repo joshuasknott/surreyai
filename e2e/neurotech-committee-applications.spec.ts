@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 const origin = 'http://127.0.0.1:4323';
 
-test('Neurotech header leads to four role applications', async ({ page }) => {
+test('Neurotech header leads to five role applications', async ({ page }) => {
   await page.goto(origin, { waitUntil: 'domcontentloaded' });
   const cta = page.locator('.society-committee-banner');
   await expect(cta).toContainText('Committee applications are out!');
@@ -12,7 +12,8 @@ test('Neurotech header leads to four role applications', async ({ page }) => {
   await expect(apply).toBeVisible();
   await apply.click();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Join the committee.');
-  await expect(page.locator('.committee-role-card')).toHaveCount(4);
+  await expect(page.locator('.committee-role-card')).toHaveCount(5);
+  await expect(page.locator('.committee-role-card[href="/committee-applications/wellbeing-champion"]')).toBeVisible();
 
   await page.locator('.committee-role-card[href="/committee-applications/workshops-projects"]').click();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Workshops & Projects Officer');
@@ -30,11 +31,18 @@ test('Social Media form requires a mock post and supplies Neurotech assets', asy
 
 test('Cards and form fit a narrow phone viewport', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 740 });
-  for (const path of ['/committee-applications', '/committee-applications/social-media-content']) {
+  for (const path of ['/committee-applications', '/committee-applications/social-media-content', '/committee-applications/wellbeing-champion']) {
     await page.goto(`${origin}${path}`, { waitUntil: 'domcontentloaded' });
     const overflow = await page.evaluate(() => Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - window.innerWidth);
     expect(overflow).toBeLessThanOrEqual(1);
   }
+});
+
+test('Wellbeing Champion application asks for a response and an improvement', async ({ page }) => {
+  await page.goto(`${origin}/committee-applications/wellbeing-champion`, { waitUntil: 'domcontentloaded' });
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Wellbeing Champion');
+  await expect(page.locator('textarea[name="wellbeingResponse"]')).toBeVisible();
+  await expect(page.locator('textarea[name="wellbeingImprovement"]')).toBeVisible();
 });
 
 test('Committee banner stays below the header while scrolling', async ({ page }) => {
