@@ -43,6 +43,19 @@ describe('committee application email delivery', () => {
     expect(mail.text).toContain('Introduction to useful AI tools');
   });
 
+  it('sends Career & Opportunities answers and requires both', async () => {
+    const fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify({ id: 'sent-career' })));
+    vi.stubGlobal('fetch', fetch);
+    const answers = { careerIdea: 'An alumni careers panel', careerPlan: 'Share options for beginners and keep links current' };
+    expect((await send(request('career-opportunities', answers))).status).toBe(200);
+    const mail = JSON.parse(fetch.mock.calls[0][1].body);
+    expect(mail.text).toContain('Career & Opportunities Officer');
+    expect(mail.text).toContain(answers.careerIdea);
+    expect(mail.text).toContain(answers.careerPlan);
+    expect((await send(request('career-opportunities', { ...answers, careerPlan: '' }))).status).toBe(400);
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
   it('rejects cross-origin and incomplete applications before sending', async () => {
     const fetch = vi.fn(); vi.stubGlobal('fetch', fetch);
     expect((await send(request('workshops-learning', {}, 'https://other.example'))).status).toBe(403);

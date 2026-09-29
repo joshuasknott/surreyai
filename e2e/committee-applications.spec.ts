@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 const origin = 'http://127.0.0.1:4321';
 
-test('AI Society header leads to six distinct committee applications', async ({ page }) => {
+test('AI Society header leads to seven distinct committee applications', async ({ page }) => {
   await page.goto(origin, { waitUntil: 'domcontentloaded' });
   const cta = page.locator('.society-committee-banner');
   await expect(cta).toContainText('Committee applications are out!');
@@ -14,10 +14,10 @@ test('AI Society header leads to six distinct committee applications', async ({ 
 
   await expect(page).toHaveURL(`${origin}/committee-applications`);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(/Join the committee\s*2026–27/);
-  await expect(page.locator('.committee-role-card')).toHaveCount(6);
+  await expect(page.locator('.committee-role-card')).toHaveCount(7);
 
   const roles = [
-    'workshops-learning', 'industry-partnerships', 'projects-hackathons',
+    'workshops-learning', 'industry-partnerships', 'career-opportunities', 'projects-hackathons',
     'social-media-content', 'events-socials', 'wellbeing-champion',
   ];
   for (const role of roles) {
@@ -57,6 +57,14 @@ test('Committee cards and forms fit a narrow phone viewport', async ({ page }) =
       expect(countdown!.y).toBeGreaterThanOrEqual(apply!.y + apply!.height);
     }
   }
+});
+
+test('Career & Opportunities application asks for an idea and an accessibility plan', async ({ page }) => {
+  await page.goto(`${origin}/committee-applications/career-opportunities`, { waitUntil: 'domcontentloaded' });
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Career & Opportunities Officer');
+  await expect(page.locator('textarea[name="careerIdea"]')).toHaveAttribute('required', '');
+  await expect(page.locator('textarea[name="careerPlan"]')).toHaveAttribute('required', '');
+  await expect(page.locator('input[name="fullName"]')).toBeVisible();
 });
 
 test('Committee banner stays below the header while scrolling', async ({ page }) => {

@@ -32,6 +32,17 @@ export const committeeRoles: CommitteeRole[] = [
     ],
   },
   {
+    slug: 'career-opportunities', title: 'Career & Opportunities Officer',
+    summary: 'Help members find their next step in AI.',
+    intro: 'Make career paths, experience and opportunities easier for members to explore.',
+    responsibilities: ['Find and share relevant placements, internships and events', 'Connect members with useful career insight and resources', 'Make opportunities accessible to students at different stages'],
+    task: 'Plan one career-focused activity or resource that would help AI Society members explore their next step.',
+    questions: [
+      { key: 'careerIdea', label: 'What would you create or organise?', hint: 'Describe who it is for and what members would gain.' },
+      { key: 'careerPlan', label: 'How would you find opportunities and make them accessible?', hint: 'Consider different experience levels and how you would keep information current.' },
+    ],
+  },
+  {
     slug: 'projects-hackathons', title: 'Projects & Hackathons Officer',
     summary: 'Help students build and experiment together.',
     intro: 'Turn interesting ideas into collaborative projects and memorable hackathons.',
