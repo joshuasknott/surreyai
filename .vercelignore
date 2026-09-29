@@ -1,0 +1,8 @@
+# Local builds, release archives, and test evidence are not build inputs.
+output/
+videos/
+docs/
+apps/*/dist/
+apps/*/.vercel/
+.playwright-cli/
+test-results/
