@@ -15,7 +15,7 @@ export default defineConfig({
         extends: true,
         test: {
           name: "server",
-          include: ["packages/**/*.test.ts", "apps/ai/src/**/*.test.ts"],
+          include: ["packages/**/*.test.ts", "apps/ai/src/**/*.test.ts", "apps/neurotech/src/**/*.test.ts"],
           environment: "node",
         },
       },

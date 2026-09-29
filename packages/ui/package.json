@@ -5,7 +5,8 @@
   "version": "0.0.1",
   "exports": {
     ".": "./src/index.ts",
-    "./components/*": "./src/components/*.astro"
+    "./components/*": "./src/components/*.astro",
+    "./committeeDeadline": "./src/committeeDeadline.ts"
   },
   "dependencies": {
     "@surreysocieties/admin": "*"
