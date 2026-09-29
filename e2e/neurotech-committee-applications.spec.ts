@@ -38,7 +38,7 @@ test('Cards and form fit a narrow phone viewport', async ({ page }) => {
 });
 
 test('Homepage banner and activity layout fit phone and wide desktop', async ({ page }) => {
-  for (const width of [320, 390, 1920]) {
+  for (const width of [320, 390, 768, 1024, 1686, 1920]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto(origin, { waitUntil: 'domcontentloaded' });
     const apply = page.locator('.society-committee-banner').getByRole('link', { name: 'Apply' });
@@ -51,7 +51,12 @@ test('Homepage banner and activity layout fit phone and wide desktop', async ({ 
     }
     const overflow = await page.evaluate(() => Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - window.innerWidth);
     expect(overflow).toBeLessThanOrEqual(1);
-    if (width === 1920) {
+    if (width >= 1686) {
+      const sections = await page.locator('.nt-hero__inner, .nt-facts, .nt-section-heading, .nt-activity-list').evaluateAll(elements => elements.map(element => {
+        const { x, width } = element.getBoundingClientRect();
+        return { x: Math.round(x), width: Math.round(width) };
+      }));
+      expect(sections).toEqual(Array.from({ length: 4 }, () => ({ x: 0, width })));
       const widths = await page.locator('.nt-activity__image').evaluateAll(images => images.map(image => Math.round(image.getBoundingClientRect().width)));
       expect(new Set(widths).size).toBe(1);
     }
