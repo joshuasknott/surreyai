@@ -1,0 +1,114 @@
+---
+export const prerender = false;
+import Layout from '../../layouts/Layout.astro';
+import { getCommitteeRole } from '../../data/committeeRoles';
+import '../../styles/global.css';
+import '../../styles/committeeApplications.css';
+
+const role = getCommitteeRole(Astro.params.role ?? '');
+if (!role) return Astro.redirect('/committee-applications', 302);
+const applicationsOpen = Boolean(import.meta.env.RESEND_API_KEY && import.meta.env.COMMITTEE_FROM_EMAIL);
+const social = role.slug === 'social-media-content';
+---
+
+<Layout
+  title={`${role.title} application 2026–27`}
+  description={`Apply to be the Surrey Artificial Intelligence Society ${role.title} for 2026–27.`}
+  bodyClass="committee-page bg-ai-bg text-ai-fg font-sans min-h-screen"
+>
+  <div class="committee-shell committee-detail">
+    <a class="committee-back" href="/committee-applications">← All committee roles</a>
+    <div class="committee-detail-grid">
+      <section class="committee-role-brief" aria-labelledby="role-title">
+        <h1 id="role-title">{role.title}</h1>
+        <p class="committee-lede">{role.intro}</p>
+        <div class="committee-brief-block">
+          <h2>What you could do</h2>
+          <ul>{role.responsibilities.map((responsibility) => <li>{responsibility}</li>)}</ul>
+        </div>
+        <p class="committee-brief-note">Your experience can come from coursework, volunteering, personal projects or simply getting things started. We care about your ideas and your willingness to help.</p>
+      </section>
+
+      <section class="committee-form-panel" aria-labelledby="apply-title">
+        {applicationsOpen ? <>
+          <div class="committee-form-heading"><h2 id="apply-title">Tell us about yourself.</h2><p>Fields marked * are required. Your answers go directly to the application reviewer.</p></div>
+          <form id="committee-application-form" action="/api/committee-applications" method="post" enctype="multipart/form-data" data-role={role.slug}>
+            <input type="hidden" name="role" value={role.slug} />
+            <div class="committee-honeypot" aria-hidden="true"><label for="website">Website</label><input id="website" name="website" tabindex="-1" autocomplete="off" /></div>
+            <fieldset><legend>About you</legend>
+              <div class="committee-field-grid">
+                <div class="committee-field"><label for="fullName">Full name <span>*</span></label><input id="fullName" name="fullName" type="text" autocomplete="name" maxlength="120" required /></div>
+                <div class="committee-field"><label for="email">Email address <span>*</span></label><input id="email" name="email" type="email" autocomplete="email" maxlength="254" required /></div>
+                <div class="committee-field"><label for="course">Course <span>*</span></label><input id="course" name="course" type="text" maxlength="150" required /></div>
+                <div class="committee-field"><label for="yearOfStudy">Year of study <span>*</span></label><input id="yearOfStudy" name="yearOfStudy" type="text" maxlength="60" placeholder="e.g. Year 2 or postgraduate" required /></div>
+              </div>
+              <div class="committee-field"><label for="experience">Relevant experience <span>*</span></label><textarea id="experience" name="experience" maxlength="2000" rows="4" placeholder="Coursework, clubs, volunteering, personal projects — all count." required></textarea></div>
+              <div class="committee-field"><label for="motivation">Why would you like this role? <span>*</span></label><textarea id="motivation" name="motivation" maxlength="2000" rows="4" required></textarea></div>
+              <div class="committee-field"><label for="availability">What time could you realistically contribute? <span>*</span></label><input id="availability" name="availability" type="text" maxlength="300" placeholder="e.g. Around two hours a week in term time" required /></div>
+            </fieldset>
+            <fieldset><legend>Your role task</legend>
+              <p class="committee-task">{role.task}</p>
+              {social && <div class="committee-assets"><p>Use one or more approved assets in your mock post. You can combine them with your own design.</p><div><a href="/logos/brand/surrey-ai-logo-transparent.png" download>Full logo ↓</a><a href="/logos/brand/surrey-ai-avatar-light.png" download>AI mark ↓</a><a href="/logos/brand/surrey-ai-logo-light.png" download>Light logo ↓</a></div></div>}
+              {role.questions.map((question) => <div class="committee-field"><label for={question.key}>{question.label} <span>*</span></label><textarea id={question.key} name={question.key} maxlength="2000" rows="4" placeholder={question.hint} required></textarea></div>)}
+              {social && <div class="committee-field"><label for="mockPost">Upload your mock post <span>*</span></label><input id="mockPost" name="mockPost" type="file" accept=".png,.jpg,.jpeg,.webp,.pdf,image/png,image/jpeg,image/webp,application/pdf" aria-describedby="mock-post-help" required /><small id="mock-post-help">PNG, JPG, WebP or PDF; maximum 15 MB. Your file uploads securely before the form is sent.</small></div>}
+            </fieldset>
+            <label class="committee-consent"><input type="checkbox" name="consent" value="yes" required /><span>I agree to my answers and any uploaded work being emailed to the application reviewer for committee selection. <strong>*</strong></span></label>
+            <button class="committee-submit" type="submit">Send application <span aria-hidden="true">↗</span></button>
+            <p id="committee-form-message" class="committee-form-message" role="alert" aria-live="polite" hidden></p>
+          </form>
+          <div id="committee-form-success" class="committee-success" role="status" hidden><p class="committee-eyebrow">Application sent</p><h2>Thank you for applying.</h2><p>Your application has been sent to the reviewer. Keep a copy of your work for your records.</p><a href="/committee-applications">Explore other roles →</a></div>
+        </> : <div class="committee-unavailable" role="status"><p class="committee-eyebrow">Applications opening soon</p><h2 id="apply-title">Thanks for your interest.</h2><p>Submissions will open when secure email delivery is connected. Please check back shortly.</p><a href="/committee-applications">Explore all roles →</a></div>}
+      </section>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { upload } from '@vercel/blob/client';
+  const form = document.querySelector<HTMLFormElement>('#committee-application-form');
+  form?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const message = document.querySelector<HTMLElement>('#committee-form-message');
+    const button = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+    const file = form.querySelector<HTMLInputElement>('#mockPost')?.files?.[0];
+    if (!message || !button) return;
+    message.hidden = true;
+    if (file && file.size > 15_000_000) {
+      message.textContent = 'Your mock post is over 15 MB. Please upload a smaller file.';
+      message.hidden = false;
+      return;
+    }
+    button.disabled = true;
+    button.textContent = 'Sending…';
+    try {
+      const data = new FormData(form);
+      data.delete('mockPost');
+      if (file) {
+        const byExtension: Record<string, string> = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp', pdf: 'application/pdf' };
+        const extension = file.name.split('.').pop()?.toLowerCase() ?? '';
+        const contentType = file.type || byExtension[extension];
+        const suffix = contentType === 'image/jpeg' ? 'jpg' : contentType === 'application/pdf' ? 'pdf' : contentType === 'image/webp' ? 'webp' : contentType === 'image/png' ? 'png' : '';
+        if (!suffix) throw new Error('Please upload a PNG, JPG, WebP or PDF file.');
+        button.textContent = 'Uploading mock post…';
+        const blob = await upload(`committee-applications/${crypto.randomUUID()}.${suffix}`, file, {
+          access: 'private', contentType, handleUploadUrl: '/api/committee-upload',
+          onUploadProgress: ({ percentage }) => { button.textContent = `Uploading mock post… ${Math.round(percentage)}%`; },
+        });
+        data.set('mockPostUrl', blob.url);
+        button.textContent = 'Sending application…';
+      }
+      const response = await fetch(form.action, { method: 'POST', body: data });
+      const result = await response.json() as { message?: string };
+      if (!response.ok) throw new Error(result.message || 'We could not send your application. Please try again.');
+      form.hidden = true;
+      document.querySelector<HTMLElement>('#committee-form-success')!.hidden = false;
+      document.querySelector<HTMLElement>('#committee-form-success')!.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (error) {
+      message.textContent = error instanceof Error ? error.message : 'We could not send your application. Please try again.';
+      message.hidden = false;
+    } finally {
+      button.disabled = false;
+      button.textContent = 'Send application ↗';
+    }
+  });
+</script>

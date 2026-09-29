@@ -1,0 +1,33 @@
+---
+export const prerender = false;
+import Layout from '../../layouts/Layout.astro';
+import { committeeRoles } from '../../data/committeeRoles';
+import '../../styles/global.css';
+import '../../styles/committeeApplications.css';
+
+const applicationsOpen = Boolean(import.meta.env.RESEND_API_KEY && import.meta.env.COMMITTEE_FROM_EMAIL);
+---
+
+<Layout
+  title="Committee applications 2026–27"
+  description="Apply to join the Surrey Artificial Intelligence Society committee for 2026–27. Explore six roles in learning, partnerships, projects, content, events and wellbeing."
+  bodyClass="committee-page bg-ai-bg text-ai-fg font-sans min-h-screen"
+>
+  <div class="committee-shell">
+    <section class="committee-intro" aria-labelledby="committee-title">
+      <h1 id="committee-title">Join the committee<br />2026–27</h1>
+      <p class="committee-lede">Make AI accessible, practical and welcoming at Surrey.</p>
+    </section>
+
+    <section class="committee-roles" aria-labelledby="roles-title">
+      <h2 id="roles-title" class="sr-only">Open committee roles</h2>
+      <div class="committee-card-grid">
+        {committeeRoles.map((role, index) => <a class="committee-role-card" href={`/committee-applications/${role.slug}`} aria-label={`View ${role.title} application`}>
+          <span class="committee-card-top"><span>{String(index + 1).padStart(2, '0')}</span><span class="committee-card-arrow" aria-hidden="true">↗</span></span>
+          <span class="committee-card-copy"><strong>{role.title}</strong><span>{role.summary}</span></span>
+        </a>)}
+      </div>
+      {!applicationsOpen && <p class="committee-status" role="status">Applications are being prepared. You can explore the roles now; submissions will open once email delivery is connected.</p>}
+    </section>
+  </div>
+</Layout>
