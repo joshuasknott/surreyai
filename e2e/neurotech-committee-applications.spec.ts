@@ -65,7 +65,8 @@ test('Homepage banner and activity layout fit phone and wide desktop', async ({ 
     await expect(apply).toBeVisible();
     const button = await apply.boundingBox();
     expect(button?.height).toBeGreaterThanOrEqual(44);
-    if (width < 760) {
+    if (width <= 850) {
+      expect((await page.locator('.society-committee-banner').boundingBox())!.height).toBeLessThanOrEqual(90);
       const countdown = await page.locator('.society-committee-banner__countdown').boundingBox();
       expect(countdown!.y).toBeGreaterThanOrEqual(button!.y + button!.height);
     }

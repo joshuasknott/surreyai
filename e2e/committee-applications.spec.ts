@@ -49,6 +49,8 @@ test('Committee cards and forms fit a narrow phone viewport', async ({ page }) =
     expect(overflow).toBeLessThanOrEqual(1);
     if (!path) {
       const banner = page.locator('.society-committee-banner');
+      await expect(page.locator('.society-header .society-brand span')).toBeVisible();
+      expect((await banner.boundingBox())!.height).toBeLessThanOrEqual(90);
       const apply = await banner.getByRole('link', { name: 'Apply' }).boundingBox();
       const countdown = await banner.locator('.society-committee-banner__countdown').boundingBox();
       expect(apply!.height).toBeGreaterThanOrEqual(44);
@@ -58,9 +60,11 @@ test('Committee cards and forms fit a narrow phone viewport', async ({ page }) =
 });
 
 test('Committee banner stays below the header while scrolling', async ({ page }) => {
-  for (const width of [390, 1280]) {
+  for (const width of [390, 768, 1280]) {
     await page.setViewportSize({ width, height: 740 });
     await page.goto(origin, { waitUntil: 'domcontentloaded' });
+    if (width === 390) await expect(page.locator('.society-header .society-brand span')).toBeVisible();
+    if (width === 768) expect((await page.locator('.society-committee-banner strong').boundingBox())!.height).toBeLessThanOrEqual(22);
     await page.evaluate(() => {
       document.documentElement.style.scrollBehavior = 'auto';
       window.scrollTo(0, 900);

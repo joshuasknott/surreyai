@@ -180,25 +180,26 @@ const socialLinks = Object.entries(socialNames).filter(([key]) => society.social
     .society-header__inner { padding: 10px 16px; gap: 10px; min-height: 76px; }
     .society-brand { gap: 9px; font-size: 14px; }
     .society-brand img { width: 42px; height: 42px; }
-    .society-ai .society-header .society-brand span { display: none; }
+    .society-ai .society-header .society-brand span { font-size: 13px; line-height: 1.15; }
     .society-public .society-nav-join { min-height: 44px; }
     .society-public .society-nav-join { padding: 12px; gap: 8px; font-size: 15px; }
     .society-join-panel { top: calc(100% + 12px); }
     .society-join-socials a { padding-inline: 8px; }
     .society-footer > div { flex-direction: column; align-items: start; }
   }
-  @media (max-width: 760px) {
-    .society-committee-banner__inner { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; padding: 12px 16px; }
-    .society-committee-banner strong { grid-column: 1 / -1; font-size: 17px; }
-    .society-committee-banner__label { grid-column: 1; grid-row: 2; margin-left: 0; font-size: 14px; }
-    .society-committee-banner__countdown { grid-column: 1 / -1; grid-row: 3; margin-left: 0; justify-content: start; gap: 8px; }
-    .society-committee-banner__countdown b { font-size: 17px; }
-    .society-committee-banner__countdown small { font-size: 12px; }
-    .society-committee-banner__apply { grid-column: 2; grid-row: 2; align-self: center; }
+  @media (max-width: 850px) {
+    .society-committee-banner__inner { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 10px; min-height: 0; padding: 6px 16px; }
+    .society-committee-banner strong { grid-column: 1; grid-row: 1; font-size: 15px; }
+    .society-committee-banner__label { display: none; }
+    .society-committee-banner__countdown { grid-column: 1 / -1; grid-row: 2; margin-left: 0; justify-content: space-between; gap: 4px; }
+    .society-committee-banner__countdown > span { gap: 3px; }
+    .society-committee-banner__countdown b { font-size: 16px; }
+    .society-committee-banner__countdown small { font-size: 11px; }
+    .society-public .society-committee-banner__apply { grid-column: 2; grid-row: 1; align-self: center; padding-inline: 14px; }
   }
   @media (max-width: 359px) {
-    .society-committee-banner__countdown { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .society-header .society-brand { font-size: 13px; gap: 8px; }
     .society-header .society-brand img { width: 36px; height: 36px; }
+    .society-ai .society-header .society-brand span { font-size: 12px; }
   }
 </style>
