@@ -170,10 +170,15 @@ const socialLinks = Object.entries(socialNames).filter(([key]) => society.social
   .society-join-email { border-top: 1px solid var(--society-line); }
   .society-public .society-join-panel a:hover { background: color-mix(in srgb, var(--society-accent) 22%, white); }
   .society-public .society-header .society-join-panel a:focus-visible { outline: 2px solid var(--society-ink); outline-offset: -2px; }
-  .society-footer { background: var(--society-ink); color: #fffaf1; padding: 32px 28px 100px; }
-  .society-footer > div { max-width: 1224px; margin: auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px; }
+  .society-footer { background: var(--society-ink); color: #fffaf1; padding: 20px 28px; }
+  .society-footer > div { max-width: 1168px; margin: auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px 24px; }
   .society-footer p, .society-footer > div > a { font-size: 15px; }
+  .society-footer > div > a { display: inline-flex; align-items: center; min-height: 44px; }
+  .society-footer p { margin: 0; padding-inline-end: 72px; max-width: 100%; overflow-wrap: anywhere; }
   .society-public :is(.society-header, .society-footer) :is(a, button, summary):focus-visible { outline: 3px solid var(--society-accent); outline-offset: 5px; }
+  @media (max-width: 760px) {
+    .society-footer { padding-inline: 20px; }
+  }
   @media (max-width: 540px) {
     .society-committee-banner { top: 76px; }
     .society-ai section[id], .society-ai [id="activities"], .society-neurotech section[id], .society-neurotech [id="activities"] { scroll-margin-top: 14rem; }
