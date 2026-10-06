@@ -1,4 +1,5 @@
 ---
+import { getSecret } from 'astro:env/server';
 export const prerender = false;
 import Layout from '../../layouts/Layout.astro';
 import { getCommitteeRole } from '../../data/committeeRoles';
@@ -9,7 +10,7 @@ import '../../styles/committeeApplications.css';
 const role = getCommitteeRole(Astro.params.role ?? '');
 if (!role) return Astro.redirect('/committee-applications', 302);
 const applicationsClosed = committeeApplicationsClosed();
-const applicationsOpen = !applicationsClosed && Boolean(import.meta.env.RESEND_API_KEY && import.meta.env.COMMITTEE_FROM_EMAIL);
+const applicationsOpen = !applicationsClosed && Boolean(getSecret('RESEND_API_KEY') && getSecret('COMMITTEE_FROM_EMAIL'));
 const social = role.slug === 'social-media-content';
 ---
 

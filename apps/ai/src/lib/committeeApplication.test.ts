@@ -25,12 +25,13 @@ const send = (req = request(), options: { apiKey?: string; fromEmail?: string } 
 afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals(); vi.clearAllMocks(); });
 
 describe('committee application email delivery', () => {
-  it('stops accepting applications when the countdown ends', async () => {
+  it('accepts applications after the old automatic deadline', async () => {
     vi.useFakeTimers();
-    vi.setSystemTime(new Date(COMMITTEE_APPLICATIONS_CLOSE_AT));
-    const fetch = vi.fn(); vi.stubGlobal('fetch', fetch);
-    expect((await send()).status).toBe(410);
-    expect(fetch).not.toHaveBeenCalled();
+    vi.setSystemTime(new Date('2026-10-08T12:00:00Z'));
+    const fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify({ id: 'reopened-1' })));
+    vi.stubGlobal('fetch', fetch);
+    expect((await send()).status).toBe(200);
+    expect(fetch).toHaveBeenCalledOnce();
   });
   it('sends the selected role and answers only to the reviewer inbox', async () => {
     const fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify({ id: 'sent-1' })));

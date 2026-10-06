@@ -1,12 +1,12 @@
 import { expect, test } from '@playwright/test';
 
-const origin = 'http://127.0.0.1:4323';
+const origin = process.env.E2E_NEUROTECH_ORIGIN || 'http://127.0.0.1:4323';
 
 test('Neurotech header leads to five role applications', async ({ page }) => {
   await page.goto(origin, { waitUntil: 'domcontentloaded' });
   const cta = page.locator('.society-committee-banner');
   await expect(cta).toContainText('Committee applications are out!');
-  await expect(cta.locator('[data-seconds]')).toHaveText(/^\d{2}$/);
+  await expect(cta.locator('[data-committee-countdown]')).toHaveCount(0);
   const apply = cta.getByRole('link', { name: 'Apply' });
   await expect(apply).toHaveAttribute('href', '/committee-applications');
   await expect(apply).toBeVisible();
@@ -75,8 +75,6 @@ test('Homepage banner and activity layout fit phone and wide desktop', async ({ 
     expect(button?.height).toBeGreaterThanOrEqual(44);
     if (width <= 850) {
       expect((await page.locator('.society-committee-banner').boundingBox())!.height).toBeLessThanOrEqual(90);
-      const countdown = await page.locator('.society-committee-banner__countdown').boundingBox();
-      expect(countdown!.y).toBeGreaterThanOrEqual(button!.y + button!.height);
     }
     const overflow = await page.evaluate(() => Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - window.innerWidth);
     expect(overflow).toBeLessThanOrEqual(1);

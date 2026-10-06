@@ -1,12 +1,12 @@
 import { expect, test } from '@playwright/test';
 
-const origin = 'http://127.0.0.1:4321';
+const origin = process.env.E2E_AI_ORIGIN || 'http://127.0.0.1:4321';
 
 test('AI Society header leads to seven distinct committee applications', async ({ page }) => {
   await page.goto(origin, { waitUntil: 'domcontentloaded' });
   const cta = page.locator('.society-committee-banner');
   await expect(cta).toContainText('Committee applications are out!');
-  await expect(cta.locator('[data-seconds]')).toHaveText(/^\d{2}$/);
+  await expect(cta.locator('[data-committee-countdown]')).toHaveCount(0);
   const apply = cta.getByRole('link', { name: 'Apply' });
   await expect(apply).toHaveAttribute('href', '/committee-applications');
   await expect(apply).toBeVisible();
@@ -52,9 +52,7 @@ test('Committee cards and forms fit a narrow phone viewport', async ({ page }) =
       await expect(page.locator('.society-header .society-brand span')).toBeVisible();
       expect((await banner.boundingBox())!.height).toBeLessThanOrEqual(90);
       const apply = await banner.getByRole('link', { name: 'Apply' }).boundingBox();
-      const countdown = await banner.locator('.society-committee-banner__countdown').boundingBox();
       expect(apply!.height).toBeGreaterThanOrEqual(44);
-      expect(countdown!.y).toBeGreaterThanOrEqual(apply!.y + apply!.height);
     }
   }
 });
