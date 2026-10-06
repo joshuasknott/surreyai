@@ -4,7 +4,7 @@ import AssistantWidget from './AssistantWidget.astro';
 import SocialIcon from './SocialIcon.astro';
 import { ASSISTANT_CONFIGS, type AssistantSocietyKey } from '../assistant';
 import { getSocietyById } from '@surreysocieties/admin/config';
-import { COMMITTEE_APPLICATIONS_CLOSE_AT } from '../committeeDeadline';
+import { COMMITTEE_APPLICATIONS_CLOSE_AT, NEUROTECH_COMMITTEE_APPLICATIONS_CLOSE_AT } from '../committeeDeadline';
 
 interface Props {
   societyKey: AssistantSocietyKey;
@@ -16,6 +16,7 @@ interface Props {
 }
 const { societyKey, title, description, ogImage, bodyClass = '', extraFontHrefs = [] } = Astro.props;
 const society = getSocietyById(societyKey)!;
+const committeeDeadline = societyKey === 'neurotech' ? NEUROTECH_COMMITTEE_APPLICATIONS_CLOSE_AT : COMMITTEE_APPLICATIONS_CLOSE_AT;
 const socialNames: Record<string, string> = { whatsapp: 'WhatsApp', instagram: 'Instagram', linkedin: 'LinkedIn', discord: 'Discord', tiktok: 'TikTok' };
 const socialLinks = Object.entries(socialNames).filter(([key]) => society.socials[key as keyof typeof society.socials]);
 ---
@@ -50,11 +51,11 @@ const socialLinks = Object.entries(socialNames).filter(([key]) => society.social
       </div>
     </div>
   </header>
-  {(societyKey === 'ai' || societyKey === 'neurotech') && <aside class="society-committee-banner" aria-label="Committee applications" data-committee-deadline={COMMITTEE_APPLICATIONS_CLOSE_AT}>
+  {(societyKey === 'ai' || societyKey === 'neurotech') && <aside class="society-committee-banner" aria-label="Committee applications" data-committee-deadline={committeeDeadline}>
     <span class="society-committee-banner__inner">
       <strong>Committee applications are out!</strong>
-      {COMMITTEE_APPLICATIONS_CLOSE_AT && <span class="society-committee-banner__label">Closes in</span>}
-      {COMMITTEE_APPLICATIONS_CLOSE_AT && <span class="society-committee-banner__countdown" aria-label="Applications close in" data-committee-countdown>
+      {committeeDeadline && <span class="society-committee-banner__label">Closes in</span>}
+      {committeeDeadline && <span class="society-committee-banner__countdown" aria-label="Applications close in" data-committee-countdown>
         <span><b data-days>07</b><small>days</small></span>
         <span><b data-hours>00</b><small>hours</small></span>
         <span><b data-minutes>00</b><small>minutes</small></span>

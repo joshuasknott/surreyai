@@ -5,6 +5,7 @@ const origin = process.env.E2E_NEUROTECH_ORIGIN || 'http://127.0.0.1:4323';
 test('Neurotech header leads to five role applications', async ({ page }) => {
   await page.goto(origin, { waitUntil: 'domcontentloaded' });
   const cta = page.locator('.society-committee-banner');
+  await expect(cta).toHaveAttribute('data-committee-deadline', '2026-10-07T18:24:22Z');
   await expect(cta).toContainText('Committee applications are out!');
   await expect(cta.locator('[data-seconds]')).toHaveText(/^\d{2}$/);
   const apply = cta.getByRole('link', { name: 'Apply' });
