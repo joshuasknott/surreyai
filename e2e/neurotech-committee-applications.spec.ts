@@ -6,7 +6,7 @@ test('Neurotech header leads to five role applications', async ({ page }) => {
   await page.goto(origin, { waitUntil: 'domcontentloaded' });
   const cta = page.locator('.society-committee-banner');
   await expect(cta).toContainText('Committee applications are out!');
-  await expect(cta.locator('[data-committee-countdown]')).toHaveCount(0);
+  await expect(cta.locator('[data-seconds]')).toHaveText(/^\d{2}$/);
   const apply = cta.getByRole('link', { name: 'Apply' });
   await expect(apply).toHaveAttribute('href', '/committee-applications');
   await expect(apply).toBeVisible();

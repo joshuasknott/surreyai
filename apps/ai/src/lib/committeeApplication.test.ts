@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { del, get } from '@vercel/blob';
 import { handleCommitteeApplication } from './committeeApplication';
 import { COMMITTEE_APPLICATIONS_CLOSE_AT } from '@surreysocieties/ui/committeeDeadline';
@@ -22,16 +22,28 @@ function request(role = 'workshops-learning', extras: Record<string, string> = {
 
 const send = (req = request(), options: { apiKey?: string; fromEmail?: string } = config) => handleCommitteeApplication(req, options, String(++address));
 
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(new Date('2026-10-06T12:00:00Z'));
+});
+
 afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals(); vi.clearAllMocks(); });
 
 describe('committee application email delivery', () => {
-  it('accepts applications after the old automatic deadline', async () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date('2026-10-08T12:00:00Z'));
-    const fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify({ id: 'reopened-1' })));
+  it('accepts applications right up until the closing time', async () => {
+    vi.setSystemTime(new Date(Date.parse(COMMITTEE_APPLICATIONS_CLOSE_AT) - 1));
+    const fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify({ id: 'before-close-1' })));
     vi.stubGlobal('fetch', fetch);
     expect((await send()).status).toBe(200);
     expect(fetch).toHaveBeenCalledOnce();
+  });
+
+  it('closes applications at the countdown deadline', async () => {
+    vi.setSystemTime(new Date(COMMITTEE_APPLICATIONS_CLOSE_AT));
+    const fetch = vi.fn();
+    vi.stubGlobal('fetch', fetch);
+    expect((await send()).status).toBe(410);
+    expect(fetch).not.toHaveBeenCalled();
   });
   it('sends the selected role and answers only to the reviewer inbox', async () => {
     const fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify({ id: 'sent-1' })));

@@ -1,6 +1,5 @@
-// Applications stay open until an explicit closing date is agreed.
-// Set an ISO timestamp to restore a shared countdown and server-side cutoff.
-export const COMMITTEE_APPLICATIONS_CLOSE_AT: string | null = null;
+// Fixed release deadline shared by both society sites and their application handlers.
+export const COMMITTEE_APPLICATIONS_CLOSE_AT = '2026-10-06T13:44:00Z';
 
 export const committeeApplicationsClosed = (now = Date.now()) =>
-  COMMITTEE_APPLICATIONS_CLOSE_AT !== null && now >= Date.parse(COMMITTEE_APPLICATIONS_CLOSE_AT);
+  now >= Date.parse(COMMITTEE_APPLICATIONS_CLOSE_AT);
