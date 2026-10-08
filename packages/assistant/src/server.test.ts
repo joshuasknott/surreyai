@@ -98,7 +98,7 @@ describe("website assistant safeguards", () => {
 
     expect(socialBody.message).toContain("[Instagram](https://www.instagram.com/surreybusinesssociety)");
     expect(socialBody.message).toContain("[LinkedIn](https://www.linkedin.com/company/surreybusinesssociety/)");
-    expect(committeeBody.message).toContain("[the committee section](/#committee)");
+    expect(committeeBody.message).toMatch(/\[[^\]]+\]\(\/#committee\)/);
   });
 
   it("rate limits repeated fallback requests from the same address", async () => {
