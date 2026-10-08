@@ -6,3 +6,5 @@ apps/*/dist/
 apps/*/.vercel/
 .playwright-cli/
 test-results/
+.env*
+**/.env*

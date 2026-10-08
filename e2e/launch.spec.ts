@@ -18,7 +18,7 @@ const sites = [
   {
     key: 'business',
     name: 'Business',
-    origin: 'http://127.0.0.1:4322',
+    origin: process.env.BUSINESS_E2E_ORIGIN ?? 'http://127.0.0.1:4322',
     unionUrl: 'https://surreyunion.org/your-activity/clubs-and-societies-a-z/business-society',
     linktreeUrl: 'https://linktr.ee/surreybusinesssociety',
     joinUrl: 'https://chat.whatsapp.com/IIk88Q5Y2Du65aC5wmkAPE',
@@ -44,7 +44,7 @@ async function captureRefinementEvidence(page: Page, name: string, fullPage = fa
   if (!directory) return;
   await mkdir(directory, { recursive: true });
   if (fullPage) {
-    for (const image of await page.locator('main img').all()) {
+    for (const image of await page.locator('main img:visible').all()) {
       await image.scrollIntoViewIfNeeded();
       await expect.poll(() => image.evaluate((element: HTMLImageElement) => element.complete && element.naturalWidth > 0)).toBe(true);
     }
@@ -149,6 +149,14 @@ for (const site of sites) {
       for (const width of [320, 390, 768, 1440]) {
         await page.setViewportSize({ width, height: 900 });
         await expectNoHorizontalOverflow(page);
+        if (site.key === 'business') {
+          const notebook = page.locator('.committee-notebook__surface');
+          await notebook.scrollIntoViewIfNeeded();
+          await expect.poll(() => notebook.evaluate((image: HTMLImageElement) => image.currentSrc.includes('business-committee-notebook-mobile'))).toBe(width <= 700);
+          await expect.poll(() => notebook.evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0)).toBe(true);
+          const overflowingText = await page.locator('#committee h3, #committee p, .editorial-activity h3').evaluateAll(elements => elements.filter(element => element.scrollWidth > element.clientWidth + 1).map(element => element.textContent));
+          expect(overflowingText).toEqual([]);
+        }
         if (width === 390 || width === 1440) {
           await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
           await captureRefinementEvidence(page, `${site.key}-home-${width}`);
@@ -158,7 +166,14 @@ for (const site of sites) {
       }
     });
 
-    test('contact form opens one prefilled email from a single click', async ({ page }) => {
+    test('contact action opens the society email', async ({ page }) => {
+      if (site.key === 'business') {
+        await page.goto(site.origin);
+        const emailLink = page.locator('#contact').getByRole('link', { name: 'ussu.bizsoc@surrey.ac.uk' });
+        await expect(emailLink).toBeVisible();
+        await expect(emailLink).toHaveAttribute('href', 'mailto:ussu.bizsoc@surrey.ac.uk');
+        return;
+      }
       await page.addInitScript(() => {
         document.addEventListener('click', event => {
           const link = (event.target as Element).closest('.contact-form__mailto') as HTMLAnchorElement | null;
@@ -243,7 +258,7 @@ for (const site of sites) {
         const height = width === 768 ? 390 : 844;
         await page.setViewportSize({ width, height });
         await expect(panel).toBeHidden();
-        await expect(header.locator('a:visible')).toHaveCount(1);
+        await expect(header.locator('a:visible')).toHaveCount(site.key === 'business' && width > 700 ? 4 : 1);
         expect((await trigger.boundingBox())?.height).toBeGreaterThanOrEqual(44);
         await trigger.click();
         await expect(panel).toBeVisible();
@@ -254,7 +269,7 @@ for (const site of sites) {
           await expect(link).toHaveAccessibleName(/.+/);
           expect((await link.boundingBox())?.height).toBeGreaterThanOrEqual(44);
         }
-        for (const social of await page.locator('.community-socials a').all()) {
+        for (const social of await page.locator(site.key === 'business' ? '.business-contact nav a' : '.community-socials a').all()) {
           await expect(panel.locator(`a[href="${await social.getAttribute('href')}"]`)).toHaveCount(1);
         }
         const bounds = (await panel.boundingBox())!;
@@ -284,15 +299,20 @@ for (const site of sites) {
       await expect(panel).toBeHidden();
     });
 
-    test('hero offers the Union society page followed by Linktree', async ({ page }) => {
+    test('hero offers membership and the society discovery action', async ({ page }) => {
       await page.goto(site.origin, { waitUntil: 'domcontentloaded' });
       const links = page.locator('[data-hero-actions] a');
       await expect(links).toHaveCount(2);
       await expect(links.nth(0)).toHaveAccessibleName('Join the society');
       await expect(links.nth(0)).toHaveAttribute('href', site.unionUrl);
-      await expect(links.nth(1)).toHaveAccessibleName('Linktree');
-      await expect(links.nth(1)).toHaveAttribute('href', site.linktreeUrl);
-      for (const link of await links.all()) {
+      await expect(links.nth(1)).toHaveAccessibleName(site.key === 'business' ? 'Explore events' : 'Linktree');
+      await expect(links.nth(1)).toHaveAttribute('href', site.key === 'business' ? '#activities' : site.linktreeUrl);
+      if (site.key === 'business') {
+        await links.nth(1).click();
+        await expect(page).toHaveURL(/#activities$/);
+        await expect(page.getByRole('heading', { name: 'Careers', exact: true })).toBeInViewport();
+      }
+      for (const link of await (site.key === 'business' ? links.nth(0).all() : links.all())) {
         await expect(link).toHaveAttribute('target', '_blank');
         await expect(link).toHaveAttribute('rel', /noopener/);
       }
@@ -301,9 +321,10 @@ for (const site of sites) {
     test('social links have labelled icons and generous click targets', async ({ page }) => {
       await page.setViewportSize({ width: 390, height: 844 });
       await page.goto(site.origin, { waitUntil: 'domcontentloaded' });
-      const socialLinks = page.locator('.community-socials a');
+      const socialLinks = page.locator(site.key === 'business' ? '.business-contact nav a' : '.community-socials a');
+      if (site.key === 'business') await expect(socialLinks).toHaveCount(3);
       for (const link of await socialLinks.all()) {
-        await expect(link.locator('svg')).toHaveCount(1);
+        await expect(link.locator(site.key === 'business' ? '.business-social-link__icon svg' : 'svg')).toHaveCount(1);
         await expect(link).toHaveAccessibleName(/.+/);
         expect((await link.boundingBox())?.height).toBeGreaterThanOrEqual(48);
       }
@@ -361,7 +382,9 @@ for (const site of sites) {
       const toggle = page.locator('[data-assistant-widget] .assistant-toggle');
       await expect(toggle).toBeVisible();
       const siteLogo = await page.locator('.society-header .society-brand img').getAttribute('src');
-      await expect(toggle.locator('img')).toHaveAttribute('src', siteLogo || '');
+      const assistantImage = site.key === 'business' ? '/images/business-assistant-fawn.webp' : siteLogo || '';
+      await expect(toggle.locator('img')).toHaveAttribute('src', assistantImage);
+      await expect.poll(() => toggle.locator('img').evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0)).toBe(true);
       await toggle.click();
 
       const panel = page.locator('[data-assistant-widget] .assistant-panel');
@@ -374,6 +397,8 @@ for (const site of sites) {
       const box = await panel.boundingBox();
       expect(box?.x ?? -1).toBeGreaterThanOrEqual(0);
       expect((box?.x ?? 0) + (box?.width ?? 0)).toBeLessThanOrEqual(390);
+      const toggleBox = await toggle.boundingBox();
+      expect((box?.y ?? 0) + (box?.height ?? 0)).toBeLessThanOrEqual(toggleBox?.y ?? 0);
 
       await page.locator('[data-assistant-widget] .assistant-close').click();
       await expect(panel).toBeHidden();

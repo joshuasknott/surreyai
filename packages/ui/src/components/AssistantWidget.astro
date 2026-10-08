@@ -6,9 +6,10 @@ import type { AssistantSocietyConfig } from '../assistant';
 interface Props {
   config: AssistantSocietyConfig;
   endpoint?: string;
+  mascotSrc?: string;
 }
 
-const { config, endpoint = '/api/assistant/chat' } = Astro.props;
+const { config, endpoint = '/api/assistant/chat', mascotSrc } = Astro.props;
 const widgetId = 'society-assistant-' + config.societyKey;
 const title = config.societyKey === 'ai' ? 'AI Society assistant' : config.societyKey === 'business' ? 'Business Society assistant' : 'Neurotech assistant';
 const logo = getSocietyById(config.societyKey)!.logo;
@@ -33,7 +34,7 @@ const styleVars = [
 
 <div
   id={widgetId}
-  class={'society-assistant assistant--' + config.societyKey}
+  class:list={['society-assistant', 'assistant--' + config.societyKey, { 'assistant--mascot': Boolean(mascotSrc) }]}
   data-assistant-widget
   data-endpoint={endpoint}
   data-society-name={config.societyName}
@@ -47,7 +48,7 @@ const styleVars = [
     aria-expanded="false"
     aria-controls={widgetId + '-panel'}
   >
-    <img src={logo} alt="" width="56" height="56" loading="lazy" decoding="async" />
+    <img src={mascotSrc ?? logo} alt="" width={mascotSrc ? 80 : 56} height={mascotSrc ? 97 : 56} decoding="async" />
   </button>
 
   <section
@@ -60,7 +61,7 @@ const styleVars = [
   >
     <header class="assistant-header">
       <div class="assistant-brand">
-        <span class="assistant-brand-mark" aria-hidden="true"><img src={logo} alt="" width="34" height="34" loading="lazy" decoding="async" /></span>
+        <span class="assistant-brand-mark" aria-hidden="true"><img src={mascotSrc ?? logo} alt="" width="34" height={mascotSrc ? 41 : 34} loading="lazy" decoding="async" /></span>
         <h2 id={widgetId + '-title'}>{title}</h2>
       </div>
       <div class="assistant-header-actions">
@@ -140,6 +141,10 @@ const styleVars = [
   [data-assistant-widget] .assistant-toggle:hover { transform: translateY(-2px); box-shadow: 0 12px 26px #0b1a2d2e; }
   [data-assistant-widget] .assistant-toggle img { display: block; width: 100%; height: 100%; object-fit: cover; }
 
+  [data-assistant-widget].assistant--mascot .assistant-toggle { width: 5rem; height: 6.1rem; overflow: visible; border: 0; border-radius: 0.5rem; background: transparent; box-shadow: none; }
+  [data-assistant-widget].assistant--mascot .assistant-toggle img { object-fit: contain; filter: drop-shadow(0 4px 4px #0b1a2d24); }
+  [data-assistant-widget].assistant--mascot .assistant-toggle:hover { box-shadow: none; }
+
   [data-assistant-widget] .assistant-panel {
     position: fixed;
     right: 1.25rem;
@@ -158,6 +163,8 @@ const styleVars = [
   [data-assistant-widget] .assistant-panel:has(.assistant-messages:not(:empty)) { height: min(28rem, calc(100dvh - 7rem)); }
   [data-assistant-widget].assistant--business .assistant-panel { border-color: #071a2d; border-radius: 0.9rem; }
   [data-assistant-widget].assistant--neurotech .assistant-panel { border-color: #d7dfe8; }
+  [data-assistant-widget].assistant--mascot .assistant-panel { bottom: 8rem; height: min(21rem, calc(100dvh - 9.5rem)); }
+  [data-assistant-widget].assistant--mascot .assistant-panel:has(.assistant-messages:not(:empty)) { height: min(28rem, calc(100dvh - 9.5rem)); }
 
   [data-assistant-widget] .assistant-header {
     display: flex;
@@ -171,6 +178,8 @@ const styleVars = [
   [data-assistant-widget] .assistant-brand { display: flex; align-items: center; min-width: 0; gap: 0.65rem; }
   [data-assistant-widget] .assistant-brand-mark { display: grid; place-items: center; flex: 0 0 2.15rem; width: 2.15rem; height: 2.15rem; overflow: hidden; border-radius: 50%; }
   [data-assistant-widget] .assistant-brand-mark img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  [data-assistant-widget].assistant--mascot .assistant-brand-mark { flex-basis: 2.3rem; width: 2.3rem; height: 2.8rem; overflow: visible; border-radius: 0; }
+  [data-assistant-widget].assistant--mascot .assistant-brand-mark img { object-fit: contain; }
   [data-assistant-widget] .assistant-header h2 { margin: 0; color: var(--assistant-text); font-size: 0.92rem; font-weight: 750; letter-spacing: -0.015em; line-height: 1.2; }
   [data-assistant-widget].assistant--business .assistant-header h2 { font-family: 'Playfair Display', Georgia, serif; font-size: 1.04rem; }
   [data-assistant-widget] .assistant-header-actions { display: flex; align-items: center; gap: 0.1rem; }
@@ -320,6 +329,13 @@ const styleVars = [
       height: min(23rem, calc(100dvh - 6.5rem));
     }
     [data-assistant-widget] .assistant-panel:has(.assistant-messages:not(:empty)) { height: min(29rem, calc(100dvh - 6.5rem)); }
+    [data-assistant-widget].assistant--mascot .assistant-toggle { width: 4rem; height: 4.85rem; }
+    [data-assistant-widget].assistant--mascot .assistant-panel { bottom: 6.5rem; height: min(23rem, calc(100dvh - 7.75rem)); }
+    [data-assistant-widget].assistant--mascot .assistant-panel:has(.assistant-messages:not(:empty)) { height: min(29rem, calc(100dvh - 7.75rem)); }
+  }
+  @media (max-width: 360px) {
+    [data-assistant-widget].assistant--mascot { right: 0.75rem; bottom: 0.75rem; }
+    [data-assistant-widget].assistant--mascot .assistant-toggle { width: 3rem; height: 3.65rem; }
   }
   @media (prefers-reduced-motion: reduce) {
     [data-assistant-widget] *, [data-assistant-widget] *::before, [data-assistant-widget] *::after { transition: none !important; scroll-behavior: auto !important; }
