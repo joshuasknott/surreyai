@@ -373,6 +373,15 @@ for (const site of sites) {
       await expect(membershipLink).toHaveAttribute('target', '_blank');
       await membershipLink.hover();
       await captureRefinementEvidence(page, `${site.key}-membership-hover`);
+      if (site.key === 'business') {
+        for (const width of [320, 390]) {
+          await page.setViewportSize({ width, height: 844 });
+          const copy = (await page.locator('.business-join__copy').boundingBox())!;
+          const pencil = (await page.locator('.business-join__pencil').boundingBox())!;
+          expect(pencil.y).toBeGreaterThanOrEqual(copy.y + copy.height);
+          await expectNoHorizontalOverflow(page);
+        }
+      }
     });
 
     test('assistant opens, closes, and is usable on mobile', async ({ page }) => {
