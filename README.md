@@ -1,84 +1,63 @@
-<div align="center">
+# Surrey Societies
 
-# surreysocieties
+Three student communities at the University of Surrey, each with a website of its own. Discover what they do, explore events and find your way to get involved.
 
-**Three University of Surrey society sites. One monorepo.**
+[AI Society](https://surreyaisociety.org) · [Business Society](https://surreybusinesssociety.org) · [Neurotech Society](https://surreyneurotechsociety.org)
 
-Astro · Convex · Tailwind · TypeScript
+## AI Society
 
-<p>
-  <a href="https://surreyaisociety.org">AI</a> ·
-  <a href="https://surreybusinesssociety.org">Business</a> ·
-  <a href="https://surreyneurotechsociety.org">Neurotech</a>
-</p>
+A community for students curious about artificial intelligence, machine learning and data science. Learn together, build projects and ask questions, whatever your degree or experience.
 
-</div>
+[Visit the AI site →](https://surreyaisociety.org)
 
-<p align="center">
-  <img src="docs/images/surrey-ai-hero.png" alt="Surrey Artificial Intelligence Society" width="32%" />
-  <img src="docs/images/surrey-business-hero.png" alt="Surrey Business Society" width="32%" />
-  <img src="docs/images/surrey-neurotech-hero.png" alt="Surrey Neurotech Society" width="32%" />
-</p>
+![AI Society homepage with playful lettering, colourful artwork and links to join the society and explore events.](docs/images/surrey-ai-hero.png)
 
-## Sites
+## Business Society
 
-| Society | App | Domain |
-|---------|-----|--------|
-| Surrey Artificial Intelligence Society | `apps/ai` | [surreyaisociety.org](https://surreyaisociety.org) |
-| Surrey Business Society | `apps/business` | [surreybusinesssociety.org](https://surreybusinesssociety.org) |
-| Surrey Neurotech Society | `apps/neurotech` | [surreyneurotechsociety.org](https://surreyneurotechsociety.org) |
+Meet Surrey’s business community through careers, enterprise, networking and practical skills. A place to exchange ideas, meet other students and take your next step.
 
-Shared Convex backend and UI packages. Each society keeps its own brand and production deploy. Public product surface is the three society websites only (no per-site admin CMS).
+[Visit the Business site →](https://surreybusinesssociety.org)
 
-## Stack
+![Business Society homepage featuring its campus artwork and an invitation to meet Surrey’s business community.](docs/images/surrey-business-hero.png)
 
-[Astro](https://astro.build/) (SSR, Node) · [Tailwind CSS v4](https://tailwindcss.com/) · [Convex](https://convex.dev/) · TypeScript · npm workspaces · [Vercel](https://vercel.com/)
+## Neurotech Society
 
-## Setup
+Explore where neuroscience meets technology through workshops, brain–computer interface projects, research discussions and socials. No previous experience needed.
 
-Requires Node.js `>= 22.12.0` and a Convex project.
+[Visit the Neurotech site →](https://surreyneurotechsociety.org)
 
-```bash
-npm install
-cp .env.example .env   # fill values — see comments in the file
-npx convex dev         # link project, generate types, deploy functions
-```
+![Neurotech Society homepage with a laboratory scene, an introduction to neurotechnology and a link to join.](docs/images/surrey-neurotech-hero.png)
 
-Seed societies if needed:
+*Screenshots captured from all three live websites on 9 October 2026.*
 
-```bash
-npx convex run seed:seedSocieties
-```
+## About the project
 
-Never put secrets behind a `PUBLIC_` prefix.
-
-```bash
-npm run dev:ai         # :4321
-npm run dev:business   # :4322
-npm run dev:neurotech  # :4323
-npm run build:all
-npm test
-npm run test:e2e
-```
-
-## Layout
-
-```
-apps/{ai,business,neurotech}   # society sites
-packages/{admin,ui,assistant}  # shared public helpers + UI + assistant
-convex/                        # schema, functions, permissions, seed
-scripts/                       # Vercel build + ops
-e2e/                           # Playwright
-```
-
-`packages/admin` is a public-safe shared helpers package (society config, contact delivery, Convex client helpers). It no longer ships a CMS.
-
-Each contact form opens a prefilled message in the visitor’s email app with one click. The visitor reviews and sends it there; the website never claims to have sent it. A separate `/api/contact` endpoint supports server-side delivery if needed later, but the public form does not call it. The endpoint requires server-only `RESEND_API_KEY` and `CONTACT_FROM_EMAIL`; never use `PUBLIC_` variables for these secrets.
-
-## Deploy
-
-Vercel: from repo root run `node scripts/build-vercel.mjs ai|business|neurotech` → `.vercel/output`. Point each domain at its app and deploy Convex to the same project as `CONVEX_URL`.
+The sites bring each society’s activities, committee and membership links together in one place. Each keeps its own look and personality, with shared foundations that make it easier to maintain all three.
 
 ## Contributing
 
-PRs that improve shared packages, isolation, tests, or deploys are welcome. Don’t invent society content. Prefer `npm test`, `npm run test:e2e`, and the relevant `build:*` before opening a PR.
+Ideas, corrections and improvements are welcome. Keep society information accurate and check changes on both desktop and mobile. The project’s [working guide](AGENTS.md) covers where things live and which checks to run.
+
+<details>
+<summary>For developers: run the sites locally</summary>
+
+Use Node.js 22.12 or newer. Install dependencies, copy [.env.example](.env.example) to `.env` and configure your own Convex project:
+
+```sh
+npm install
+npx convex dev
+```
+
+Start the site you want to work on, then open the address printed in the terminal:
+
+```sh
+npm run dev:ai
+npm run dev:business
+npm run dev:neurotech
+```
+
+The sites are in `apps/ai`, `apps/business` and `apps/neurotech`. They share UI packages and a Convex backend, and are published separately on Vercel. Keep credentials private; never use a `PUBLIC_` prefix for secrets.
+
+Before submitting changes, run the relevant build and checks described in [AGENTS.md](AGENTS.md).
+
+</details>
