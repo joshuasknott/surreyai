@@ -7,12 +7,13 @@ import { getSocietyById } from '@surreysocieties/admin/config';
 import { queryPublicConvex } from '@surreysocieties/admin';
 import { api } from '../../../../convex/_generated/api.js';
 import Layout from '../layouts/Layout.astro';
-import SocietyCommunity from '@surreysocieties/ui/components/SocietyCommunity';
+import NeurotechCommunity from '../components/NeurotechCommunity.astro';
 import heroImage from '../assets/showcase/neurotech-hero-lab.png';
 import workshopImage from '../assets/showcase/neurotech-workshop-bci.png';
 import talkImage from '../assets/showcase/neurotech-journal-talk.png';
 import communityImage from '../assets/showcase/neurotech-community.png';
 import '../styles/global.css';
+import '../styles/editorial-home.css';
 
 const SOCIETY_ID = 'neurotech';
 const society = getSocietyById(SOCIETY_ID)!;
@@ -22,8 +23,6 @@ const committee = await queryPublicConvex(api.committee.listActive, { societySlu
 
 const activityRows = [
   {
-    number: '01',
-    label: 'Make',
     title: 'Workshops & projects',
     copy: 'Record electrical activity from the scalp with EEG, learn to make sense of the signals, and explore brain–computer interfaces together.',
     image: workshopImage,
@@ -31,8 +30,6 @@ const activityRows = [
     reverse: false,
   },
   {
-    number: '02',
-    label: 'Discuss',
     title: 'Journal clubs and talks',
     copy: 'Discuss a paper, ask questions and hear from researchers and people working in neurotechnology.',
     image: talkImage,
@@ -40,8 +37,6 @@ const activityRows = [
     reverse: true,
   },
   {
-    number: '03',
-    label: 'Connect',
     title: 'Meet the community',
     copy: 'Get to know students from other courses through socials, shared projects and collaborations with other societies.',
     image: communityImage,
@@ -54,11 +49,12 @@ const activityRows = [
 <Layout
   title="Home"
   description="Take part in neurotechnology at Surrey through practical workshops, brain-computer interface projects, journal clubs, talks, collaborations and socials."
+  bodyClass="nt-body nt-editorial"
 >
   <section class="nt-hero" aria-labelledby="nt-hero-title">
     <div class="nt-hero__inner">
-      <div class="nt-hero__copy" data-reveal>
-        <h1 id="nt-hero-title">Take part in neurotechnology at Surrey.</h1>
+      <div class="nt-hero__copy">
+        <h1 id="nt-hero-title">Take part in <span>neurotechnology</span> at Surrey.</h1>
         <p class="nt-hero__intro">
           Explore the brain and the technology that connects with it. Join workshops, research discussions and socials — no experience needed.
         </p>
@@ -77,7 +73,7 @@ const activityRows = [
           src={heroImage}
           alt="Students running an EEG session in a university laboratory."
           widths={[720, 960, 1200, 1600]}
-          sizes="(min-width: 1440px) 907px, (min-width: 900px) 63vw, 100vw"
+          sizes="(min-width: 1440px) 720px, (min-width: 760px) 52vw, 100vw"
           loading="eager"
           fetchpriority="high"
           decoding="async"
@@ -85,9 +81,11 @@ const activityRows = [
         />
       </div>
     </div>
+    <img class="nt-hero__wave" src="/images/editorial/hero-wave.png" alt="" aria-hidden="true" width="1536" height="512" />
   </section>
 
   <section id="about" class="nt-facts" aria-labelledby="nt-facts-title">
+    <img class="nt-facts__art" src="/images/editorial/neural-detail.webp" alt="" aria-hidden="true" width="540" height="414" loading="lazy" decoding="async" />
     <div class="nt-facts__inner">
       <BrainCircuit size={64} strokeWidth={1.5} aria-hidden="true" />
       <div>
@@ -98,25 +96,25 @@ const activityRows = [
   </section>
 
   <section id="activities" class="nt-activities" aria-labelledby="nt-activities-title">
-    <div class="nt-section-heading" data-reveal>
-      <h2 id="nt-activities-title">What happens in the society</h2>
+    <div class="nt-section-heading">
+      <h2 id="nt-activities-title">What happens in the society.</h2>
     </div>
 
     <div class="nt-activity-list">
       {activityRows.map((activity) => (
         <article class:list={['nt-activity', activity.reverse && 'nt-activity--reverse']}>
-          <div class="nt-activity__image" data-reveal>
+          <div class="nt-activity__image">
             <Image
               src={activity.image}
               alt={activity.alt}
-              widths={[640, 960, 1200, 1400]}
-              sizes="(min-width: 760px) 52vw, 100vw"
+              widths={[640, 960, 1200]}
+              sizes="(min-width: 1440px) 760px, (min-width: 760px) 53vw, 100vw"
               loading="lazy"
               decoding="async"
               quality={80}
             />
           </div>
-          <div class="nt-activity__copy" data-reveal>
+          <div class="nt-activity__copy">
             <h3>{activity.title}</h3>
             <p>{activity.copy}</p>
           </div>
@@ -125,5 +123,5 @@ const activityRows = [
     </div>
   </section>
 
-  <SocietyCommunity society={society} committee={committee} />
+  <NeurotechCommunity society={society} committee={committee} />
 </Layout>

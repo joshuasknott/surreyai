@@ -1,0 +1,59 @@
+---
+import type { Society } from '@surreysocieties/admin/types';
+import ContactForm from '@surreysocieties/ui/components/ContactForm';
+import SocialIcon from '@surreysocieties/ui/components/SocialIcon';
+import { UsersRound } from 'lucide-astro';
+
+interface Props { society: Society; committee?: Array<{ name: string; role?: string }>; }
+const { society, committee = [] } = Astro.props;
+const officers = society.signatories.map(officer => {
+  const member = committee.find(member => member.role === officer.role && member.name.trim()) ?? officer;
+  return { ...member, name: member.name === 'Josh Knott' ? 'Joshua Knott' : member.name };
+});
+const socialNames: Record<string, string> = { instagram: 'Instagram', linkedin: 'LinkedIn', linktree: 'Linktree', whatsapp: 'WhatsApp' };
+const socialLinks = Object.entries(socialNames).filter(([key]) => society.socials[key as keyof typeof society.socials]);
+---
+
+<section id="committee" class="nt-committee" aria-labelledby="committee-title">
+  <div class="nt-section-shell nt-committee__inner">
+    <div>
+      <h2 id="committee-title">Meet the committee.</h2>
+      <p>The students running Neurotech Society.</p>
+    </div>
+    <div class="nt-officers">
+      {officers.map(officer => <article>
+        <h3>{officer.name}</h3>
+        <p>{officer.role}</p>
+      </article>)}
+    </div>
+  </div>
+</section>
+
+<section id="join" class="nt-join" aria-labelledby="join-title">
+  <div class="nt-section-shell nt-join__inner">
+    <UsersRound class="nt-join__icon" size={72} strokeWidth={1.6} aria-hidden="true" />
+    <div class="nt-join__copy">
+      <h2 id="join-title">Come and join us.</h2>
+      <p>Get your membership through the Union, then join our WhatsApp group for events and society news.</p>
+    </div>
+    <div class="nt-join__actions">
+      <a class="nt-button nt-button--navy" href={society.membershipUrl} target="_blank" rel="noopener noreferrer">Get your membership <span aria-hidden="true">↗</span></a>
+      <a class="nt-button nt-button--navy" href={society.socials.whatsapp} target="_blank" rel="noopener noreferrer">Join our WhatsApp <span aria-hidden="true">↗</span></a>
+    </div>
+  </div>
+</section>
+
+<section id="contact" class="nt-contact" aria-labelledby="contact-title">
+  <div class="nt-section-shell nt-contact__inner">
+    <div class="nt-contact__copy">
+      <h2 id="contact-title">Get in touch.</h2>
+      <p>Have a question or just want to say hello?<br />We’d love to hear from you.</p>
+      <a class="community-email" href={`mailto:${society.contactEmail}`}><SocialIcon name="email" /><span>{society.contactEmail}</span></a>
+      <nav class="community-socials" aria-label="Society social channels">
+        {socialLinks.map(([key, label]) => <a href={society.socials[key as keyof typeof society.socials]} target="_blank" rel="noopener noreferrer" aria-label={`${label} (opens in a new tab)`}><SocialIcon name={key} /><span>{label}</span></a>)}
+        <a href={society.studentsUnionUrl} target="_blank" rel="noopener noreferrer" aria-label="Union page (opens in a new tab)"><SocialIcon name="union" /><span>Union page</span></a>
+      </nav>
+    </div>
+    <ContactForm society={society} />
+  </div>
+</section>

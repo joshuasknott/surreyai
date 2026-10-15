@@ -1,3 +1,61 @@
+# Neurotech editorial redesign QA - 15 October 2026
+
+final result: passed
+
+## Source and final evidence
+
+- Approved attachment: C:/Users/JOSHUA~1/AppData/Local/Temp/codex-clipboard-0961bac6-b50b-4235-a7ff-b94825ccc5a8.png, copied to output/playwright/neurotech-editorial/reference.png (838 x 1877).
+- Local preview: http://127.0.0.1:4453/ in the isolated codex/neurotech-editorial worktree. This redesign has not been deployed.
+- Final desktop capture: output/playwright/neurotech-editorial/final/editorial-1440-full.png (1440 x 3306). CSS viewport 1440 x 1000, device scale factor 1.
+- Full comparison: output/playwright/neurotech-editorial/comparison-full-final.png. The implementation is normalized to 838 x 1924 with preserved aspect ratio beside the source.
+- Focused comparisons: output/playwright/neurotech-editorial/comparison-hero-final.png and comparison-contact-final.png.
+- Responsive captures: output/playwright/neurotech-editorial/final/editorial-{320,390,838,1024,1440,1920}-{full,hero}.png.
+
+## Comparison history and fixes
+
+The first comparison (comparison-pass-1.png, implementation 1440 x 3483) exposed five P2 fidelity issues:
+
+- The curved hero transition was too shallow. Increased the supplied raster wave height and tightened the introduction overlap to match the reference rhythm.
+- Activity headings were too small. Increased desktop heading scale while retaining unclipped phone typography.
+- Shared scoped form styles overrode the intended rounded fields and message height. Increased the specificity of homepage-only form rules.
+- Shared social-icon flex sizing shrank the icons. Reset flex basis and matched the reference scale.
+- The introduction brain icon was vertically centered rather than aligned beside the heading. Aligned it to the top.
+
+After these fixes, inspected full-page, hero and contact comparisons. A final pass tightened committee and footer whitespace, removed the redundant contact note, and kept functional mobile social labels readable. The mobile review also exposed a legacy minimum height below activity descriptions; removed it and added a regression assertion against excess blank space. The final desktop page is approximately 2.5% taller than the source after normalizing width. No actionable P0, P1 or P2 findings remain.
+
+## Fidelity and behavior
+
+- Preserves the actual society logo, existing EEG/activity photography, established copy, membership/social destinations and neuron assistant.
+- Implements the navy, ivory and gold palette, serif headings, arched gold photograph, curved transition, neural artwork, alternating activity rows, compact committee roster, gold join strip and navy contact/footer from the selected mockup.
+- Uses local display/body fonts and optimized decorative raster assets. Decorative images have empty alt text; content photographs retain descriptive alternatives.
+- The existing assistant remains fixed and interactive. Full-page browser captures show it at the first viewport's fixed position; the source presents it beside the footer. This is an intentional functional adaptation.
+- Desktop and mobile layouts have no horizontal overflow. Tested hero, join, social and form actions remain within the viewport with targets at least 44 pixels high and wide. No desktop headline/photo overlap was found.
+- Functional form labels remain present. The contact form opens a mail app; it does not claim to submit a server-side message.
+- Changes are limited to Neurotech app files, a focused responsive regression test and this QA record. Shared society components, backend logic and the primary checkout are unchanged.
+
+## Verification actually run
+
+- npm run build:neurotech: passed after final CSS changes.
+- npm run typecheck: passed after generating each app's Astro types in the fresh worktree.
+- npm test -- --maxWorkers=1: 50 tests passed across seven files.
+- Neurotech launch, closed-application and editorial Playwright coverage: 22 distinct cases passed across the initial run and focused retries. Two initial image-loading failures came from Astro's Windows Sharp loader after a configuration hot restart; restarting the owned preview server resolved both, and both failed cases passed on retry. This is not a claim that one final 22-case run passed without retries.
+- Final editorial regression passed again after the last spacing changes at 320, 390, 838, 1024, 1440 and 1920 pixels.
+- Browser coverage includes joining links, navigation and keyboard menu behavior, section destinations, contact mailto behavior, social controls, reduced motion, assistant open/close/error/retry/reset and safe reply links, closed committee-application routes and absence of a public CMS. Assistant API response states are mocked.
+- No page JavaScript errors were recorded by the responsive regression.
+- git diff --check: passed; Windows line-ending notices only.
+- Reopened the final in-app preview after the production build and retained it for review.
+
+## Limits and remaining P3 differences
+
+- This is local implementation and QA. No redesign deployment, database mutation, real membership checkout or live assistant-provider response was performed.
+- No CONVEX_URL is configured for this preview, so committee rendering uses the existing configured signatory fallback. Live backend data acceptance is not claimed.
+- Small differences remain in photograph crop, generated neural branches and the exact generated-reference letterforms. The browser implementation uses consistent self-hosted fonts and clean flat color rather than reproducing raster texture.
+- The Astro development toolbar is disabled for this app preview so it does not cover the design. Existing reduced-motion behavior remains intact.
+
+---
+
+# Earlier QA records (preserved)
+
 # Agentic Builder Approved Showcase Build — 28 August 2026
 
 final result: passed

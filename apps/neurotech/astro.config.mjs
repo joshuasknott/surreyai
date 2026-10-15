@@ -6,6 +6,7 @@ const imageSizes = [360, 600, 640, 750, 828, 960, 1080, 1200, 1440, 1800, 1920, 
 
 export default defineConfig({
   compressHTML: true,
+  devToolbar: { enabled: false },
   site: 'https://surreyneurotechsociety.org',
   output: 'server',
   adapter: vercel({
