@@ -106,7 +106,7 @@
   max-width: 550px;
 }
 .nt-editorial .nt-actions { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 30px; }
-.nt-editorial .nt-hero .nt-button, .nt-editorial .nt-button {
+.nt-editorial .nt-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -121,6 +121,8 @@
   text-decoration: none;
   transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
 }
+/* Preserve hero sizing regardless of bundle order without overriding variant borders. */
+.nt-editorial .nt-hero .nt-button { font-size: 19px; min-height: 60px; padding: 14px 24px; }
 .nt-editorial .nt-button:hover { transform: none; }
 .nt-editorial .nt-button--yellow { color: var(--nt-navy) !important; background: var(--nt-gold); border-color: var(--nt-gold); }
 .nt-editorial .nt-button--yellow:hover { background: #f6d98d; border-color: #f6d98d; }
