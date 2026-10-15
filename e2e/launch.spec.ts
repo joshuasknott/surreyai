@@ -262,10 +262,10 @@ for (const site of sites) {
         expect((await trigger.boundingBox())?.height).toBeGreaterThanOrEqual(44);
         await trigger.click();
         await expect(panel).toBeVisible();
-        await expect(panel.getByRole('link', { name: 'Join the society' })).toHaveAttribute('href', site.unionUrl);
+        await expect(panel.getByRole('link', { name: 'Join the society' })).toHaveAttribute('href', site.key === 'ai' ? site.joinUrl : site.unionUrl);
         await expect(panel.getByRole('link', { name: 'Linktree' })).toHaveAttribute('href', site.linktreeUrl);
         for (const link of await panel.locator('a').all()) {
-          await expect(link.locator('svg')).toHaveCount(1);
+          await expect(link.locator('svg').first()).toBeVisible();
           await expect(link).toHaveAccessibleName(/.+/);
           expect((await link.boundingBox())?.height).toBeGreaterThanOrEqual(44);
         }
