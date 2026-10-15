@@ -1,3 +1,32 @@
+# Neurotech presentation and mascot QA - 15 October 2026
+
+final result: passed
+
+## Findings and fixes
+
+- P1: The hero divider could cover the membership and Linktree actions at intermediate widths. Reserved divider clearance within the copy column and reduced the decorative wave height. The actions now finish at least 12 pixels above the wave's complete paint box.
+- P2: The long hero word approached the photograph. The heading now scales with its actual column; the regression measures rendered text with a Range and requires at least 20 pixels of separation from the photo.
+- P2: Introduction copy felt crowded at tablet widths. Limited the heading and paragraph line lengths and reduced the decorative neural artwork footprint.
+- P2: A legacy body font rule could win in the bundled stylesheet. Added a focused body font override so the local self-hosted sans font is used consistently.
+- Recoloured the existing neuron through imagegen to warm gold with a navy face and boots, preserving transparent edges and its friendly identity. Optimized the result to a 320 x 320 WebP sibling asset.
+- Reduced the assistant launcher to a 64px desktop badge and 56px phone badge, with an ivory background and gold edge. The matching panel opens above the badge, retains visible controls and stays within short/narrow viewports. Reserved footer space beside the Union link.
+
+## Evidence
+
+- User report: C:/Users/JOSHUA~1/AppData/Local/Temp/codex-clipboard-2fca6026-6860-4fbf-b4d3-2781404dc623.png (906 x 926).
+- Local screenshots: output/playwright/neurotech-presentation/local/editorial-{width}-{hero,full}.png and assistant-{906,390,320}.png.
+- The responsive check covers 1440x1000, 906x926, 838x1000, 768x1024, 761x900, 760x900, 390x844, 320x640, 1024x600, 1152x900, 1280x720 and 1920x1000. Assistant interaction coverage additionally includes 320x568.
+- Publication evidence and final screenshots are recorded separately under output/playwright/neurotech-presentation/live/ and output/neurotech-presentation-release/.
+
+## Verification and limits
+
+- 22 Neurotech browser checks passed, including navigation, membership/social links, contact mailto, keyboard and reduced motion, assistant mocked reply/error/recovery states, closed application routes and responsive layout. The focused layout check was repeated after the final font-cascade adjustment.
+- The layout regression checks real headline bounds, hero action/wave separation, loaded photos and fonts, paragraph contrast, touch targets, no horizontal overflow, compact mascot sizing, and assistant panel/launcher clearance.
+- Typecheck and Neurotech production build passed. No shared product components or backend logic changed.
+- No actionable P0/P1/P2 findings remain in the reviewed sizes and states. The assistant dialog intentionally appears over the page when opened. Live provider response quality, a real membership checkout and database mutations are outside this visual fix.
+
+---
+
 # Neurotech editorial redesign QA - 15 October 2026
 
 final result: passed

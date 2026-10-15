@@ -1,0 +1,46 @@
+/* The Neurotech theme stays local to this app; shared society widgets retain their defaults. */
+body.nt-body #society-assistant-neurotech {
+  --assistant-accent: #edcb70 !important;
+  --assistant-accent-text: #0d2b50 !important;
+  --assistant-surface: #fffcf6 !important;
+  --assistant-text: #0d2b50 !important;
+  --assistant-muted: #445873 !important;
+  --assistant-border: #ded5c0 !important;
+  right: 16px;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  font-family: 'Neurotech Sans', Manrope, Arial, sans-serif;
+}
+
+body.nt-body #society-assistant-neurotech .assistant-toggle {
+  width: 64px;
+  height: 64px;
+  padding: 5px;
+  overflow: hidden;
+  border: 1px solid #d4b15a;
+  border-radius: 50%;
+  background: #fffcf6;
+  box-shadow: 0 3px 14px #0d2b5024;
+}
+body.nt-body #society-assistant-neurotech .assistant-toggle img { object-fit: contain; filter: none; }
+body.nt-body #society-assistant-neurotech .assistant-toggle:hover { box-shadow: 0 5px 18px #0d2b5036; }
+body.nt-body #society-assistant-neurotech .assistant-toggle:focus-visible { outline: 3px solid #d4b15a; outline-offset: 4px; }
+
+body.nt-body #society-assistant-neurotech .assistant-panel {
+  right: 16px;
+  bottom: 92px;
+  width: min(448px, calc(100vw - 32px));
+  height: min(384px, calc(100dvh - 112px));
+  border-color: #d4b15a;
+}
+body.nt-body #society-assistant-neurotech .assistant-panel:has(.assistant-messages:not(:empty)) { height: min(448px, calc(100dvh - 112px)); }
+body.nt-body #society-assistant-neurotech .assistant-brand-mark { flex-basis: 34px; width: 34px; height: 34px; }
+body.nt-body #society-assistant-neurotech .assistant-header h2 { font: 700 17px/1.25 'Neurotech Sans', Manrope, Arial, sans-serif; letter-spacing: -.01em; }
+body.nt-body #society-assistant-neurotech .assistant-close,
+body.nt-body #society-assistant-neurotech .assistant-reset { width: 44px; height: 44px; }
+
+@media (max-width: 760px) {
+  body.nt-body #society-assistant-neurotech { right: 12px; bottom: max(12px, env(safe-area-inset-bottom)); }
+  body.nt-body #society-assistant-neurotech .assistant-toggle { width: 56px; height: 56px; padding: 4px; }
+  body.nt-body #society-assistant-neurotech .assistant-panel { left: 12px; right: 12px; bottom: 80px; width: auto; height: min(384px, calc(100dvh - 96px)); }
+  body.nt-body #society-assistant-neurotech .assistant-panel:has(.assistant-messages:not(:empty)) { height: min(448px, calc(100dvh - 96px)); }
+}

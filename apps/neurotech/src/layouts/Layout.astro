@@ -1,8 +1,9 @@
 ---
 import SocietyLayout from '@surreysocieties/ui/components/SocietyLayout';
+import '../styles/assistant.css';
 interface Props { title: string; description: string; ogImage?: string; bodyClass?: string; hideCTA?: boolean; }
 const { title, description, ogImage, bodyClass = 'nt-body' } = Astro.props;
 ---
-<SocietyLayout societyKey="neurotech" title={title} description={description} ogImage={ogImage} bodyClass={bodyClass} assistantMascotSrc="/images/neurotech-assistant-neuron.webp" showCommitteeApplications={false} extraFontHrefs={bodyClass.includes('nt-editorial') ? [] : ["https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"]}>
+<SocietyLayout societyKey="neurotech" title={title} description={description} ogImage={ogImage} bodyClass={bodyClass} assistantMascotSrc="/images/neurotech-assistant-neuron-gold.webp" showCommitteeApplications={false} extraFontHrefs={bodyClass.includes('nt-editorial') ? [] : ["https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"]}>
   <slot />
 </SocietyLayout>
