@@ -15,14 +15,14 @@ body.nt-body #society-assistant-neurotech .assistant-toggle {
   width: 64px;
   height: 64px;
   padding: 5px;
-  overflow: hidden;
-  border: 1px solid #d4b15a;
-  border-radius: 50%;
-  background: #fffcf6;
-  box-shadow: 0 3px 14px #0d2b5024;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 body.nt-body #society-assistant-neurotech .assistant-toggle img { object-fit: contain; filter: none; }
-body.nt-body #society-assistant-neurotech .assistant-toggle:hover { box-shadow: 0 5px 18px #0d2b5036; }
+body.nt-body #society-assistant-neurotech .assistant-toggle:hover { box-shadow: none; }
 body.nt-body #society-assistant-neurotech .assistant-toggle:focus-visible { outline: 3px solid #d4b15a; outline-offset: 4px; }
 
 body.nt-body #society-assistant-neurotech .assistant-panel {
