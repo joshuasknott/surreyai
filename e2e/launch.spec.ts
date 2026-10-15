@@ -391,7 +391,7 @@ for (const site of sites) {
       const toggle = page.locator('[data-assistant-widget] .assistant-toggle');
       await expect(toggle).toBeVisible();
       const siteLogo = await page.locator('.society-header .society-brand img').getAttribute('src');
-      const assistantImage = site.key === 'business' ? '/images/business-assistant-fawn.webp' : site.key === 'neurotech' ? '/images/neurotech-assistant-neuron.webp' : siteLogo || '';
+      const assistantImage = site.key === 'business' ? '/images/business-assistant-fawn.webp' : site.key === 'neurotech' ? '/images/neurotech-assistant-neuron-gold.webp' : siteLogo || '';
       await expect(toggle.locator('img')).toHaveAttribute('src', assistantImage);
       await expect.poll(() => toggle.locator('img').evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0)).toBe(true);
       await toggle.click();

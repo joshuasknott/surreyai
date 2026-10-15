@@ -3,7 +3,7 @@ import { mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 
 const origin = process.env.E2E_NEUROTECH_ORIGIN || 'http://127.0.0.1:4323';
-const mascot = '/images/neurotech-assistant-neuron.webp';
+const mascot = '/images/neurotech-assistant-neuron-gold.webp';
 const evidenceDir = process.env.REFINEMENT_EVIDENCE_DIR;
 
 test('Closed Neurotech applications are no longer advertised', async ({ page, request }) => {
