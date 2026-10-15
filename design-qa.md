@@ -5,7 +5,7 @@ final result: passed
 ## Source and final evidence
 
 - Approved attachment: C:/Users/JOSHUA~1/AppData/Local/Temp/codex-clipboard-0961bac6-b50b-4235-a7ff-b94825ccc5a8.png, copied to output/playwright/neurotech-editorial/reference.png (838 x 1877).
-- Local preview: http://127.0.0.1:4453/ in the isolated codex/neurotech-editorial worktree. This redesign has not been deployed.
+- Pre-release local preview: http://127.0.0.1:4453/ in the isolated codex/neurotech-editorial worktree. Subsequent publication evidence is recorded separately in output/neurotech-release-2026-10-15/.
 - Final desktop capture: output/playwright/neurotech-editorial/final/editorial-1440-full.png (1440 x 3306). CSS viewport 1440 x 1000, device scale factor 1.
 - Full comparison: output/playwright/neurotech-editorial/comparison-full-final.png. The implementation is normalized to 838 x 1924 with preserved aspect ratio beside the source.
 - Focused comparisons: output/playwright/neurotech-editorial/comparison-hero-final.png and comparison-contact-final.png.
@@ -22,6 +22,8 @@ The first comparison (comparison-pass-1.png, implementation 1440 x 3483) exposed
 - The introduction brain icon was vertically centered rather than aligned beside the heading. Aligned it to the top.
 
 After these fixes, inspected full-page, hero and contact comparisons. A final pass tightened committee and footer whitespace, removed the redundant contact note, and kept functional mobile social labels readable. The mobile review also exposed a legacy minimum height below activity descriptions; removed it and added a regression assertion against excess blank space. The final desktop page is approximately 2.5% taller than the source after normalizing width. No actionable P0, P1 or P2 findings remain.
+
+Production validation exposed a CSS ordering difference: legacy selectors overrode activity paragraph colors/sizes and hero action sizing in the bundled build. Increased the specificity of those three homepage overrides. Added regression checks for at least 4.5:1 journal paragraph contrast, 17px activity copy and 50px hero action height. The new contrast assertion reproduced the initial production failure at 1.20:1 before the correction.
 
 ## Fidelity and behavior
 
@@ -47,7 +49,7 @@ After these fixes, inspected full-page, hero and contact comparisons. A final pa
 
 ## Limits and remaining P3 differences
 
-- This is local implementation and QA. No redesign deployment, database mutation, real membership checkout or live assistant-provider response was performed.
+- This section records pre-release local implementation and QA; the later production release is verified separately. No database mutation, real membership checkout or live assistant-provider response was performed.
 - No CONVEX_URL is configured for this preview, so committee rendering uses the existing configured signatory fallback. Live backend data acceptance is not claimed.
 - Small differences remain in photograph crop, generated neural branches and the exact generated-reference letterforms. The browser implementation uses consistent self-hosted fonts and clean flat color rather than reproducing raster texture.
 - The Astro development toolbar is disabled for this app preview so it does not cover the design. Existing reduced-motion behavior remains intact.
