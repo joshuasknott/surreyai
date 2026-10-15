@@ -24,6 +24,27 @@ test('Neurotech editorial layout preserves readable content and controls across 
     expect(await page.evaluate(() => Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - innerWidth)).toBeLessThanOrEqual(1);
     await expect(page.locator('body')).toHaveClass(/nt-editorial/);
     expect(await page.evaluate(() => document.fonts.check('48px "Neurotech Serif"'))).toBe(true);
+    const activityReadability = await page.locator('.nt-activity--reverse').evaluate(row => {
+      const paragraph = row.querySelector('p')!;
+      const luminance = (color: string) => {
+        const [red, green, blue] = color.match(/[\d.]+/g)!.slice(0, 3).map(Number).map(channel => {
+          const value = channel / 255;
+          return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+        });
+        return red * 0.2126 + green * 0.7152 + blue * 0.0722;
+      };
+      const foreground = luminance(getComputedStyle(paragraph).color);
+      const background = luminance(getComputedStyle(row).backgroundColor);
+      return {
+        contrast: (Math.max(foreground, background) + 0.05) / (Math.min(foreground, background) + 0.05),
+        fontSize: parseFloat(getComputedStyle(paragraph).fontSize),
+      };
+    });
+    expect(activityReadability.contrast).toBeGreaterThanOrEqual(4.5);
+    expect(activityReadability.fontSize).toBeGreaterThanOrEqual(17);
+    for (const action of await page.locator('[data-hero-actions] a').all()) {
+      expect((await action.boundingBox())!.height).toBeGreaterThanOrEqual(50);
+    }
     for (const control of await page.locator('[data-hero-actions] a, .nt-join__actions a, .community-socials a, .contact-form button').all()) {
       const rect = (await control.boundingBox())!;
       expect(rect.width).toBeGreaterThanOrEqual(44);
