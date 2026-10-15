@@ -14,8 +14,9 @@ interface Props {
   bodyClass?: string;
   extraFontHrefs?: string[];
   assistantMascotSrc?: string;
+  showCommitteeApplications?: boolean;
 }
-const { societyKey, title, description, ogImage, bodyClass = '', extraFontHrefs = [], assistantMascotSrc } = Astro.props;
+const { societyKey, title, description, ogImage, bodyClass = '', extraFontHrefs = [], assistantMascotSrc, showCommitteeApplications = true } = Astro.props;
 const society = getSocietyById(societyKey)!;
 const committeeDeadline = societyKey === 'neurotech' ? NEUROTECH_COMMITTEE_APPLICATIONS_CLOSE_AT : COMMITTEE_APPLICATIONS_CLOSE_AT;
 const socialNames: Record<string, string> = { whatsapp: 'WhatsApp', instagram: 'Instagram', linkedin: 'LinkedIn', discord: 'Discord', tiktok: 'TikTok' };
@@ -53,7 +54,7 @@ const socialLinks = Object.entries(socialNames).filter(([key]) => society.social
       </div>
     </div>
   </header>
-  {(societyKey === 'ai' || societyKey === 'neurotech') && <aside class="society-committee-banner" aria-label="Committee applications" data-committee-deadline={committeeDeadline}>
+  {showCommitteeApplications && (societyKey === 'ai' || societyKey === 'neurotech') && <aside class="society-committee-banner" aria-label="Committee applications" data-committee-deadline={committeeDeadline}>
     <span class="society-committee-banner__inner">
       <strong>Committee applications are out!</strong>
       {committeeDeadline && <span class="society-committee-banner__label">Closes in</span>}
