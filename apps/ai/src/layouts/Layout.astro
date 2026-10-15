@@ -1,8 +1,11 @@
 ---
 import SocietyLayout from '@surreysocieties/ui/components/SocietyLayout';
+import JoinMenu from '../components/JoinMenu.astro';
+import { getSocietyById } from '@surreysocieties/admin/config';
 interface Props { title: string; description: string; ogImage?: string; bodyClass?: string; hideCTA?: boolean; }
 const { title, description, ogImage, bodyClass = 'bg-ai-bg text-ai-fg font-sans min-h-screen' } = Astro.props;
 ---
 <SocietyLayout societyKey="ai" title={title} description={description} ogImage={ogImage} bodyClass={bodyClass} extraFontHrefs={[]}>
+  <JoinMenu slot="join-menu" society={getSocietyById('ai')!} />
   <slot />
 </SocietyLayout>
