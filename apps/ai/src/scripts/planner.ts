@@ -6,6 +6,7 @@ import { activityDate, activityKind, blankActivity, londonToday } from '../lib/p
 import { createPlannerSignIn, type ClerkSDK, type ClerkSession } from './plannerSignIn';
 import { appendMentionText, createMentionPicker } from './plannerMentions';
 import { plannerTeams, type PlannerTeam } from '../../../../convex/plannerTeams';
+import { SOCIETIES } from '@surreysocieties/admin/config';
 
 type Item = Doc<'plannerItems'>;
 type Stage = 'ideas' | 'planning' | 'ready' | 'done';
@@ -313,7 +314,8 @@ async function start(root: HTMLElement) {
   }
 
   function renderMembers() {
-    const members = plannerTeams.flatMap(team => [...team.members]);
+    const officers = SOCIETIES.ai.signatories;
+    const members = [...officers.map(officer => officer.name), ...plannerTeams.flatMap(team => [...team.members])];
     const stack = $('open-members'); stack.replaceChildren(); stack.hidden = false;
     const memberAvatar = (name: string) => {
       const words = name.split(/\s+/); const node = el('span', `${words[0][0]}${words.at(-1)![0]}`, 'person-avatar');
@@ -322,6 +324,13 @@ async function start(root: HTMLElement) {
     for (const name of members.slice(0, 3)) stack.append(memberAvatar(name));
     stack.append(el('span', `+${members.length - 3}`, 'person-avatar avatar-more'));
     const list = $('team-members'); list.replaceChildren();
+    const officerSection = el('section', undefined, 'member-team'); officerSection.append(el('h3', 'Officers'));
+    for (const { name, role } of officers) {
+      const row = el('div', undefined, 'member-row');
+      const details = el('span', undefined, 'member-details'); details.append(el('span', name), el('small', role, 'member-role'));
+      row.append(memberAvatar(name), details); officerSection.append(row);
+    }
+    list.append(officerSection);
     for (const team of plannerTeams) {
       const section = el('section', undefined, 'member-team'); section.append(el('h3', team.name));
       for (const name of team.members) { const row = el('div', undefined, 'member-row'); row.append(memberAvatar(name), el('span', name)); section.append(row); }

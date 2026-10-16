@@ -156,9 +156,13 @@ test('team board supports internal work, shared filters, members and collapsible
   await expect(page.locator('#board .planner-card')).toHaveCount(11);
   await noOverflow(page); await screenshot(page, 'team-board-desktop');
   await page.getByRole('button', { name: 'View committee members', exact: true }).click();
-  await expect(page.locator('#team-members .member-row')).toHaveCount(11);
+  await expect(page.locator('#team-members .member-row')).toHaveCount(14);
   await expect(page.locator('#team-members')).toContainText("Amanda Lages O'Connor");
   await expect(page.locator('#team-members')).toContainText('Miguel Antonio');
+  await screenshot(page, 'committee-members-desktop');
+  await page.setViewportSize({ width: 390, height: 844 }); await noOverflow(page);
+  await screenshot(page, 'committee-members-mobile');
+  await page.setViewportSize({ width: 1756, height: 896 });
   await page.getByRole('button', { name: 'Close members', exact: true }).click();
   await page.getByRole('button', { name: 'Industry & Partnerships', exact: true }).click();
   await expect(page.locator('#board .planner-card')).toHaveCount(2);
