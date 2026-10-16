@@ -13,7 +13,8 @@ export const activityFields = {
 };
 export const activityValidator = v.object(activityFields);
 export type Activity = Infer<typeof activityValidator>;
-export const planningStage = v.union(v.literal("ideas"), v.literal("planning"), v.literal("ready"));
+export const planningStage = v.union(v.literal("ideas"), v.literal("planning"), v.literal("ready"), v.literal("done"));
+export const plannerTeam = v.union(v.literal('learning'), v.literal('events'), v.literal('industry'), v.literal('projects'), v.literal('careers'));
 export const itemStage = v.union(planningStage, v.literal("published"), v.literal("archived"));
 export const taskValidator = v.object({ text: v.string(), done: v.boolean() });
 export const plannerPersonValidator = v.object({
@@ -48,6 +49,10 @@ export const plannerFields = {
   ...activityFields,
   societyId: v.id("societies"),
   stage: itemStage,
+  team: v.optional(v.union(plannerTeam, v.null())),
+  internalOnly: v.optional(v.boolean()),
+  // Published rows keep their legacy stage/index; board progress is independent.
+  workflowStage: v.optional(planningStage),
   notes: v.string(),
   owner: v.string(),
   tasks: v.array(taskValidator),
@@ -65,6 +70,8 @@ export const plannerItemValidator = v.object({
 export const publicActivityValidator = v.object({ id: v.id("plannerItems"), ...activityFields });
 export const calendarItemValidator = v.object({
   _id: v.id("plannerItems"), stage: itemStage,
+  team: v.optional(v.union(plannerTeam, v.null())),
+  internalOnly: v.optional(v.boolean()),
   title: v.string(), kind: activityFields.kind, category: v.string(),
   date: v.string(), startTime: v.string(), endTime: v.string(), location: v.string(),
 });

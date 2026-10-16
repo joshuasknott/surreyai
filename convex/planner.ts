@@ -5,7 +5,7 @@ import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
 import { OWNER_EMAIL, getUserByIdentity, ensureUser, logAction } from "./permissions";
 import {
-  activityValidator, cleanActivity, planningStage, publicFields,
+  activityValidator, cleanActivity, planningStage, plannerTeam, publicFields,
   plannerItemValidator, publicActivityValidator, taskValidator,
   calendarItemValidator, plannerToday,
   plannerCommentValidator, personInitials, type PlannerPerson,
@@ -200,7 +200,7 @@ export const list = query({
     const { ai } = await requireCommittee(ctx);
     if (archived) return await ctx.db.query("plannerItems")
       .withIndex("by_societyId_and_stage", q => q.eq("societyId", ai._id).eq("stage", "archived")).order("desc").take(200);
-    const stages = ["ideas", "planning", "ready", "published"] as const;
+    const stages = ["ideas", "planning", "ready", "done", "published"] as const;
     return (await Promise.all(stages.map(stage => ctx.db.query("plannerItems")
       .withIndex("by_societyId_and_stage", q => q.eq("societyId", ai._id).eq("stage", stage)).order("desc").take(100)))).flat();
   },
@@ -333,6 +333,7 @@ export const calendar = query({
     return {
       items: rows.slice(0, 200).map(item => ({
         _id: item._id, stage: item.stage, title: item.title, kind: item.kind, category: item.category,
+        team: item.team, internalOnly: item.internalOnly,
         date: item.date, startTime: item.startTime, endTime: item.endTime, location: item.location,
       })),
       hasMore: rows.length > 200,
@@ -348,13 +349,14 @@ export const archivePastEvents = internalMutation({
     if (!ai) return 0;
     const today = plannerToday();
     let count = 0;
-    for (const stage of ["ideas", "planning", "ready", "published"] as const) {
+    for (const stage of ["ideas", "planning", "ready", "done", "published"] as const) {
       for (const kind of ["event", "hackathon"] as const) {
         const rows = await ctx.db.query("plannerItems")
           .withIndex("by_societyId_and_stage_and_kind_and_date", q => q.eq("societyId", ai._id)
             .eq("stage", stage).eq("kind", kind).gt("date", "").lt("date", today))
           .take(100 - count);
         for (const item of rows) {
+          if (item.internalOnly) continue;
           await ctx.db.patch(item._id, { stage: "archived", published: undefined, publishedAt: undefined,
             revision: item.revision + 1, updatedAt: Date.now() });
           count++;
@@ -370,33 +372,54 @@ export const archivePastEvents = internalMutation({
 });
 
 export const create = mutation({
-  args: { activity: activityValidator, stage: v.optional(planningStage), notes: v.optional(v.string()), owner: v.optional(v.string()), tasks: v.optional(v.array(taskValidator)) },
+  args: { activity: activityValidator, stage: v.optional(planningStage), team: v.optional(v.union(plannerTeam, v.null())), internalOnly: v.optional(v.boolean()), notes: v.optional(v.string()), owner: v.optional(v.string()), tasks: v.optional(v.array(taskValidator)) },
   returns: v.id("plannerItems"),
   handler: async (ctx, args) => {
     const access = await requireCommittee(ctx);
     const person = await actor(ctx, access);
-    const activity = cleanActivity(args.activity);
+    const activity = cleanActivity(args.internalOnly ? { ...args.activity, kind: 'project' } : args.activity);
     validatePrivate(args.notes || "", args.owner || "", args.tasks || []);
     const id = await ctx.db.insert("plannerItems", { ...activity, societyId: access.ai._id, createdBy: person, contributors: [person], commentCount: 0,
-      stage: args.stage || "ideas", notes: args.notes || "", owner: args.owner || "", tasks: args.tasks || [], revision: 1, updatedAt: Date.now() });
+      stage: args.stage || "ideas", team: args.team, internalOnly: args.internalOnly, notes: args.notes || "", owner: args.owner || "", tasks: args.tasks || [], revision: 1, updatedAt: Date.now() });
     await audit(ctx, "create_planner_item", id, activity.title);
     return id;
   },
 });
 
 export const save = mutation({
-  args: { id: v.id("plannerItems"), revision: v.number(), activity: activityValidator, stage: v.optional(planningStage), notes: v.string(), owner: v.string(), tasks: v.array(taskValidator) },
+  args: { id: v.id("plannerItems"), revision: v.number(), activity: activityValidator, stage: v.optional(planningStage), workflowStage: v.optional(planningStage), team: v.optional(v.union(plannerTeam, v.null())), internalOnly: v.optional(v.boolean()), notes: v.string(), owner: v.string(), tasks: v.array(taskValidator) },
   returns: v.null(),
   handler: async (ctx, args) => {
     const access = await requireItem(ctx, args.id, args.revision);
     const { item } = access;
     const person = await actor(ctx, access);
     validatePrivate(args.notes, args.owner, args.tasks);
-    const activity = cleanActivity(args.activity);
+    const activity = cleanActivity((args.internalOnly ?? item.internalOnly) ? { ...args.activity, kind: 'project' } : args.activity);
     if (item.stage === "published" && args.stage) throw new Error("Unpublish this activity before changing its stage");
+    if (item.published && args.internalOnly) throw new Error("Unpublish this activity before making it an internal card");
     await ctx.db.patch(item._id, { ...activity, stage: args.stage || item.stage, notes: args.notes.trim(), owner: args.owner.trim(), tasks: args.tasks,
+      ...(args.team !== undefined ? { team: args.team } : {}),
+      ...(args.internalOnly !== undefined ? { internalOnly: args.internalOnly } : {}),
+      ...(args.workflowStage !== undefined && item.stage === 'published' ? { workflowStage: args.workflowStage } : {}),
       contributors: contributorsFor(item, person), revision: item.revision + 1, updatedAt: Date.now() });
     await audit(ctx, "save_planner_draft", item._id, activity.title);
+    return null;
+  },
+});
+
+/** Moving a card on the board never publishes or withdraws its public snapshot. */
+export const moveOnBoard = mutation({
+  args: { id: v.id('plannerItems'), revision: v.number(), stage: planningStage }, returns: v.null(),
+  handler: async (ctx, args) => {
+    const access = await requireItem(ctx, args.id, args.revision);
+    const { item } = access;
+    if (item.stage === 'archived') throw new Error('Restore this card before moving it');
+    const person = await actor(ctx, access);
+    await ctx.db.patch(item._id, {
+      ...(item.stage === 'published' ? { workflowStage: args.stage } : { stage: args.stage }),
+      contributors: contributorsFor(item, person), revision: item.revision + 1, updatedAt: Date.now(),
+    });
+    await audit(ctx, 'move_planner_item', item._id, item.title);
     return null;
   },
 });
@@ -408,7 +431,7 @@ export const move = mutation({
     const access = await requireItem(ctx, args.id, args.revision);
     const { item } = access;
     const person = await actor(ctx, access);
-    await ctx.db.patch(item._id, { stage: args.stage, published: undefined, publishedAt: undefined,
+    await ctx.db.patch(item._id, { stage: args.stage, published: undefined, publishedAt: undefined, workflowStage: undefined,
       contributors: contributorsFor(item, person), revision: item.revision + 1, updatedAt: Date.now() });
     await audit(ctx, item.stage === "published" ? "unpublish_planner_item" : "move_planner_item", item._id, item.title);
     return null;
@@ -422,9 +445,10 @@ export const publish = mutation({
     const access = await requireItem(ctx, args.id, args.revision);
     const { item } = access;
     const person = await actor(ctx, access);
+    if (item.internalOnly) throw new Error("Internal cards cannot be published to the website");
     if (item.stage !== "ready" && item.stage !== "published") throw new Error("Move this activity to Ready before publishing");
     const snapshot = cleanActivity(publicFields(item), true);
-    await ctx.db.patch(item._id, { stage: "published", published: snapshot, publishedAt: Date.now(),
+    await ctx.db.patch(item._id, { stage: "published", workflowStage: item.workflowStage || 'ready', published: snapshot, publishedAt: Date.now(),
       contributors: contributorsFor(item, person), revision: item.revision + 1, updatedAt: Date.now() });
     await audit(ctx, "publish_planner_item", item._id, item.title);
     return null;

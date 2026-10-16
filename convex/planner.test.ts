@@ -9,6 +9,36 @@ import { mentionTokens } from './lib/plannerMentions';
 
 const modules = import.meta.glob('./**/*.ts');
 const activity: Activity = { title: 'AI workshop', kind: 'event', category: 'Workshop', description: 'A beginner workshop.', date: '2026-10-29', startTime: '18:00', endTime: '20:00', location: 'Stag Hill', registrationUrl: 'https://example.test/signup' };
+
+describe('team board workflow', () => {
+  it('persists and clears teams, keeps internal work private and preserves overdue tasks', async () => {
+    const { admin, t } = await setup();
+    const id = await admin.mutation(api.planner.create, { activity: { ...activity, title: 'Sponsor proposal', date: '2020-01-01' }, team: 'industry', internalOnly: true, stage: 'ready' });
+    const item = (await admin.query(api.planner.get, { id }))!;
+    expect(item).toMatchObject({ team: 'industry', internalOnly: true, kind: 'project' });
+    await expect(admin.mutation(api.planner.publish, { id, revision: 1 })).rejects.toThrow('Internal cards');
+    await t.mutation(internal.planner.archivePastEvents, {});
+    expect((await admin.query(api.planner.get, { id }))?.stage).toBe('ready');
+    await admin.mutation(api.planner.save, { id, revision: 1, activity, team: null, stage: 'done', notes: '', owner: '', tasks: [] });
+    expect(await admin.query(api.planner.list, {})).toContainEqual(expect.objectContaining({ _id: id, team: null, stage: 'done', internalOnly: true }));
+    expect(await t.query(api.planner.listPublished, {})).toEqual([]);
+  });
+
+  it('moves published cards without changing public content and still supports explicit unpublish', async () => {
+    const { admin, t } = await setup();
+    const id = await admin.mutation(api.planner.create, { activity, team: 'learning', stage: 'ready' });
+    await admin.mutation(api.planner.publish, { id, revision: 1 });
+    await admin.mutation(api.planner.moveOnBoard, { id, revision: 2, stage: 'done' });
+    expect(await admin.query(api.planner.get, { id })).toMatchObject({ stage: 'published', workflowStage: 'done' });
+    expect(await t.query(api.planner.getPublished, { id })).toEqual({ id, ...activity });
+    expect(JSON.stringify(await t.query(api.planner.listPublished, {}))).not.toContain('learning');
+    await expect(admin.mutation(api.planner.moveOnBoard, { id, revision: 2, stage: 'ideas' })).rejects.toThrow('Someone else updated');
+    await expect(t.mutation(api.planner.moveOnBoard, { id, revision: 3, stage: 'ideas' })).rejects.toThrow('Committee access');
+    await expect(admin.mutation(api.planner.save, { id, revision: 3, activity, internalOnly: true, notes: '', owner: '', tasks: [] })).rejects.toThrow('Unpublish');
+    await admin.mutation(api.planner.move, { id, revision: 3, stage: 'ready' });
+    expect(await t.query(api.planner.getPublished, { id })).toBeNull();
+  });
+});
 async function setup(role: 'admin' | 'member' = 'admin', slug = 'ai') {
   const t = convexTest(schema, modules);
   const tokenIdentifier = 'https://planner.test|admin';

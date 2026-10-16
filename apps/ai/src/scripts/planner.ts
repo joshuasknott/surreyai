@@ -5,9 +5,10 @@ import type { Activity, PlannerCalendarItem, PlannerPerson, PlannerMention, Plan
 import { activityDate, activityKind, blankActivity, londonToday } from '../lib/programme';
 import { createPlannerSignIn, type ClerkSDK, type ClerkSession } from './plannerSignIn';
 import { appendMentionText, createMentionPicker } from './plannerMentions';
+import { plannerTeams, type PlannerTeam } from '../../../../convex/plannerTeams';
 
 type Item = Doc<'plannerItems'>;
-type Stage = 'ideas' | 'planning' | 'ready';
+type Stage = 'ideas' | 'planning' | 'ready' | 'done';
 type Access = { name: string; email: string; userId: Id<'users'> | null; canManageAccess: boolean };
 declare global { interface Window { Clerk?: ClerkSDK } }
 
@@ -23,8 +24,13 @@ async function start(root: HTMLElement) {
   const notificationsDialog = $<HTMLDialogElement>('notifications-dialog');
   const commentForm = $<HTMLFormElement>('comment-form');
   const commentText = $<HTMLTextAreaElement>('comment-text');
-  const stages = ['ideas', 'planning', 'ready', 'published'] as const;
-  const labels = { ideas: 'Ideas', planning: 'Planning', ready: 'Ready', published: 'Published', archived: 'Archived' };
+  const stages = ['ideas', 'planning', 'ready', 'done'] as const;
+  const labels = { ideas: 'Ideas', planning: 'In progress', ready: 'Ready', done: 'Done', published: 'Ready', archived: 'Archived' };
+  const boardStage = (item: Item) => item.stage === 'published' ? item.workflowStage || 'ready' : item.stage;
+  let selectedTeam: PlannerTeam | 'all' = 'all';
+  let search = '';
+  const matches = (item: { title: string; team?: PlannerTeam | null }) => (selectedTeam === 'all' || item.team === selectedTeam) && item.title.toLowerCase().includes(search);
+  const membersDialog = $<HTMLDialogElement>('members-dialog');
   let client: ConvexHttpClient;
   let clerk: ClerkSDK;
   let access: Access | null = null;
@@ -88,9 +94,13 @@ async function start(root: HTMLElement) {
   const readActivity = (): Activity => {
     const result = blankActivity();
     for (const name of Object.keys(result) as (keyof Activity)[]) (result[name] as string) = field(name).value.trim();
+    if (field('purpose').value === 'internal') {
+      result.kind = 'project'; result.category = ''; result.date = field('dueDate').value;
+      result.startTime = ''; result.endTime = ''; result.location = ''; result.registrationUrl = '';
+    }
     return result;
   };
-  const signature = () => JSON.stringify({ activity: readActivity(), stage: field('stage').value, notes: field('notes').value, owner: field('owner').value, tasks });
+  const signature = () => JSON.stringify({ activity: readActivity(), stage: field('stage').value, team: field('team').value, purpose: field('purpose').value, notes: field('notes').value, owner: field('owner').value, tasks });
   const dirty = () => editor.open && signature() !== baseline;
   const closeEditor = () => { if (busy || (dirty() && !window.confirm('Discard your unsaved changes?'))) return; const item = returnToCard ? current : null; returnToCard = false; editor.close(); if (item) openPreview(item); };
 
@@ -110,10 +120,13 @@ async function start(root: HTMLElement) {
     $<HTMLButtonElement>('edit-card').disabled = false;
     calendarVersion++; calendarItems = []; calendarLoadedMonth = ''; calendarError = ''; calendarLoading = false;
     $('workspace').hidden = true;
+    for (const id of ['workspace-nav', 'open-members', 'sidebar-account']) $(id).hidden = true;
+    $('open-members').replaceChildren(); $('team-members').replaceChildren(); $('account-name').textContent = '';
+    selectedTeam = 'all'; search = ''; $<HTMLInputElement>('card-search').value = ''; syncTeamFilters();
     $('open-settings').hidden = true; $('committee-settings').hidden = true; $('settings-account').textContent = '';
     for (const id of ['board', 'calendar', 'archive', 'access-list', 'public-preview', 'task-list', 'card-title', 'card-description', 'card-people', 'card-facts', 'comment-list', 'comments-status', 'comment-message', 'card-state', 'comment-count', 'comment-author', 'account-avatar']) $(id).replaceChildren();
     $('account-avatar').hidden = true;
-    for (const dialog of [editor, settingsDialog, cardDialog, notificationsDialog]) if (dialog.open) dialog.close();
+    for (const dialog of [editor, settingsDialog, cardDialog, notificationsDialog, membersDialog]) if (dialog.open) dialog.close();
     resetDescriptionHelp(); form.reset(); $<HTMLFormElement>('access-form').reset();
     $('item-heading').textContent = 'New activity'; $('item-state').textContent = ''; $('item-message').textContent = '';
     tasks = []; current = null;
@@ -136,13 +149,15 @@ async function start(root: HTMLElement) {
       items = await client.query(api.planner.list, {});
       if (view === 'archive') archived = await client.query(api.planner.list, { archived: true });
       $('access-state').hidden = true; $('workspace').hidden = false;
+      $('workspace-nav').hidden = false; $('sidebar-account').hidden = false; $('account-name').textContent = access.name || access.email;
+      renderMembers();
       $('open-settings').hidden = false; $('committee-settings').hidden = !access.canManageAccess;
       $('open-notifications').hidden = false;
       $('settings-account').textContent = `Signed in as ${access.email}`;
-      if (access.userId) {
+      {
         const initials = (access.name || access.email).trim().split(/\s+/).map(part => part[0]).slice(0, 2).join('').toUpperCase();
         const person = { userId: access.userId, name: access.name, email: access.email, initials };
-        $('comment-author').replaceChildren(avatar(person, access.name));
+        if (person.userId) $('comment-author').replaceChildren(avatar({ ...person, userId: person.userId }, access.name));
         $('account-avatar').textContent = initials; $('account-avatar').hidden = false;
       }
       $('help-description').hidden = root.dataset.ai !== 'true';
@@ -276,26 +291,17 @@ async function start(root: HTMLElement) {
     const board = $('board'); board.replaceChildren();
     for (const stage of stages) {
       const column = el('section', undefined, 'board-column'); column.dataset.stage = stage; column.setAttribute('aria-label', labels[stage]);
-      const cards = items.filter(item => item.stage === stage).sort((a, b) => b.updatedAt - a.updatedAt);
-      const heading = el('div', undefined, 'column-heading'); const title = el('h2', labels[stage]); title.prepend(icon('stage')); heading.append(title, el('span', String(cards.length), 'column-count'));
-      if (stage === 'ready') heading.append(el('small', 'Private'));
-      if (stage === 'published') heading.append(el('small', 'Live on website', 'published-label'));
+      const cards = items.filter(item => boardStage(item) === stage && matches(item)).sort((a, b) => b.updatedAt - a.updatedAt);
+      const heading = el('div', undefined, 'column-heading'); const title = el('h2', labels[stage]); heading.append(title, el('span', String(cards.length), 'column-count'));
       column.append(heading);
       for (const item of cards) column.append(card(item));
-      if (!cards.length) column.append(el('p', stage === 'published' ? 'Published activities appear here.' : 'No activities yet.', 'column-empty'));
-      if (stage !== 'published') {
-        const add = el('button', stage === 'ideas' ? 'Add idea' : 'Add card', 'column-add'); add.prepend(icon('plus')); add.onclick = () => openEditor(null, stage); column.append(add);
-      }
+      const add = el('button', 'Add card', 'column-add'); add.prepend(icon('plus')); add.onclick = () => openEditor(null, stage); column.append(add);
       column.addEventListener('dragover', event => { event.preventDefault(); column.classList.add('drag-over'); });
       column.addEventListener('dragleave', () => column.classList.remove('drag-over'));
       column.addEventListener('drop', event => {
         event.preventDefault(); column.classList.remove('drag-over');
         const item = items.find(row => row._id === event.dataTransfer?.getData('text/plain'));
-        if (!item || item.stage === stage) return;
-        if (stage === 'published') {
-          if (item.stage !== 'ready') return status('Move the activity to Ready, then review and publish it.');
-          openEditor(item); return;
-        }
+        if (!item || boardStage(item) === stage) return;
         void move(item, stage);
       });
       board.append(column);
@@ -304,6 +310,23 @@ async function start(root: HTMLElement) {
       status('Showing the latest 100 activities per stage. Archive finished items to keep the board manageable.');
     }
     renderCalendar(); renderArchive();
+  }
+
+  function renderMembers() {
+    const members = plannerTeams.flatMap(team => [...team.members]);
+    const stack = $('open-members'); stack.replaceChildren(); stack.hidden = false;
+    const memberAvatar = (name: string) => {
+      const words = name.split(/\s+/); const node = el('span', `${words[0][0]}${words.at(-1)![0]}`, 'person-avatar');
+      node.title = name; node.setAttribute('aria-hidden', 'true'); return node;
+    };
+    for (const name of members.slice(0, 3)) stack.append(memberAvatar(name));
+    stack.append(el('span', `+${members.length - 3}`, 'person-avatar avatar-more'));
+    const list = $('team-members'); list.replaceChildren();
+    for (const team of plannerTeams) {
+      const section = el('section', undefined, 'member-team'); section.append(el('h3', team.name));
+      for (const name of team.members) { const row = el('div', undefined, 'member-row'); row.append(memberAvatar(name), el('span', name)); section.append(row); }
+      list.append(section);
+    }
   }
 
   function avatar(person: PlannerPerson, title: string) {
@@ -327,10 +350,12 @@ async function start(root: HTMLElement) {
     if (!previewItem) return; const item = previewItem;
     $('card-title').textContent = item.title;
     const state = $('card-state'); state.replaceChildren(); state.dataset.stage = item.stage;
-    const stage = el('span', labels[item.stage], 'card-state-label'); stage.prepend(icon('stage'));
+    const stage = el('span', labels[boardStage(item)], 'card-state-label'); stage.prepend(icon('stage'));
     const visibility = el('span', item.stage === 'published' ? 'Live on website' : 'Private', 'card-visibility');
     if (item.stage !== 'published') visibility.prepend(icon('lock'));
     state.append(stage, visibility);
+    const team = plannerTeams.find(team => team.id === item.team);
+    if (team) state.append(el('span', team.name, 'card-team'));
     $('card-description').textContent = item.description || 'No description yet.'; fillPeople($('card-people'), item);
     $('card-contributors').hidden = !$('card-people').childElementCount;
     const facts = $('card-facts'); facts.replaceChildren();
@@ -530,16 +555,34 @@ async function start(root: HTMLElement) {
     node.addEventListener('dragstart', event => { event.dataTransfer?.setData('text/plain', item._id); });
     const open = el('button', undefined, 'card-open'); open.setAttribute('aria-label', `View ${item.title}`);
     open.append(el('strong', item.title));
+    const team = plannerTeams.find(team => team.id === item.team);
+    if (team && selectedTeam === 'all') { const badge = el('span', team.name, 'team-badge'); badge.dataset.team = team.id; open.append(badge); }
+    const footer = el('span', undefined, 'card-footer');
+    if (item.date) footer.append(el('span', activityDate(item.date, { day: 'numeric', month: 'short' }), 'card-date'));
+    if (item.published) footer.append(el('span', 'Live on website', 'card-live'));
+    if (item.tasks.length) { const progress = el('span', `${item.tasks.filter(task => task.done).length}/${item.tasks.length}`, 'card-stat'); progress.prepend(icon('checklist')); footer.append(progress); }
+    if (item.commentCount) { const count = el('span', String(item.commentCount), 'card-stat'); count.prepend(icon('comments')); footer.append(count); }
     const people = el('span', undefined, 'avatar-group'); fillPeople(people, item);
-    if (people.childElementCount) { people.id = `contributors-${item._id}`; open.setAttribute('aria-describedby', people.id); open.append(people); }
+    if (people.childElementCount) { people.id = `contributors-${item._id}`; open.setAttribute('aria-describedby', people.id); footer.append(people); }
+    if (footer.childElementCount) open.append(footer);
     open.onclick = () => openPreview(item); node.append(open);
+    const menu = el('details', undefined, 'card-menu'); const trigger = el('summary'); trigger.setAttribute('aria-label', `Actions for ${item.title}`); trigger.append(icon('more'));
+    const actions = el('div', undefined, 'card-menu-actions');
+    for (const stage of stages.filter(stage => stage !== boardStage(item))) {
+      const button = el('button', `Move to ${labels[stage]}`); button.type = 'button'; button.onclick = () => { menu.open = false; void move(item, stage); }; actions.append(button);
+    }
+    menu.addEventListener('toggle', () => { if (menu.open) document.querySelectorAll<HTMLDetailsElement>('.card-menu[open]').forEach(other => { if (other !== menu) other.open = false; }); });
+    menu.addEventListener('keydown', event => { if (event.key === 'Escape' && menu.open) { event.preventDefault(); event.stopPropagation(); menu.open = false; trigger.focus(); } });
+    menu.append(trigger, actions); node.append(menu);
     return node;
   }
 
   async function move(item: Item, stage: Stage | 'archived') {
     if (busy) return;
-    if (item.stage === 'published' && !window.confirm('Remove this activity from the public website and move it back to the private board?')) return;
-    try { busy = true; await authenticated(); await client.mutation(api.planner.move, { id: item._id, revision: item.revision, stage }); status(stage === 'archived' ? 'Activity archived.' : 'Activity moved.'); }
+    try { busy = true; await authenticated();
+      if (stage === 'archived' || item.stage === 'archived') await client.mutation(api.planner.move, { id: item._id, revision: item.revision, stage });
+      else await client.mutation(api.planner.moveOnBoard, { id: item._id, revision: item.revision, stage });
+      status(stage === 'archived' ? 'Card archived.' : 'Card moved.'); }
     catch (error) { showError(error); }
     finally { busy = false; await refresh(); }
   }
@@ -575,7 +618,7 @@ async function start(root: HTMLElement) {
     const focused = container.contains(document.activeElement) ? (document.activeElement as HTMLElement)?.id : '';
     container.replaceChildren(); container.setAttribute('aria-busy', String(calendarLoading));
     const month = calendarMonth.toISOString().slice(0, 7);
-    const monthItems = calendarLoadedMonth === month ? [...calendarItems].sort((a, b) =>
+    const monthItems = calendarLoadedMonth === month ? calendarItems.filter(matches).sort((a, b) =>
       `${a.date} ${a.startTime || '99:99'}`.localeCompare(`${b.date} ${b.startTime || '99:99'}`) || a.title.localeCompare(b.title)) : [];
     const toolbar = el('div', undefined, 'calendar-toolbar');
     const heading = el('div'); const title = el('h2', new Intl.DateTimeFormat('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(calendarMonth));
@@ -618,20 +661,22 @@ async function start(root: HTMLElement) {
         const button = el('button', undefined, 'calendar-event'); button.dataset.stage = item.stage;
         button.append(el('span', item.title, 'calendar-event-title'));
         const meta = el('span', undefined, 'calendar-event-meta');
-        meta.append(el('span', item.startTime ? `${item.startTime}${item.endTime ? `–${item.endTime}` : ''}` : 'Time to confirm'), el('span', labels[item.stage], 'calendar-event-stage')); button.append(meta);
+        const calendarStage = item.stage === 'published' ? 'Live on website' : labels[item.stage];
+        const timeLabel = item.internalOnly ? 'Due' : item.startTime ? `${item.startTime}${item.endTime ? `–${item.endTime}` : ''}` : 'Time to confirm';
+        meta.append(el('span', timeLabel), el('span', calendarStage, 'calendar-event-stage')); button.append(meta);
         if (item.location) button.append(el('span', item.location, 'calendar-event-location'));
-        button.setAttribute('aria-label', `${item.title}, ${item.startTime || 'time to confirm'}, ${labels[item.stage]}`);
+        button.setAttribute('aria-label', `${item.title}, ${timeLabel}, ${calendarStage}`);
         button.onclick = () => void openCalendarItem(item); cell.append(button);
       }
       grid.append(cell);
     }
     for (let i = 0; i < (7 - (offset + end) % 7) % 7; i++) pad();
     container.append(grid);
-    const undated = items.filter(item => !item.date);
+    const undated = items.filter(item => !item.date && matches(item));
     if (undated.length) {
       const details = el('details', undefined, 'calendar-undated'); details.append(el('summary', `Without a date · ${undated.length}`));
       const list = el('div', undefined, 'calendar-undated-list');
-      for (const item of undated) { const open = el('button'); open.append(el('strong', item.title), el('span', labels[item.stage])); open.onclick = () => openPreview(item); list.append(open); }
+      for (const item of undated) { const open = el('button'); open.append(el('strong', item.title), el('span', labels[boardStage(item)])); open.onclick = () => openPreview(item); list.append(open); }
       details.append(list); container.append(details);
     }
     if (focused) document.getElementById(focused)?.focus({ preventScroll: true });
@@ -639,9 +684,9 @@ async function start(root: HTMLElement) {
 
   function renderArchive() {
     const container = $('archive'); container.replaceChildren();
-    if (!archived.length) container.append(el('p', 'No archived activities.', 'muted'));
-    for (const item of archived) {
-      const row = el('div', undefined, 'archive-row'); const open = el('button', undefined, 'archive-open'); open.append(el('strong', item.title), el('span', `${activityKind(item)}${item.date ? ` · ${activityDate(item.date)}` : ''}`)); open.onclick = () => openPreview(item); row.append(open);
+    if (!archived.some(matches)) container.append(el('p', 'No archived cards in this view.', 'muted'));
+    for (const item of archived.filter(matches)) {
+      const row = el('div', undefined, 'archive-row'); const open = el('button', undefined, 'archive-open'); open.append(el('strong', item.title), el('span', `${item.internalOnly ? 'Internal work' : activityKind(item)}${item.date ? ` · ${activityDate(item.date)}` : ''}`)); open.onclick = () => openPreview(item); row.append(open);
       const restore = el('button', 'Restore to Ideas', 'quiet-button'); restore.onclick = () => void move(item, 'ideas'); row.append(restore); container.append(row);
     }
   }
@@ -652,13 +697,17 @@ async function start(root: HTMLElement) {
     const activity = item || { ...blankActivity(), date };
     for (const name of Object.keys(blankActivity())) field(name).value = activity[name as keyof Activity];
     field('notes').value = item?.notes || ''; field('owner').value = item?.owner || '';
+    field('team').value = item?.team || (item ? '' : selectedTeam === 'all' ? '' : selectedTeam);
+    field('purpose').value = item ? item.internalOnly ? 'internal' : 'activity' : date ? 'activity' : 'internal';
+    field('purpose').disabled = !!item?.published;
+    field('dueDate').value = item?.internalOnly ? item.date : '';
     const stageField = field('stage') as HTMLSelectElement;
     for (const value of ['published', 'archived']) stageField.querySelector(`[value=${value}]`)?.remove();
-    if (item?.stage === 'published' || item?.stage === 'archived') { const option = el('option', labels[item.stage]); option.value = item.stage; stageField.append(option); }
-    stageField.value = item?.stage || stage; stageField.disabled = item?.stage === 'published';
+    if (item?.stage === 'archived') { const option = el('option', labels[item.stage]); option.value = item.stage; stageField.append(option); }
+    stageField.value = item ? boardStage(item) : stage; stageField.disabled = false;
     tasks = structuredClone(item?.tasks || []);
-    $('item-heading').textContent = item ? item.title : stage === 'ideas' ? 'New idea' : 'New activity';
-    $('item-state').textContent = `${labels[item?.stage || stage]} · ${item?.stage === 'published' ? 'Public version is live' : 'Private'}`;
+    $('item-heading').textContent = item ? item.title : 'New card';
+    $('item-state').textContent = `${labels[item ? boardStage(item) : stage]} · ${item?.published ? 'Public version is live' : 'Private'}`;
     $('archive-item').hidden = !item || item.stage === 'archived'; $('unpublish-item').hidden = item?.stage !== 'published';
     $('item-message').textContent = '';
     renderTasks(); updatePreview(); baseline = signature(); editor.showModal(); field('title').focus();
@@ -676,11 +725,14 @@ async function start(root: HTMLElement) {
 
   function updatePreview() {
     const stage = field('stage').value;
-    const idea = stage === 'ideas'; const review = stage === 'ready' || stage === 'published';
+    const internal = field('purpose').value === 'internal';
+    const idea = stage === 'ideas'; const review = !internal && (stage === 'ready' || !!current?.published);
     editor.classList.toggle('has-preview', review);
-    $('activity-details').hidden = idea; $('private-options').hidden = idea; $('editor-preview').hidden = !review;
+    $('activity-details').hidden = internal || idea; $('private-options').hidden = !internal && idea; $('editor-preview').hidden = !review;
+    $('internal-due-label').hidden = !internal;
     $('stage-help').textContent = idea ? 'Start with a title and a few words. Work out the details later.' : field('stage').value === 'archived' ? 'Archived events stay on the calendar. To reschedule, choose a future date and move it to Planning.' : review ? 'Check the public details here. Ready is still private.' : 'Add the practical details as they are confirmed.';
     $('save-item').textContent = idea ? 'Save idea' : field('stage').value === 'archived' ? 'Save changes' : 'Save draft';
+    if (internal) { $('stage-help').textContent = 'Internal work stays on the committee board.'; $('save-item').textContent = 'Save card'; }
     const activity = readActivity(); const preview = $('public-preview'); preview.replaceChildren();
     preview.append(el('p', activity.date ? activityDate(activity.date) : activity.kind === 'project' ? 'Ongoing project' : 'Date to confirm', 'preview-date'), el('h4', activity.title || 'Your activity title'));
     preview.append(el('p', [activity.startTime ? `${activity.startTime}${activity.endTime ? `–${activity.endTime}` : ''}` : '', activity.location].filter(Boolean).join(' · ')));
@@ -699,16 +751,16 @@ async function start(root: HTMLElement) {
   async function persist() {
     if (!form.reportValidity()) return false;
     await authenticated();
-    const payload = { activity: readActivity(), notes: field('notes').value, owner: field('owner').value, tasks };
+    const payload = { activity: readActivity(), team: (field('team').value || null) as PlannerTeam | null, internalOnly: field('purpose').value === 'internal', notes: field('notes').value, owner: field('owner').value, tasks };
     let id: Id<'plannerItems'>;
     if (current) {
       id = current._id;
-      await client.mutation(api.planner.save, { id, revision: current.revision, ...payload, ...(current.stage !== 'published' && field('stage').value !== 'archived' ? { stage: field('stage').value as Stage } : {}) });
+      await client.mutation(api.planner.save, { id, revision: current.revision, ...payload, ...(current.stage === 'published' ? { workflowStage: field('stage').value as Stage } : field('stage').value !== 'archived' ? { stage: field('stage').value as Stage } : {}) });
     } else id = await client.mutation(api.planner.create, { ...payload, stage: field('stage').value as Stage });
     items = await client.query(api.planner.list, {}); current = await client.query(api.planner.get, { id });
     if (!current) throw new Error('Activity saved but could not be reloaded. Close and reopen the board.');
     baseline = signature(); $('archive-item').hidden = current.stage === 'archived';
-    $('item-state').textContent = `${labels[current.stage]} · ${current.stage === 'published' ? 'Public version is live' : 'Private'}`;
+    $('item-state').textContent = `${labels[boardStage(current)]} · ${current.published ? 'Public version is live' : 'Private'}`;
     updatePreview(); render(); if (view === 'calendar') void loadCalendar(true); return true;
   }
 
@@ -736,9 +788,35 @@ async function start(root: HTMLElement) {
   editor.addEventListener('close', resetDescriptionHelp);
   window.addEventListener('beforeunload', event => { if (dirty()) event.preventDefault(); });
   $('new-item').onclick = () => openEditor(null);
+  $('open-members').onclick = () => membersDialog.showModal();
+  document.addEventListener('click', event => { if (!(event.target instanceof Element) || event.target.closest('.card-menu')) return; document.querySelectorAll<HTMLDetailsElement>('.card-menu[open]').forEach(menu => { menu.open = false; }); });
+  function syncTeamFilters() { document.querySelectorAll<HTMLButtonElement>('[data-team]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.team === selectedTeam))); }
+  document.querySelectorAll<HTMLButtonElement>('button[data-team]').forEach(button => button.onclick = () => { selectedTeam = button.dataset.team as typeof selectedTeam; syncTeamFilters(); render(); });
+  $('toggle-search').onclick = () => { const open = $('board-search').hidden; $('board-search').hidden = !open; $('toggle-search').setAttribute('aria-expanded', String(open)); if (open) $('card-search').focus(); else { search = ''; $<HTMLInputElement>('card-search').value = ''; render(); } };
+  $('card-search').oninput = () => { search = $<HTMLInputElement>('card-search').value.trim().toLowerCase(); render(); };
+  const mobileNav = () => window.matchMedia('(max-width: 720px)').matches;
+  function setSidebar(collapsed: boolean, remember = false) {
+    document.body.classList.toggle('sidebar-collapsed', collapsed);
+    document.body.classList.toggle('sidebar-mobile-open', !collapsed && mobileNav());
+    $('collapse-sidebar').setAttribute('aria-expanded', String(!collapsed));
+    $('toggle-sidebar').setAttribute('aria-expanded', String(!collapsed));
+    $('sidebar-scrim').hidden = collapsed || !mobileNav();
+    $('planner-sidebar').inert = mobileNav() && collapsed;
+    root.inert = mobileNav() && !collapsed;
+    if (remember && !mobileNav()) try { localStorage.setItem('ai-planner-sidebar', collapsed ? 'collapsed' : 'expanded'); } catch { /* Storage may be unavailable. */ }
+  }
+  let desktopCollapsed = false; try { desktopCollapsed = localStorage.getItem('ai-planner-sidebar') === 'collapsed'; } catch { /* Use expanded navigation. */ }
+  setSidebar(mobileNav() || desktopCollapsed);
+  $('collapse-sidebar').onclick = () => { setSidebar(true, true); $('toggle-sidebar').focus(); };
+  $('toggle-sidebar').onclick = () => { setSidebar(false, true); if (mobileNav()) $('collapse-sidebar').focus(); };
+  $('sidebar-scrim').onclick = () => { setSidebar(true); $('toggle-sidebar').focus(); };
+  document.addEventListener('keydown', event => { if (event.key === 'Escape' && document.body.classList.contains('sidebar-mobile-open')) { setSidebar(true); $('toggle-sidebar').focus(); } });
+  window.matchMedia('(max-width: 720px)').addEventListener('change', () => { let collapsed = false; try { collapsed = localStorage.getItem('ai-planner-sidebar') === 'collapsed'; } catch {} setSidebar(mobileNav() || collapsed); });
   document.querySelectorAll<HTMLButtonElement>('[data-view]').forEach(button => button.onclick = () => { view = button.dataset.view as typeof view;
     document.querySelectorAll<HTMLButtonElement>('[data-view]').forEach(tab => tab.setAttribute('aria-pressed', String(tab === button)));
     for (const name of ['board', 'calendar', 'archive']) $(name).hidden = name !== view;
+    $('workspace-title').textContent = view === 'board' ? 'Committee board' : view === 'calendar' ? 'Calendar' : 'Archive';
+    if (mobileNav()) { setSidebar(true); $('toggle-sidebar').focus(); }
     void refresh();
   });
   function resetDescriptionHelp() {
