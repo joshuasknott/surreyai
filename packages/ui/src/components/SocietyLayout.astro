@@ -19,6 +19,7 @@ interface Props {
 const { societyKey, title, description, ogImage, bodyClass = '', extraFontHrefs = [], assistantMascotSrc, showCommitteeApplications = true } = Astro.props;
 const society = getSocietyById(societyKey)!;
 const committeeDeadline = societyKey === 'neurotech' ? NEUROTECH_COMMITTEE_APPLICATIONS_CLOSE_AT : COMMITTEE_APPLICATIONS_CLOSE_AT;
+const curiousHome = societyKey === 'ai' && bodyClass.split(' ').includes('ai-curious-home');
 const socialNames: Record<string, string> = { whatsapp: 'WhatsApp', instagram: 'Instagram', linkedin: 'LinkedIn', discord: 'Discord', tiktok: 'TikTok' };
 const socialLinks = Object.entries(socialNames).filter(([key]) => society.socials[key as keyof typeof society.socials]);
 ---
@@ -35,13 +36,18 @@ const socialLinks = Object.entries(socialNames).filter(([key]) => society.social
   <header class="society-header">
     <div class="society-header__inner">
       <a class="society-brand" href="/" aria-label={`${society.name} home`}>
-        <img src={society.logo} alt="" width="56" height="56" fetchpriority="high" />
-        <span>{society.name}</span>
+        <img src={curiousHome ? '/logos/brand/surrey-ai-logo-transparent.png' : society.logo} alt="" width="56" height="56" fetchpriority="high" />
+        <span>{curiousHome ? society.shortName : society.name}</span>
       </a>
       <div class="society-header__actions">
       <slot name="header-actions" />
+      {curiousHome && <nav class="ai-home-nav" aria-label="Main navigation">
+        <a href="#about">About</a>
+        <a href="#programme">Events</a>
+        <a href="#committee">Committee</a>
+      </nav>}
       <slot name="join-menu"><details class="society-join-menu" data-join-menu>
-        <summary class="society-nav-join">Join us <svg class="society-join-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg></summary>
+        <summary class="society-nav-join">{curiousHome ? 'Join' : 'Join us'}{!curiousHome && <svg class="society-join-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>}</summary>
         <nav class="society-join-panel" aria-label="Join and follow the society">
           <a class="society-join-featured" href={society.studentsUnionUrl} target="_blank" rel="noopener noreferrer"><SocialIcon name="union" /><span>Join the society</span><span class="society-join-arrow" aria-hidden="true">↗</span></a>
           <a class="society-join-featured society-join-linktree" href={society.socials.linktree} target="_blank" rel="noopener noreferrer"><SocialIcon name="linktree" /><span>Linktree</span><span class="society-join-arrow" aria-hidden="true">↗</span></a>
@@ -54,7 +60,9 @@ const socialLinks = Object.entries(socialNames).filter(([key]) => society.social
       </div>
     </div>
   </header>
-  {showCommitteeApplications && (societyKey === 'ai' || societyKey === 'neurotech') && <aside class="society-committee-banner" aria-label="Committee applications" data-committee-deadline={committeeDeadline}>
+  <main id="main-content" tabindex="-1">
+  <slot name="hero" />
+  {showCommitteeApplications && societyKey === 'neurotech' && <aside class="society-committee-banner" aria-label="Committee applications" data-committee-deadline={committeeDeadline}>
     <span class="society-committee-banner__inner">
       <strong>Committee applications are out!</strong>
       {committeeDeadline && <span class="society-committee-banner__label">Closes in</span>}
@@ -67,17 +75,25 @@ const socialLinks = Object.entries(socialNames).filter(([key]) => society.social
       <a class="society-committee-banner__apply" href="/committee-applications" data-committee-apply>Apply</a>
     </span>
   </aside>}
-  <main id="main-content" tabindex="-1"><slot /></main>
+  <slot /></main>
   <slot name="footer">
-  <footer class="society-footer">
+  <footer class:list={['society-footer', curiousHome && 'flow-footer']}>
+    {curiousHome ? <div class="flow-footer__inner">
+      <div class="flow-footer__identity">
+        <a class="society-brand" href="/" aria-label={`${society.name} home`}><img src="/logos/brand/surrey-ai-icon-dark.webp" alt="" width="56" height="56" loading="lazy" /><span>{society.shortName}</span></a>
+        <p>© {new Date().getFullYear()} {society.shortName}</p>
+        <a href={society.studentsUnionUrl} target="_blank" rel="noopener noreferrer">Surrey Students’ Union ↗</a>
+      </div>
+      <nav aria-label="Footer navigation"><a href="#about">About</a><a href="#programme">Events</a><a href="#committee">Committee</a><a href="#contact">Contact</a></nav>
+    </div> :
     <div>
       <a class="society-brand" href="/"><img src={society.logo} alt="" width="44" height="44" loading="lazy" /><span>{society.shortName}</span></a>
       <a href={society.studentsUnionUrl} target="_blank" rel="noopener noreferrer">Surrey Students’ Union ↗</a>
       <p>© {new Date().getFullYear()} {society.shortName}</p>
-    </div>
+    </div>}
   </footer>
   </slot>
-  <AssistantWidget config={ASSISTANT_CONFIGS[societyKey]} mascotSrc={assistantMascotSrc} endpoint="/api/assistant/chat" />
+  <AssistantWidget config={ASSISTANT_CONFIGS[societyKey]} mascotSrc={assistantMascotSrc} endpoint="/api/assistant/chat" launcherImage={curiousHome ? '/images/flow-assistant.webp' : undefined} launcherLabel={curiousHome ? 'Ask AI' : undefined} />
 </BaseLayout>
 
 <script>

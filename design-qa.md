@@ -460,3 +460,282 @@ final result: passed
 - Checkout: `C:/Users/Joshua Knott/.codex/worktrees/business-committee-refinements/surreysocieties`; branch `codex/business-committee-refinements`. The primary checkout's unrelated work remains preserved.
 
 Business release result: passed.
+
+---
+
+# Business editorial hero — 6 October 2026
+
+final result: passed
+
+Source: C:/Users/JOSHUA~1/AppData/Local/Temp/codex-clipboard-2bf27b0f-6559-45bb-881d-5a60419aa837.png (1672 x 941).
+Local implementation: http://localhost:4322/, homepage at scroll top.
+Intentional differences: retain the existing navy top navigation; omit the gold SURREY BUSINESS SCHOOL eyebrow. The physical building signage remains part of the photograph.
+
+Evidence (under C:/Users/Joshua Knott/Projects/surreysocieties/output/business-hero/):
+- desktop-exact.jpg: in-app browser, CSS viewport 1672 x 941, devicePixelRatio 1; browser capture returned 1650 x 933 pixels.
+- comparison.png: source left / implementation right, each normalized to 836 x 471 for composition comparison. Small capture scaling differences were excluded from findings.
+- mobile-final.jpg: 390 x 844 CSS viewport, density 1.
+- mobile-320-final.jpg: 320 x 740 CSS viewport, density 1.
+- desktop.jpg and mobile.jpg preserve earlier capture evidence.
+
+Fidelity review:
+- Typography: Georgia reproduces the large, regular-weight editorial serif, two-line desktop heading, serif supporting copy and button labels. The existing navigation typography stays unchanged by request.
+- Layout: full-width photo, lower-left content, generous spacing, two visible actions; small-screen text wraps to three lines with stacked full-width buttons. No horizontal overflow at 320 or 390; existing E2E checks also cover 768 and 1440.
+- Colors: navy photographic shading, ivory text, gold primary button, ivory outline secondary button. Added restrained desktop shading for legibility against the brick facade.
+- Images: generated a photo-only asset from the selected mockup, preserving the building, golden tree and statue composition; optimized WebP is 348868 bytes. No UI is baked into the background.
+- Copy: exact selected headline, Talks/workshops/socials supporting copy, Join the society and Explore events; no school eyebrow.
+- Full-view comparison and full-resolution individual captures were reviewed together. Separate focused crop was unnecessary because the only changed controls and typography are large and legible in these captures.
+
+Iteration history:
+- P2: initial mobile source was only 390px wide and visibly soft after object-fit cropping. Corrected responsive image sizes; verified naturalWidth 1440 and sharp final mobile capture.
+- P2: at 320 x 740 the existing fixed assistant overlapped the second hero button. Adjusted mobile height and vertical padding; mobile-320-final.jpg confirms the button is clear of the launcher.
+- No remaining actionable P0/P1/P2 findings. Expected minor generated-photograph variation and preserved navigation differ from the mockup intentionally.
+
+Interaction and checks:
+- Explore events clicked in the in-app browser; URL became /#activities and target top was 96px, below the sticky navigation.
+- Union destination remains unchanged; accessible links have visible focus styling and external-link protections.
+- Browser console error list was empty.
+- Business build passed. Initial Business E2E run: 16 passed, one obsolete Linktree expectation failed. Updated that existing test for the Business events anchor; rerun passed on all three societies.
+- Standard E2E startup could not reuse IPv6 localhost servers through its hardcoded IPv4 URL. Tests used an ignored output-directory copy with localhost URLs and no server startup, leaving running previews intact.
+- Shared layout hash remained d5ab49ade697aa6dcbb6ba8a2cbc8294dfb92a8a; no topnav source changes.
+- Local verification only; no deployment.
+
+---
+
+# AI Curious Forms static hero — 6 October 2026
+
+final result: passed (static visual implementation; operational form limitations below)
+
+## Reference and scope
+
+- Selected source: C:/Users/JOSHUA~1/AppData/Local/Temp/codex-clipboard-fd5371bf-82de-4baf-9329-a96a0b581973.png, 1672 x 941.
+- Local implementation: http://localhost:4321/, AI homepage at scroll top.
+- Preserved the actual society logo and existing #FF4A00, #111111 and #FAF8F3 brand tokens. Kept navigation, headline, supporting copy and actions as HTML with accessible names and keyboard controls.
+- Artwork was prepared separately from the reference, without baked-in copy or controls: desktop WebP 140602 bytes, portrait WebP 94978 bytes. Phones and portrait tablets request the portrait composition at appropriate resolutions. No canvas, video or flowing animation is mounted in the hero.
+- Kept the existing assistant launcher. The committee strip follows the hero; committee routes retain their existing sticky header/strip. The mockup's concept number and title are intentionally omitted from the public page.
+
+## Evidence and comparison
+
+Evidence directory: C:/Users/Joshua Knott/Projects/surreysocieties/output/ai-hero/.
+
+- reference.png is the supplied source; e2e/ai-curious-forms-1672.png is the final actual browser capture at exactly 1672 x 941, density 1.
+- comparison-final.png puts source left and browser result right, each normalized to 1003 x 565. Both images were inspected together in one visual input.
+- comparison-type-controls.png compares matching full-resolution crops (x415, y205, 875 x 600) of the headline, supporting copy and buttons. Inspected together after the final type refinement.
+- Final responsive captures: e2e/ai-curious-forms-{1440,1024,768,390,320}.png. Viewports were 1440 x 900, 1024 x 1366, 768 x 1024, 390 x 844 and 320 x 740. All were inspected during iteration.
+- Earlier desktop-v1.jpg, desktop-v2.jpg, comparison-v1.png and comparison-v2.png retain the initial comparison evidence. The final PNGs come from Chromium E2E; the initial in-app-browser JPEGs have slight capture scaling/softness and were not used for final pixel placement.
+
+## Fidelity and iteration
+
+- Layout: matched the large central three-line heading, surrounding cropped forms, wide top navigation and side-by-side desktop actions. Phones use the same materials arranged around a clear center, two navigation rows and stacked actions where needed.
+- Materials and colors: preserved the transparent glass loop and sphere, glossy orange form, black reflective tube, warm background and contact shadows. The image edit closely retains the source composition; shader/mesh equivalence is not claimed.
+- Typography: compared Fredoka, Lilita One and Baloo 2 in the browser. Selected a locally served Baloo 2 800 Latin font (30600-byte WOFF plus OFL license), with static letter rotations, spacing and subtle stroke to approach the reference's weight. The accessible H1 is read as one complete sentence.
+- P2 fixed: the initial headline was undersized and misplaced. Iterated desktop size, letter placement, line spacing and the gap before the supporting copy/actions against the source.
+- P2 fixed: portrait tablets initially cropped away most artwork and left a large empty region. Added portrait art selection, larger centered type and a soft header backing to protect logo/navigation legibility.
+- P2 fixed: initial live type had noticeably different B, Q and dot shapes. Replaced it after a three-font comparison and repeated the focused source/browser review.
+- No remaining actionable P0/P1/P2 visual findings. P3: individual generated glyph contours, especially the Q tail, remain approximate rather than pixel-identical. The source is an image, while the implementation uses selectable accessible text.
+
+## Verification
+
+- npm run typecheck passed; npm test passed (47 tests across seven files).
+- npm run build:all passed after the shared layout change. npm run build:ai passed again after the final font/artwork/CSS changes. The existing large-client-chunk warning remains.
+- Final focused Chromium run: all 19 AI public-launch and committee-strip checks passed. Includes all six viewport sizes, loaded artwork/font, no horizontal overflow, accessible heading, 44px minimum control targets, section anchors, Join dropdown keyboard/Escape/outside dismissal, reduced-motion mode and mobile artwork request selection.
+- Full three-site E2E run initially passed 55/62. The obsolete AI homepage sticky-strip expectation was updated to test the new hero/strip order plus preserved sticky behavior on committee pages, then passed. The remaining six failures are AI/Neurotech form-field expectations: local pages intentionally show “Submissions will open when secure email delivery is connected” because their existing email configuration gate is unmet. No form submissions or configuration changes were attempted.
+- All Business and Neurotech public-launch checks passed in that full run. Existing unrelated Business changes were preserved.
+- E2E_HOST is now an optional test-host override, preserving 127.0.0.1 by default. Verification used E2E_HOST=localhost to reuse the existing IPv6 local previews without disrupting them.
+- git diff --check passed. No backend or member-data changes, commits, pushes or deployments. Flowing animation awaits review of this static version.
+
+---
+
+# AI Flow full homepage — 6 October 2026
+
+final result: passed
+
+## Reference, state and evidence
+
+- Source visual truth: `output/ai-flow/approved-mockup.png`, copied from the user's selected `codex-clipboard-f302c69b-442b-4568-b043-5f3a189a4a92.png`; 725 x 2170 pixels. The source depicts a desktop composition, not a 725px responsive breakpoint.
+- Local implementation: http://127.0.0.1:4321/, AI homepage, light/orange/black palette, assistant closed. User specifically requested compact icon branding instead of the rectangular header/footer lockups.
+- Final full-page browser evidence: `output/ai-flow/e2e/ai-home-desktop.png` (1440 x 4531 pixels; 1440 x 900 CSS viewport, deviceScaleFactor 1) and `output/ai-flow/e2e/ai-home-mobile.png` (390 x 4824 pixels; 390 x 844 CSS viewport, density 1).
+- `output/ai-flow/comparison-final.png` combines the source on the left with the actual desktop capture on the right, each normalized to 725px wide. Reviewed in one visual input. Section positions differ because the existing active committee application strip remains present and the real form retains visible labels.
+- Focused source/browser comparison: `output/ai-flow/comparison-footer.png`, including contact controls, branding and mascot. Source crop is 725 x 520; the actual 1440 x 900 desktop viewport is normalized to 725px wide. This is a region comparison, not a claim of identical crops or pixel positions.
+- Additional actual browser captures: `desktop-footer-final.png`, `mobile-footer-final.png`, `mobile-assistant-final.png`, `mobile-320-activities.png`, `tablet-activities.png`, and `tablet-footer-final.png`, all under `output/ai-flow/`. In-app-browser captures include the Windows scrollbar; Chromium test captures do not.
+- Manually inspected the hero/header, activity cards, committee, join, contact/footer and assistant at desktop, 768px tablet, 390px phone and 320px phone sizes. Existing hero checks additionally cover 1672, 1024 and reduced motion.
+
+## Fidelity surfaces
+
+- Fonts and typography: retained the locally served Baloo 2 800 display face and Inter UI/body text; large rounded section headings continue the hero's hierarchy. Static tilts give headings the selected character without animating reading text. Small controls remain readable, committee names wrap, and mobile headings do not truncate. Handwritten side notes use Segoe Print with fallbacks.
+- Spacing and layout: cream/orange/cream/black/cream/black sequence, broad curved section boundaries, three organic activity cards, three officer badges, two join steps and three contact columns follow the reference. Phone layouts become rows or a single column; footer links keep space for the fixed mascot. The existing application strip is intentionally retained.
+- Colors and tokens: #FAF8F3 paper, #FF4A00 orange, #111111 ink. Dark text on orange controls intentionally provides stronger contrast than the reference's white labels. Keyboard focus remains visible, including against the black join section.
+- Images and assets: retained the approved existing hero artwork. New optimized alpha WebP glass forms, orange objects, black officer badge and star mascot follow the reference materials. Official light/dark AI icon assets supply header/footer branding; no generated approximation of the society logo is used. Decorative imagery has empty alt text and no embedded UI text.
+- Copy and content: retained the selected section headings and supporting copy. Real society configuration supplies membership/social destinations and signatories, with the existing public committee query retained. Name/email/message labels and honest email-app helper text remain visible. The assistant is the existing accessible widget with a new launcher image, not a disconnected illustration.
+
+## Findings and comparison history
+
+- P2 fixed: the first comparison (`comparison-first.png` / `desktop-first.png`) showed undersized lower-page headings, shallow curves and square form inputs. Increased display sizes, fitted the generated wave mask to its silhouette, and corrected selector specificity for pill-shaped fields. `comparison-final.png` and `comparison-footer.png` confirm the revised hierarchy and shapes.
+- P2 fixed: the first generated president star was too slender for readable initials. Replaced it with the plump five-point orange badge; final full-page and committee captures confirm a clear JK badge.
+- P2 fixed: the mobile assistant panel used viewport width including the Windows scrollbar, extending beyond the content area. Changed its width to `calc(100% - 24px)`. Final browser measurements at a 390px viewport are left 12px, right 363px within a 375px content area; `mobile-assistant-final.png` confirms the panel and controls fit.
+- Preview-only fault resolved: Astro's development reload briefly returned failed image transforms. Restarted the AI preview, then confirmed loaded images visually and reran all 18 AI public checks successfully. This recovery is not counted as a design iteration.
+- No remaining actionable P0/P1/P2 findings. P3: generated form contours and lighting, individual glyph shapes, handwritten notes and the exact wave phase are approximate. The transparent loop on the dark section is lighter than the reference. These do not prevent the selected style or content from carrying through the page.
+- Intentional adaptations: compact official icons with readable society text in header/footer; mobile reflow; retained application strip; persistent form labels; fixed assistant placement; actual external destinations and accessible control sizing.
+
+## Verification and handoff checklist
+
+- [x] `npm run typecheck` passed.
+- [x] `npm test` passed: 47 tests across seven files.
+- [x] `npm run build:all` passed; `npm run build:ai` passed again after the final assistant width change. Existing large-client-chunk warning remains.
+- [x] Public-launch suite: all Business and Neurotech checks passed. After fixing an obsolete assistant-image assertion and restarting the AI preview, all 18 AI public checks passed. The three AI assistant checks passed again after the final width fix.
+- [x] Browser coverage includes anchors, loaded branding/art, overflow, Join dropdown keyboard/Escape/outside dismissal, contact email draft, social links, skip link, reduced motion, assistant open/close/focus and mocked loading/error/retry/reset/reply links. No real messages or forms were sent.
+- [x] Latest in-app browser console error list was empty. Real assistant-provider response generation was not retested; backend behavior is unchanged.
+- [x] `git diff --check` passed. Existing unrelated working-tree changes were preserved.
+- [x] Local AI preview remains available at http://127.0.0.1:4321/. No commit, push or deployment.
+
+## Follow-up: launcher, footer and header corrections
+
+final result: passed
+
+- User evidence: `codex-clipboard-5f3c5b96-1b29-45f3-b50c-176aaed667f0.png` (label overlap), `codex-clipboard-032e5a7d-a468-446f-8334-20f1803aaa8c.png` (oversized footer), and `codex-clipboard-cb8c0991-fd4b-40ea-8409-598d665bd98a.png` (cream logo box), supplied on 6 October 2026.
+- Corrected the previously missed launcher overlap: the Ask AI label now sits above the entire mascot image with 4px bounding-box clearance at both desktop and phone sizes, and has an explicit stacking order.
+- Reduced the footer body to 122px at 1920px desktop width, with a 90px maximum wave. Tightened padding, icon size and metadata layout while retaining 44px links. The 390px footer is 212px plus its 40px wave and has no horizontal overflow.
+- Reused the existing official transparent logo asset, framing only its left icon using object-fit/object-position. The cream square is gone, including where the header overlaps the glass artwork at the user's 2423px wide viewport. No logo was regenerated or redrawn.
+- Inspected actual wide desktop and phone views. Evidence: `output/ai-flow/polish/desktop-header.png`, `wide-header.png`, `desktop-footer.png`, `mobile-footer.png`, and updated Chromium captures in `output/ai-flow/polish/e2e/`.
+- AI build passed; all 18 AI public browser checks passed; `git diff --check` passed. Latest browser console error list was empty. The local preview remains open; no deployment.
+
+## AI committee planner — 15 October 2026
+
+final result: passed
+
+- Target: the approved minimal committee board, publishing review, and homepage programme mockups from this chat. The existing AI homepage hero and society identity are retained.
+- Compared the actual board and publication screenshots with their source mockups in combined inputs: `output/planner/comparison-board.png` and `comparison-publication.png`. Inspected desktop at 1440×1024, mobile at 390×844, and overflow at 320px.
+- Fixed P2: the full brand lockup was too small in the planner header. Reused the existing transparent asset with the same left-icon crop used on the public site; final desktop and mobile captures show a readable AI mark.
+- Fixed P2: public activity routes initially nested a main landmark inside the shared layout. They now use the layout's single main landmark.
+- Verified the board, live preview, calendar view, access controls and mobile editor. No remaining actionable P0/P1/P2 layout findings. Intentional adaptations: native keyboard-accessible stage selectors, an Archive view, access controls for admins, a scrollable activity dialog, and compact text-only public project entries.
+- Evidence: `output/planner/board-desktop.png`, `board-mobile.png`, `publication-desktop.png`, `publication-mobile.png`, `homepage-programme-desktop.png`, and `homepage-programme-mobile.png`. Programme and authenticated-board captures use temporary test data, not hosted or production events.
+- Backend: explicit committee checks on every private operation; separate whitelisted publication snapshots; Ready is private; edits remain drafts until republished; revocation, optimistic revision conflicts, cross-society isolation and safe calendar escaping have regression coverage.
+- Checks: 77 unit/backend tests; all six planner browser cases; all 18 AI public launch cases passed across the main run and the focused retry of a navigation timeout. Root and Convex TypeScript checks and all three site builds passed. Existing large-client-chunk warning remains.
+- Browser transport fixtures stand in for Clerk sessions and HTTP delivery, while the real Convex functions execute in an isolated test database. Actual local Clerk sign-in UI also loaded successfully. A real committee account, live AI-provider generation and production publication are separate acceptance checks; do not infer them from the fixture tests.
+- Release: deployed the AI app and promoted the checked release to https://surreyaisociety.org/. Retained the website's existing Convex backend and Clerk instance; the current Clerk sign-in still identifies itself as Development mode. Existing AI owner/admin access and the Convex JWT template were verified without changing account grants.
+- Live checks: homepage and planner return 200 with no-store; planner has noindex/nofollow and renders the real Clerk email sign-in screen. The public JSON feed is empty, the calendar is valid, unknown activity IDs return 404, anonymous AI requests return 401, and anonymous private-board queries are rejected. Evidence: `output/planner/live-verification.json`. No sample activities were inserted into the hosted database. Real-account sign-in, authenticated live AI generation and a hosted content publication remain unexercised.
+
+### Follow-up: sign-in only and owner-managed emails
+
+- Removed the sign-up action from the actual Clerk sign-in component and disabled transfer into sign-up. Confirmed the real local sign-in screen renders only email and Continue.
+- Dashboard Settings now contains Committee access only for the authenticated `joshhknott@gmail.com` account. Owner access does not depend on an existing membership row. Other accounts require a manually added email; inherited society roles no longer grant planner access. The owner checks run on Convex reads and mutations, including direct calls.
+- Adding an email prepares a reserved Clerk account server-side and grants planner access only after that succeeds. Email verification remains with Clerk at sign-in. Existing accounts are reused; no invitation, password or automatic sign-in is created. Other settings views do not load the private email list.
+- Inspected `output/planner/owner-settings-desktop.png` at 1440x1024 and `owner-settings-mobile.png` at 390x844, with an additional 320px overflow check. These owner screenshots use isolated test sessions and sample emails. No actionable layout findings.
+- Verification: 88 unit/backend/server tests, all seven planner browser cases, root TypeScript and Convex TypeScript passed. The real Clerk sign-in-only view was also checked locally. Provisioning failures, non-owner direct calls, profile-email spoofing, unverified emails, owner bootstrapping and immediate revocation have coverage. Real-account sign-in and creating a real committee sign-in account remain separate acceptance checks.
+- Release checks: the AI build passed and the updated functions were pushed to the website's existing backend. The owner's existing Clerk account and email-code sign-in support were verified read-only. Vercel already has the required server secret. The staged production access endpoint correctly returned 401 without a session; no real committee accounts or grants were created during verification.
+- Promoted deployment `dpl_77hUnSxbu2beQxgHNBU8fu6jnkam` to the main domain. Live browser verification confirms the real sign-in screen has no sign-up action. Live HTTP checks confirm the Settings markup, no-store response, removed legacy access toolbar button, working programme endpoint and 401 on anonymous access-management requests. Evidence: `output/planner/owner-live-verification.json`.
+
+### Follow-up: custom email-code sign-in
+
+- Replaced the mounted Clerk UI with a custom email/code form using the Clerk JavaScript sign-in resource. There is no password or sign-up control, provider footer, or development-mode text in the product UI. The lock icon, heading and form share a centre line on desktop and mobile.
+- Before asking Clerk to send an email code, the server checks the email against AI planner grants or the owner email. A server-only shared secret protects that check from direct anonymous access. Rate limits cover allowed emails and keyed requester hashes; no raw IP address is stored. Board access is independently checked after verification and on return visits, including if access was revoked while a code was in flight.
+- Clerk verifies the code and persists its normal browser session. The app restores that session after reload rather than requiring another code. Signing out removes access; no application JWT or code is put in local storage. Existing Clerk expiry settings still apply.
+- Inspected `output/planner/sign-in-desktop.png`, `sign-in-mobile.png`, `sign-in-code-desktop.png`, and `sign-in-code-mobile.png`. Desktop is 1440x1024; mobile is 390x844, with an additional 320px overflow check. The real local Clerk SDK also loaded the custom form successfully. Code-step screenshots use isolated test sessions; no verification email was sent during these tests.
+- Verification: 97 unit/backend/server tests, all ten planner browser cases, root and Convex TypeScript, AI build, and whitespace checks passed. Browser coverage includes denied email with no code request, wrong/expired code, resend cooldown, changing email, successful verification, remembered session, sign-out and revocation during sign-in. A public-build scan found no shared-secret exposure. Actual inbox delivery and a real-user verification remain unexercised.
+- The actual local server/backend access check accepted the owner and denied an unlisted email after restarting the long-running preview to load its new environment setting. The staged production owner check also returned 200 with `allowed: true`. Promoted deployment `dpl_BezjsLxCb3CCg7jP5KcgyZr67BiL` to https://surreyaisociety.org/. The access-check requests do not send verification emails. Live HTTP evidence is in `output/planner/code-live-verification.json`.
+
+### Follow-up: simpler Ideas and embedded description help
+
+- Ideas now shows only title, description and optional collaborators. Planning reveals practical details and collapsed optional notes/checklists. Ready and Published add the website preview and a list of missing publication details. Returning to Ideas preserves previously entered logistics and private notes.
+- Event and hackathon publication requires a date, start time, room/location and booking link; incomplete drafts can still be saved in Ready. Project dates and links remain optional. Collaborators use the existing private owner field and are excluded from public snapshots.
+- Removed the standalone AI action/dialog. Description help now uses the current item's title and description, displays a suggestion for review, and changes only the description when explicitly applied. Closing the editor or changing sessions aborts pending suggestions. No real provider request was made during verification.
+- Separated the four board lists with bordered, tinted panels, stage accents, item counts and short stage descriptions. Idea cards show their description and collaborators without premature date/task metadata.
+- Inspected `output/planner/simple-idea-desktop.png`, `simple-idea-mobile.png`, updated board captures and the mobile publication form. Desktop is 1440x1024, mobile is 390x844, with a 320px overflow check. No actionable layout findings. Authenticated screenshots use isolated test data.
+- Verification: 103 unit/backend/server tests, all 11 planner browser cases, root and Convex TypeScript, the AI build and whitespace checks passed. Browser tests cover sparse ideas, preservation across stages, publication requirements, reviewed description suggestions, and existing access/sign-in flows. Provider and Clerk transport are mocked; real Convex functions run in an isolated database. The existing website backend received the updated publication validation without sample content or access-grant mutations.
+- Release: checked the staged planner markup and public feed, then promoted `dpl_HEyAfGnr3PKsCgXtezNqSVeTttmR` to https://surreyaisociety.org/. Live checks confirm the new editor markup and board assets, a 200/no-store planner response, a working public programme array, and 401 responses for anonymous AI and access-management requests. Evidence: `output/planner/simple-live-verification.json`. Real signed-in hosted editing and live provider generation were not exercised during this release.
+
+### Follow-up: calendar, compact cards and automatic archive
+
+- Fixed the phone calendar's long list of empty days by showing only scheduled days as an agenda. Desktop retains a complete Monday-first month grid with leading/trailing padding, clearer event blocks, Today/previous/next controls, stage labels and London time. Same-day events sort by start time. Dates can open a new Planning item, and empty/loading/error states have clear actions.
+- Calendar history now queries the selected month, including archived records, independently of the active board and the archive list's most-recent-200 limit. It returns a bounded summary; opening an event separately checks committee access before retrieving its private editor details. Requests from older month selections cannot overwrite newer results, and session changes clear the calendar data.
+- Added an internal hourly archive sweep at five minutes past the hour. It archives events and hackathons whose date is before the current London date, including in summer/winter time, without deleting their dates, description, collaborators, notes or tasks. Today, future dates, undated ideas, projects and other societies are excluded. Batches are limited to 100 and continue through the scheduler. Archiving removes public snapshots under the existing archive rules, while retaining the private calendar entry.
+- Board cards now separate the activity type, title, short description, date/time and location. Removed all per-card stage dropdowns and empty footers while retaining the four section headers. Drag/drop moves private stages; dropping into Published opens the existing review rather than publishing directly. The editor retains its stage selector for keyboard and touch access.
+- Inspected desktop at 1440x1024, mobile at 390x844, and overflow at 320px. Evidence: `output/planner/calendar-before-desktop.png`, `calendar-before-mobile.png`, `calendar-desktop.png`, `calendar-mobile.png`, `calendar-empty-mobile.png`, `cards-desktop.png` and `cards-mobile.png`. Authenticated screenshots use isolated test data. No remaining actionable layout findings.
+- Verification: 107 unit/backend/server tests, all 14 planner browser cases, root and Convex TypeScript and whitespace checks passed. New cases cover London date boundaries, idempotent/batched archiving, archive retention beyond the list limit, month/year navigation, retry and stale responses, editing archived notes, creating from a calendar date, and drag/drop without card dropdowns or implicit publication. Clerk transport remains mocked in these private browser tests; real Convex functions run in an isolated database.
+- Release: the AI build passed with the existing large-client-chunk warning. Pushed the new month/date indexes, protected queries and hourly archive job to the website's existing Convex backend. Checked the staged planner and client bundle, then promoted `dpl_8hu1mny6BF2ENuMRpQ3PA5JTvSEN` to https://surreyaisociety.org/. Live HTTP checks confirm the new assets, mobile agenda styles, retained column headers, removed card dropdowns, a working public programme feed, and rejection of anonymous private-calendar/AI requests. An initial live archive sweep completed and found zero past events. Evidence: `output/planner/calendar-live-verification.json` and `archive-sweep-live.txt`. No sample content or access grants were created in the hosted database; signed-in hosted editing remains separate from the fixture browser acceptance.
+
+### Follow-up: homepage programme simplification
+
+- Removed the Calendar feed link and Projects to join panel from the homepage Coming up section. Events now use the full section width. Removed the corresponding client refresh branch and obsolete panel/grid styles so subsequent public-feed refreshes work without the removed elements.
+- Inspected the updated programme at 1440px desktop and 390px mobile using `output/planner/homepage-programme-desktop.png` and `homepage-programme-mobile.png`. Screenshots use isolated published test activities. No new layout defects or horizontal overflow.
+- Root TypeScript, both affected existing planner/publication browser cases, the AI build and whitespace checks passed. Publishing, revising and unpublishing still update the homepage correctly. No backend data or access changes were needed.
+- Promoted `dpl_7DTHaegmTjFv9dpd7mqtJsWB3NKg` after checking its staged homepage. Live homepage verification confirms both requested elements and the split-column wrapper are removed, with the event list retained. Evidence: `output/planner/programme-simple-live.json`.
+
+### Follow-up: card ownership, preview and private comments
+
+- Cards now open a compact reading view with their description, confirmed details, initials avatars and a comment thread underneath. Edit opens the existing progressive detail form; closing it returns to the card. Unsaved comment text survives that transition. Board cards retain drag/drop and use avatars plus an optional comment count instead of text contributor lines and action footers.
+- Creators and unique editors are recorded server-side from authenticated accounts. Saves, stage changes and publishing add an editor; comments and automatic archiving do not. Existing author metadata is optional for compatibility. The internal audit-history backfill restored attribution on three hosted cards and returned zero changes on a repeat run. It does not infer authorship from freeform collaborator text or change content revisions.
+- Comments live in an indexed, separately paginated table. Every read/write checks AI committee access and item ownership. Authors are server-derived; text is limited to 2,000 characters and rendered as plain text. Idempotency keys prevent duplicates after a committed request loses its response. Comment counts do not advance the content revision or change public snapshots. Archives retain their discussion.
+- Inspected `output/planner/card-preview-desktop.png`, `card-preview-mobile.png` and the updated board captures at 1440x1024 and 390x844, with a 320px overflow check. These images use isolated test sessions and comments. No actionable layout defects remained.
+- Verification: 113 unit/backend/server tests, all 16 planner browser cases, root/Convex TypeScript and whitespace checks passed. The two discussion cases passed again after guarding posting during a pending history load. Coverage includes attribution deduplication, historical backfill, pagination, retry without duplicates, plaintext rendering, drafts across Edit, return-to-preview, public privacy and access revocation clearing loaded discussion. No hosted test comments or access grants were created.
+- Release: the AI build passed with the existing client-chunk warning. Added the comment table, required indexes and optional attribution fields to the existing website backend, checked the staged planner, then promoted `dpl_GsWnQUyUQaWQ9nyWw7pXNmXY2ZUy` to https://surreyaisociety.org/. Live checks confirm the preview/comment markup and new client bundle, initials rendering, removed card dropdowns, anonymous comment reads/posts denied, and attribution/discussion metadata excluded from the public feed. The previous homepage simplification remains in place. Evidence: `output/planner/card-preview-live-verification.json`. Signed-in hosted commenting was not exercised; authenticated browser acceptance uses isolated sessions and real Convex functions in a test database.
+
+### 2026-10-15: approved AI Join dropdown
+
+- Source visual truth: `C:/Users/Joshua Knott/.codex/generated_images/01a140dc-ed48-7a02-9c74-bcfd742f678c/exec-beebfe5b-78df-4c66-a240-1bc22ea1384d.png` (1665 x 944 pixels). The selected design is the latest warm-white revision.
+- Implementation: `output/ai-join/desktop.png` and `output/ai-join/mobile.png`; open Join menu, homepage, local AI preview at port 4321. Desktop CSS viewport 905 x 513 with devicePixelRatio 1; browser capture is 890 x 504. The reference was normalized with contain sizing to 890 x 504 for comparison.
+- Full-view evidence: `output/ai-join/comparison.png`; focused evidence: `output/ai-join/panel-comparison.png`. Each image places the reference on the left and implementation on the right. The surrounding existing site layout was preserved.
+- Typography: Inter for compact product text, 22px title, 16px primary row labels, muted descriptions; no clipping or truncation. Spacing: the panel closely matches the reference width and density, with consistent rows and 44px minimum touch targets. Colors: warm-white surface, fine neutral outline, restrained shadow and orange membership action match the approved light direction. Image/icon quality: existing shared vector brand icons and Lucide functional icons stay crisp; existing outline brand marks differ from the generated filled/gradient marks as a minor P3 variation. Copy: all approved text and seven destinations are present; membership opens the existing Union membership URL.
+- Comparison history: initial inspection found P2 assistant overlap and P2 phone-edge clipping. Raised the open header above the assistant and anchored the phone panel to the header with 12px side insets. The subsequent desktop/mobile captures and responsive browser test confirm both fixes. Tightened row spacing and kept the open trigger orange.
+- Interaction evidence: the AI launch dropdown browser case passed at 320, 390, 768 (390px high) and 1440px widths, covering visibility, target size, viewport fit, links, Enter/Space, Escape with focus restoration, focus leaving the menu, outside click and toggle. Local in-app browser error log was empty. Root typecheck, all 113 unit tests and the AI production build passed. Build retains its existing client chunk-size warning.
+- Findings: no actionable P0/P1/P2 findings remain. P3: existing outline brand icons are retained for consistency with the site.
+- final result: passed
+- Production release: pushed the four-file dropdown change to `origin/main` as `e7b40bb24e7183721c706308527e655abbdef974`, using a separate Git index to preserve the dirty primary checkout. The release build preserves the already-deployed page baseline. Staged verification confirmed seven menu links, direct membership, and unchanged main/footer markup after normalizing inter-tag whitespace. Promoted `dpl_EXLedmGg2cxRZxrW1VQSB5psHy2z` to `https://surreyaisociety.org/`.
+- Live acceptance: desktop (905 x 513) and mobile (390 x 844) smoke checks passed against the custom domain, including HTTP 200, seven links, fit, unobscured Linktree/email targets, Escape/focus restoration, outside dismissal and no page errors. The first mobile smoke attempt targeted a headline underneath the open panel; the corrected test clicks visible page padding and passed. Evidence: `output/ai-join/live-desktop.png`, `output/ai-join/live-mobile.png`. In-app browser checks also confirmed the deployed menu and an empty browser error log. Deployment runtime-error query returned no error records.
+
+### Follow-up: authors edit and delete their own comments
+
+- Added small Edit and Delete actions beneath the signed-in author's comments. Editing uses an inline textarea with Save changes and Cancel; saved changes show an Edited marker. Deletion asks for confirmation within the thread. Other people's comments remain read-only, including for the planner owner. The server derives the current user and checks authorship, committee access, comment society and parent-card society for both mutations.
+- Optional comment revisions preserve existing records and prevent overwriting a different edit from another tab. Retrying an already-applied edit or deletion is safe. Deletion removes the stored comment and decrements the count once without changing the card revision, contributor avatars or public snapshot. Loaded history is refreshed page by page so edits and deletions from another session also reach older comments. An active edit keeps its text through background refreshes; failed requests retain the edit or deletion confirmation for retry. Comments remain editable/deletable after archiving.
+- Inspected `output/planner/comment-controls-desktop.png`, `comment-edit-mobile.png` and `comment-delete-mobile.png` at 1440x1024 and 390x844, plus overflow at 320px. The screenshots use isolated accounts and comments. No actionable layout defects remained.
+- Verification: all 117 unit/backend/server tests, all 18 planner browser cases, root and Convex TypeScript, the AI build and whitespace checks passed. Coverage includes author-only controls and direct authorization, planner-owner restrictions, validation, revision conflicts, retry after lost responses, cancellation, confirmed deletion, retained unposted drafts, archived comments, accurate zero counts, paginated cross-session changes and revoked access. Browser sign-in transport is mocked; real Convex functions execute in an isolated database. No hosted test comments or access grants were created.
+- Release: pushed the updated functions and optional comment fields to the website's existing Convex deployment. Verified the staged HTML and delivered client asset, then promoted `dpl_9xCUNbv2ha8jeT5DdDKtyKJsd6TT` to https://surreyaisociety.org/. Live HTTP checks confirm the 200/no-store planner, new author controls and client code, and private metadata excluded from the public feed. Homepage main/footer markup and all seven Join-menu destinations match the preceding live release. Evidence: `output/planner/comment-controls-backend-spec.json`, `comment-controls-stage-verification.json` and `comment-controls-live-verification.json`. Actual signed-in hosted edit/delete remains unexercised; no real comments were changed for verification. The build retains its existing client chunk-size warning.
+
+### Follow-up: committee mentions and private notifications
+
+- Added an @ picker to new and edited comments. It searches current committee names/emails, supports arrows, Enter, Tab, Escape and pointer selection, and inserts canonical @email tokens to distinguish people with the same name. Saved comments display highlighted names using plain text nodes. The picker clears its rendered options on close/sign-out. Directory reads require committee access and return a bounded list of active AI grants plus the owner.
+- Mentions are resolved server-side from the comment text, limited to ten distinct recipients, and checked against current AI access grants. Valid recipients can receive a notification before their first sign-in. Self-mentions do not notify; duplicate tokens and committed-request retries do not create duplicate alerts. Edits add newly mentioned recipients, retain existing read state, and remove notifications for removed mentions. Deleting a comment removes its notifications in the same transaction. Comment revisions, ownership and publication privacy stay separate from discussion metadata.
+- Added a bell inbox with a capped unread badge, paginated history, individual read receipts and bounded Mark all as read batches. Every operation checks current committee access and the signed-in recipient email; callers cannot choose another inbox. Notifications refresh every 30 seconds while the planner is visible, on window focus, and when opening the inbox. Clicking a notification opens the card and loads earlier comment pages as needed to focus/highlight the exact comment. Archived cards remain reachable. No email or desktop notifications are sent.
+- Inspected `output/planner/mention-picker-desktop.png`, `mention-picker-mobile.png`, `notifications-desktop.png`, `notifications-mobile.png` and `mention-jump-mobile.png` at 1440x1024 and 390x844, with an additional 320px overflow check. Screenshots use isolated test accounts and comments. No actionable layout defects remained.
+- Verification: all 124 unit/backend/server tests, all 21 planner browser cases, root and Convex TypeScript, the AI build and whitespace checks passed. The three mention/inbox cases passed again after hardening picker clearing, retry loading state, keyboard navigation and focus preservation. Coverage includes recipients awaiting first sign-in, active-grant filtering, private inboxes, unverified/revoked access, read persistence, notification pagination, capped unread totals, bounded read-all batches, edit/delete cleanup, duplicate suppression, older-comment navigation on archived cards and HTTP retry. Browser auth transport is mocked; the actual Convex functions run in an isolated database.
+- Release: pushed the new notification table/indexes, active-grant index and optional comment mention metadata to the existing website backend. Verified all four new API functions and the staged delivered client, then promoted `dpl_9xPRGrN5wpvaxdkWWWbBFf3NTkQq` to https://surreyaisociety.org/. Live HTTP checks confirm the 200/no-store planner, picker/inbox assets, anonymous directory/inbox/read-all requests rejected, and mention metadata excluded from the public feed. Homepage main/footer markup and all seven Join destinations match the preceding release. Evidence: `output/planner/mentions-backend-spec.json`, `mentions-stage-verification.json` and `mentions-live-verification.json`. No hosted test comments, notifications or access grants were created. Actual signed-in hosted mention delivery remains unexercised. The existing large-client-chunk warning remains.
+
+### Follow-up: real-time mention notifications
+
+- Replaced the inbox's 30-second refresh dependency with an authenticated Convex WebSocket subscription. A small indexed revision document per recipient changes in the same transaction as added/edited/removed mentions and read receipts. The subscription prompts a refresh of all currently loaded inbox pages, so changes to older read notifications also arrive live. Existing notifications work without a backfill. The board's existing refresh remains separate.
+- The client authenticates using the current Clerk session and honours forced token refresh. It reconnects automatically, queues updates received during a pending fetch or read operation, and retries transient HTTP refresh failures with backoff. Sign-out, expired authentication and revoked committee access clear the inbox and close its subscription. Version checks discard late responses after a session ends; page hide/show closes and restores the connection.
+- Inspected `output/planner/notifications-realtime-desktop.png` at 1440x1024 and `notifications-realtime-mobile.png` at 390x844, with no horizontal overflow. Appearance and card navigation are preserved. The existing full suite also checks the planner at 320px. These screenshots use isolated test data.
+- Verification: all 127 unit/backend/server tests, root/Convex TypeScript, the AI build and whitespace checks passed. All 24 planner browser cases passed across the full run and focused retry. The initial sign-out test had an ambiguous label; its corrected run exposed that the fixed mock session signed itself back in after reload. The fixture now preserves sign-out, and the late-response case exercises a Clerk session-ended event without navigation. The focused rerun passed the three real-time cases plus existing email-code/sign-out coverage.
+- New browser coverage uses the actual Convex browser SDK and a simulated Convex WebSocket transport backed by the actual Convex functions in an isolated database. It verifies two open tabs receive new mentions, edited snippets, read receipts and removals without a reload/focus/poll; reconnection catches up; failed refreshes retry; a new change arriving during a held older response is retained; older loaded history refreshes; and revocation/sign-out close connections and prevent late data from returning. No hosted test comments or notifications were created.
+- Release: deployed the recipient-state table/index and protected query to the website's existing backend, then checked and promoted `dpl_4vQiaqs1puX8r4dxNaeNaMtdqK4L` to https://surreyaisociety.org/. The actual hosted WebSocket connected and rejected an anonymous subscription; the corresponding anonymous HTTP query was also rejected. Main-domain checks confirm the new client code, 200/no-store planner, existing directory/inbox/read-all guards and private public-feed metadata. Homepage main/footer markup and all seven Join destinations match the preceding release. Evidence: `output/planner/realtime-backend-verification.json`, `realtime-stage-verification.json` and `realtime-live-verification.json`. Authenticated hosted push delivery remains unexercised; signed-in browser acceptance uses isolated transport. The existing client chunk-size warning remains.
+
+
+## AI committee planner: approved board and card — 15 October 2026
+
+final result: passed
+
+The approved targets are `output/planner/mockups-2026-10-15/board.png` and `opened-card.png`. This change is limited to the existing AI planner frontend and its browser tests. No backend schema, hosted data, publishing rules, or other society UI was changed.
+
+**Visual evidence.** Both source images (1488 × 1056 pixels) were normalized with containment to the implementation viewport of 1440 × 1024, device scale factor 1. Compared reference and rendered UI together in `output/planner/approved-board-comparison.png` and `approved-card-comparison.png`; inspected the readable comment/composer region in `approved-comments-comparison.png`. Sample card titles, people, stage counts, and comments match the concepts. Captures use isolated fixture accounts and real planner functions in an in-memory Convex database.
+
+- Typography: retained the existing Inter font, with clear title/body/name hierarchy and readable contributor names. Matched the opened-card description wrapping and increased the first-pass column/comment heading sizes.
+- Spacing and layout: four stage columns on desktop, two on an 834 × 1194 tablet, and one on phones. Private-column add actions align at the bottom. The 800px opened card has one conversation surface and an integrated composer. First-pass mobile ellipsis/text overlap was fixed by reserving space beside the author's comment. Inspected `approved-board-tablet.png`, `approved-board-mobile.png`, `approved-card-mobile.png`, and `approved-composer-mobile.png`; 390px and 320px views have no horizontal overflow. The long mobile dialog scrolls vertically and the send button remains reachable.
+- Colors and tokens: warm off-white, lilac/blue/peach/sage stage surfaces, neutral comment text, purple mentions, and restrained orange actions follow the source. Darkened the orange action color to #d24419 for 4.58:1 white-text contrast and strengthened muted text/placeholder colors.
+- Asset fidelity: reused the existing Surrey AI monogram and Lucide icons. Contributor avatars remain initials derived from actual identities, with stable per-user color tones; no mockup was used as a runtime image.
+- Copy and content: closed cards contain only the title and creator/editor names plus initials, across every stage, including published cards. Description, dates, location, booking links, and discussion remain inside the opened card. Contributor names are also exposed as the card button's accessible description.
+
+**Behavior and accessibility.** Comments support the existing draft recovery, pagination, retries, edit/delete confirmation, and mentions. A keyboard-accessible ellipsis menu replaces the always-visible edit/delete links; Escape closes that menu without closing the card and focus returns to its trigger. The composer mention button opens the existing directory picker. Privacy clearing also removes the new current-user avatars. Signed-out/revoked access, drag-to-stage, publish review, calendar/archive navigation, and real-time inbox behavior remain covered.
+
+**Verification.** All 25 planner browser cases passed, followed by a focused pass on the final contributor accessibility/tablet checks. All 127 unit tests passed. Root typecheck, the final AI production build, and whitespace checks passed. The build retains the existing large-client-chunk warning. Browser auth and transport are fixtures backed by actual isolated Convex functions; authenticated hosted acceptance was not exercised.
+
+**Accepted differences.** Avatar tones come from identity IDs, timestamps reflect fixture creation, and Planning/Ready use the accurate label “Add card.” The orange is slightly darker for contrast. Keyboard-focus outlines are intentionally visible in the interaction captures. No remaining P0/P1/P2 findings.
+
+The local preview remains at http://127.0.0.1:4321/committee/planner and uses the normal committee sign-in. This implementation has not been committed, pushed, or deployed.
+
+## Branch reconciliation — 16 October 2026
+
+Consolidated the current AI homepage and approved committee planner, Neurotech editorial design and upload recovery, Business committee release, and AI Join dropdown on current main. Shared layout integration preserves Business header/footer slots and its fawn mascot, Neurotech's gold neuron and closed-application state, and the AI homepage navigation, artwork and assistant. Earlier local hero variants, deadline resets, and an unconfigured committee-email queue prototype remain in the local recovery archive instead of replacing current behavior. Two unused AI artwork variants are also archived.
+
+Verified the combined source with root TypeScript, Convex TypeScript, all 127 unit/backend/server tests, all three production builds, all 87 browser cases, and whitespace checks. Reviewed fresh desktop/mobile captures of all three society sites and the approved planner board/card. Browser sign-in and private planner operations use isolated fixtures and Convex functions; this reconciliation does not establish authenticated production acceptance or perform a new backend deployment. The earlier dated release notes above remain historical evidence.
+
+final result: passed

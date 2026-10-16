@@ -1,7 +1,39 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
+import { plannerFields, plannerCommentFields } from "./plannerModel";
 
 export default defineSchema({
+  plannerItems: defineTable(plannerFields)
+    .index("by_societyId_and_updatedAt", ["societyId", "updatedAt"])
+    .index("by_societyId_and_stage", ["societyId", "stage"])
+    .index("by_societyId_and_date", ["societyId", "date"])
+    .index("by_societyId_and_stage_and_kind_and_date", ["societyId", "stage", "kind", "date"]),
+
+  plannerComments: defineTable(plannerCommentFields)
+    .index("by_itemId", ["itemId"])
+    .index("by_itemId_and_requestId", ["itemId", "requestId"]),
+
+  plannerNotifications: defineTable({
+    societyId: v.id("societies"), itemId: v.id("plannerItems"), commentId: v.id("plannerComments"),
+    recipientEmail: v.string(), read: v.boolean(),
+  })
+    .index("by_societyId_and_recipientEmail", ["societyId", "recipientEmail"])
+    .index("by_societyId_and_recipientEmail_and_read", ["societyId", "recipientEmail", "read"])
+    .index("by_commentId", ["commentId"]),
+
+  plannerNotificationState: defineTable({
+    societyId: v.id("societies"), recipientEmail: v.string(), revision: v.number(),
+  }).index("by_societyId_and_recipientEmail", ["societyId", "recipientEmail"]),
+
+  plannerAccess: defineTable({
+    societyId: v.id("societies"),
+    email: v.string(),
+    active: v.boolean(),
+  })
+    .index("by_societyId_and_email", ["societyId", "email"])
+    .index("by_societyId_and_active_and_email", ["societyId", "active", "email"])
+    .index("by_societyId", ["societyId"]),
+
   societies: defineTable({
     name: v.string(),
     shortName: v.string(),
@@ -138,7 +170,8 @@ export default defineSchema({
     targetType: v.optional(v.string()),
     details: v.optional(v.string()),
   })
-    .index("by_society", ["societyId"]),
+    .index("by_society", ["societyId"])
+    .index("by_societyId_and_targetId", ["societyId", "targetId"]),
 
   agentBuilds: defineTable({
     task: v.string(),

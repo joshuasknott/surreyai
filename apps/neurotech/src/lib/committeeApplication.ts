@@ -1,6 +1,8 @@
+import { createHash } from 'node:crypto';
 import { getCommitteeRole } from '../data/committeeRoles';
 import { del, get } from '@vercel/blob';
 import { neurotechCommitteeApplicationsClosed } from '@surreysocieties/ui/committeeDeadline';
+import { committeeFileType, readLimitedBody } from './committeeFile';
 
 type DeliveryConfig = { apiKey?: string; fromEmail?: string };
 type Upload = { filename: string; content: string };
@@ -18,14 +20,6 @@ function reply(status: number, message: string) {
 function field(form: FormData, key: string, max: number) {
   const value = form.get(key);
   return typeof value === 'string' && value.trim().length <= max ? value.trim() : '';
-}
-
-function fileType(bytes: Uint8Array): { extension: string; mime: string } | null {
-  if (bytes.length >= 8 && bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47 && bytes[4] === 0x0d && bytes[5] === 0x0a && bytes[6] === 0x1a && bytes[7] === 0x0a) return { extension: 'png', mime: 'image/png' };
-  if (bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return { extension: 'jpg', mime: 'image/jpeg' };
-  if (bytes.length >= 12 && new TextDecoder().decode(bytes.slice(0, 4)) === 'RIFF' && new TextDecoder().decode(bytes.slice(8, 12)) === 'WEBP') return { extension: 'webp', mime: 'image/webp' };
-  if (bytes.length >= 5 && new TextDecoder().decode(bytes.slice(0, 5)) === '%PDF-') return { extension: 'pdf', mime: 'application/pdf' };
-  return null;
 }
 
 export async function handleCommitteeApplication(request: Request, config: DeliveryConfig, clientAddress = 'unknown'): Promise<Response> {
@@ -78,10 +72,11 @@ export async function handleCommitteeApplication(request: Request, config: Deliv
     }
     blobUrl = parsedUrl.href;
     try {
-      const result = await get(blobUrl, { access: 'private' });
-      if (!result || result.statusCode !== 200 || result.blob.size === 0 || result.blob.size > MAX_FILE_BYTES) return reply(400, 'Please upload a mock post under 15 MB.');
-      const bytes = new Uint8Array(await new Response(result.stream).arrayBuffer());
-      const type = fileType(bytes);
+      const result = await get(blobUrl, { access: 'private', useCache: false });
+      if (!result || result.statusCode !== 200 || result.blob.size > MAX_FILE_BYTES) return reply(400, 'Please upload a mock post under 15 MB.');
+      const bytes = await readLimitedBody(new Response(result.stream), MAX_FILE_BYTES);
+      if (!bytes.length) return reply(400, 'Please upload a mock post under 15 MB.');
+      const type = committeeFileType(bytes);
       if (!type || type.mime !== result.blob.contentType) return reply(400, 'Please upload a PNG, JPG, WebP or PDF file.');
       upload = { filename: `social-post-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 50)}.${type.extension}`, content: Buffer.from(bytes).toString('base64') };
     } catch { return reply(400, 'We could not read your upload. Please upload it again.'); }
@@ -95,23 +90,26 @@ export async function handleCommitteeApplication(request: Request, config: Deliv
     'Role task', role.task, '', ...answers.flatMap((answer) => [answer.label, answer.value, '']),
     upload ? `Mock post: attached as ${upload.filename}` : '',
   ];
+  const emailBody = JSON.stringify({
+    from: config.fromEmail,
+    to: [OWNER_EMAIL],
+    reply_to: email,
+    subject: `Neurotech Society committee application: ${role.title} — ${name}`,
+    text: lines.join('\n'),
+    ...(upload ? { attachments: [upload] } : {}),
+  });
+  let delivered = false;
   try {
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
-      headers: { Authorization: `Bearer ${config.apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        from: config.fromEmail,
-        to: [OWNER_EMAIL],
-        reply_to: email,
-        subject: `Neurotech Society committee application: ${role.title} — ${name}`,
-        text: lines.join('\n'),
-        ...(upload ? { attachments: [upload] } : {}),
-      }),
+      headers: { Authorization: `Bearer ${config.apiKey}`, 'Content-Type': 'application/json', 'Idempotency-Key': `neurotech-committee/${createHash('sha256').update(emailBody).digest('hex')}` },
+      body: emailBody,
       signal: AbortSignal.timeout(15_000),
     });
     const result = await response.json() as { id?: unknown };
     if (!response.ok || typeof result.id !== 'string' || !result.id) return reply(502, 'We could not confirm delivery. Please try again later.');
+    delivered = true;
     return reply(200, 'Your application has been sent.');
   } catch { return reply(502, 'We could not confirm delivery. Please try again later.'); }
-  finally { if (blobUrl) { try { await del(blobUrl); } catch { /* Avoid retaining an upload if deletion temporarily fails. */ } } }
+  finally { if (blobUrl && delivered) { try { await del(blobUrl); } catch { /* Avoid retaining an upload if deletion temporarily fails. */ } } }
 }

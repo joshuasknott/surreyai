@@ -64,6 +64,28 @@ describe('Neurotech committee applications', () => {
     expect((await send(request(), {})).status).toBe(503);
   });
 
+  it('keeps an attachment after uncertain delivery and deduplicates the email retry', async () => {
+    const bytes = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 1, 2]);
+    const stored = () => ({ statusCode: 200, blob: { size: bytes.byteLength, contentType: 'image/png' }, stream: new Response(bytes).body! }) as Awaited<ReturnType<typeof get>>;
+    vi.mocked(get).mockImplementation(async () => stored());
+    const fetch = vi.fn().mockRejectedValueOnce(new TypeError('fetch failed')).mockResolvedValueOnce(Response.json({ id: 'retry-confirmed' }));
+    vi.stubGlobal('fetch', fetch);
+    expect((await send(request('social-media-content', { mockPostUrl: postUrl }))).status).toBe(502);
+    expect(del).not.toHaveBeenCalled();
+    expect((await send(request('social-media-content', { mockPostUrl: postUrl }))).status).toBe(200);
+    expect(fetch.mock.calls[0][1].headers['Idempotency-Key']).toBe(fetch.mock.calls[1][1].headers['Idempotency-Key']);
+    expect(del).toHaveBeenCalledWith(postUrl);
+  });
+
+  it('accepts an attachment when storage omits its Content-Length header', async () => {
+    const bytes = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 1, 2]);
+    vi.mocked(get).mockResolvedValue({ statusCode: 200, blob: { size: 0, contentType: 'image/png' }, stream: new Response(bytes).body! } as Awaited<ReturnType<typeof get>>);
+    const fetch = vi.fn().mockResolvedValue(Response.json({ id: 'no-length-header' }));
+    vi.stubGlobal('fetch', fetch);
+    expect((await send(request('social-media-content', { mockPostUrl: postUrl }))).status).toBe(200);
+    expect(JSON.parse(fetch.mock.calls[0][1].body).attachments[0].content).toBe(Buffer.from(bytes).toString('base64'));
+  });
+
   it('keeps Neurotech open after AI closes', async () => {
     vi.setSystemTime(new Date(COMMITTEE_APPLICATIONS_CLOSE_AT));
     expect(committeeApplicationsClosed()).toBe(true);

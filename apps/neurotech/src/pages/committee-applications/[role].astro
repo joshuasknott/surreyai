@@ -67,14 +67,17 @@ const social = role.slug === 'social-media-content';
 </Layout>
 
 <script>
-  import { upload } from '@vercel/blob/client';
+  import { uploadCommitteeFile } from '../../lib/committeeUploadClient';
   const form = document.querySelector<HTMLFormElement>('#committee-application-form');
+  let uploaded: { file: File; url: string } | undefined;
+  form?.querySelector('#mockPost')?.addEventListener('change', () => { uploaded = undefined; });
   form?.addEventListener('submit', async (event) => {
     event.preventDefault();
     const message = document.querySelector<HTMLElement>('#committee-form-message');
     const button = form.querySelector<HTMLButtonElement>('button[type="submit"]');
     const file = form.querySelector<HTMLInputElement>('#mockPost')?.files?.[0];
     if (!message || !button) return;
+    if (button.disabled) return;
     message.hidden = true;
     if (file && file.size > 15_000_000) {
       message.textContent = 'Your mock post is over 15 MB. Please upload a smaller file.';
@@ -87,27 +90,29 @@ const social = role.slug === 'social-media-content';
       const data = new FormData(form);
       data.delete('mockPost');
       if (file) {
-        const byExtension: Record<string, string> = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp', pdf: 'application/pdf' };
-        const extension = file.name.split('.').pop()?.toLowerCase() ?? '';
-        const contentType = file.type || byExtension[extension];
-        const suffix = contentType === 'image/jpeg' ? 'jpg' : contentType === 'application/pdf' ? 'pdf' : contentType === 'image/webp' ? 'webp' : contentType === 'image/png' ? 'png' : '';
-        if (!suffix) throw new Error('Please upload a PNG, JPG, WebP or PDF file.');
-        button.textContent = 'Uploading mock post…';
-        const blob = await upload(`neurotech-committee-applications/${crypto.randomUUID()}.${suffix}`, file, {
-          access: 'private', contentType, handleUploadUrl: '/api/committee-upload',
-          onUploadProgress: ({ percentage }) => { button.textContent = `Uploading mock post… ${Math.round(percentage)}%`; },
-        });
-        data.set('mockPostUrl', blob.url);
+        if (!uploaded || uploaded.file !== file) {
+          button.textContent = 'Uploading mock post…';
+          const url = await uploadCommitteeFile(file, percentage => { button.textContent = `Uploading mock post… ${percentage}%`; });
+          uploaded = { file, url };
+        }
+        data.set('mockPostUrl', uploaded.url);
         button.textContent = 'Sending application…';
       }
       const response = await fetch(form.action, { method: 'POST', body: data });
-      const result = await response.json() as { message?: string };
-      if (!response.ok) throw new Error(result.message || 'We could not send your application. Please try again.');
+      let result: { message?: string };
+      try { result = await response.json(); }
+      catch { throw new Error('We could not confirm delivery. Your answers are still on this page. Please try again shortly.'); }
+      if (!response.ok) {
+        if (response.status === 400) uploaded = undefined;
+        throw new Error(result.message || 'We could not send your application. Please try again.');
+      }
       form.hidden = true;
       document.querySelector<HTMLElement>('#committee-form-success')!.hidden = false;
       document.querySelector<HTMLElement>('#committee-form-success')!.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } catch (error) {
-      message.textContent = error instanceof Error ? error.message : 'We could not send your application. Please try again.';
+      message.textContent = error instanceof TypeError || (error instanceof Error && error.name === 'TimeoutError')
+        ? 'We could not connect to the website to confirm delivery. Your answers are still on this page. Check your connection and try again; on campus Wi-Fi, try mobile data.'
+        : error instanceof Error ? error.message : 'We could not send your application. Please try again.';
       message.hidden = false;
     } finally {
       button.disabled = false;

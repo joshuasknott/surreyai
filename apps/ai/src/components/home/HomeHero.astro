@@ -1,245 +1,95 @@
 ---
-import { getImage } from "astro:assets";
+import { getImage } from 'astro:assets';
+import { ArrowRight } from 'lucide-astro';
 import { getSocietyById } from '@surreysocieties/admin/config';
-import humanoidHero from "../../assets/generated/ai-humanoid-hero-centered-v2.png";
-
-const robotImage = await getImage({
-  src: humanoidHero,
-  width: 1200,
-  format: "webp",
-  quality: 88,
-});
-const robotImageMobile = await getImage({
-  src: humanoidHero,
-  width: 828,
-  format: "webp",
-  quality: 86,
-});
+import artwork from '../../assets/generated/ai-curious-forms-background.webp';
+import mobileArtwork from '../../assets/generated/ai-curious-forms-mobile.webp';
 
 const society = getSocietyById('ai')!;
+const desktopImage = await getImage({ src: artwork, width: 1672, format: 'webp', quality: 90 });
+const mobileImage = await getImage({ src: mobileArtwork, width: 750, format: 'webp', quality: 86 });
+const tabletImage = await getImage({ src: mobileArtwork, width: 941, format: 'webp', quality: 90 });
+const lines = ['Learn it.', 'Build it.', 'Question it.'];
+// Static letter placement follows the playful typesetting in the selected concept.
+const tilts = [[-10, -4, 1, 3, 5, 0, 8, 9, 0], [-8, -4, 0, 3, 6, 0, 7, 7, 0], [-8, -5, -2, 0, 3, 5, 7, 0, 7, 8, 0, 0]];
+const lifts = [[8, 0, -4, -5, -2, 0, 0, 8, 16], [9, 0, -6, -5, -1, 0, 6, 13, 17], [5, 0, -4, -6, -7, -5, 0, 0, 6, 13, 18, 20]];
 ---
 
-<section class="home-hero" aria-labelledby="home-hero-title" data-ai-robot-hero>
-  <div class="home-hero__shell">
-    <div class="home-hero__copy">
-      <h1 id="home-hero-title" class="home-hero__title" data-hero-reveal>
-        <span>Learn it.</span> <span>Build it.</span> <em>Question it.</em>
-      </h1>
-      <p class="home-hero__intro" data-hero-reveal>
-        Explore artificial intelligence, machine learning and data science with other Surrey students. Every degree welcome. No coding experience needed.
-      </p>
-
-      <div class="home-hero__actions" data-hero-reveal data-hero-actions>
-        <a href={society.studentsUnionUrl} target="_blank" rel="noopener noreferrer" class="btn-primary">Join the society <span aria-hidden="true">↗</span></a>
-        <a href={society.socials.linktree} target="_blank" rel="noopener noreferrer" class="btn-secondary btn-secondary--dark">Linktree <span aria-hidden="true">↗</span></a>
-      </div>
-
+<section class="home-hero" aria-labelledby="home-hero-title">
+  <picture class="home-hero__artwork" aria-hidden="true">
+    <source media="(min-width: 761px) and (max-width: 1100px) and (orientation: portrait)" srcset={tabletImage.src} width={tabletImage.attributes.width} height={tabletImage.attributes.height} />
+    <source media="(max-width: 760px)" srcset={mobileImage.src} width={mobileImage.attributes.width} height={mobileImage.attributes.height} />
+    <img src={desktopImage.src} alt="" width={desktopImage.attributes.width} height={desktopImage.attributes.height} loading="eager" fetchpriority="high" decoding="async" />
+  </picture>
+  <div class="home-hero__copy">
+    <h1 id="home-hero-title" class="home-hero__title" aria-label="Learn it. Build it. Question it.">
+      {lines.map((line, lineIndex) => (
+        <span class="home-hero__line" aria-hidden="true">
+          {[...line].map((letter, index) => (
+            <span class:list={['home-hero__letter', letter === ' ' && 'home-hero__space']} style={`--tilt: ${tilts[lineIndex][index] ?? 0}deg; --lift: ${(lifts[lineIndex][index] ?? 0) / 170}em`}>{letter === ' ' ? '\u00a0' : letter}</span>
+          ))}
+        </span>
+      ))}
+    </h1>
+    <p class="home-hero__intro">Explore AI with other Surrey students. Every degree welcome.</p>
+    <div class="home-hero__actions" data-hero-actions>
+      <a class="home-hero__join" href={society.studentsUnionUrl} target="_blank" rel="noopener noreferrer">Join the society <ArrowRight aria-hidden="true" /></a>
+      <a class="home-hero__events" href="#programme">Explore events <ArrowRight aria-hidden="true" /></a>
     </div>
-
-    <div class="home-hero__stage" aria-hidden="true">
-      <canvas
-        class="home-hero__canvas"
-        id="ai-robot-head-canvas"
-        data-robot-head-src={robotImage.src}
-        data-robot-head-src-mobile={robotImageMobile.src}
-        data-engine="three.js"
-      ></canvas>
-      <picture>
-        <source media="(max-width: 880px)" srcset={robotImageMobile.src} />
-        <img
-          class="home-hero__fallback"
-          src={robotImage.src}
-          alt=""
-          width={robotImage.attributes.width}
-          height={robotImage.attributes.height}
-          loading="eager"
-          decoding="async"
-          fetchpriority="high"
-        />
-      </picture>
-    </div>
-
   </div>
 </section>
 
-<script>
-  import { animate, stagger } from "animejs";
-  import { startRobotHero } from "./robotHero.client";
-
-  const hero = document.querySelector<HTMLElement>("[data-ai-robot-hero]");
-  const canvas = document.getElementById("ai-robot-head-canvas") as HTMLCanvasElement | null;
-  const stage = canvas?.closest<HTMLElement>(".home-hero__stage") ?? null;
-  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  if (hero && canvas && stage) {
-    if (!prefersReducedMotion) {
-      animate(hero.querySelectorAll("[data-hero-reveal]"), {
-        opacity: [0, 1],
-        y: [18, 0],
-        duration: 480,
-        delay: stagger(45),
-        ease: "outCubic",
-      });
-    }
-
-    startRobotHero({ hero, canvas, stage, prefersReducedMotion });
-  }
-</script>
-
 <style>
+  @font-face {
+    font-family: 'Baloo 2';
+    src: url('/fonts/baloo-extra-bold.woff') format('woff');
+    font-style: normal;
+    font-weight: 800;
+    font-display: swap;
+  }
   .home-hero {
     position: relative;
-    z-index: 1;
-    overflow: clip;
-    padding: 0;
-    background: #111111;
-    color: #faf8f3;
-  }
-
-  .home-hero__shell {
-    position: relative;
-    display: grid;
-    grid-template-columns: minmax(0, 0.96fr) minmax(28rem, 1.04fr);
-    min-height: clamp(39rem, 70svh, 48rem);
-    width: min(100%, 90rem);
-    margin: 0 auto;
-  }
-
-  .home-hero__copy {
-    position: relative;
-    z-index: 3;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: clamp(4.5rem, 7vw, 7.25rem) clamp(2rem, 5vw, 5rem) clamp(6.5rem, 9vw, 8rem) clamp(1.25rem, 4vw, 3.25rem);
-    background: #111111;
-  }
-
-  .home-hero__copy::before {
-    position: absolute;
-    top: clamp(4.8rem, 7.2vw, 7.5rem);
-    bottom: clamp(6.8rem, 9vw, 8.2rem);
-    left: clamp(1.25rem, 4vw, 3.25rem);
-    width: 0.28rem;
-    background: #ff4a00;
-    content: "";
-  }
-
-  .home-hero__copy > * {
-    margin-left: clamp(1.25rem, 2.3vw, 2.2rem);
-  }
-
-.home-hero__title {
-    max-width: 100%;
-    margin-top: 0;
-    margin-bottom: 0;
-    color: #faf8f3;
-    font-size: clamp(3.2rem, 5vw, 4.65rem);
-    font-weight: 850;
-    letter-spacing: -0.045em;
-    line-height: 1.02;
-    text-wrap: balance;
-  }
-
-  .home-hero__title em {
-    color: #ff4a00;
-    font-style: normal;
-  }
-
-  .home-hero__title span,
-  .home-hero__title em { display: inline-block; white-space: nowrap; }
-
-  .home-hero__intro {
-    max-width: 37rem;
-    margin-top: 1.5rem;
-    margin-bottom: 0;
-    color: rgba(250, 248, 243, 0.72);
-    font-size: clamp(1rem, 1.4vw, 1.15rem);
-    line-height: 1.65;
-  }
-
-  .home-hero__actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.85rem;
-    margin-top: 1.8rem;
-  }
-
-  .home-hero__actions :global(.btn-primary),
-  .home-hero__actions :global(.btn-secondary) {
-    min-height: 3.15rem;
-  }
-
-  .home-hero__stage {
-    position: relative;
-    min-height: clamp(39rem, 70svh, 48rem);
-    overflow: hidden;
-    background: #ff4a00;
     isolation: isolate;
-  }
-
-  .home-hero__stage::after {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    border-left: 1px solid rgba(250, 248, 243, 0.22);
-    box-shadow: inset 0 0 5rem rgba(17, 17, 17, 0.08);
-    content: "";
-    pointer-events: none;
-  }
-
-  .home-hero__canvas,
-  .home-hero__fallback {
-    position: absolute;
-    inset: 0;
-    display: block;
+    overflow: clip;
     width: 100%;
-    height: 100%;
+    background: var(--ai-paper);
+    color: var(--ai-fg);
   }
-
-  .home-hero__stage picture { display: contents; }
-
-  .home-hero__canvas {
-    z-index: 1;
-    opacity: 0;
-    transition: opacity 0.45s ease;
+  .home-hero__artwork { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; }
+  .home-hero__artwork img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .home-hero__copy { position: relative; margin-inline: auto; padding-block: clamp(64px, 7vw, 120px) clamp(90px, 9vw, 150px); width: 90%; text-align: center; }
+  .home-hero__title { margin: 0; font-family: 'Baloo 2', ui-rounded, sans-serif; font-size: min(10.3vw, 198px); font-weight: 800; line-height: .78; letter-spacing: -.045em; -webkit-text-stroke: .018em currentColor; paint-order: stroke fill; transform: translateX(min(1vw, 19px)); }
+  .home-hero__line { display: block; white-space: nowrap; }
+  .home-hero__line:last-child { color: var(--ai-accent); transform: scaleX(.96); }
+  .home-hero__line:last-child .home-hero__letter:first-child { scale: 1.12; }
+  .home-hero__letter { display: inline-block; transform: translateY(var(--lift)) rotate(var(--tilt)); transform-origin: 50% 70%; }
+  .home-hero__space { width: .23em; }
+  .home-hero__intro { margin: 1.6vw 0 0; font-size: clamp(16px, 1.56vw, 30px); line-height: 1.4; letter-spacing: -.035em; }
+  .home-hero__actions { display: flex; justify-content: center; align-items: center; gap: 1.05vw; margin-top: 1.75vw; }
+  .home-hero__actions a { display: inline-flex; align-items: center; justify-content: center; gap: 1.3vw; min-height: 44px; padding: 1.07vw 2.45vw; border: 1.5px solid var(--ai-fg); border-radius: 100px; color: var(--ai-fg); font-size: clamp(16px, 1.3vw, 25px); font-weight: 550; line-height: 1.3; letter-spacing: -.03em; text-decoration: none; }
+  .home-hero__actions .home-hero__join { background: var(--ai-accent); border-color: var(--ai-accent); }
+  .home-hero__events { background: transparent; }
+  .home-hero__actions a:hover { background: var(--ai-fg); border-color: var(--ai-fg); color: var(--ai-paper); }
+  .home-hero__actions a:focus-visible { outline: 3px solid var(--ai-fg); outline-offset: 5px; }
+  .home-hero__actions :global(svg) { width: clamp(22px, 1.7vw, 30px); height: auto; stroke-width: 1.8; flex-shrink: 0; }
+  @media (max-width: 760px), (max-width: 1100px) and (orientation: portrait) {
+    .home-hero__artwork img { object-fit: cover; }
+    .home-hero__copy { width: 94%; padding-top: 200px; padding-bottom: 110px; }
+    .home-hero__title { font-size: clamp(50px, 16.5vw, 88px); line-height: .9; letter-spacing: -.045em; transform: none; }
+    .home-hero__intro { max-width: 31ch; margin: 28px auto 0; padding-inline: 14px; font-size: 16px; line-height: 1.55; letter-spacing: -.025em; }
+    .home-hero__actions { flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+    .home-hero__actions a { padding: 13px 20px; gap: 12px; font-size: 15px; min-height: 48px; }
   }
-
-  .home-hero__fallback {
-    z-index: 0;
-    object-fit: cover;
-    object-position: center;
-    transition: opacity 0.35s ease;
+  @media (min-width: 761px) and (max-width: 1100px) and (orientation: portrait) {
+    .home-hero__copy { padding-top: 240px; }
+    .home-hero__title { font-size: 13vw; }
+    .home-hero__intro { max-width: 38ch; font-size: 20px; }
+    .home-hero__actions a { padding: 16px 28px; font-size: 18px; }
   }
-
-  :global(.home-hero--ready) .home-hero__canvas { opacity: 1; }
-  :global(.home-hero--ready) .home-hero__fallback { opacity: 0; }
-
-  [data-hero-reveal] { opacity: 1; }
-
-  @media (max-width: 1050px) {
-    .home-hero__shell { grid-template-columns: minmax(0, 1fr) minmax(23rem, 0.8fr); }
-  }
-
-  @media (max-width: 880px) {
-    .home-hero { padding-bottom: 0; }
-    .home-hero__shell { grid-template-columns: 1fr; }
-    .home-hero__copy { padding: 2.75rem 1.2rem 2.5rem; }
-    .home-hero__copy::before { top: 2.9rem; bottom: 2.7rem; left: 1.2rem; }
-    .home-hero__title { max-width: 11ch; }
-    .home-hero__stage { min-height: min(34rem, 88vw); }
-  }
-
-  @media (max-width: 540px) {
-    .home-hero__title { font-size: clamp(2.5rem, 12.8vw, 3.5rem); }
-    .home-hero__actions { display: grid; }
-    .home-hero__actions :global(.btn-primary),
-    .home-hero__actions :global(.btn-secondary) { width: 100%; }
-    .home-hero__stage { min-height: 20rem; }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .home-hero__canvas { display: none; }
-    .home-hero__fallback { opacity: 1 !important; }
+  @media (max-width: 380px) {
+    .home-hero__copy { padding-top: 180px; }
+    .home-hero__actions { flex-direction: column; }
+    .home-hero__actions a { min-width: 220px; }
+    .home-hero__title { font-size: 16.4vw; }
   }
 </style>

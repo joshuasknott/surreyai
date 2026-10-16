@@ -7,9 +7,11 @@ interface Props {
   config: AssistantSocietyConfig;
   endpoint?: string;
   mascotSrc?: string;
+  launcherImage?: string;
+  launcherLabel?: string;
 }
 
-const { config, endpoint = '/api/assistant/chat', mascotSrc } = Astro.props;
+const { config, endpoint = '/api/assistant/chat', mascotSrc, launcherImage, launcherLabel } = Astro.props;
 const widgetId = 'society-assistant-' + config.societyKey;
 const title = config.societyKey === 'ai' ? 'AI Society assistant' : config.societyKey === 'business' ? 'Business Society assistant' : 'Neurotech assistant';
 const logo = getSocietyById(config.societyKey)!.logo;
@@ -48,7 +50,8 @@ const styleVars = [
     aria-expanded="false"
     aria-controls={widgetId + '-panel'}
   >
-    <img src={mascotSrc ?? logo} alt="" width={mascotSrc ? 80 : 56} height={mascotSrc ? 97 : 56} decoding="async" />
+    {launcherLabel && <span class="assistant-launcher-label" aria-hidden="true">{launcherLabel}</span>}
+    <img src={launcherImage ?? mascotSrc ?? logo} alt="" width={mascotSrc ? 80 : 56} height={mascotSrc ? 97 : 56} decoding="async" />
   </button>
 
   <section

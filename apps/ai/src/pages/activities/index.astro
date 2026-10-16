@@ -1,0 +1,19 @@
+---
+export const prerender = false;
+import Layout from '../../layouts/Layout.astro';
+import '../../styles/global.css';
+import '../../styles/programme.css';
+import { ArrowLeft, ArrowRight } from 'lucide-astro';
+import { queryPublicConvex } from '@surreysocieties/admin';
+import { api } from '../../../../../convex/_generated/api';
+import { activityDate, activityKind, upcomingActivities } from '../../lib/programme';
+const activities = await queryPublicConvex(api.planner.listPublished, {}, []);
+const events = upcomingActivities(activities);
+const projects = activities.filter(item => item.kind === 'project');
+Astro.response.headers.set('Cache-Control', 'no-store');
+---
+<Layout title="Activities" description="Workshops, projects and hackathons from Surrey AI Society.">
+  <div class="activity-list"><a class="programme-link" href="/"><ArrowLeft size={17} aria-hidden="true" />Home</a><h1>What’s happening.</h1><p>Workshops, projects and hackathons. Open to every degree.</p>
+    {[{ title: 'Coming up', items: events }, { title: 'Projects to join', items: projects }].map(group => <section class="activity-list-group"><h2>{group.title}</h2>{group.items.map(item => <article class="programme-event"><div class="programme-date">{item.date && <time datetime={item.date}>{activityDate(item.date)}</time>}</div><div><h3>{item.title}</h3><p>{[activityKind(item), item.startTime, item.location].filter(Boolean).join(' · ')}</p><p class="programme-summary">{item.description}</p><a class="programme-link" href={`/activities/${item.id}`}>View details <ArrowRight size={17} aria-hidden="true" /></a></div></article>)}{!group.items.length && <p>Confirmed {group.title === 'Coming up' ? 'events' : 'project opportunities'} will appear here.</p>}</section>)}
+  </div>
+</Layout>

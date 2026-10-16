@@ -1,0 +1,499 @@
+import { v } from "convex/values";
+import { paginationOptsValidator } from "convex/server";
+import { query, mutation, internalMutation, type QueryCtx, type MutationCtx } from "./_generated/server";
+import { internal } from "./_generated/api";
+import type { Doc, Id } from "./_generated/dataModel";
+import { OWNER_EMAIL, getUserByIdentity, ensureUser, logAction } from "./permissions";
+import {
+  activityValidator, cleanActivity, planningStage, publicFields,
+  plannerItemValidator, publicActivityValidator, taskValidator,
+  calendarItemValidator, plannerToday,
+  plannerCommentValidator, personInitials, type PlannerPerson,
+  plannerMentionValidator, plannerNotificationValidator, type PlannerMention, type PlannerNotification,
+} from "./plannerModel";
+import { mentionTokens } from "./lib/plannerMentions";
+
+async function society(ctx: QueryCtx | MutationCtx) {
+  const row = await ctx.db.query("societies").withIndex("by_slug", q => q.eq("slug", "ai")).unique();
+  if (!row) throw new Error("AI Society is not configured");
+  return row;
+}
+
+async function committeeAccess(ctx: QueryCtx | MutationCtx) {
+  const identity = await ctx.auth.getUserIdentity();
+  if (!identity) return null;
+  const ai = await society(ctx);
+  const user = await getUserByIdentity(ctx, identity);
+  // Access is tied to the authenticated email claim, never an editable profile
+  // or an inherited society role. The owner can bootstrap without a membership.
+  const email = (identity.email || "").trim().toLowerCase();
+  if (!email || identity.emailVerified === false) return null;
+  const manager = email === OWNER_EMAIL;
+  const grant = email ? await ctx.db.query("plannerAccess")
+    .withIndex("by_societyId_and_email", q => q.eq("societyId", ai._id).eq("email", email)).unique() : null;
+  if (!manager && !grant?.active) return null;
+  return { ai, identity, user, email, manager };
+}
+
+async function requireCommittee(ctx: QueryCtx | MutationCtx) {
+  const access = await committeeAccess(ctx);
+  if (!access) throw new Error("Committee access required");
+  return access;
+}
+
+async function requireItem(ctx: MutationCtx, id: Id<"plannerItems">, revision: number) {
+  const access = await requireCommittee(ctx);
+  const item = await ctx.db.get(id);
+  if (!item || item.societyId !== access.ai._id) throw new Error("Activity not found");
+  if (item.revision !== revision) throw new Error("Someone else updated this activity. Close it and reopen the latest version.");
+  return { ...access, item };
+}
+
+async function audit(ctx: MutationCtx, action: string, targetId: string, title: string) {
+  const access = await requireCommittee(ctx);
+  const user = await ensureUser(ctx, access.identity);
+  await logAction(ctx, access.ai._id, user._id, action, targetId, "plannerItem", title);
+}
+
+async function actor(ctx: MutationCtx, access: Awaited<ReturnType<typeof requireCommittee>>): Promise<PlannerPerson> {
+  const user = await ensureUser(ctx, access.identity);
+  const name = (access.identity.name || user.name || access.email.split("@")[0]).trim().slice(0, 100);
+  return { userId: user._id, name, email: access.email, initials: personInitials(name, access.email) };
+}
+
+function contributorsFor(item: Pick<Doc<"plannerItems">, "createdBy" | "contributors">, person: PlannerPerson) {
+  const people = new Map((item.contributors || []).map(member => [member.userId, member]));
+  people.delete(person.userId); people.set(person.userId, person);
+  if (item.createdBy) people.delete(item.createdBy.userId);
+  return [...(item.createdBy ? [item.createdBy] : []), ...[...people.values()].slice(-199)];
+}
+
+function cleanComment(text: string) {
+  const clean = text.trim();
+  if (!clean || clean.length > 2000) throw new Error("Write a comment of up to 2,000 characters");
+  return clean;
+}
+
+async function ownComment(ctx: MutationCtx, id: Id<"plannerComments">) {
+  const access = await requireCommittee(ctx);
+  const comment = await ctx.db.get(id);
+  if (!comment) return null;
+  const item = await ctx.db.get(comment.itemId);
+  if (!item || item.societyId !== access.ai._id || comment.societyId !== access.ai._id) throw new Error("Comment not found");
+  if (comment.author.userId !== access.user?._id) throw new Error("You can only change your own comments");
+  return { comment, item };
+}
+
+async function mentionPerson(ctx: QueryCtx | MutationCtx, email: string): Promise<PlannerMention> {
+  const user = await ctx.db.query("users").withIndex("by_email", q => q.eq("email", email)).first();
+  const name = user?.name || email.split("@")[0];
+  return { email, name, initials: personInitials(name, email) };
+}
+
+async function resolveMentions(ctx: MutationCtx, societyId: Id<"societies">, text: string) {
+  const emails = [...new Set(mentionTokens(text).map(token => token.email))];
+  if (emails.length > 10) throw new Error("Mention up to 10 people in one comment");
+  const people: PlannerMention[] = [];
+  for (const email of emails) {
+    const grant = await ctx.db.query("plannerAccess").withIndex("by_societyId_and_email", q => q.eq("societyId", societyId).eq("email", email)).unique();
+    if (email === OWNER_EMAIL || grant?.active) people.push(await mentionPerson(ctx, email));
+  }
+  return people;
+}
+
+async function notifyInboxChanged(ctx: MutationCtx, societyId: Id<"societies">, recipientEmail: string) {
+  const state = await ctx.db.query("plannerNotificationState").withIndex("by_societyId_and_recipientEmail", q => q.eq("societyId", societyId).eq("recipientEmail", recipientEmail)).unique();
+  if (state) await ctx.db.patch(state._id, { revision: state.revision + 1 });
+  else await ctx.db.insert("plannerNotificationState", { societyId, recipientEmail, revision: 1 });
+}
+
+async function syncMentionNotifications(ctx: MutationCtx, item: Doc<"plannerItems">, commentId: Id<"plannerComments">, mentions: PlannerMention[], authorEmail: string) {
+  const recipients = new Set(mentions.map(person => person.email).filter(email => email !== authorEmail));
+  const existing = await ctx.db.query("plannerNotifications").withIndex("by_commentId", q => q.eq("commentId", commentId)).take(10);
+  for (const notification of existing) if (!recipients.has(notification.recipientEmail)) await ctx.db.delete(notification._id);
+  for (const email of recipients) if (!existing.some(notification => notification.recipientEmail === email)) {
+    // An allowed email can be mentioned before its first sign-in. Reading is bound
+    // to the verified session email, using the same allowlist as committee access.
+    await ctx.db.insert("plannerNotifications", { societyId: item.societyId, itemId: item._id, commentId, recipientEmail: email, read: false });
+  }
+  // One small reactive document invalidates the recipient's entire loaded inbox,
+  // including edited/deleted/read notifications beyond the first history page.
+  for (const email of new Set([...recipients, ...existing.map(notification => notification.recipientEmail)])) await notifyInboxChanged(ctx, item.societyId, email);
+}
+
+export const notificationChanges = query({
+  args: {}, returns: v.number(),
+  handler: async ctx => {
+    const { ai, email } = await requireCommittee(ctx);
+    const state = await ctx.db.query("plannerNotificationState").withIndex("by_societyId_and_recipientEmail", q => q.eq("societyId", ai._id).eq("recipientEmail", email)).unique();
+    return state?.revision ?? 0;
+  },
+});
+
+export const access = query({
+  args: {},
+  returns: v.union(v.null(), v.object({ name: v.string(), email: v.string(), userId: v.union(v.id("users"), v.null()), canManageAccess: v.boolean() })),
+  handler: async ctx => {
+    const result = await committeeAccess(ctx);
+    return result ? { name: result.user?.name || result.identity.name || result.email, email: result.email, userId: result.user?._id || null, canManageAccess: result.manager } : null;
+  },
+});
+
+export const mentionPeople = query({
+  args: {}, returns: v.array(plannerMentionValidator),
+  handler: async ctx => {
+    const { ai } = await requireCommittee(ctx);
+    const grants = await ctx.db.query("plannerAccess").withIndex("by_societyId_and_active_and_email", q => q.eq("societyId", ai._id).eq("active", true)).take(200);
+    const emails = [...new Set([OWNER_EMAIL, ...grants.map(grant => grant.email)])];
+    return (await Promise.all(emails.map(email => mentionPerson(ctx, email)))).sort((a, b) => a.name.localeCompare(b.name));
+  },
+});
+
+export const notifications = query({
+  args: { paginationOpts: paginationOptsValidator },
+  returns: v.object({ page: v.array(plannerNotificationValidator), isDone: v.boolean(), continueCursor: v.string(), unreadCount: v.number() }),
+  handler: async (ctx, { paginationOpts }) => {
+    const { ai, email } = await requireCommittee(ctx);
+    const result = await ctx.db.query("plannerNotifications").withIndex("by_societyId_and_recipientEmail", q => q.eq("societyId", ai._id).eq("recipientEmail", email))
+      .order("desc").paginate({ ...paginationOpts, numItems: Math.min(30, Math.max(1, paginationOpts.numItems)) });
+    const unread = await ctx.db.query("plannerNotifications").withIndex("by_societyId_and_recipientEmail_and_read", q => q.eq("societyId", ai._id).eq("recipientEmail", email).eq("read", false)).take(100);
+    const page: PlannerNotification[] = [];
+    for (const notification of result.page) {
+      const comment = await ctx.db.get(notification.commentId); const item = await ctx.db.get(notification.itemId);
+      if (!comment || !item || comment.societyId !== ai._id || item.societyId !== ai._id || comment.itemId !== item._id) continue;
+      page.push({ _id: notification._id, _creationTime: notification._creationTime, read: notification.read,
+        itemId: item._id, commentId: comment._id, title: item.title, author: comment.author, text: comment.text.slice(0, 220), mentions: comment.mentions || [] });
+    }
+    return { page, isDone: result.isDone, continueCursor: result.continueCursor, unreadCount: unread.length };
+  },
+});
+
+export const markNotificationRead = mutation({
+  args: { id: v.id("plannerNotifications") }, returns: v.null(),
+  handler: async (ctx, { id }) => {
+    const { ai, email } = await requireCommittee(ctx);
+    const notification = await ctx.db.get(id);
+    if (!notification || notification.societyId !== ai._id || notification.recipientEmail !== email) throw new Error("Notification not found");
+    if (!notification.read) {
+      await ctx.db.patch(id, { read: true });
+      await notifyInboxChanged(ctx, ai._id, email);
+    }
+    return null;
+  },
+});
+
+export const markAllNotificationsRead = mutation({
+  args: {}, returns: v.object({ hasMore: v.boolean() }),
+  handler: async ctx => {
+    const { ai, email } = await requireCommittee(ctx);
+    const unread = await ctx.db.query("plannerNotifications").withIndex("by_societyId_and_recipientEmail_and_read", q => q.eq("societyId", ai._id).eq("recipientEmail", email).eq("read", false)).take(100);
+    for (const notification of unread) await ctx.db.patch(notification._id, { read: true });
+    if (unread.length) await notifyInboxChanged(ctx, ai._id, email);
+    return { hasMore: unread.length === 100 };
+  },
+});
+
+export const list = query({
+  args: { archived: v.optional(v.boolean()) },
+  returns: v.array(plannerItemValidator),
+  handler: async (ctx, { archived }) => {
+    const { ai } = await requireCommittee(ctx);
+    if (archived) return await ctx.db.query("plannerItems")
+      .withIndex("by_societyId_and_stage", q => q.eq("societyId", ai._id).eq("stage", "archived")).order("desc").take(200);
+    const stages = ["ideas", "planning", "ready", "published"] as const;
+    return (await Promise.all(stages.map(stage => ctx.db.query("plannerItems")
+      .withIndex("by_societyId_and_stage", q => q.eq("societyId", ai._id).eq("stage", stage)).order("desc").take(100)))).flat();
+  },
+});
+
+export const get = query({
+  args: { id: v.id("plannerItems") }, returns: v.union(plannerItemValidator, v.null()),
+  handler: async (ctx, { id }) => {
+    const { ai } = await requireCommittee(ctx);
+    const item = await ctx.db.get(id);
+    return item?.societyId === ai._id ? item : null;
+  },
+});
+
+export const listComments = query({
+  args: { id: v.id("plannerItems"), paginationOpts: paginationOptsValidator },
+  returns: v.object({ page: v.array(plannerCommentValidator), isDone: v.boolean(), continueCursor: v.string() }),
+  handler: async (ctx, { id, paginationOpts }) => {
+    const { ai } = await requireCommittee(ctx);
+    const item = await ctx.db.get(id);
+    if (!item || item.societyId !== ai._id) throw new Error("Activity not found");
+    const result = await ctx.db.query("plannerComments").withIndex("by_itemId", q => q.eq("itemId", id))
+      .order("desc").paginate({ ...paginationOpts, numItems: Math.min(30, Math.max(1, paginationOpts.numItems)) });
+    return { page: result.page, isDone: result.isDone, continueCursor: result.continueCursor };
+  },
+});
+
+export const addComment = mutation({
+  args: { id: v.id("plannerItems"), text: v.string(), requestId: v.string() },
+  returns: v.id("plannerComments"),
+  handler: async (ctx, { id, text, requestId }) => {
+    const access = await requireCommittee(ctx);
+    const item = await ctx.db.get(id);
+    if (!item || item.societyId !== access.ai._id) throw new Error("Activity not found");
+    const clean = cleanComment(text);
+    if (!/^[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}$/i.test(requestId)) throw new Error("Please try posting your comment again");
+    const author = await actor(ctx, access);
+    const existing = await ctx.db.query("plannerComments")
+      .withIndex("by_itemId_and_requestId", q => q.eq("itemId", id).eq("requestId", requestId)).unique();
+    if (existing) {
+      if (existing.author.userId !== author.userId || existing.text !== clean) throw new Error("Please try posting your comment again");
+      return existing._id;
+    }
+    const mentions = await resolveMentions(ctx, access.ai._id, clean);
+    const commentId = await ctx.db.insert("plannerComments", { societyId: access.ai._id, itemId: id, author, text: clean, requestId, mentions });
+    await syncMentionNotifications(ctx, item, commentId, mentions, author.email);
+    // Discussion does not change the content revision or count as an edit.
+    await ctx.db.patch(id, { commentCount: (item.commentCount || 0) + 1 });
+    await audit(ctx, "comment_planner_item", id, item.title);
+    return commentId;
+  },
+});
+
+export const editComment = mutation({
+  args: { id: v.id("plannerComments"), text: v.string(), revision: v.number() },
+  returns: plannerCommentValidator,
+  handler: async (ctx, { id, text, revision }) => {
+    const own = await ownComment(ctx, id);
+    if (!own) throw new Error("Comment not found");
+    const { comment, item } = own;
+    const clean = cleanComment(text);
+    // A retry after a lost response is safe, while edits from another tab cannot be overwritten.
+    if (clean === comment.text) return comment;
+    if ((comment.revision ?? 0) !== revision) throw new Error("This comment changed. Cancel and edit the latest version.");
+    const mentions = await resolveMentions(ctx, item.societyId, clean);
+    const changes = { text: clean, editedAt: Date.now(), revision: (comment.revision ?? 0) + 1, mentions };
+    await ctx.db.patch(id, changes);
+    await syncMentionNotifications(ctx, item, id, mentions, comment.author.email);
+    await audit(ctx, "edit_planner_comment", comment.itemId, item.title);
+    return { ...comment, ...changes };
+  },
+});
+
+export const deleteComment = mutation({
+  args: { id: v.id("plannerComments") }, returns: v.null(),
+  handler: async (ctx, { id }) => {
+    const own = await ownComment(ctx, id);
+    if (!own) return null;
+    const { comment, item } = own;
+    await syncMentionNotifications(ctx, item, id, [], comment.author.email);
+    await ctx.db.delete(id);
+    await ctx.db.patch(item._id, { commentCount: Math.max(0, (item.commentCount ?? 0) - 1) });
+    await audit(ctx, "delete_planner_comment", comment.itemId, item.title);
+    return null;
+  },
+});
+
+/** Recover legacy attribution from server-written audit records, never owner text. */
+export const backfillAttribution = internalMutation({
+  args: { cursor: v.optional(v.string()) }, returns: v.number(),
+  handler: async (ctx, { cursor }) => {
+    const ai = await ctx.db.query("societies").withIndex("by_slug", q => q.eq("slug", "ai")).unique();
+    if (!ai) return 0;
+    const batch = await ctx.db.query("plannerItems").withIndex("by_societyId_and_updatedAt", q => q.eq("societyId", ai._id))
+      .paginate({ numItems: 10, cursor: cursor || null });
+    let changed = 0;
+    for (const item of batch.page) {
+      if (item.createdBy && item.contributors) continue;
+      const history = await ctx.db.query("auditLogs")
+        .withIndex("by_societyId_and_targetId", q => q.eq("societyId", ai._id).eq("targetId", item._id)).take(200);
+      let createdBy = item.createdBy;
+      let people = item.contributors || [];
+      for (const entry of history) {
+        if (entry.targetType !== "plannerItem" || !["create_planner_item", "save_planner_draft", "move_planner_item", "publish_planner_item", "unpublish_planner_item"].includes(entry.action)) continue;
+        const user = await ctx.db.get(entry.userId);
+        if (!user) continue;
+        const person = { userId: user._id, name: user.name, email: user.email, initials: personInitials(user.name, user.email) };
+        if (!createdBy && entry.action === "create_planner_item") createdBy = person;
+        people = contributorsFor({ createdBy, contributors: people }, person);
+      }
+      if (createdBy || people.length) { await ctx.db.patch(item._id, { createdBy, contributors: people }); changed++; }
+    }
+    if (!batch.isDone) await ctx.scheduler.runAfter(0, internal.planner.backfillAttribution, { cursor: batch.continueCursor });
+    return changed;
+  },
+});
+
+/** Calendar history is independent of the board's active/archive limits. */
+export const calendar = query({
+  args: { month: v.string() },
+  returns: v.object({ items: v.array(calendarItemValidator), hasMore: v.boolean() }),
+  handler: async (ctx, { month }) => {
+    const { ai } = await requireCommittee(ctx);
+    if (!/^[1-9]\d{3}-(0[1-9]|1[0-2])$/.test(month)) throw new Error("Choose a valid calendar month");
+    const last = new Date(Date.UTC(Number(month.slice(0, 4)), Number(month.slice(5)), 0)).toISOString().slice(0, 10);
+    const rows = await ctx.db.query("plannerItems")
+      .withIndex("by_societyId_and_date", q => q.eq("societyId", ai._id)
+        .gte("date", `${month}-01`).lte("date", last))
+      .take(201);
+    return {
+      items: rows.slice(0, 200).map(item => ({
+        _id: item._id, stage: item.stage, title: item.title, kind: item.kind, category: item.category,
+        date: item.date, startTime: item.startTime, endTime: item.endTime, location: item.location,
+      })),
+      hasMore: rows.length > 200,
+    };
+  },
+});
+
+/** Runs without an open browser. Keep every event and its private details. */
+export const archivePastEvents = internalMutation({
+  args: {}, returns: v.number(),
+  handler: async ctx => {
+    const ai = await ctx.db.query("societies").withIndex("by_slug", q => q.eq("slug", "ai")).unique();
+    if (!ai) return 0;
+    const today = plannerToday();
+    let count = 0;
+    for (const stage of ["ideas", "planning", "ready", "published"] as const) {
+      for (const kind of ["event", "hackathon"] as const) {
+        const rows = await ctx.db.query("plannerItems")
+          .withIndex("by_societyId_and_stage_and_kind_and_date", q => q.eq("societyId", ai._id)
+            .eq("stage", stage).eq("kind", kind).gt("date", "").lt("date", today))
+          .take(100 - count);
+        for (const item of rows) {
+          await ctx.db.patch(item._id, { stage: "archived", published: undefined, publishedAt: undefined,
+            revision: item.revision + 1, updatedAt: Date.now() });
+          count++;
+        }
+        if (count === 100) {
+          await ctx.scheduler.runAfter(0, internal.planner.archivePastEvents, {});
+          return count;
+        }
+      }
+    }
+    return count;
+  },
+});
+
+export const create = mutation({
+  args: { activity: activityValidator, stage: v.optional(planningStage), notes: v.optional(v.string()), owner: v.optional(v.string()), tasks: v.optional(v.array(taskValidator)) },
+  returns: v.id("plannerItems"),
+  handler: async (ctx, args) => {
+    const access = await requireCommittee(ctx);
+    const person = await actor(ctx, access);
+    const activity = cleanActivity(args.activity);
+    validatePrivate(args.notes || "", args.owner || "", args.tasks || []);
+    const id = await ctx.db.insert("plannerItems", { ...activity, societyId: access.ai._id, createdBy: person, contributors: [person], commentCount: 0,
+      stage: args.stage || "ideas", notes: args.notes || "", owner: args.owner || "", tasks: args.tasks || [], revision: 1, updatedAt: Date.now() });
+    await audit(ctx, "create_planner_item", id, activity.title);
+    return id;
+  },
+});
+
+export const save = mutation({
+  args: { id: v.id("plannerItems"), revision: v.number(), activity: activityValidator, stage: v.optional(planningStage), notes: v.string(), owner: v.string(), tasks: v.array(taskValidator) },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const access = await requireItem(ctx, args.id, args.revision);
+    const { item } = access;
+    const person = await actor(ctx, access);
+    validatePrivate(args.notes, args.owner, args.tasks);
+    const activity = cleanActivity(args.activity);
+    if (item.stage === "published" && args.stage) throw new Error("Unpublish this activity before changing its stage");
+    await ctx.db.patch(item._id, { ...activity, stage: args.stage || item.stage, notes: args.notes.trim(), owner: args.owner.trim(), tasks: args.tasks,
+      contributors: contributorsFor(item, person), revision: item.revision + 1, updatedAt: Date.now() });
+    await audit(ctx, "save_planner_draft", item._id, activity.title);
+    return null;
+  },
+});
+
+export const move = mutation({
+  args: { id: v.id("plannerItems"), revision: v.number(), stage: v.union(planningStage, v.literal("archived")) },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const access = await requireItem(ctx, args.id, args.revision);
+    const { item } = access;
+    const person = await actor(ctx, access);
+    await ctx.db.patch(item._id, { stage: args.stage, published: undefined, publishedAt: undefined,
+      contributors: contributorsFor(item, person), revision: item.revision + 1, updatedAt: Date.now() });
+    await audit(ctx, item.stage === "published" ? "unpublish_planner_item" : "move_planner_item", item._id, item.title);
+    return null;
+  },
+});
+
+export const publish = mutation({
+  args: { id: v.id("plannerItems"), revision: v.number() },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const access = await requireItem(ctx, args.id, args.revision);
+    const { item } = access;
+    const person = await actor(ctx, access);
+    if (item.stage !== "ready" && item.stage !== "published") throw new Error("Move this activity to Ready before publishing");
+    const snapshot = cleanActivity(publicFields(item), true);
+    await ctx.db.patch(item._id, { stage: "published", published: snapshot, publishedAt: Date.now(),
+      contributors: contributorsFor(item, person), revision: item.revision + 1, updatedAt: Date.now() });
+    await audit(ctx, "publish_planner_item", item._id, item.title);
+    return null;
+  },
+});
+
+export const listPublished = query({
+  args: {}, returns: v.array(publicActivityValidator),
+  handler: async ctx => {
+    const ai = await ctx.db.query("societies").withIndex("by_slug", q => q.eq("slug", "ai")).unique();
+    if (!ai) return [];
+    const rows = await ctx.db.query("plannerItems")
+      .withIndex("by_societyId_and_stage", q => q.eq("societyId", ai._id).eq("stage", "published")).order("desc").take(200);
+    return rows.flatMap(item => item.published ? [{ id: item._id, ...publicFields(item.published) }] : []);
+  },
+});
+
+export const getPublished = query({
+  args: { id: v.id("plannerItems") }, returns: v.union(publicActivityValidator, v.null()),
+  handler: async (ctx, { id }) => {
+    const item = await ctx.db.get(id);
+    if (!item || item.stage !== "published" || !item.published) return null;
+    const ai = await ctx.db.get(item.societyId);
+    return ai?.slug === "ai" ? { id: item._id, ...publicFields(item.published) } : null;
+  },
+});
+
+export const listAccess = query({
+  args: {}, returns: v.array(v.object({ email: v.string(), active: v.boolean() })),
+  handler: async ctx => {
+    const { ai, manager } = await requireCommittee(ctx);
+    if (!manager) throw new Error("Only the planner owner can manage committee access");
+    const rows = await ctx.db.query("plannerAccess").withIndex("by_societyId", q => q.eq("societyId", ai._id)).take(200);
+    return rows.map(row => ({ email: row.email, active: row.active }));
+  },
+});
+
+export const setAccess = mutation({
+  args: { email: v.string(), active: v.boolean() }, returns: v.null(),
+  handler: async (ctx, { email, active }) => {
+    const { ai, manager } = await requireCommittee(ctx);
+    if (!manager) throw new Error("Only the planner owner can manage committee access");
+    const normalized = email.trim().toLowerCase();
+    if (normalized.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized)) throw new Error("Enter a valid committee email");
+    if (normalized === OWNER_EMAIL) throw new Error("The planner owner always has access");
+    const row = await ctx.db.query("plannerAccess").withIndex("by_societyId_and_email", q => q.eq("societyId", ai._id).eq("email", normalized)).unique();
+    if (row) await ctx.db.patch(row._id, { active });
+    else await ctx.db.insert("plannerAccess", { societyId: ai._id, email: normalized, active });
+    await audit(ctx, active ? "grant_planner_access" : "revoke_planner_access", normalized, "Committee access");
+    return null;
+  },
+});
+
+export const reserveDraft = mutation({
+  args: {}, returns: v.boolean(),
+  handler: async ctx => {
+    const { identity } = await requireCommittee(ctx);
+    const now = Date.now();
+    const key = identity.tokenIdentifier;
+    const row = await ctx.db.query("agentRateLimits").withIndex("by_scope_and_key", q => q.eq("scope", "plannerDraft").eq("key", key)).unique();
+    if (row && row.resetAt > now && row.count >= 10) return false;
+    if (row) await ctx.db.patch(row._id, { count: row.resetAt > now ? row.count + 1 : 1, resetAt: row.resetAt > now ? row.resetAt : now + 3_600_000, updatedAt: now });
+    else await ctx.db.insert("agentRateLimits", { scope: "plannerDraft", key, count: 1, resetAt: now + 3_600_000, updatedAt: now });
+    return true;
+  },
+});
+
+function validatePrivate(notes: string, owner: string, tasks: Doc<"plannerItems">["tasks"]) {
+  if (notes.length > 8000 || owner.length > 160 || tasks.length > 30 || tasks.some(task => !task.text.trim() || task.text.length > 300)) {
+    throw new Error("Keep notes under 8,000 characters and checklists to 30 short tasks");
+  }
+}

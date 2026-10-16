@@ -1,6 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
 const isCI = Boolean(process.env.CI);
+const previewHost = process.env.E2E_HOST || '127.0.0.1';
 const webServerEnv = { ...process.env, ASTRO_DEV_BACKGROUND: '0' };
 
 export default defineConfig({
@@ -19,23 +20,23 @@ export default defineConfig({
   },
   webServer: [
     {
-      command: 'npm run dev -w apps/ai -- --host 127.0.0.1',
+      command: `npm run dev -w apps/ai -- --host ${previewHost}`,
       env: webServerEnv,
-      url: 'http://127.0.0.1:4321',
+      url: `http://${previewHost}:4321`,
       reuseExistingServer: !isCI,
       timeout: 120_000,
     },
     {
-      command: 'npm run dev -w apps/business -- --host 127.0.0.1',
+      command: `npm run dev -w apps/business -- --host ${previewHost}`,
       env: webServerEnv,
-      url: 'http://127.0.0.1:4322',
+      url: `http://${previewHost}:4322`,
       reuseExistingServer: !isCI,
       timeout: 120_000,
     },
     {
-      command: 'npm run dev -w apps/neurotech -- --host 127.0.0.1',
+      command: `npm run dev -w apps/neurotech -- --host ${previewHost}`,
       env: webServerEnv,
-      url: 'http://127.0.0.1:4323',
+      url: `http://${previewHost}:4323`,
       reuseExistingServer: !isCI,
       timeout: 120_000,
     },

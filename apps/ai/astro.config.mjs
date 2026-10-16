@@ -5,6 +5,7 @@ import vercel from '@astrojs/vercel';
 const imageSizes = [360, 600, 640, 750, 828, 960, 1080, 1200, 1440, 1800, 1920, 2048, 3840];
 
 export default defineConfig({
+  devToolbar: { enabled: false },
   compressHTML: true,
   site: 'https://surreyaisociety.org',
   output: 'server',

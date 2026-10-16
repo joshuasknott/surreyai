@@ -4,12 +4,13 @@ import { join } from 'node:path';
 
 const publicRoutes = ['/'] as const;
 const mojibakePattern = /[âÃÂ\uFFFD]|ðŸ|ï¿½/;
+const previewHost = process.env.E2E_HOST || '127.0.0.1';
 
 const sites = [
   {
     key: 'ai',
     name: 'AI',
-    origin: 'http://127.0.0.1:4321',
+    origin: `http://${previewHost}:4321`,
     unionUrl: 'https://surreyunion.org/your-activity/clubs-and-societies-a-z/artificial-intelligence-society',
     linktreeUrl: 'https://linktr.ee/surreyaisociety',
     joinUrl: 'https://surreyunion.org/shop/artificial-intelligence-society/9a8a30d9-b5e2-4d40-a864-8e688f5a306a',
@@ -18,7 +19,7 @@ const sites = [
   {
     key: 'business',
     name: 'Business',
-    origin: process.env.BUSINESS_E2E_ORIGIN ?? 'http://127.0.0.1:4322',
+    origin: process.env.BUSINESS_E2E_ORIGIN || `http://${previewHost}:4322`,
     unionUrl: 'https://surreyunion.org/your-activity/clubs-and-societies-a-z/business-society',
     linktreeUrl: 'https://linktr.ee/surreybusinesssociety',
     joinUrl: 'https://chat.whatsapp.com/IIk88Q5Y2Du65aC5wmkAPE',
@@ -27,7 +28,7 @@ const sites = [
   {
     key: 'neurotech',
     name: 'Neurotech',
-    origin: process.env.E2E_NEUROTECH_ORIGIN || 'http://127.0.0.1:4323',
+    origin: process.env.E2E_NEUROTECH_ORIGIN || `http://${previewHost}:4323`,
     unionUrl: 'https://surreyunion.org/your-activity/clubs-and-societies-a-z/neurotech-society',
     linktreeUrl: 'https://linktr.ee/surreyneurotechsociety',
     joinUrl: 'https://surreyunion.org/shop/neurotech-society/dff8af2e-9be8-4415-ba54-6e492d3daca8',
@@ -124,12 +125,12 @@ for (const site of sites) {
       for (const [route, anchor] of [['about', 'about'], ['events', 'activities'], ['committee', 'committee'], ['join', 'join']]) {
         const response = await request.get(`${site.origin}/${route}`, { maxRedirects: 0 });
         expect(response.status()).toBe(301);
-        expect(response.headers().location).toBe(`/#${anchor}`);
+        expect(response.headers().location).toBe(`/#${site.key === 'ai' && route === 'events' ? 'programme' : anchor}`);
       }
     });
 
     test('single page has signatories, working section anchors and branded assets', async ({ page, request }) => {
-      await page.goto(site.origin);
+      await page.goto(site.origin, { waitUntil: 'domcontentloaded' });
       for (const role of ['President', 'Vice President', 'Treasurer']) {
         await expect(page.locator('#committee article').filter({ has: page.getByText(role, { exact: true }) }).locator('h3')).not.toBeEmpty();
       }
@@ -138,7 +139,7 @@ for (const site of sites) {
         .filter(id => !document.getElementById(id)));
       expect(broken).toEqual([]);
       await expect(page.locator('header a[href="/events"], main a[href="/events"], footer a[href="/events"]')).toHaveCount(0);
-      await expect(page.locator('.society-header .society-brand img')).toHaveAttribute('src', '/logos/society.png');
+      await expect(page.locator('.society-header .society-brand img')).toHaveAttribute('src', site.key === 'ai' ? '/logos/brand/surrey-ai-logo-transparent.png' : '/logos/society.png');
       for (const path of ['/logos/society.png', '/social-cover.png', '/favicon.png', '/apple-touch-icon.png']) {
         const response = await request.get(`${site.origin}${path}`);
         expect(response.status()).toBe(200);
@@ -258,7 +259,7 @@ for (const site of sites) {
         const height = width === 768 ? 390 : 844;
         await page.setViewportSize({ width, height });
         await expect(panel).toBeHidden();
-        await expect(header.locator('a:visible')).toHaveCount(site.key === 'business' && width > 700 ? 4 : 1);
+        await expect(header.locator('a:visible')).toHaveCount(site.key === 'ai' || (site.key === 'business' && width > 700) ? 4 : 1);
         expect((await trigger.boundingBox())?.height).toBeGreaterThanOrEqual(44);
         await trigger.click();
         await expect(panel).toBeVisible();
@@ -305,14 +306,17 @@ for (const site of sites) {
       await expect(links).toHaveCount(2);
       await expect(links.nth(0)).toHaveAccessibleName('Join the society');
       await expect(links.nth(0)).toHaveAttribute('href', site.unionUrl);
-      await expect(links.nth(1)).toHaveAccessibleName(site.key === 'business' ? 'Explore events' : 'Linktree');
-      await expect(links.nth(1)).toHaveAttribute('href', site.key === 'business' ? '#activities' : site.linktreeUrl);
-      if (site.key === 'business') {
+      if (site.key === 'business' || site.key === 'ai') {
+        await expect(links.nth(1)).toHaveAccessibleName('Explore events');
+        await expect(links.nth(1)).toHaveAttribute('href', site.key === 'ai' ? '#programme' : '#activities');
         await links.nth(1).click();
-        await expect(page).toHaveURL(/#activities$/);
-        await expect(page.getByRole('heading', { name: 'Careers', exact: true })).toBeInViewport();
+        await expect(page).toHaveURL(`${site.origin}/#${site.key === 'ai' ? 'programme' : 'activities'}`);
+        await expect(page.locator(site.key === 'ai' ? '#programme' : '#activities')).toBeInViewport();
+      } else {
+        await expect(links.nth(1)).toHaveAccessibleName('Linktree');
+        await expect(links.nth(1)).toHaveAttribute('href', site.linktreeUrl);
       }
-      for (const link of await (site.key === 'business' ? links.nth(0).all() : links.all())) {
+      for (const link of await page.locator('[data-hero-actions] a[href^="https://"]').all()) {
         await expect(link).toHaveAttribute('target', '_blank');
         await expect(link).toHaveAttribute('rel', /noopener/);
       }
@@ -391,7 +395,7 @@ for (const site of sites) {
       const toggle = page.locator('[data-assistant-widget] .assistant-toggle');
       await expect(toggle).toBeVisible();
       const siteLogo = await page.locator('.society-header .society-brand img').getAttribute('src');
-      const assistantImage = site.key === 'business' ? '/images/business-assistant-fawn.webp' : site.key === 'neurotech' ? '/images/neurotech-assistant-neuron-gold.webp' : siteLogo || '';
+      const assistantImage = site.key === 'business' ? '/images/business-assistant-fawn.webp' : site.key === 'neurotech' ? '/images/neurotech-assistant-neuron-gold.webp' : '/images/flow-assistant.webp';
       await expect(toggle.locator('img')).toHaveAttribute('src', assistantImage);
       await expect.poll(() => toggle.locator('img').evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0)).toBe(true);
       await toggle.click();
@@ -508,19 +512,59 @@ for (const site of sites) {
     });
 
     if (site.key === 'ai') {
-      test('mobile homepage uses the small hero and defers the 3D project', async ({ page }) => {
+      test('static hero keeps readable controls and section navigation at desktop and mobile sizes', async ({ page }) => {
+        await page.emulateMedia({ reducedMotion: 'reduce' });
+        await page.goto(site.origin);
+        await page.evaluate(() => document.fonts.ready);
+        await expect.poll(() => page.evaluate(() => document.fonts.check('800 20px "Baloo 2"'))).toBe(true);
+        const hero = page.locator('.home-hero');
+        await expect(hero.getByRole('heading', { level: 1 })).toHaveAccessibleName('Learn it. Build it. Question it.');
+        await expect(hero.locator('canvas, video')).toHaveCount(0);
+        for (const [width, height] of [[1672, 941], [1440, 900], [1024, 1366], [768, 1024], [390, 844], [320, 740]]) {
+          await page.setViewportSize({ width, height });
+          const image = hero.locator('img');
+          await expect.poll(() => image.evaluate((element: HTMLImageElement) => element.complete && element.naturalWidth > 0)).toBe(true);
+          await expectNoHorizontalOverflow(page);
+          await expectAccessibilityBasics(page);
+          const heroBox = await hero.boundingBox();
+          for (const control of await page.locator('.society-header .ai-home-nav a, .society-header summary, .home-hero__actions a').all()) {
+            const box = await control.boundingBox();
+            expect(box).toBeTruthy();
+            expect(box!.x).toBeGreaterThanOrEqual(0);
+            expect(box!.x + box!.width).toBeLessThanOrEqual(width);
+            expect(box!.height).toBeGreaterThanOrEqual(44);
+            expect(box!.y + box!.height).toBeLessThanOrEqual(heroBox!.y + heroBox!.height);
+          }
+          const headerBox = await page.locator('.society-header').boundingBox();
+          expect(headerBox!.y).toBeGreaterThanOrEqual(0);
+          expect(headerBox!.y + headerBox!.height).toBeLessThanOrEqual(heroBox!.y);
+          // The first section's decorative wave must not cover the hero actions.
+          expect(await page.locator('#about').evaluate(el => getComputedStyle(el, '::before').content)).toBe('none');
+          await captureRefinementEvidence(page, `ai-curious-forms-${width}`);
+        }
+        for (const [name, hash] of [['About', 'about'], ['Events', 'programme'], ['Committee', 'committee']]) {
+          await page.goto(site.origin);
+          await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name, exact: true }).click();
+          await expect(page).toHaveURL(`${site.origin}/#${hash}`);
+          await expect(page.locator(`#${hash}`)).toBeInViewport();
+        }
+      });
+
+      test('mobile homepage uses the portrait artwork without loading a 3D scene', async ({ page }) => {
         await page.setViewportSize({ width: 390, height: 844 });
         const requestedUrls: string[] = [];
         page.on('request', (request) => requestedUrls.push(request.url()));
         const mobileHeroResponse = page.waitForResponse(
-          (response) => response.url().includes('/_image') && response.url().includes('w=828'),
+          (response) => response.url().includes('/_image') && response.url().includes('ai-curious-forms-mobile') && response.url().includes('w=750'),
         );
 
         await page.goto(site.origin, { waitUntil: 'load' });
         await page.locator('.home-hero').waitFor();
         await mobileHeroResponse;
 
-        expect(requestedUrls.some((requestUrl) => requestUrl.includes('w=828'))).toBe(true);
+        expect(requestedUrls.some((requestUrl) => requestUrl.includes('w=750'))).toBe(true);
+        expect(requestedUrls.some((requestUrl) => requestUrl.includes('ai-curious-forms-background'))).toBe(false);
+        await expect(page.locator('.home-hero canvas')).toHaveCount(0);
         expect(requestedUrls.some((requestUrl) => requestUrl.includes('w=1800'))).toBe(false);
         expect(requestedUrls.some((requestUrl) => requestUrl.endsWith('.glb'))).toBe(false);
         expect(requestedUrls.some((requestUrl) => requestUrl.includes('HintzeHallExperience'))).toBe(false);
