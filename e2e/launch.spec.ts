@@ -27,7 +27,7 @@ const sites = [
   {
     key: 'neurotech',
     name: 'Neurotech',
-    origin: 'http://127.0.0.1:4323',
+    origin: process.env.E2E_NEUROTECH_ORIGIN || 'http://127.0.0.1:4323',
     unionUrl: 'https://surreyunion.org/your-activity/clubs-and-societies-a-z/neurotech-society',
     linktreeUrl: 'https://linktr.ee/surreyneurotechsociety',
     joinUrl: 'https://surreyunion.org/shop/neurotech-society/dff8af2e-9be8-4415-ba54-6e492d3daca8',
@@ -391,7 +391,7 @@ for (const site of sites) {
       const toggle = page.locator('[data-assistant-widget] .assistant-toggle');
       await expect(toggle).toBeVisible();
       const siteLogo = await page.locator('.society-header .society-brand img').getAttribute('src');
-      const assistantImage = site.key === 'business' ? '/images/business-assistant-fawn.webp' : siteLogo || '';
+      const assistantImage = site.key === 'business' ? '/images/business-assistant-fawn.webp' : site.key === 'neurotech' ? '/images/neurotech-assistant-neuron-gold.webp' : siteLogo || '';
       await expect(toggle.locator('img')).toHaveAttribute('src', assistantImage);
       await expect.poll(() => toggle.locator('img').evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0)).toBe(true);
       await toggle.click();
