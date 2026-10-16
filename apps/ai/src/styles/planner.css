@@ -231,6 +231,8 @@ dialog{border:1px solid #dcdde1;border-radius:10px;padding:0;background:#fafaf8;
 .member-team { margin: 22px 0; }
 .member-team h3 { font-size: 14px; color: #5e5272; }
 .member-row { display: flex; align-items: center; gap: 12px; margin: 12px 0; font-size: 14px; }
+.member-details { min-width: 0; }
+.member-role { display: block; margin-top: 3px; color: #5e5272; font-size: 12px; }
 .members-dialog { background: #fff; }
 .sidebar-collapsed { --sidebar-width: 68px; }
 .sidebar-collapsed .planner-sidebar { padding-inline: 9px; }
