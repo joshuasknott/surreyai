@@ -1,7 +1,8 @@
 ---
 export const prerender = false;
 import BaseLayout from '@surreysocieties/ui/components/BaseLayout';
-import { ArrowUpRight, ArrowLeft, Plus, X, CalendarDays, MapPin, UsersRound, Pencil, Sparkles, LockKeyhole, LogOut, Settings, Bell, Circle, AtSign, Send, Ellipsis } from 'lucide-astro';
+import { ArrowUpRight, ArrowLeft, Plus, X, CalendarDays, MapPin, UsersRound, Pencil, Sparkles, LockKeyhole, LogOut, Settings, Bell, Circle, AtSign, Send, Ellipsis, Columns3, Archive, ChevronsLeft, Menu, Search, MessageCircle, ListChecks } from 'lucide-astro';
+import { plannerTeams } from '../../../../../convex/plannerTeams';
 import '../../styles/planner.css';
 import { isAIEnabled } from '../../lib/server/ai/gemini';
 
@@ -13,12 +14,33 @@ const convexUrl = process.env.CONVEX_URL || import.meta.env.CONVEX_URL || '';
 <BaseLayout title="Committee planner | Surrey AI Society" description="Private programme planning for the Surrey AI Society committee." bodyClass="planner-page">
   <Fragment slot="head"><meta name="robots" content="noindex,nofollow" /></Fragment>
   <a class="planner-skip" href="#planner-main">Skip to planner</a>
-  <header class="planner-header">
-    <a class="planner-brand" href="/" aria-label="Surrey AI Society home"><img src="/logos/brand/surrey-ai-logo-transparent.png" alt="" width="46" height="46" /><strong>Surrey AI Society</strong></a>
-    <span class="planner-context">/ <span>Committee</span></span>
-    <div class="planner-header-actions"><a href="/" target="_blank" rel="noopener">View website <ArrowUpRight size={16} /></a><button id="open-notifications" class="icon-button notification-trigger" hidden aria-label="Notifications" title="Notifications"><Bell size={20} /><span id="notification-count" class="notification-count" aria-hidden="true" hidden></span></button><button id="open-settings" class="icon-button" hidden aria-label="Settings" title="Settings"><Settings size={20} /></button><button id="sign-out" class="icon-button account-button" hidden aria-label="Sign out" title="Sign out"><span id="account-avatar" class="person-avatar" aria-hidden="true" hidden></span><LogOut size={18} /></button></div>
-  </header>
+  <aside id="planner-sidebar" class="planner-sidebar" aria-label="Planner navigation">
+    <div class="sidebar-brand-row">
+    <a class="planner-brand" href="/" aria-label="Surrey AI Society home"><img src="/logos/brand/surrey-ai-icon-dark.webp" alt="" width="46" height="46" /><strong>Surrey AI Society</strong></a>
+    <button id="collapse-sidebar" class="icon-button" aria-label="Collapse navigation" aria-expanded="true" aria-controls="planner-sidebar"><ChevronsLeft size={18} /></button>
+    </div>
+    <nav id="workspace-nav" class="sidebar-nav" aria-label="Planner views" hidden>
+      <button data-view="board" aria-pressed="true" title="Board"><Columns3 size={20} /><span>Board</span></button>
+      <button data-view="calendar" aria-pressed="false" title="Calendar"><CalendarDays size={20} /><span>Calendar</span></button>
+      <button data-view="archive" aria-pressed="false" title="Archive"><Archive size={20} /><span>Archive</span></button>
+    </nav>
+    <div class="sidebar-bottom">
+      <a href="/" target="_blank" rel="noopener" title="View website"><ArrowUpRight size={20} /><span>View website</span></a>
+      <button id="open-settings" hidden title="Settings"><Settings size={20} /><span>Settings</span></button>
+      <div id="sidebar-account" class="sidebar-account" hidden><span id="account-avatar" class="person-avatar" aria-hidden="true" hidden></span><span id="account-name"></span></div>
+      <button id="sign-out" hidden title="Sign out"><LogOut size={20} /><span>Sign out</span></button>
+    </div>
+  </aside>
+  <button id="sidebar-scrim" class="sidebar-scrim" aria-label="Close navigation" hidden></button>
   <main id="planner-main" data-planner data-key={publishableKey} data-convex={convexUrl} data-ai={String(isAIEnabled())}>
+    <header class="planner-header">
+      <button id="toggle-sidebar" class="icon-button" aria-label="Open navigation" aria-expanded="false" aria-controls="planner-sidebar"><Menu size={22} /></button>
+      <h1><LockKeyhole size={18} aria-hidden="true" /><span id="workspace-title">Committee board</span></h1>
+      <div class="planner-header-actions">
+        <button id="open-members" class="member-stack" hidden aria-label="View committee members" title="Committee members"></button>
+        <button id="open-notifications" class="icon-button notification-trigger" hidden aria-label="Notifications" title="Notifications"><Bell size={22} /><span id="notification-count" class="notification-count" aria-hidden="true" hidden></span></button>
+      </div>
+    </header>
     <section id="access-state" class="planner-access" aria-live="polite">
       <LockKeyhole size={24} aria-hidden="true" /><h1>Committee planner</h1><p id="access-message">Checking your access…</p>
       <div id="sign-in" class="planner-sign-in" hidden>
@@ -41,12 +63,14 @@ const convexUrl = process.env.CONVEX_URL || import.meta.env.CONVEX_URL || '';
       <noscript><p>Enable JavaScript to sign in and use the private planner.</p></noscript>
     </section>
     <section id="workspace" hidden>
-      <div class="planner-toolbar"><div><h1>Planner</h1><p class="workspace-privacy"><LockKeyhole size={15} aria-hidden="true" />Private workspace</p></div><div class="planner-tools"><button id="new-item" class="primary-button"><Plus size={18} />New idea</button></div></div>
-      <div class="planner-view-tabs" role="group" aria-label="Planner view"><button data-view="board" aria-pressed="true">Board</button><button data-view="calendar" aria-pressed="false">Calendar</button><button data-view="archive" aria-pressed="false">Archive</button></div>
+      <div class="planner-toolbar">
+        <div class="team-filters" role="group" aria-label="Filter by team"><button data-team="all" aria-pressed="true">All</button>{plannerTeams.map(team => <button data-team={team.id} aria-pressed="false">{team.name}</button>)}</div>
+        <div class="planner-tools"><button id="toggle-search" class="icon-button" aria-label="Search cards" aria-expanded="false" aria-controls="board-search"><Search size={20} /></button><button id="new-item" class="primary-button"><Plus size={18} /><span>New card</span></button></div>
+      </div>
+      <div id="board-search" class="board-search" hidden><label for="card-search" class="sr-only">Search cards</label><input id="card-search" type="search" placeholder="Search cards…" autocomplete="off" /></div>
       <div id="board" class="planner-board"></div>
       <div id="calendar" class="planner-calendar" hidden></div>
       <div id="archive" hidden></div>
-      <p class="planner-hint">Published activities appear on <a href="/#programme" target="_blank" rel="noopener">surreyaisociety.org</a>.</p>
     </section>
     <p id="planner-status" class="planner-status" role="status" aria-live="polite"></p>
   </main>
@@ -79,10 +103,12 @@ const convexUrl = process.env.CONVEX_URL || import.meta.env.CONVEX_URL || '';
       <div class="editor-top"><button type="button" data-close class="quiet-button"><ArrowLeft size={16} /><span id="editor-back-label">Planner</span></button><span id="item-state" class="muted">Idea · Private</span><button type="button" data-close class="icon-button" aria-label="Close activity"><X size={20} /></button></div>
       <div class="editor-actions"><h2 id="item-heading">New activity</h2><div><button type="button" id="archive-item" class="quiet-button" hidden>Archive</button><button type="submit" id="save-item" class="secondary-button">Save draft</button><button type="button" id="publish-item" class="primary-button" hidden>Publish to website</button></div></div>
       <p id="item-message" role="status" class="form-message"></p>
-      <div class="editor-stage-bar"><label>Stage<select name="stage"><option value="ideas">Ideas</option><option value="planning">Planning</option><option value="ready">Ready</option></select></label><p id="stage-help" class="field-help">Start with a title and a few words. Work out the details later.</p></div>
+      <div class="editor-stage-bar"><label>Stage<select name="stage"><option value="ideas">Ideas</option><option value="planning">In progress</option><option value="ready">Ready</option><option value="done">Done</option></select></label><p id="stage-help" class="field-help">Start with a title and a few words. Work out the details later.</p></div>
       <div class="editor-columns">
         <div class="editor-fields">
           <label>Title<input name="title" maxlength="160" required autocomplete="off" /></label>
+          <div class="field-pair"><label>Lead team<select name="team"><option value="">Unassigned</option>{plannerTeams.map(team => <option value={team.id}>{team.name}</option>)}</select></label><label>Card purpose<select name="purpose"><option value="internal">Internal work</option><option value="activity">Website activity</option></select></label></div>
+          <label id="internal-due-label">Due date (optional)<input type="date" name="dueDate" /></label>
           <div class="description-field">
             <div class="field-label-row"><label for="activity-description">Description</label><button type="button" id="help-description" class="inline-ai" hidden><Sparkles size={14} />Help write this</button></div>
             <textarea id="activity-description" name="description" rows="4" maxlength="4000" placeholder="What’s the idea?"></textarea>
@@ -104,6 +130,11 @@ const convexUrl = process.env.CONVEX_URL || import.meta.env.CONVEX_URL || '';
         <aside id="editor-preview" class="editor-preview" aria-labelledby="preview-heading" hidden><h3 id="preview-heading">Website preview</h3><p class="muted">surreyaisociety.org</p><div id="public-preview" class="public-preview"></div><p id="publication-help" class="field-help">Ready stays private. Publish when the public details are confirmed.</p><ul id="publication-missing" class="publication-missing"></ul><button type="button" id="unpublish-item" class="quiet-button danger" hidden>Unpublish and move to Ready</button><p class="field-help">Collaborators, committee notes and preparation tasks stay private.</p></aside>
       </div>
     </form>
+  </dialog>
+
+  <dialog id="members-dialog" class="small-dialog members-dialog" aria-labelledby="members-heading">
+    <div class="dialog-heading"><h2 id="members-heading">Committee members</h2><button type="button" data-close class="icon-button" aria-label="Close members"><X size={20} /></button></div>
+    <div id="team-members"></div>
   </dialog>
 
   <dialog id="notifications-dialog" class="notifications-dialog" aria-labelledby="notifications-heading">
@@ -133,5 +164,7 @@ const convexUrl = process.env.CONVEX_URL || import.meta.env.CONVEX_URL || '';
   <template id="stage-icon"><Circle size={12} fill="currentColor" aria-hidden="true" /></template>
   <template id="lock-icon"><LockKeyhole size={14} aria-hidden="true" /></template>
   <template id="more-icon"><Ellipsis size={19} aria-hidden="true" /></template>
+  <template id="comments-icon"><MessageCircle size={14} aria-hidden="true" /></template>
+  <template id="checklist-icon"><ListChecks size={14} aria-hidden="true" /></template>
   <script>import '../../scripts/planner';</script>
 </BaseLayout>

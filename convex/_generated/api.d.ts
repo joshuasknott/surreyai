@@ -21,6 +21,7 @@ import type * as permissions from "../permissions.js";
 import type * as planner from "../planner.js";
 import type * as plannerModel from "../plannerModel.js";
 import type * as plannerSignIn from "../plannerSignIn.js";
+import type * as plannerTeams from "../plannerTeams.js";
 import type * as seed from "../seed.js";
 import type * as settings from "../settings.js";
 import type * as societies from "../societies.js";
@@ -47,6 +48,7 @@ declare const fullApi: ApiFromModules<{
   planner: typeof planner;
   plannerModel: typeof plannerModel;
   plannerSignIn: typeof plannerSignIn;
+  plannerTeams: typeof plannerTeams;
   seed: typeof seed;
   settings: typeof settings;
   societies: typeof societies;

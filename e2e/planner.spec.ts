@@ -115,7 +115,11 @@ async function fixture(context: BrowserContext, mode: 'admin' | 'owner' | 'outsi
   });
   return { t, admin, owner, pushNotifications, disconnectNotifications: async () => { await Promise.all([...streams].map(stream => stream.disconnect())); }, connections: () => connections, activeConnections: () => streams.size, readyConnections: () => [...streams].filter(stream => stream.subscribed).length };
 }
-async function ready(page: Page) { await page.goto(`${origin}/committee/planner`); await expect(page.getByRole('heading', { name: 'Planner', exact: true })).toBeVisible(); }
+async function ready(page: Page) { await page.goto(`${origin}/committee/planner`); await expect(page.locator('#workspace')).toBeVisible(); }
+async function navigate(page: Page, name: string) {
+  if ((page.viewportSize()?.width || 1440) <= 720 && !await page.locator('body').evaluate(body => body.classList.contains('sidebar-mobile-open'))) await page.getByRole('button', { name: 'Open navigation', exact: true }).click();
+  await page.getByRole('button', { name, exact: true }).click();
+}
 async function noOverflow(page: Page) { expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(1); }
 async function commentAction(scope: Page | Locator, name: 'Edit comment' | 'Delete comment') {
   const button = scope.getByRole('button', { name, exact: true, includeHidden: true });
@@ -134,11 +138,74 @@ async function closeActivity(page: Page) {
   if (await page.locator('#card-dialog').isVisible()) await page.getByRole('button', { name: 'Close card', exact: true }).click();
 }
 
+test('team board supports internal work, shared filters, members and collapsible navigation', async ({ page, context }) => {
+  const { admin, t } = await fixture(context, 'owner');
+  const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
+  const samples = [
+    ['Joint society bar crawl', 'events', 'ideas'], ['Approach NVIDIA for sponsorship', 'industry', 'ideas'],
+    ['Weekend AI build challenge', 'projects', 'ideas'], ['AI internship roundup', 'careers', 'ideas'],
+    ['Intro to Python workshop', 'learning', 'planning'], ['Autumn sponsor deck', 'industry', 'planning'],
+    ['Hackathon project shortlist', 'projects', 'planning'], ['Workshop announcement post', 'learning', 'ready'],
+    ['Welcome social', 'events', 'done'], ['Share graduate opportunities', 'careers', 'done'],
+  ] as const;
+  for (const [title, team, stage] of samples) await admin.mutation(api.planner.create, { activity: { ...activity, title, date: '', location: '' }, team, stage, internalOnly: true });
+  const live = await admin.mutation(api.planner.create, { activity: { ...activity, title: 'AI x Neurotech Meet & Greet' }, team: 'events', stage: 'ready' });
+  await admin.mutation(api.planner.publish, { id: live, revision: 1 });
+  await page.setViewportSize({ width: 1756, height: 896 }); await ready(page);
+  await expect(page.locator('.planner-context')).toHaveCount(0);
+  await expect(page.locator('#board .planner-card')).toHaveCount(11);
+  await noOverflow(page); await screenshot(page, 'team-board-desktop');
+  await page.getByRole('button', { name: 'View committee members', exact: true }).click();
+  await expect(page.locator('#team-members .member-row')).toHaveCount(11);
+  await expect(page.locator('#team-members')).toContainText("Amanda Lages O'Connor");
+  await expect(page.locator('#team-members')).toContainText('Miguel Antonio');
+  await page.getByRole('button', { name: 'Close members', exact: true }).click();
+  await page.getByRole('button', { name: 'Industry & Partnerships', exact: true }).click();
+  await expect(page.locator('#board .planner-card')).toHaveCount(2);
+  await expect(page.locator('#board .team-badge')).toHaveCount(0);
+  await page.getByRole('button', { name: 'New card', exact: true }).click();
+  await expect(page.getByRole('combobox', { name: 'Lead team', exact: true })).toHaveValue('industry');
+  await expect(page.getByRole('combobox', { name: 'Card purpose', exact: true })).toHaveValue('internal');
+  await page.getByLabel('Title', { exact: true }).fill('Draft sponsor email');
+  await page.getByLabel('Due date (optional)', { exact: true }).fill(activity.date);
+  await page.getByRole('combobox', { name: 'Stage', exact: true }).selectOption('ready');
+  await expect(page.locator('#editor-preview')).not.toBeVisible();
+  await expect(page.locator('#publish-item')).not.toBeVisible();
+  await page.getByRole('button', { name: 'Save card', exact: true }).click();
+  await expect(page.locator('#item-message')).toContainText('Draft saved');
+  await closeActivity(page);
+  await page.reload(); await expect(page.locator('#board .planner-card')).toHaveCount(12);
+  await page.getByRole('button', { name: 'Industry & Partnerships', exact: true }).click();
+  await expect(page.locator('#board .planner-card')).toHaveCount(3);
+  const card = page.locator('.planner-card').filter({ hasText: 'Draft sponsor email' });
+  await card.locator('summary').click(); await card.getByRole('button', { name: 'Move to Done', exact: true }).click();
+  await expect(page.locator('.board-column[data-stage=done]')).toContainText('Draft sponsor email');
+  expect((await t.query(api.planner.listPublished, {})).map(row => row.id)).toEqual([live]);
+  await page.getByRole('button', { name: 'Search cards', exact: true }).click();
+  await page.getByRole('searchbox', { name: 'Search cards', exact: true }).fill('email');
+  await expect(page.locator('#board .planner-card')).toHaveCount(1);
+  await page.getByRole('button', { name: 'Search cards', exact: true }).click();
+  await page.getByRole('button', { name: 'All', exact: true }).click();
+  await page.getByRole('button', { name: 'Collapse navigation', exact: true }).click();
+  await page.reload(); await expect(page.locator('body')).toHaveClass(/sidebar-collapsed/);
+  await page.getByRole('button', { name: 'Open navigation', exact: true }).click();
+  await page.setViewportSize({ width: 390, height: 844 }); await noOverflow(page); await screenshot(page, 'team-board-mobile');
+  await page.getByRole('button', { name: 'Open navigation', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Settings', exact: true })).toBeVisible();
+  await navigate(page, 'Calendar');
+  await expect(page.locator('#calendar')).toBeVisible(); await noOverflow(page);
+  await page.getByRole('button', { name: 'Open navigation', exact: true }).click();
+  await navigate(page, 'Board');
+  await page.setViewportSize({ width: 320, height: 760 }); await noOverflow(page);
+  await screenshot(page, 'team-board-small'); expect(errors).toEqual([]);
+});
+
 test('committee can prepare, publish, revise and unpublish without exposing private notes', async ({ page, context }) => {
   const { t } = await fixture(context);
   const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
   await ready(page);
-  await page.getByRole('button', { name: 'New idea', exact: true }).click();
+  await page.getByRole('button', { name: 'New card', exact: true }).click();
+  await page.getByRole('combobox', { name: 'Card purpose', exact: true }).selectOption('activity');
   await page.getByLabel('Title', { exact: true }).fill('Committee integration workshop');
   await page.getByRole('combobox', { name: 'Stage', exact: true }).selectOption('ready');
   await page.getByLabel('Date', { exact: true }).fill(activity.date);
@@ -192,9 +259,9 @@ test('private board and publication review match the minimal layout on desktop a
   await expect(page.locator('#item-dialog')).toBeVisible(); await noOverflow(page); await screenshot(page, 'publication-mobile');
   await closeActivity(page);
   await page.setViewportSize({ width: 320, height: 760 }); await noOverflow(page);
-  await page.getByRole('button', { name: 'Calendar', exact: true }).click(); await expect(page.locator('#calendar')).toBeVisible(); await noOverflow(page);
+  await navigate(page, 'Calendar'); await expect(page.locator('#calendar')).toBeVisible(); await noOverflow(page);
   await page.setViewportSize({ width: 1440, height: 1024 });
-  await page.getByRole('button', { name: 'Board', exact: true }).click();
+  await navigate(page, 'Board');
   await editCard(page, 'Build night & project teams');
   await page.getByRole('button', { name: 'Publish to website', exact: true }).click();
   await expect(page.locator('#item-dialog')).not.toBeVisible();
@@ -229,7 +296,7 @@ test('signed-out state is private and public detail links do not reveal drafts',
 
 test('only the owner manages emails in Settings and AI suggestions remain unsaved drafts', async ({ page, context }) => {
   const { t } = await fixture(context, 'owner'); await ready(page);
-  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await navigate(page, 'Settings');
   await expect(page.locator('#committee-settings')).toBeVisible();
   await expect(page.locator('#settings-account')).toContainText('joshhknott@gmail.com');
   await page.locator('#access-form').getByLabel('Committee email', { exact: true }).fill('new-committee@example.test');
@@ -244,7 +311,8 @@ test('only the owner manages emails in Settings and AI suggestions remain unsave
   await page.getByRole('button', { name: 'Close settings', exact: true }).click();
   if (await page.locator('[data-planner]').getAttribute('data-ai') === 'true') {
     await context.route('**/api/planner/draft', async route => { expect(route.request().postDataJSON()).toMatchObject({ focus: 'description' }); await route.fulfill({ json: { description: 'A welcoming beginner workshop.' } }); });
-    await page.getByRole('button', { name: 'New idea', exact: true }).click();
+    await page.getByRole('button', { name: 'New card', exact: true }).click();
+  await page.getByRole('combobox', { name: 'Card purpose', exact: true }).selectOption('activity');
     await page.getByLabel('Title', { exact: true }).fill('My workshop idea');
     await page.getByLabel('Description', { exact: true }).fill('My rough notes');
     await page.getByLabel('Collaborators (optional)', { exact: true }).fill('Josh, Mosie');
@@ -264,7 +332,7 @@ test('only the owner manages emails in Settings and AI suggestions remain unsave
 
 test('ordinary committee accounts have no email access controls in Settings', async ({ page, context }) => {
   await fixture(context); await ready(page);
-  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await navigate(page, 'Settings');
   await expect(page.locator('#settings-account')).toContainText('committee@example.test');
   await expect(page.locator('#committee-settings')).not.toBeVisible();
   await expect(page.locator('#access-form').getByLabel('Committee email', { exact: true })).not.toBeVisible();
@@ -326,7 +394,7 @@ test('email codes handle retry, expiry and resend, then restore sign-in after re
   await expect(page.locator('#workspace')).toBeVisible();
   await expect(page.locator('#sign-in')).not.toBeVisible();
   expect(await page.evaluate(() => (window as unknown as { fixtureAuthCalls: { send: number } }).fixtureAuthCalls.send)).toBe(0);
-  await page.getByRole('button', { name: 'Sign out', exact: true }).click();
+  await navigate(page, 'Sign out');
   await expect(page.locator('#email-sign-in')).toBeVisible(); await expect(page.locator('#workspace')).not.toBeVisible();
 });
 
@@ -344,7 +412,8 @@ test('revocation between receiving a code and signing in still prevents board ac
 
 test('Ideas needs only a title, description and optional collaborators; details appear later', async ({ page, context }) => {
   const { admin, t } = await fixture(context); await ready(page);
-  await page.getByRole('button', { name: 'New idea', exact: true }).click();
+  await page.getByRole('button', { name: 'New card', exact: true }).click();
+  await page.getByRole('combobox', { name: 'Card purpose', exact: true }).selectOption('activity');
   await page.getByLabel('Title', { exact: true }).fill('AI film night');
   await page.getByLabel('Description', { exact: true }).fill('A film and a discussion about AI.');
   await page.getByLabel('Collaborators (optional)', { exact: true }).fill('Josh, Mosie');
@@ -386,7 +455,7 @@ test('calendar retains archived events, orders times and uses a compact mobile a
   await admin.mutation(api.planner.create, { activity: { ...activity, title: 'Undated idea', date: '', startTime: '', endTime: '' } });
   await ready(page);
   await expect(page.locator('#board')).not.toContainText('Committee welcome night');
-  await page.getByRole('button', { name: 'Calendar', exact: true }).click();
+  await navigate(page, 'Calendar');
   await expect(page.locator('#calendar[aria-busy=false] .calendar-event')).toHaveCount(3);
   await expect(page.locator('#calendar-month')).toHaveText('October 2026');
   await expect(page.locator('.calendar-day[data-date]')).toHaveCount(31);
@@ -432,7 +501,7 @@ test('calendar retains archived events, orders times and uses a compact mobile a
   await page.getByRole('button', { name: 'Today', exact: true }).click();
   await expect(page.locator('#calendar-month')).toHaveText('October 2026');
   await expect(page.locator('#calendar[aria-busy=false]')).toContainText('Committee welcome night');
-  await page.getByRole('button', { name: 'Archive', exact: true }).click();
+  await navigate(page, 'Archive');
   await expect(page.locator('#archive')).toContainText('Committee welcome night');
 });
 
@@ -447,7 +516,7 @@ test('calendar can retry failures and ignores an older month response after navi
     if (body.args[0].month === '2026-11') await new Promise<void>(resolve => { releaseNovember = resolve; });
     return route.fallback();
   });
-  await ready(page); await page.getByRole('button', { name: 'Calendar', exact: true }).click();
+  await ready(page); await navigate(page, 'Calendar');
   await expect(page.locator('.calendar-feedback')).toContainText('Could not load');
   await page.locator('.calendar-feedback').getByRole('button', { name: 'Try again', exact: true }).click();
   await expect(page.locator('#calendar[aria-busy=false] .calendar-empty')).toBeVisible();
@@ -475,17 +544,18 @@ test('board cards omit stage dropdowns and move by drag and drop without publish
   await admin.mutation(api.planner.publish, { id: published, revision: 1 });
   await ready(page);
   await expect(page.locator('#board select')).toHaveCount(0);
-  await expect(page.locator(`.planner-card[data-item="${id}"] .card-footer`)).toHaveCount(0);
-  await expect(page.locator('.column-heading h2')).toHaveText(['Ideas', 'Planning', 'Ready', 'Published']);
+  await expect(page.locator(`.planner-card[data-item="${id}"] .card-footer`)).toHaveCount(1);
+  await expect(page.locator('.column-heading h2')).toHaveText(['Ideas', 'In progress', 'Ready', 'Done']);
   await page.locator(`.planner-card[data-item="${id}"]`).dragTo(page.locator('.board-column[data-stage=planning]'));
   await expect(page.locator(`.board-column[data-stage=planning] [data-item="${id}"]`)).toBeVisible();
   await page.locator(`.planner-card[data-item="${id}"]`).dragTo(page.locator('.board-column[data-stage=ready]'));
   await expect(page.locator(`.board-column[data-stage=ready] [data-item="${id}"]`)).toBeVisible();
-  await page.locator(`.planner-card[data-item="${id}"]`).dragTo(page.locator('.board-column[data-stage=published]'));
-  await expect(page.locator('#item-dialog')).toBeVisible();
+  await page.locator(`.planner-card[data-item="${id}"]`).dragTo(page.locator('.board-column[data-stage=done]'));
+  await expect(page.locator(`.board-column[data-stage=done] [data-item="${id}"]`)).toBeVisible();
   expect((await t.query(api.planner.listPublished, {})).map(item => item.id)).toEqual([published]);
-  await expect(page.getByRole('button', { name: 'Publish to website', exact: true })).toBeDisabled();
-  await closeActivity(page);
+  await page.locator(`.planner-card[data-item="${published}"]`).dragTo(page.locator('.board-column[data-stage=done]'));
+  await expect(page.locator(`.board-column[data-stage=done] [data-item="${published}"]`)).toBeVisible();
+  expect((await t.query(api.planner.listPublished, {})).map(item => item.id)).toEqual([published]);
   await noOverflow(page); await screenshot(page, 'cards-desktop');
   await page.setViewportSize({ width: 390, height: 844 }); await noOverflow(page); await screenshot(page, 'cards-mobile');
   await page.setViewportSize({ width: 320, height: 760 }); await noOverflow(page);
@@ -532,16 +602,16 @@ test('approved board and opened card keep details inside and make comment action
   const own = await owner.mutation(api.planner.addComment, { id: workshopId, text: "Definitely. @committee@example.test I'll put together a starter project.", requestId: '00000000-0000-4000-8000-000000000002' });
   await admin.mutation(api.planner.addComment, { id: workshopId, text: "Perfect — I'll sort the slides.", requestId: '00000000-0000-4000-8000-000000000003' });
   await ready(page);
-  await expect(page.locator('.column-count')).toHaveText(['3', '2', '1', '2']);
+  await expect(page.locator('.column-count')).toHaveText(['3', '2', '3', '0']);
   await expect(page.locator('#board .planner-card')).toHaveCount(8);
   await expect(page.locator('#board .card-kind, #board .card-description, #board .card-details, #board .card-comment-count, #board select, #board a')).toHaveCount(0);
   await expect(page.locator('#board')).not.toContainText(workshop.description);
   await expect(page.locator('#board')).not.toContainText(workshop.location);
   const card = page.locator(`.planner-card[data-item="${workshopId}"]`);
   await expect(card.locator('.person-name')).toHaveText(['Joshua Knott', 'Sam']);
-  await expect(card.getByRole('button')).toHaveAccessibleDescription(/Joshua Knott.*Sam/);
+  await expect(card.getByRole('button', { name: /^View / })).toHaveAccessibleDescription(/Joshua Knott.*Sam/);
   await noOverflow(page); await screenshot(page, 'approved-board-desktop');
-  await card.getByRole('button').focus(); await page.keyboard.press('Enter');
+  await card.getByRole('button', { name: /^View / }).focus(); await page.keyboard.press('Enter');
   await expect(page.locator('#card-description')).toHaveText(workshop.description);
   await expect(page.locator('#card-facts')).toContainText('22 Oct');
   await expect(page.locator('#card-facts')).toContainText(workshop.location);
