@@ -12,7 +12,7 @@ const activities = [
       <p>We’re a student-run community exploring what AI can do — and what it should do. Learn useful skills, work on ideas together, and discuss the questions behind the technology, from privacy to its impact on everyday life.</p>
     </div>
     <div id="activities" class="ai-activities" aria-label="Society activities">
-      {activities.map(activity => <article><h3>{activity.title}</h3><p>{activity.text}</p></article>)}
+      {activities.map(activity => <article id={activity.title === 'Projects & challenges' ? 'projects' : undefined}><h3>{activity.title}</h3><p>{activity.text}</p></article>)}
     </div>
   </div>
 </section>

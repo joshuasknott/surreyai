@@ -5,7 +5,7 @@ function getConvexUrl(): string {
     env?: Record<string, string | undefined>;
   }).env;
 
-  return metaEnv?.CONVEX_URL || process.env.CONVEX_URL || "";
+  return process.env.CONVEX_URL || metaEnv?.CONVEX_URL || "";
 }
 
 export function createConvexClient(authToken?: string): ConvexHttpClient {

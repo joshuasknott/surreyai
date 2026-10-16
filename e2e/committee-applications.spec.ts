@@ -1,17 +1,21 @@
 import { expect, test } from '@playwright/test';
 
-const origin = process.env.E2E_AI_ORIGIN || 'http://127.0.0.1:4321';
+const origin = `http://${process.env.E2E_HOST || '127.0.0.1'}:4321`;
 
-test('AI Society header leads to seven distinct committee applications', async ({ page }) => {
-  await page.goto(origin, { waitUntil: 'domcontentloaded' });
-  const cta = page.locator('.society-committee-banner');
-  await expect(cta).toHaveAttribute('data-committee-deadline', '2026-10-06T13:44:00Z');
-  await expect(cta).toContainText('Committee applications are out!');
-  await expect(cta.locator('[data-seconds]')).toHaveText(/^\d{2}$/);
-  const apply = cta.getByRole('link', { name: 'Apply' });
-  await expect(apply).toHaveAttribute('href', '/committee-applications');
-  await expect(apply).toBeVisible();
-  await apply.click();
+test('AI Society pages omit the committee application strip', async ({ page }) => {
+  for (const width of [320, 1280]) {
+    await page.setViewportSize({ width, height: 740 });
+    for (const path of ['', '/committee-applications', '/committee-applications/social-media-content']) {
+      await page.goto(`${origin}${path}`, { waitUntil: 'domcontentloaded' });
+      await expect(page.locator('.society-committee-banner')).toHaveCount(0);
+      await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+      if (!path) await page.screenshot({ path: `output/committee-fetch-fix/ai-${width}.png` });
+    }
+  }
+});
+
+test('AI Society retains seven role pages after applications close', async ({ page, request }) => {
+  await page.goto(`${origin}/committee-applications`, { waitUntil: 'domcontentloaded' });
 
   await expect(page).toHaveURL(`${origin}/committee-applications`);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(/Join the committee\s*2026–27/);
@@ -24,22 +28,17 @@ test('AI Society header leads to seven distinct committee applications', async (
   for (const role of roles) {
     await expect(page.locator(`.committee-role-card[href="/committee-applications/${role}"]`)).toHaveCount(1);
   }
-  await page.locator('.committee-role-card[href="/committee-applications/workshops-learning"]').click();
-  await expect(page).toHaveURL(`${origin}/committee-applications/workshops-learning`);
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Workshops & Learning Officer');
-  await expect(page.locator('textarea[name="workshopTopic"]')).toBeVisible();
-  await expect(page.locator('textarea[name="workshopOutline"]')).toBeVisible();
-  await expect(page.locator('input[name="fullName"]')).toBeVisible();
-});
-
-test('Social Media application includes brand assets and a 15 MB mock post upload', async ({ page }) => {
-  await page.goto(`${origin}/committee-applications/social-media-content`, { waitUntil: 'domcontentloaded' });
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Social Media & Content Officer');
-  await expect(page.locator('.committee-assets a')).toHaveCount(3);
-  await expect(page.locator('input[name="mockPost"]')).toHaveAttribute('required', '');
-  await expect(page.locator('#mock-post-help')).toContainText('15 MB');
-  await expect(page.locator('textarea[name="postCaption"]')).toBeVisible();
-  await expect(page.locator('textarea[name="postApproach"]')).toBeVisible();
+  for (const role of roles) {
+    await page.goto(`${origin}/committee-applications/${role}`, { waitUntil: 'domcontentloaded' });
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    await expect(page.getByText(/Applications have closed/).first()).toBeVisible();
+    await expect(page.locator('#committee-application-form')).toHaveCount(0);
+  }
+  for (const path of ['/api/committee-applications', '/api/committee-upload']) {
+    const response = await request.post(`${origin}${path}`, { data: {}, headers: { origin } });
+    expect(response.status()).toBe(410);
+    expect(await response.json()).toMatchObject({ message: 'Committee applications have closed.' });
+  }
 });
 
 test('Committee cards and forms fit a narrow phone viewport', async ({ page }) => {
@@ -49,41 +48,37 @@ test('Committee cards and forms fit a narrow phone viewport', async ({ page }) =
     const overflow = await page.evaluate(() => Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - window.innerWidth);
     expect(overflow).toBeLessThanOrEqual(1);
     if (!path) {
-      const banner = page.locator('.society-committee-banner');
       await expect(page.locator('.society-header .society-brand span')).toBeVisible();
-      expect((await banner.boundingBox())!.height).toBeLessThanOrEqual(90);
-      const apply = await banner.getByRole('link', { name: 'Apply' }).boundingBox();
-      expect(apply!.height).toBeGreaterThanOrEqual(44);
+      await expect(page.locator('.society-committee-banner')).toHaveCount(0);
     }
   }
 });
 
-test('Career & Opportunities application asks for an idea and an accessibility plan', async ({ page }) => {
+test('Career & Opportunities role remains readable after closure', async ({ page }) => {
   await page.goto(`${origin}/committee-applications/career-opportunities`, { waitUntil: 'domcontentloaded' });
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Career & Opportunities Officer');
-  await expect(page.locator('textarea[name="careerIdea"]')).toHaveAttribute('required', '');
-  await expect(page.locator('textarea[name="careerPlan"]')).toHaveAttribute('required', '');
-  await expect(page.locator('input[name="fullName"]')).toBeVisible();
+  await expect(page.getByText(/Applications have closed/).first()).toBeVisible();
+  await expect(page.locator('#committee-application-form')).toHaveCount(0);
 });
 
-test('Committee banner stays below the header while scrolling', async ({ page }) => {
+test('AI header remains usable without the committee strip', async ({ page }) => {
   for (const width of [390, 768, 1280]) {
     await page.setViewportSize({ width, height: 740 });
     await page.goto(origin, { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('.society-committee-banner')).toHaveCount(0);
+    await page.goto(`${origin}/committee-applications`, { waitUntil: 'domcontentloaded' });
     if (width === 390) await expect(page.locator('.society-header .society-brand span')).toBeVisible();
-    if (width === 768) expect((await page.locator('.society-committee-banner strong').boundingBox())!.height).toBeLessThanOrEqual(22);
+    await expect(page.locator('.society-committee-banner')).toHaveCount(0);
     await page.evaluate(() => {
       document.documentElement.style.scrollBehavior = 'auto';
       window.scrollTo(0, 900);
     });
     const positions = await page.evaluate(() => {
       const header = document.querySelector('.society-header')!.getBoundingClientRect();
-      const banner = document.querySelector('.society-committee-banner')!.getBoundingClientRect();
-      return { scrollY: window.scrollY, headerTop: Math.round(header.top), gap: Math.round(banner.top - header.bottom) };
+      return { scrollY: window.scrollY, headerTop: Math.round(header.top) };
     });
     expect(positions.scrollY).toBeGreaterThan(100);
     expect(positions.headerTop).toBe(0);
-    expect(Math.abs(positions.gap)).toBeLessThanOrEqual(1);
-    await expect(page.locator('.society-committee-banner').getByRole('link', { name: 'Apply' })).toBeInViewport();
+    await expect(page.locator('.society-header .society-nav-join')).toBeInViewport();
   }
 });

@@ -7,5 +7,6 @@ const { title, description, ogImage, bodyClass = 'bg-ai-bg text-ai-fg font-sans 
 ---
 <SocietyLayout societyKey="ai" title={title} description={description} ogImage={ogImage} bodyClass={bodyClass} extraFontHrefs={[]}>
   <JoinMenu slot="join-menu" society={getSocietyById('ai')!} />
+  <slot name="hero" slot="hero" />
   <slot />
 </SocietyLayout>

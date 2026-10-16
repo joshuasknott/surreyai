@@ -26,6 +26,7 @@ type GeminiClient = {
 };
 
 function env(key: string): string | undefined {
+  if (process.env[key] !== undefined) return process.env[key];
   const metaVal = (import.meta.env as Record<string, any>)[key];
   if (metaVal !== undefined) {
     return typeof metaVal === "string" ? metaVal : String(metaVal);

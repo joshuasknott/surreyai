@@ -1,0 +1,25 @@
+---
+export const prerender = false;
+import Layout from '../../layouts/Layout.astro';
+import '../../styles/global.css';
+import '../../styles/programme.css';
+import { ArrowLeft, ArrowUpRight } from 'lucide-astro';
+import { queryPublicConvex } from '@surreysocieties/admin';
+import { api } from '../../../../../convex/_generated/api';
+import type { Id } from '../../../../../convex/_generated/dataModel';
+import { activityDate, activityKind } from '../../lib/programme';
+const item = await queryPublicConvex(api.planner.getPublished, { id: Astro.params.id as Id<'plannerItems'> }, null);
+Astro.response.headers.set('Cache-Control', 'no-store');
+if (!item) Astro.response.status = 404;
+---
+<Layout title={item?.title || 'Activity not found'} description={item?.description.slice(0, 160) || 'This activity is not currently published.'}>
+  <article class="activity-detail">
+    <a class="programme-link" href="/#programme"><ArrowLeft size={18} aria-hidden="true" />All activities</a>
+    {item ? <>
+      <h1>{item.title}</h1>
+      <div class="activity-info"><span>{activityKind(item)}</span>{item.date && <time datetime={item.date}>{activityDate(item.date, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</time>}{item.startTime && <span>{item.startTime}{item.endTime && `–${item.endTime}`} (Europe/London)</span>}{item.location && <span>{item.location}</span>}</div>
+      <p class="activity-description">{item.description}</p>
+      <div class="activity-actions">{item.registrationUrl && <a class="programme-link programme-link--orange" href={item.registrationUrl} target="_blank" rel="noopener noreferrer">{item.kind === 'project' ? 'Get involved' : 'Register'}<ArrowUpRight size={18} aria-hidden="true" /></a>}{item.date && <a class="programme-link" href={`/programme.ics?id=${item.id}`}>Add to calendar</a>}</div>
+    </> : <><h1>This activity isn’t available.</h1><p>It may have been unpublished or the link may be incorrect. Check the main programme for current activities.</p></>}
+  </article>
+</Layout>

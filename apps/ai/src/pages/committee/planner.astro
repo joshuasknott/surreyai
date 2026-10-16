@@ -1,0 +1,137 @@
+---
+export const prerender = false;
+import BaseLayout from '@surreysocieties/ui/components/BaseLayout';
+import { ArrowUpRight, ArrowLeft, Plus, X, CalendarDays, MapPin, UsersRound, Pencil, Sparkles, LockKeyhole, LogOut, Settings, Bell, Circle, AtSign, Send, Ellipsis } from 'lucide-astro';
+import '../../styles/planner.css';
+import { isAIEnabled } from '../../lib/server/ai/gemini';
+
+Astro.response.headers.set('Cache-Control', 'no-store');
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+const publishableKey = process.env.PUBLIC_CLERK_PUBLISHABLE_KEY || import.meta.env.PUBLIC_CLERK_PUBLISHABLE_KEY || '';
+const convexUrl = process.env.CONVEX_URL || import.meta.env.CONVEX_URL || '';
+---
+<BaseLayout title="Committee planner | Surrey AI Society" description="Private programme planning for the Surrey AI Society committee." bodyClass="planner-page">
+  <Fragment slot="head"><meta name="robots" content="noindex,nofollow" /></Fragment>
+  <a class="planner-skip" href="#planner-main">Skip to planner</a>
+  <header class="planner-header">
+    <a class="planner-brand" href="/" aria-label="Surrey AI Society home"><img src="/logos/brand/surrey-ai-logo-transparent.png" alt="" width="46" height="46" /><strong>Surrey AI Society</strong></a>
+    <span class="planner-context">/ <span>Committee</span></span>
+    <div class="planner-header-actions"><a href="/" target="_blank" rel="noopener">View website <ArrowUpRight size={16} /></a><button id="open-notifications" class="icon-button notification-trigger" hidden aria-label="Notifications" title="Notifications"><Bell size={20} /><span id="notification-count" class="notification-count" aria-hidden="true" hidden></span></button><button id="open-settings" class="icon-button" hidden aria-label="Settings" title="Settings"><Settings size={20} /></button><button id="sign-out" class="icon-button account-button" hidden aria-label="Sign out" title="Sign out"><span id="account-avatar" class="person-avatar" aria-hidden="true" hidden></span><LogOut size={18} /></button></div>
+  </header>
+  <main id="planner-main" data-planner data-key={publishableKey} data-convex={convexUrl} data-ai={String(isAIEnabled())}>
+    <section id="access-state" class="planner-access" aria-live="polite">
+      <LockKeyhole size={24} aria-hidden="true" /><h1>Committee planner</h1><p id="access-message">Checking your access…</p>
+      <div id="sign-in" class="planner-sign-in" hidden>
+        <form id="email-sign-in">
+          <label for="sign-in-email">Committee email</label>
+          <input id="sign-in-email" name="email" type="email" autocomplete="email" inputmode="email" maxlength="254" required placeholder="you@example.com" />
+          <button id="send-code" class="primary-button" type="submit" disabled>Send sign-in code</button>
+        </form>
+        <form id="code-sign-in" hidden>
+          <p id="code-destination" class="code-destination"></p>
+          <label for="sign-in-code">Six-digit code</label>
+          <input id="sign-in-code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" minlength="6" maxlength="6" required aria-describedby="code-destination" />
+          <button id="verify-code" class="primary-button" type="submit">Verify and sign in</button>
+          <div class="code-actions"><button id="change-email" class="quiet-button" type="button">Use another email</button><button id="resend-code" class="quiet-button" type="button" disabled>Resend code</button></div>
+        </form>
+        <p id="sign-in-feedback" class="form-message" role="alert"></p>
+        <p class="sign-in-hint">Your sign-in is remembered on this browser.</p>
+      </div>
+      <button id="retry-access" class="quiet-button" hidden>Try again</button>
+      <noscript><p>Enable JavaScript to sign in and use the private planner.</p></noscript>
+    </section>
+    <section id="workspace" hidden>
+      <div class="planner-toolbar"><div><h1>Planner</h1><p class="workspace-privacy"><LockKeyhole size={15} aria-hidden="true" />Private workspace</p></div><div class="planner-tools"><button id="new-item" class="primary-button"><Plus size={18} />New idea</button></div></div>
+      <div class="planner-view-tabs" role="group" aria-label="Planner view"><button data-view="board" aria-pressed="true">Board</button><button data-view="calendar" aria-pressed="false">Calendar</button><button data-view="archive" aria-pressed="false">Archive</button></div>
+      <div id="board" class="planner-board"></div>
+      <div id="calendar" class="planner-calendar" hidden></div>
+      <div id="archive" hidden></div>
+      <p class="planner-hint">Published activities appear on <a href="/#programme" target="_blank" rel="noopener">surreyaisociety.org</a>.</p>
+    </section>
+    <p id="planner-status" class="planner-status" role="status" aria-live="polite"></p>
+  </main>
+
+  <dialog id="card-dialog" class="card-dialog" aria-labelledby="card-title">
+    <div class="card-preview-top"><div id="card-state" class="card-state"></div><div class="card-preview-actions"><button id="edit-card" type="button" class="secondary-button"><Pencil size={15} />Edit</button><button type="button" data-close class="icon-button" aria-label="Close card"><X size={22} /></button></div></div>
+    <div class="card-preview-heading"><h2 id="card-title"></h2></div>
+    <div id="card-contributors" class="card-contributors"><p class="card-section-label">Worked on by</p><div id="card-people" class="avatar-group" aria-label="Card contributors"></div></div>
+    <div class="card-description-section"><h3 class="card-section-label">Description</h3><p id="card-description" class="card-preview-description"></p></div>
+    <div id="card-facts" class="card-facts"></div>
+    <section class="card-comments" aria-labelledby="card-comments-title">
+      <h3 id="card-comments-title">Comments <span id="comment-count"></span></h3>
+      <button id="older-comments" type="button" class="quiet-button" hidden>Load earlier comments</button>
+      <p id="comments-status" class="field-help" role="status"></p>
+      <ol id="comment-list" class="comment-list"></ol>
+      <form id="comment-form" class="comment-form">
+        <label for="comment-text" class="sr-only">Add a comment</label>
+        <div id="comment-author" class="composer-avatar" aria-hidden="true"></div>
+        <div class="comment-composer">
+          <textarea id="comment-text" name="comment" rows="2" maxlength="2000" required placeholder="Share an update or ask a question…"></textarea>
+          <div class="comment-actions"><button id="mention-person" type="button" class="mention-button" aria-label="Mention a committee member"><AtSign size={19} /><span>Mention someone</span></button><button id="post-comment" type="submit" class="primary-button" aria-label="Post comment"><Send size={16} />Send</button></div>
+        </div>
+        <p id="comment-message" class="form-message" role="status"></p>
+      </form>
+    </section>
+  </dialog>
+
+  <dialog id="item-dialog" class="item-dialog" aria-labelledby="item-heading">
+    <form id="item-form">
+      <div class="editor-top"><button type="button" data-close class="quiet-button"><ArrowLeft size={16} /><span id="editor-back-label">Planner</span></button><span id="item-state" class="muted">Idea · Private</span><button type="button" data-close class="icon-button" aria-label="Close activity"><X size={20} /></button></div>
+      <div class="editor-actions"><h2 id="item-heading">New activity</h2><div><button type="button" id="archive-item" class="quiet-button" hidden>Archive</button><button type="submit" id="save-item" class="secondary-button">Save draft</button><button type="button" id="publish-item" class="primary-button" hidden>Publish to website</button></div></div>
+      <p id="item-message" role="status" class="form-message"></p>
+      <div class="editor-stage-bar"><label>Stage<select name="stage"><option value="ideas">Ideas</option><option value="planning">Planning</option><option value="ready">Ready</option></select></label><p id="stage-help" class="field-help">Start with a title and a few words. Work out the details later.</p></div>
+      <div class="editor-columns">
+        <div class="editor-fields">
+          <label>Title<input name="title" maxlength="160" required autocomplete="off" /></label>
+          <div class="description-field">
+            <div class="field-label-row"><label for="activity-description">Description</label><button type="button" id="help-description" class="inline-ai" hidden><Sparkles size={14} />Help write this</button></div>
+            <textarea id="activity-description" name="description" rows="4" maxlength="4000" placeholder="What’s the idea?"></textarea>
+            <p id="description-ai-message" class="form-message" role="status"></p>
+            <div id="description-suggestion" class="description-suggestion" hidden><strong>Suggested description</strong><p id="suggested-description"></p><div><button type="button" id="use-description" class="secondary-button">Use description</button><button type="button" id="dismiss-description" class="quiet-button">Dismiss</button></div></div>
+          </div>
+          <label>Collaborators (optional)<input name="owner" maxlength="160" autocomplete="off" placeholder="Who might help with this?" /></label>
+          <section id="activity-details" class="activity-details" hidden aria-label="Activity details">
+            <h3>Activity details</h3>
+            <div class="field-pair"><label>Type<select name="kind"><option value="event">Event</option><option value="project">Project</option><option value="hackathon">Hackathon</option></select></label><label>Category<select name="category"><option>Workshop</option><option>Talk</option><option>Social</option><option>Project session</option><option>Other</option></select></label></div>
+            <div class="field-pair"><label>Date<input type="date" name="date" /></label><label>Room or location<input name="location" maxlength="200" autocomplete="off" placeholder="Room number, venue or online" /></label></div>
+            <div class="field-pair"><label>Start time<input type="time" name="startTime" /></label><label>End time<input type="time" name="endTime" /></label></div>
+            <label>Booking or project link<input type="url" name="registrationUrl" maxlength="1500" placeholder="https://" /></label>
+            <p class="field-help">Times use Europe/London. Events need a room or location and booking link before publishing. Ongoing projects can stay undated.</p>
+          </section>
+          <details id="private-options" class="private-fields" hidden><summary>Notes &amp; checklist <span>Private · optional</span></summary><label>Notes<textarea name="notes" rows="3" maxlength="8000"></textarea></label>
+          <fieldset class="checklist"><legend>Preparation checklist</legend><div id="task-list"></div><div class="add-task"><input id="task-text" maxlength="300" aria-label="New checklist task" placeholder="Add a task" /><button type="button" id="add-task" class="quiet-button">Add</button></div></fieldset></details>
+        </div>
+        <aside id="editor-preview" class="editor-preview" aria-labelledby="preview-heading" hidden><h3 id="preview-heading">Website preview</h3><p class="muted">surreyaisociety.org</p><div id="public-preview" class="public-preview"></div><p id="publication-help" class="field-help">Ready stays private. Publish when the public details are confirmed.</p><ul id="publication-missing" class="publication-missing"></ul><button type="button" id="unpublish-item" class="quiet-button danger" hidden>Unpublish and move to Ready</button><p class="field-help">Collaborators, committee notes and preparation tasks stay private.</p></aside>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="notifications-dialog" class="notifications-dialog" aria-labelledby="notifications-heading">
+    <div class="dialog-heading"><h2 id="notifications-heading">Notifications</h2><button type="button" data-close class="icon-button" aria-label="Close notifications"><X size={20} /></button></div>
+    <div class="notifications-intro"><p>Mentions from your committee.</p><button id="read-all-notifications" type="button" class="quiet-button" hidden>Mark all as read</button></div>
+    <p id="notifications-status" class="field-help" role="status"></p>
+    <ol id="notification-list" class="notification-list"></ol>
+    <button id="older-notifications" type="button" class="quiet-button" hidden>Load earlier notifications</button>
+  </dialog>
+
+  <dialog id="settings-dialog" class="small-dialog" aria-labelledby="settings-heading">
+    <div class="dialog-heading"><h2 id="settings-heading">Settings</h2><button type="button" data-close class="icon-button" aria-label="Close settings"><X size={20} /></button></div>
+    <p id="settings-account" class="settings-account"></p>
+    <section id="committee-settings" hidden aria-labelledby="access-heading">
+      <h3 id="access-heading">Committee access</h3><p>Only you can add or remove emails. People you add can sign in and use the private board.</p>
+      <form id="access-form"><label>Committee email<input name="email" type="email" maxlength="254" required autocomplete="off" /></label><button type="submit" class="primary-button">Add email</button></form>
+      <p class="field-help">They can sign in with this email without registering separately. Share the planner link with them; no invitation email is sent.</p>
+      <p id="access-feedback" class="form-message" role="status"></p><div id="access-list"></div>
+    </section>
+  </dialog>
+
+  <template id="plus-icon"><Plus size={17} aria-hidden="true" /></template>
+  <template id="external-icon"><ArrowUpRight size={15} aria-hidden="true" /></template>
+  <template id="calendar-icon"><CalendarDays size={18} aria-hidden="true" /></template>
+  <template id="location-icon"><MapPin size={16} aria-hidden="true" /></template>
+  <template id="collaborators-icon"><UsersRound size={16} aria-hidden="true" /></template>
+  <template id="stage-icon"><Circle size={12} fill="currentColor" aria-hidden="true" /></template>
+  <template id="lock-icon"><LockKeyhole size={14} aria-hidden="true" /></template>
+  <template id="more-icon"><Ellipsis size={19} aria-hidden="true" /></template>
+  <script>import '../../scripts/planner';</script>
+</BaseLayout>

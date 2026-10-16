@@ -1,0 +1,131 @@
+---
+import { Image } from 'astro:assets';
+import { ArrowRight, ArrowUpRight } from 'lucide-astro';
+import type { Society } from '@surreysocieties/admin/types';
+import ContactForm from '@surreysocieties/ui/components/ContactForm';
+import SocialIcon from '@surreysocieties/ui/components/SocialIcon';
+import glassLoop from '../../assets/generated/flow/glass-loop.webp';
+import glassOrb from '../../assets/generated/flow/glass-orb.webp';
+import orangeCube from '../../assets/generated/flow/orange-cube.webp';
+import orangeStar from '../../assets/generated/flow/orange-star.webp';
+import orangeBadge from '../../assets/generated/flow/orange-badge.webp';
+import blackPebble from '../../assets/generated/flow/black-pebble.webp';
+
+interface Props { society: Society; committee?: Array<{ name: string; role?: string }>; }
+const { society, committee = [] } = Astro.props;
+const officers = society.signatories.map((officer, index) => {
+  const member = committee.find(member => member.role === officer.role && member.name.trim()) ?? officer;
+  const name = member.name === 'Josh Knott' ? 'Joshua Knott' : member.name;
+  return { ...member, name, initials: name.trim().split(/\s+/).filter((_, i, names) => i === 0 || i === names.length - 1).map(part => part[0]).join(''), artwork: [orangeBadge, glassOrb, blackPebble][index % 3] };
+});
+const activities = [
+  { title: 'Workshops', text: 'Learn new skills, hands-on and together.', image: orangeCube, href: society.socials.instagram, label: 'Find workshops on Instagram' },
+  { title: 'Projects & challenges', text: 'Turn ideas into real projects with a supportive community.', image: glassOrb, href: society.socials.discord, label: 'Talk projects with us on Discord', id: 'projects' },
+  { title: 'Talks & socials', text: 'Fresh perspectives, interesting people, great conversations.', image: orangeStar, href: society.socials.whatsapp, label: 'Find talks and socials on WhatsApp' },
+];
+const socials = [ ['instagram', 'Instagram'], ['linkedin', 'LinkedIn'], ['discord', 'Discord'], ['linktree', 'Linktree'] ];
+const teams = [
+  { role: 'Workshops & Learning', members: ["Amanda Lages O'Connor", 'Samuel Joyson Rekala', 'Tadavarthi Kusumitha'] },
+  { role: 'Events & Socials', members: ['Fatima Waheed', 'George Mahon', 'Miguel Antonio'] },
+  { role: 'Industry & Partnerships', members: ['Ibrahim Haque', 'Samuel Young'] },
+  { role: 'Projects & Hackathons', members: ['Bibek Limbu', 'Muhammad Zain Khan'] },
+  { role: 'Careers & Opportunities', members: ['Deepanshu Dariya'] },
+];
+---
+
+<section id="about" class="flow-section flow-about" aria-labelledby="about-title">
+  <div class="flow-shell flow-about__inner">
+    <div class="flow-about__copy">
+      <h2 id="about-title" class="flow-heading">Curious about AI?<span>You're in the right place.</span></h2>
+      <p>A student-run community exploring what AI can do,<br class="flow-desktop-break" /> and what it should do.</p>
+    </div>
+    <div class="flow-about__art" aria-hidden="true">
+      <Image src={glassLoop} width={600} alt="" loading="lazy" />
+      <p class="flow-note">Ideas<br />people<br />possibilities</p>
+    </div>
+  </div>
+</section>
+
+<section id="activities" class="flow-section flow-activities" aria-labelledby="activities-title">
+  <div class="flow-shell">
+    <p class="flow-note flow-activities__note" aria-hidden="true">Bigger<br />questions.<br />Brighter<br />people.</p>
+    <h2 id="activities-title" class="flow-heading">Find your thing.</h2>
+    <p class="flow-note flow-activities__note-right" aria-hidden="true">Learn<br />build<br />connect</p>
+    <div class="flow-activity-grid">
+      {activities.map(activity => <article id={activity.id} class="flow-activity">
+        <Image src={activity.image} width={320} height={320} alt="" loading="lazy" />
+        <h3>{activity.title}</h3>
+        <p>{activity.text}</p>
+        <a href={activity.href} target="_blank" rel="noopener noreferrer" aria-label={activity.label}><ArrowRight aria-hidden="true" size={24} strokeWidth={1.8} /></a>
+      </article>)}
+    </div>
+    <a class="flow-button flow-button--paper flow-events-link" href="#programme">Explore events <ArrowRight size={22} aria-hidden="true" /></a>
+    <Image class="flow-activities__orb" src={glassOrb} width={180} alt="" loading="lazy" />
+  </div>
+</section>
+
+<section id="committee" class="flow-section flow-committee" aria-labelledby="committee-title">
+  <div class="flow-shell">
+    <h2 id="committee-title" class="flow-heading">Meet the <span>committee.</span></h2>
+    <p class="flow-note flow-committee__note" aria-hidden="true">Students<br />ideas<br />impact</p>
+    <div class="flow-officers">
+      {officers.map((officer, index) => <article class:list={['flow-officer', index === 1 && 'flow-officer--glass']}>
+        <div class="flow-officer__portrait" aria-hidden="true">
+          <Image src={officer.artwork} width={320} height={320} alt="" loading="lazy" />
+          <span>{officer.initials}</span>
+        </div>
+        <h3>{officer.name}</h3>
+        <p>{officer.role}</p>
+      </article>)}
+    </div>
+    <div class="flow-teams">
+      {teams.map(team => <article class="flow-team">
+        <h3>{team.role}</h3>
+        <ul>{team.members.map(name => <li>{name}</li>)}</ul>
+      </article>)}
+    </div>
+  </div>
+</section>
+
+<section id="join" class="flow-section flow-join" aria-labelledby="join-title">
+  <Image class="flow-join__loop" src={glassLoop} width={620} alt="" loading="lazy" />
+  <Image class="flow-join__orb" src={glassOrb} width={380} alt="" loading="lazy" />
+  <div class="flow-shell">
+    <p class="flow-note flow-join__note" aria-hidden="true">Same<br />curiosity.<br />A brighter<br />tomorrow.</p>
+    <h2 id="join-title" class="flow-heading">Come and join us<span>.</span></h2>
+    <p class="flow-join__intro">Every degree. Every level. Everyone welcome.</p>
+    <ol class="flow-join__steps">
+      <li>
+        <span class="flow-step-number" aria-hidden="true">01</span>
+        <h3>Get your membership</h3>
+        <p>Become an official member<br /> through the Students’ Union.</p>
+        <a class="flow-button flow-button--orange" href={society.membershipUrl} target="_blank" rel="noopener noreferrer">Get your membership <ArrowUpRight size={22} aria-hidden="true" /></a>
+      </li>
+      <li>
+        <span class="flow-step-number" aria-hidden="true">02</span>
+        <h3>Join our WhatsApp</h3>
+        <p>Get the latest updates and<br /> connect with other members.</p>
+        <a class="flow-button flow-button--paper" href={society.socials.whatsapp} target="_blank" rel="noopener noreferrer">Join our WhatsApp <ArrowUpRight size={22} aria-hidden="true" /></a>
+      </li>
+    </ol>
+    <p class="flow-note flow-join__note-right" aria-hidden="true">More<br />than AI.<br />A community.</p>
+  </div>
+</section>
+
+<section id="contact" class="flow-section flow-contact" aria-labelledby="contact-title">
+  <div class="flow-shell flow-contact__inner">
+    <div class="flow-contact__intro">
+      <h2 id="contact-title" class="flow-heading">Get in <span>touch.</span></h2>
+      <p>Have a question, an idea or just want to say hi?<br />We’d love to hear from you.</p>
+      <Image src={glassOrb} width={520} alt="" loading="lazy" />
+    </div>
+    <div class="flow-contact__form"><ContactForm society={society} /></div>
+    <div class="flow-contact__socials">
+      <h3>Find us here.</h3>
+      <nav class="community-socials" aria-label="Society social channels">
+        {socials.map(([key, label]) => <a class={`flow-social flow-social--${key}`} href={society.socials[key as keyof typeof society.socials]} target="_blank" rel="noopener noreferrer" aria-label={`${label} (opens in a new tab)`}><SocialIcon name={key} /><span>{label}</span><span class="flow-social-arrow" aria-hidden="true">↗</span></a>)}
+      </nav>
+      <p class="flow-note" aria-hidden="true">Let’s<br />stay connected.</p>
+    </div>
+  </div>
+</section>
