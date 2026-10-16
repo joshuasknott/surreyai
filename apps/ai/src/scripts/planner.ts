@@ -324,7 +324,7 @@ async function start(root: HTMLElement) {
     for (const name of members.slice(0, 3)) stack.append(memberAvatar(name));
     stack.append(el('span', `+${members.length - 3}`, 'person-avatar avatar-more'));
     const list = $('team-members'); list.replaceChildren();
-    const officerSection = el('section', undefined, 'member-team'); officerSection.append(el('h3', 'Officers'));
+    const officerSection = el('section', undefined, 'member-team'); officerSection.append(el('h3', 'Signatories'));
     for (const { name, role } of officers) {
       const row = el('div', undefined, 'member-row');
       const details = el('span', undefined, 'member-details'); details.append(el('span', name), el('small', role, 'member-role'));
