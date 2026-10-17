@@ -34,6 +34,12 @@ export default defineSchema({
     .index("by_societyId_and_active_and_email", ["societyId", "active", "email"])
     .index("by_societyId", ["societyId"]),
 
+  plannerBoardLayouts: defineTable({
+    societyId: v.id("societies"),
+    order: v.array(v.union(v.literal("ideas"), v.literal("planning"), v.literal("ready"), v.literal("done"))),
+    revision: v.number(),
+  }).index("by_societyId", ["societyId"]),
+
   societies: defineTable({
     name: v.string(),
     shortName: v.string(),

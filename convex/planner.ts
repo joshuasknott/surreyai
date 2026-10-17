@@ -206,6 +206,32 @@ export const list = query({
   },
 });
 
+const defaultBoardOrder = ["ideas", "planning", "ready", "done"] as const;
+const boardLayoutValidator = v.object({ order: v.array(planningStage), revision: v.number() });
+
+export const boardLayout = query({
+  args: {}, returns: boardLayoutValidator,
+  handler: async ctx => {
+    const { ai } = await requireCommittee(ctx);
+    const layout = await ctx.db.query("plannerBoardLayouts").withIndex("by_societyId", q => q.eq("societyId", ai._id)).unique();
+    return layout ? { order: layout.order, revision: layout.revision } : { order: [...defaultBoardOrder], revision: 0 };
+  },
+});
+
+export const reorderBoard = mutation({
+  args: { order: v.array(planningStage), revision: v.number() }, returns: v.number(),
+  handler: async (ctx, { order, revision }) => {
+    const { ai } = await requireCommittee(ctx);
+    if (order.length !== defaultBoardOrder.length || new Set(order).size !== defaultBoardOrder.length ||
+      defaultBoardOrder.some(stage => !order.includes(stage))) throw new Error("Include each board list exactly once");
+    const layout = await ctx.db.query("plannerBoardLayouts").withIndex("by_societyId", q => q.eq("societyId", ai._id)).unique();
+    if ((layout?.revision ?? 0) !== revision) throw new Error("Someone else reordered the lists. The latest order has been loaded.");
+    if (layout) await ctx.db.patch(layout._id, { order, revision: revision + 1 });
+    else await ctx.db.insert("plannerBoardLayouts", { societyId: ai._id, order, revision: 1 });
+    return revision + 1;
+  },
+});
+
 export const get = query({
   args: { id: v.id("plannerItems") }, returns: v.union(plannerItemValidator, v.null()),
   handler: async (ctx, { id }) => {

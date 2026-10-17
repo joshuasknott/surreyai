@@ -204,6 +204,47 @@ test('team board supports internal work, shared filters, members and collapsible
   await screenshot(page, 'team-board-small'); expect(errors).toEqual([]);
 });
 
+test('list drag handles reorder the shared board without moving cards', async ({ page, context }) => {
+  const { admin } = await fixture(context, 'owner');
+  await admin.mutation(api.planner.create, { activity: { ...activity, title: 'Keep this idea' }, stage: 'ideas', internalOnly: true });
+  await ready(page);
+  const order = () => page.locator('#board .board-column').evaluateAll(columns => columns.map(column => (column as HTMLElement).dataset.stage));
+  expect(await order()).toEqual(['ideas', 'planning', 'ready', 'done']);
+  await page.getByRole('button', { name: 'Reorder Ideas list' }).dragTo(page.locator('.board-column[data-stage=done]'), { targetPosition: { x: 260, y: 30 } });
+  await expect.poll(order).toEqual(['planning', 'ready', 'done', 'ideas']);
+  await expect(page.locator('.board-column[data-stage=ideas]')).toContainText('Keep this idea');
+  await page.reload(); await expect.poll(order).toEqual(['planning', 'ready', 'done', 'ideas']);
+  await page.getByRole('button', { name: 'Reorder Ideas list' }).focus();
+  await page.keyboard.press('ArrowLeft');
+  await expect.poll(order).toEqual(['planning', 'ready', 'ideas', 'done']);
+  await page.reload(); await expect.poll(order).toEqual(['planning', 'ready', 'ideas', 'done']);
+  await screenshot(page, 'reordered-lists-desktop');
+  await page.setViewportSize({ width: 390, height: 844 }); await noOverflow(page);
+  await screenshot(page, 'reordered-lists-mobile');
+});
+
+test.describe('touch list controls', () => {
+  test.use({ hasTouch: true });
+
+  test('can drag a list across the mobile board', async ({ page, context }) => {
+    await fixture(context, 'owner');
+    await page.setViewportSize({ width: 390, height: 844 }); await ready(page);
+    const handle = await page.getByRole('button', { name: 'Reorder Ideas list' }).boundingBox();
+    expect(handle).not.toBeNull();
+    const session = await context.newCDPSession(page);
+    const y = handle!.y + handle!.height / 2;
+    await session.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: handle!.x + handle!.width / 2, y }] });
+    for (let step = 0; step < 12; step++) {
+      await session.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: 370 + step % 2, y }] });
+    }
+    await session.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: 250, y }] });
+    await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    await expect.poll(() => page.locator('#board .board-column').evaluateAll(columns => columns.map(column => (column as HTMLElement).dataset.stage))).toEqual(['planning', 'ideas', 'ready', 'done']);
+    await page.reload();
+    await expect(page.locator('#board .board-column').first()).toHaveAttribute('data-stage', 'planning');
+  });
+});
+
 test('committee can prepare, publish, revise and unpublish without exposing private notes', async ({ page, context }) => {
   const { t } = await fixture(context);
   const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
