@@ -1,7 +1,7 @@
 ---
 export const prerender = false;
 import BaseLayout from '@surreysocieties/ui/components/BaseLayout';
-import { ArrowUpRight, ArrowLeft, Plus, X, CalendarDays, MapPin, UsersRound, Sparkles, LockKeyhole, LogOut, Settings, Bell, Circle, AtSign, Send, Ellipsis, Columns3, Archive, ChevronsLeft, Menu, Search, MessageCircle, ListChecks, GripVertical, Check, Paperclip, FileText } from 'lucide-astro';
+import { ArrowUpRight, ArrowLeft, Plus, X, CalendarDays, MapPin, UsersRound, Sparkles, LockKeyhole, LogOut, Settings, Bell, Circle, AtSign, Send, Ellipsis, Columns3, Archive, ChevronsLeft, Menu, Search, MessageCircle, ListChecks, GripVertical, Check, Paperclip, FileText, Pencil, Upload, Image as ImageIcon } from 'lucide-astro';
 import { plannerTeams } from '../../../../../convex/plannerTeams';
 import { SOCIETIES } from '@surreysocieties/admin/config';
 import '../../styles/planner.css';
@@ -28,7 +28,7 @@ const convexUrl = process.env.CONVEX_URL || import.meta.env.CONVEX_URL || '';
     <div class="sidebar-bottom">
       <a href="/" target="_blank" rel="noopener" title="View website"><ArrowUpRight size={20} /><span>View website</span></a>
       <button id="open-settings" hidden title="Settings"><Settings size={20} /><span>Settings</span></button>
-      <div id="sidebar-account" class="sidebar-account" hidden><span id="account-avatar" class="person-avatar" aria-hidden="true" hidden></span><span id="account-name"></span></div>
+      <button type="button" id="sidebar-account" class="sidebar-account" hidden aria-label="Edit your planner name" title="Edit your planner name"><span id="account-avatar" class="person-avatar" aria-hidden="true" hidden></span><span id="account-name"></span><Pencil size={14} class="profile-edit-icon" /></button>
       <button id="sign-out" hidden title="Sign out"><LogOut size={20} /><span>Sign out</span></button>
     </div>
   </aside>
@@ -133,13 +133,14 @@ const convexUrl = process.env.CONVEX_URL || import.meta.env.CONVEX_URL || '';
           </div></details>
           <details id="private-options" class="private-fields card-detail-panel" hidden><summary>Notes &amp; collaborators <span>Private · optional</span></summary><div class="detail-panel-content"><button type="button" class="close-card-panel icon-button" aria-label="Close private details"><X size={18} /></button><div id="card-collaborators-slot"></div><label>Notes<textarea name="notes" rows="3" maxlength="8000"></textarea></label></div></details>
           <fieldset id="card-checklist" class="checklist"><legend>Checklist <span id="task-progress"></span></legend><div id="task-list"></div><div class="add-task"><input id="task-text" maxlength="300" aria-label="New checklist task" placeholder="Add an item…" /><button type="button" id="add-task" class="quiet-button" aria-label="Add checklist item"><Plus size={16} /></button></div></fieldset>
-          <section id="card-attachments" class="card-attachments"><div class="attachment-heading"><h3>Attachments</h3><button type="button" id="add-attachment" class="icon-button" aria-label="Attach a link"><Paperclip size={17} /></button></div><div id="attachment-list"></div><div id="attachment-editor" hidden><label>Link<input type="text" inputmode="url" id="attachment-url" placeholder="https://" /></label><label>Name<input id="attachment-name" maxlength="160" placeholder="Document or link name" /></label><div><button type="button" id="save-attachment" class="quiet-button">Add link</button><button type="button" id="cancel-attachment" class="quiet-button">Cancel</button></div><p id="attachment-error" role="status" class="form-message"></p></div></section>
+          <section id="card-attachments" class="card-attachments"><div class="attachment-heading"><h3>Attachments</h3><button type="button" id="add-attachment" class="icon-button" aria-label="Add attachment"><Paperclip size={17} /></button></div><div id="attachment-list"></div><p id="file-upload-status" role="status" class="file-upload-status" hidden></p><div class="file-upload-actions"><button type="button" id="retry-file-upload" class="quiet-button" hidden>Retry upload</button><button type="button" id="cancel-file-upload" class="quiet-button" hidden>Cancel upload</button></div><div id="attachment-editor" hidden><label class="file-upload-picker" for="attachment-file"><Upload size={20} /><strong>Upload files</strong><span>PDFs and images · up to 10 MB each</span></label><input type="file" id="attachment-file" class="sr-only" aria-label="Choose attachment files" accept=".pdf,.png,.jpg,.jpeg,.gif,.webp,.avif" multiple /><p id="file-upload-help" class="field-help" hidden>Save this card before uploading files.</p><div class="attachment-link-divider">or add a link</div><label>Link<input type="text" inputmode="url" id="attachment-url" placeholder="https://" /></label><label>Name<input id="attachment-name" maxlength="160" placeholder="Document or link name" /></label><div><button type="button" id="save-attachment" class="quiet-button">Add link</button><button type="button" id="cancel-attachment" class="quiet-button">Cancel</button></div><p id="attachment-error" role="status" class="form-message"></p></div></section>
         </div>
         <aside id="editor-preview" class="editor-preview" aria-labelledby="preview-heading" hidden><h3 id="preview-heading">Website preview</h3><p class="muted">surreyaisociety.org</p><div id="public-preview" class="public-preview"></div><p id="publication-help" class="field-help">Ready stays private. Publish when the public details are confirmed.</p><ul id="publication-missing" class="publication-missing"></ul><button type="button" id="unpublish-item" class="quiet-button danger" hidden>Unpublish and move to Ready</button><p class="field-help">Collaborators, committee notes and preparation tasks stay private.</p></aside>
       </div>
     </form>
   </dialog>
   <dialog id="card-people-dialog" class="small-dialog" aria-labelledby="card-people-heading"><div class="dialog-heading"><h2 id="card-people-heading">Worked on by</h2><button type="button" data-close class="icon-button" aria-label="Close contributors"><X size={20} /></button></div><div id="card-people" class="avatar-group"></div></dialog>
+  <dialog id="planner-profile-dialog" class="small-dialog" aria-labelledby="planner-profile-heading"><div class="dialog-heading"><h2 id="planner-profile-heading">Your planner name</h2><button type="button" data-close class="icon-button" aria-label="Close planner profile"><X size={20} /></button></div><p>This name appears on cards, comments and mentions in the committee planner.</p><form id="planner-profile-form"><label>Your name<input name="displayName" maxlength="80" required autocomplete="name" /></label><p class="field-help">Your public committee profile stays the same.</p><p id="planner-profile-message" class="form-message" role="status"></p><button type="submit" class="primary-button">Save name</button></form></dialog>
 
   <dialog id="members-dialog" class="small-dialog members-dialog" aria-labelledby="members-heading">
     <div class="dialog-heading"><h2 id="members-heading">Committee members</h2><button type="button" data-close class="icon-button" aria-label="Close members"><X size={20} /></button></div>
@@ -173,6 +174,7 @@ const convexUrl = process.env.CONVEX_URL || import.meta.env.CONVEX_URL || '';
   <template id="location-icon"><MapPin size={16} aria-hidden="true" /></template>
   <template id="collaborators-icon"><UsersRound size={16} aria-hidden="true" /></template>
   <template id="attachment-icon"><FileText size={20} aria-hidden="true" /></template>
+  <template id="image-attachment-icon"><ImageIcon size={20} aria-hidden="true" /></template>
   <template id="stage-icon"><Circle size={12} fill="currentColor" aria-hidden="true" /></template>
   <template id="lock-icon"><LockKeyhole size={14} aria-hidden="true" /></template>
   <template id="more-icon"><Ellipsis size={19} aria-hidden="true" /></template>

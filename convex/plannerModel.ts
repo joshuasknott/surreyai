@@ -18,6 +18,16 @@ export const plannerTeam = v.union(v.literal('learning'), v.literal('events'), v
 export const itemStage = v.union(planningStage, v.literal("published"), v.literal("archived"));
 export const taskValidator = v.object({ text: v.string(), done: v.boolean() });
 export const plannerAttachmentValidator = v.object({ name: v.string(), url: v.string() });
+export const plannerFileFields = {
+  societyId: v.id('societies'), itemId: v.id('plannerItems'), storageId: v.id('_storage'),
+  name: v.string(), contentType: v.string(), size: v.number(), uploadedBy: v.id('users'), requestId: v.string(),
+};
+export const plannerFileValidator = v.object({
+  _id: v.id('plannerFiles'), name: v.string(), contentType: v.string(), size: v.number(),
+});
+export type PlannerFile = Infer<typeof plannerFileValidator>;
+export const plannerProfileValidator = v.object({ userId: v.id('users'), email: v.string(), name: v.string(), initials: v.string(), rosterName: v.optional(v.string()) });
+export type PlannerProfile = Infer<typeof plannerProfileValidator>;
 export const plannerPersonValidator = v.object({
   userId: v.id("users"), name: v.string(), email: v.string(), initials: v.string(),
 });

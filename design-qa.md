@@ -798,3 +798,16 @@ Source is 1586 x 992 pixels. Desktop implementation is 1600 x 1000 CSS/pixel vie
 - Native date controls retain the full date for direct editing.
 
 final result: passed
+
+---
+
+## Planner file uploads and display names - 17 October 2026
+
+- Added authenticated PDF/image uploads alongside the existing HTTPS links. Uploads accept PDF, PNG, JPEG, GIF, WebP and AVIF, up to 10 MB each and 10 stored files per card. Both upload and download HTTP actions verify current committee access; storage URLs are not returned to browsers. Downloads are attachments with private/no-store and nosniff headers. File signature checks reject content masquerading as a PDF or image. Upload request IDs make retrying safe without duplicate records or retained duplicate storage objects.
+- The left-navigation account row now opens a planner display-name editor. A separate plannerProfiles table leaves the shared users name and public committee data intact. Queries resolve existing card contributors, discussion authors, mentions and notification authors through the profile. Live subscriptions update other open tabs; recognised committee identities also update the planner member list and lead labels.
+- Desktop/mobile screenshots inspected: output/planner/attachment-picker-desktop.png, uploaded-files-desktop.png, uploaded-files-mobile.png, planner-profile-desktop.png, planner-profile-mobile.png.
+- Fixed one P2 issue found during visual QA: an older rule intended to hide file-removal controls also hid the new filename/download button on desktop. The download button now remains visible at rest. Post-fix desktop and mobile evidence shows readable file names and types in the existing attachment list.
+- Checks: 135 unit tests; all 33 planner browser scenarios; application typecheck; Convex TypeScript check; AI production build. The browser upload tests execute the real HTTP actions and storage in convex-test with a Clerk transport fixture. Coverage includes PDF/image bytes, download, removal, reload, interrupted-upload retry, unauthorised/revoked access, incorrect types, size/count limits, idempotent retries, old-author name hydration and updates in a second open tab.
+- Live backend checks: upload preflight returns 204 for the AI site, unauthenticated download returns 401, unrelated-origin preflight returns 403. Authenticated production upload/name changes were not exercised against real committee data.
+
+final result: passed

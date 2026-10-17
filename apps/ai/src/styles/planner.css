@@ -460,3 +460,25 @@ dialog{border:1px solid #dcdde1;border-radius:10px;padding:0;background:#fafaf8;
  .card-dialog .checklist-row input:not([type=checkbox]) { min-height: 27px!important; }
  .card-dialog .card-attachments { margin-top: 8px; padding-top: 8px; }
 }
+.sidebar-account { width: 100%; text-align: left; cursor: pointer; }
+.sidebar-account .profile-edit-icon { margin-left: auto; opacity: 0; flex-shrink: 0; }
+.sidebar-account:hover .profile-edit-icon, .sidebar-account:focus-visible .profile-edit-icon { opacity: 1; }
+.sidebar-collapsed .sidebar-account .profile-edit-icon { display: none; }
+.file-upload-picker { display: flex!important; align-items: center; justify-content: center; gap: 5px!important; padding: 17px 12px; border: 1px dashed #cfc5dc; border-radius: 7px; background: #faf8fc; color: #675075!important; cursor: pointer; margin-bottom: 0!important; }
+.file-upload-picker:hover, .file-upload-picker:has(+input:focus-visible) { background: #f2edf8; border-color: #9a7fb1; }
+.file-upload-picker strong { font-size: 13px; font-weight: 600; }
+.file-upload-picker span { font-size: 11px; color: #887b94; }
+.attachment-link-divider { display: flex; gap: 10px; align-items: center; color: #9b8ea6; font-size: 11px; margin: 16px 0; }
+.attachment-link-divider::before, .attachment-link-divider::after { content: ''; flex: 1; height: 1px; background: #ece5f2; }
+.attachment-download { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; text-align: left; color: #30253e; border: 0; background: transparent; padding: 0; cursor: pointer; }
+.attachment-download > svg { padding: 9px; width: 38px; height: 42px; background: #f6f3f9; border: 1px solid #ece6f2; border-radius: 6px; color: #876b9d; flex-shrink: 0; }
+.attachment-download > span { min-width: 0; }
+.attachment-download:hover strong { text-decoration: underline; }
+.attachment-row > .attachment-download { opacity: 1; min-height: 42px; padding: 0; }
+.file-upload-status { font-size: 11px; color: #76617f; margin: 4px 0; overflow-wrap: anywhere; }
+.file-upload-actions { display: flex; gap: 6px; }
+.file-upload-actions:empty { display: none; }
+.file-upload-actions button { min-height: 26px; font-size: 11px; padding: 3px 6px; }
+@media(max-width:720px) { .sidebar-account .profile-edit-icon { opacity: .7; } }
+.card-dialog #attachment-editor label:not(.file-upload-picker) { margin-bottom: 12px; }
+#attachment-editor > div:not(.attachment-link-divider) { display: flex; align-items: center; gap: 10px; }

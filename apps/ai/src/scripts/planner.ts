@@ -1,7 +1,7 @@
 import { ConvexClient, ConvexHttpClient } from 'convex/browser';
 import { api } from '../../../../convex/_generated/api';
 import type { Doc, Id } from '../../../../convex/_generated/dataModel';
-import type { Activity, PlannerCalendarItem, PlannerPerson, PlannerMention, PlannerNotification } from '../../../../convex/plannerModel';
+import type { Activity, PlannerCalendarItem, PlannerPerson, PlannerMention, PlannerNotification, PlannerProfile, PlannerFile } from '../../../../convex/plannerModel';
 import { activityDate, activityKind, blankActivity, londonToday } from '../lib/programme';
 import { createPlannerSignIn, type ClerkSDK, type ClerkSession } from './plannerSignIn';
 import { appendMentionText, createMentionPicker } from './plannerMentions';
@@ -47,6 +47,13 @@ async function start(root: HTMLElement) {
   let current: Item | null = null;
   let tasks: Item['tasks'] = [];
   let attachments: NonNullable<Item['attachments']> = [];
+  let files: PlannerFile[] = [];
+  let profiles: PlannerProfile[] = [];
+  let profileRefreshPending = false;
+  let fileUploadBusy = false;
+  let fileAbort: AbortController | null = null;
+  let pendingUploads: { file: File; requestId: string }[] = [];
+  const downloadUrls = new Set<string>();
   let autosaveTimer: ReturnType<typeof setTimeout> | undefined;
   let autosavePromise: Promise<boolean> | null = null;
   let cardReviewOpen = false;
@@ -124,6 +131,9 @@ async function start(root: HTMLElement) {
     client.setAuth(token); return token;
   }
   function clearPrivateData() {
+    fileAbort?.abort(); fileAbort = null; pendingUploads = []; fileUploadBusy = false; files = []; profiles = []; profileRefreshPending = false;
+    for (const url of downloadUrls) URL.revokeObjectURL(url); downloadUrls.clear();
+    $<HTMLInputElement>('attachment-file').value = ''; $<HTMLFormElement>('planner-profile-form').reset(); $('planner-profile-message').textContent = '';
     stopLiveNotifications();
     access = null; items = []; archived = []; boardOrder = [...stages]; boardRevision = 0; boardOrderSaving = false;
     notificationsVersion++; notifications = []; mentionPeople = []; notificationsLoading = false; notificationsBusy = false; notificationsCursor = null; notificationsPages = 1; notificationsDone = true; unreadNotifications = 0; highlightedComment = null;
@@ -140,7 +150,7 @@ async function start(root: HTMLElement) {
     clearTimeout(autosaveTimer);
     for (const id of ['board', 'calendar', 'archive', 'access-list', 'public-preview', 'task-list', 'card-people', 'attachment-list', 'comment-list', 'comments-status', 'comment-message', 'comment-count', 'comment-author', 'account-avatar']) $(id).replaceChildren();
     $('account-avatar').hidden = true;
-    for (const dialog of [editor, settingsDialog, cardDialog, notificationsDialog, membersDialog, $<HTMLDialogElement>('card-people-dialog')]) if (dialog.open) dialog.close();
+    for (const dialog of [editor, settingsDialog, cardDialog, notificationsDialog, membersDialog, $<HTMLDialogElement>('card-people-dialog'), $<HTMLDialogElement>('planner-profile-dialog')]) if (dialog.open) dialog.close();
     resetDescriptionHelp(); form.reset(); $<HTMLFormElement>('access-form').reset();
     $('item-heading').textContent = 'New activity'; $('item-state').textContent = ''; $('item-message').textContent = '';
     tasks = []; attachments = []; current = null;
@@ -155,12 +165,13 @@ async function start(root: HTMLElement) {
   }
   async function refresh() {
     if (!clerk?.session || refreshing || busy) return;
-    refreshing = true;
+    refreshing = true; profileRefreshPending = false;
     try {
       await authenticated();
       access = await client.query(api.planner.access, {});
       if (!access) { showAccess('This board is for the AI Society committee. Ask Josh to add your sign-in email.'); return; }
-      const [latestItems, layout] = await Promise.all([client.query(api.planner.list, {}), client.query(api.planner.boardLayout, {})]);
+      const [latestItems, layout, latestProfiles] = await Promise.all([client.query(api.planner.list, {}), client.query(api.planner.boardLayout, {}), client.query(api.planner.profiles, {})]);
+      profiles = latestProfiles; syncProfileLabels();
       items = latestItems;
       if (!boardOrderSaving) { boardOrder = layout.order; boardRevision = layout.revision; }
       if (view === 'archive') archived = await client.query(api.planner.list, { archived: true });
@@ -171,7 +182,7 @@ async function start(root: HTMLElement) {
       $('open-notifications').hidden = false;
       $('settings-account').textContent = `Signed in as ${access.email}`;
       {
-        const initials = (access.name || access.email).trim().split(/\s+/).map(part => part[0]).slice(0, 2).join('').toUpperCase();
+        const initials = nameInitials(access.name || access.email);
         const person = { userId: access.userId, name: access.name, email: access.email, initials };
         if (person.userId) $('comment-author').replaceChildren(avatar({ ...person, userId: person.userId }, access.name));
         $('account-avatar').textContent = initials; $('account-avatar').hidden = false;
@@ -185,7 +196,7 @@ async function start(root: HTMLElement) {
       if (!access) showAccess('Could not check committee access. Try again, or sign out and back in.');
       showError(error);
       $('retry-access').hidden = false;
-    } finally { refreshing = false; }
+    } finally { refreshing = false; if (profileRefreshPending && access && !busy) void refresh(); }
   }
 
   function stopLiveNotifications() {
@@ -204,13 +215,20 @@ async function start(root: HTMLElement) {
       try { const token = await session.getToken({ template: 'convex', skipCache: forceRefreshToken }); return active() ? token : null; }
       catch { return null; }
     }, authenticated => { if (!authenticated && active()) showAccess('Your session has expired. Sign out and sign in again.'); });
-    stopNotificationStream = stream.onUpdate(api.planner.notificationChanges, {}, () => {
+    const stopInbox = stream.onUpdate(api.planner.notificationChanges, {}, () => {
       if (active()) { notificationRefreshPending = true; void flushNotificationChanges(); }
     }, error => {
       if (!active()) return;
       if (error.message.includes('Committee access required')) showAccess('Committee access is no longer available. Ask Josh to check your email access.');
       else { showError(error, 'notifications-status'); stopLiveNotifications(); }
     });
+    let profileSignature = JSON.stringify(profiles);
+    const stopProfiles = stream.onUpdate(api.planner.profiles, {}, latest => {
+      if (!active() || JSON.stringify(latest) === profileSignature) return;
+      profileSignature = JSON.stringify(latest); profiles = latest; syncProfileLabels(); renderMembers();
+      profileRefreshPending = true; void refresh(); void loadNotifications('refresh');
+    }, error => { if (active() && error.message.includes('Committee access required')) showAccess('Committee access is no longer available.'); });
+    stopNotificationStream = () => { stopInbox(); stopProfiles(); };
   }
   async function flushNotificationChanges() {
     if (!notificationRefreshPending || notificationsLoading || notificationsBusy || !access) return;
@@ -388,10 +406,10 @@ async function start(root: HTMLElement) {
 
   function renderMembers() {
     const officers = SOCIETIES.ai.signatories;
-    const members = [...officers.map(officer => officer.name), ...plannerTeams.flatMap(team => [...team.members])];
+    const members = [...officers.map(officer => officer.name), ...plannerTeams.flatMap(team => [...team.members])].map(plannerName);
     const stack = $('open-members'); stack.replaceChildren(); stack.hidden = false;
     const memberAvatar = (name: string) => {
-      const words = name.split(/\s+/); const node = el('span', `${words[0][0]}${words.at(-1)![0]}`, 'person-avatar');
+      const node = el('span', nameInitials(name), 'person-avatar');
       node.title = name; node.setAttribute('aria-hidden', 'true'); return node;
     };
     for (const name of members.slice(0, 3)) stack.append(memberAvatar(name));
@@ -400,15 +418,26 @@ async function start(root: HTMLElement) {
     const officerSection = el('section', undefined, 'member-team'); officerSection.append(el('h3', 'Signatories'));
     for (const { name, role } of officers) {
       const row = el('div', undefined, 'member-row');
-      const details = el('span', undefined, 'member-details'); details.append(el('span', name), el('small', role, 'member-role'));
-      row.append(memberAvatar(name), details); officerSection.append(row);
+      const displayName = plannerName(name);
+      const details = el('span', undefined, 'member-details'); details.append(el('span', displayName), el('small', role, 'member-role'));
+      row.append(memberAvatar(displayName), details); officerSection.append(row);
     }
     list.append(officerSection);
     for (const team of plannerTeams) {
       const section = el('section', undefined, 'member-team'); section.append(el('h3', team.name));
-      for (const name of team.members) { const row = el('div', undefined, 'member-row'); row.append(memberAvatar(name), el('span', name)); section.append(row); }
+      for (const name of team.members) { const displayName = plannerName(name); const row = el('div', undefined, 'member-row'); row.append(memberAvatar(displayName), el('span', displayName)); section.append(row); }
       list.append(section);
     }
+  }
+  function plannerName(name: string) { return profiles.find(profile => profile.rosterName === name)?.name || name; }
+  function nameInitials(name: string) { const words = name.trim().split(/\s+/).filter(Boolean); return `${[...(words[0] || '?')][0]}${words.length > 1 ? [...words.at(-1)!][0] : ''}`.toUpperCase(); }
+  function syncProfileLabels() {
+    for (const option of (field('lead') as HTMLSelectElement).options) if (option.value) option.textContent = plannerName(option.value);
+    updateLeadAvatar();
+  }
+  function updateLeadAvatar() {
+    const name = plannerName(field('lead').value);
+    $('lead-avatar').textContent = name ? nameInitials(name) : '—';
   }
 
   function avatar(person: PlannerPerson, title: string) {
@@ -444,6 +473,7 @@ async function start(root: HTMLElement) {
     $('card-collaborators-slot').append($('collaborators-field'));
     cardReviewOpen = false; cardDialog.dataset.panel = targetComment ? 'discussion' : 'card'; syncCardTabs();
     openEditor(item, 'ideas', '', true); setSaveStatus('All changes saved'); cardDialog.showModal();
+    void loadFiles(item._id);
     const version = previewVersion;
     if (!await loadComments('initial')) return;
     while (targetComment && version === previewVersion && !comments.some(comment => comment._id === targetComment) && !commentsDone) {
@@ -456,6 +486,7 @@ async function start(root: HTMLElement) {
     }
   }
   async function closeCard() {
+    if (fileUploadBusy) { $('file-upload-status').textContent = 'Upload in progress. Finish or cancel the upload before closing.'; return false; }
     if (commentBusy || busy || (commentEdit && commentEdit.text !== commentEdit.original && !window.confirm('Discard your unsaved comment changes?'))) return false;
     clearTimeout(autosaveTimer);
     do { if (!await saveCardNow()) return false; } while (dirty());
@@ -470,7 +501,7 @@ async function start(root: HTMLElement) {
     clearTimeout(autosaveTimer); editor.append(form); form.querySelector('.editor-stage-bar')!.prepend($('stage-field')); form.querySelector('.editor-actions')!.append($('editor-action-buttons'));
     $('collaborators-home').append($('collaborators-field'));
     $('editor-preview').append($('unpublish-item'));
-    resetDescriptionHelp(); current = null; cardReviewOpen = false;
+    resetDescriptionHelp(); current = null; cardReviewOpen = false; files = []; pendingUploads = [];
     for (const id of ['card-people', 'attachment-list', 'comment-list', 'comments-status', 'comment-message', 'comment-count']) $(id).replaceChildren();
   });
   async function refreshCard() {
@@ -479,6 +510,7 @@ async function start(root: HTMLElement) {
     await authenticated(); const item = await client.query(api.planner.get, { id });
     if (version !== previewVersion || !access || !cardDialog.open) return;
     if (!item) { closeCard(); return; } previewItem = item; renderCardPreview();
+    await loadFiles(id);
     if (!commentEdit && !commentDelete) await loadComments('refresh');
   }
   function commentControls() {
@@ -796,6 +828,7 @@ async function start(root: HTMLElement) {
     stageField.value = item ? boardStage(item) : stage; stageField.disabled = false;
     tasks = structuredClone(item?.tasks || []);
     attachments = structuredClone(item?.attachments || []);
+    files = []; pendingUploads = []; $('file-upload-status').hidden = true; $('retry-file-upload').hidden = true; $('cancel-file-upload').hidden = true;
     $('item-heading').textContent = item ? item.title : 'New card';
     $('item-state').textContent = `${labels[item ? boardStage(item) : stage]} · ${item?.published ? 'Public version is live' : 'Private'}`;
     $('archive-item').hidden = !item || item.stage === 'archived'; $('unpublish-item').hidden = item?.stage !== 'published';
@@ -819,13 +852,65 @@ async function start(root: HTMLElement) {
 
   function renderAttachments() {
     const list = $('attachment-list'); list.replaceChildren();
+    for (const file of files) {
+      const row = el('div', undefined, 'attachment-row file-attachment-row'); const download = el('button', undefined, 'attachment-download'); download.type = 'button'; download.setAttribute('aria-label', `Download ${file.name}`);
+      const text = el('span'); text.append(el('strong', file.name), el('small', `${file.contentType === 'application/pdf' ? 'PDF' : 'Image'} · ${formatFileSize(file.size)}`));
+      download.append(icon(file.contentType.startsWith('image/') ? 'image-attachment' : 'attachment'), text);
+      download.onclick = () => void downloadFile(file, download);
+      const remove = el('button', undefined, 'icon-button'); remove.type = 'button'; remove.append(icon('close')); remove.setAttribute('aria-label', `Remove file: ${file.name}`);
+      remove.onclick = () => void (async () => { if (!window.confirm(`Remove ${file.name} from this card? The uploaded file will be deleted.`)) return; remove.disabled = true; try { await authenticated(); await client.mutation(api.planner.removeFile, { id: file._id }); files = files.filter(value => value._id !== file._id); renderAttachments(); } catch (error) { fileStatus(error instanceof Error ? error.message : 'Could not remove file'); remove.disabled = false; } })();
+      row.append(download, remove); list.append(row);
+    }
     for (const [index, attachment] of attachments.entries()) {
       const row = el('div', undefined, 'attachment-row'); const link = el('a'); link.href = attachment.url; link.target = '_blank'; link.rel = 'noopener noreferrer';
       const text = el('span'); text.append(el('strong', attachment.name), el('small', new URL(attachment.url).hostname)); link.append(icon('attachment'), text);
       const remove = el('button', undefined, 'icon-button'); remove.type = 'button'; remove.append(icon('close')); remove.setAttribute('aria-label', `Remove attachment: ${attachment.name}`); remove.onclick = () => { attachments.splice(index, 1); renderAttachments(); scheduleAutosave(); };
       row.append(link, remove); list.append(row);
     }
-    if (!attachments.length) { const add = el('button', 'Attach a document or link', 'attachment-empty'); add.type = 'button'; add.onclick = () => $('add-attachment').click(); list.append(add); }
+    if (!attachments.length && !files.length) { const add = el('button', 'Attach a file or link', 'attachment-empty'); add.type = 'button'; add.onclick = () => $('add-attachment').click(); list.append(add); }
+  }
+
+  function formatFileSize(size: number) { return size < 1024 * 1024 ? `${Math.max(1, Math.round(size / 1024))} KB` : `${(size / (1024 * 1024)).toFixed(1)} MB`; }
+  function fileStatus(message: string) { $('file-upload-status').hidden = !message; $('file-upload-status').textContent = message; }
+  async function loadFiles(id: Id<'plannerItems'>) {
+    const version = previewVersion;
+    try {
+      await authenticated(); const latest = await client.query(api.planner.listFiles, { id });
+      if (version === previewVersion && current?._id === id && access) { files = latest; renderAttachments(); }
+    } catch (error) { if (version === previewVersion && access) fileStatus(error instanceof Error ? error.message : 'Could not load attachments'); }
+  }
+  async function downloadFile(file: PlannerFile, button: HTMLButtonElement) {
+    button.disabled = true;
+    try {
+      const token = await authenticated(); const service = await client.query(api.planner.fileService, {});
+      const response = await fetch(`${service}?fileId=${encodeURIComponent(file._id)}`, { headers: { Authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(120000) });
+      if (!response.ok) { const body = await response.json(); throw new Error(body.error || 'Could not download attachment'); }
+      const blob = await response.blob(); if (!access) return;
+      const url = URL.createObjectURL(blob); downloadUrls.add(url); const anchor = el('a'); anchor.href = url; anchor.download = file.name; document.body.append(anchor); anchor.click(); anchor.remove();
+      setTimeout(() => { URL.revokeObjectURL(url); downloadUrls.delete(url); }, 30000);
+    } catch (error) { if (access) fileStatus(error instanceof Error ? error.message : 'Could not download attachment'); }
+    finally { button.disabled = false; }
+  }
+  async function uploadFiles() {
+    if (fileUploadBusy || !current || !pendingUploads.length) return;
+    const id = current._id; const version = previewVersion;
+    fileUploadBusy = true; fileAbort = new AbortController(); $('retry-file-upload').hidden = true; $('cancel-file-upload').hidden = false; updatePreview();
+    try {
+      const token = await authenticated(); const service = await client.query(api.planner.fileService, {});
+      while (pendingUploads.length) {
+        const entry = pendingUploads[0]; fileStatus(`Uploading ${entry.file.name}…`);
+        const response = await fetch(`${service}?itemId=${encodeURIComponent(id)}`, { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': entry.file.type, 'X-File-Name': encodeURIComponent(entry.file.name), 'X-Request-Id': entry.requestId }, body: entry.file, signal: AbortSignal.any([fileAbort.signal, AbortSignal.timeout(120000)]) });
+        const body = await response.json(); if (!response.ok) throw new Error(body.error || 'Upload failed. Try again');
+        pendingUploads.shift();
+        if (version !== previewVersion || !access) return;
+        await loadFiles(id);
+      }
+      fileStatus('Files attached'); $('attachment-editor').hidden = true; await refresh();
+    } catch (error) {
+      if (version === previewVersion && access) { fileStatus(fileAbort?.signal.aborted ? 'Upload cancelled' : error instanceof Error ? error.message : 'Upload failed. Try again'); $('retry-file-upload').hidden = !pendingUploads.length || !!fileAbort?.signal.aborted; }
+    } finally {
+      fileUploadBusy = false; fileAbort = null; $('cancel-file-upload').hidden = true; $<HTMLInputElement>('attachment-file').value = ''; updatePreview();
+    }
   }
 
   function updatePreview() {
@@ -841,7 +926,9 @@ async function start(root: HTMLElement) {
     for (const id of ['card-review', 'card-notes', 'card-people-toggle']) $(id).hidden = !compact;
     $('card-review').hidden = !compact || internal;
     syncTeamPicker();
-    $('lead-avatar').textContent = field('lead').value ? field('lead').value.split(/\s+/).map(word => word[0]).filter(Boolean).slice(0, 2).join('') : '—';
+    updateLeadAvatar();
+    $<HTMLInputElement>('attachment-file').disabled = !current || fileUploadBusy;
+    $('file-upload-help').hidden = !!current;
     $('stage-help').textContent = idea ? 'Start with a title and a few words. Work out the details later.' : field('stage').value === 'archived' ? 'Archived events stay on the calendar. To reschedule, choose a future date and move it to Planning.' : review ? 'Check the public details here. Ready is still private.' : 'Add the practical details as they are confirmed.';
     $('save-item').textContent = idea ? 'Save idea' : field('stage').value === 'archived' ? 'Save changes' : 'Save draft';
     if (internal) { $('stage-help').textContent = 'Internal work stays on the committee board.'; $('save-item').textContent = 'Save card'; }
@@ -881,7 +968,7 @@ async function start(root: HTMLElement) {
     updatePreview(); render(); if (view === 'calendar') void loadCalendar(true); return true;
   }
 
-  function setBusy(value: boolean) { busy = value; form.inert = value; field('stage').disabled = value; for (const id of ['save-item', 'publish-item', 'archive-item', 'unpublish-item']) $<HTMLButtonElement>(id).disabled = value; $<HTMLButtonElement>('help-description').disabled = value || aiBusy; updatePreview(); }
+  function setBusy(value: boolean) { busy = value; form.inert = value; field('stage').disabled = value; for (const id of ['save-item', 'publish-item', 'archive-item', 'unpublish-item']) $<HTMLButtonElement>(id).disabled = value; $<HTMLButtonElement>('help-description').disabled = value || aiBusy; updatePreview(); if (!value && profileRefreshPending && access) void refresh(); }
   function syncTeamPicker() {
     const summary = $('team-picker-summary'); summary.replaceChildren();
     for (const id of selectedTeams()) { const team = plannerTeams.find(team => team.id === id)!; const badge = el('span', team.name, 'team-badge'); badge.dataset.team = team.id; summary.append(badge); }
@@ -935,6 +1022,22 @@ async function start(root: HTMLElement) {
   $('card-people-toggle').onclick = () => { closeCardOptions(); $<HTMLDialogElement>('card-people-dialog').showModal(); };
   document.querySelectorAll<HTMLButtonElement>('.close-card-panel').forEach(button => button.onclick = () => { const details = button.closest('details'); if (details) details.open = false; });
   $('add-attachment').onclick = () => { $('attachment-editor').hidden = false; $('attachment-error').textContent = ''; $('attachment-url').focus(); };
+  $<HTMLInputElement>('attachment-file').onchange = () => {
+    if (fileUploadBusy || !current) return;
+    const selected = [...($<HTMLInputElement>('attachment-file').files || [])];
+    const types: Record<string, string> = { pdf: 'application/pdf', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', gif: 'image/gif', webp: 'image/webp', avif: 'image/avif' };
+    if (files.length + selected.length > 10) { fileStatus('Attach up to 10 files per card'); return; }
+    for (const file of selected) {
+      const type = file.type || types[file.name.split('.').pop()?.toLowerCase() || ''];
+      if (!Object.values(types).includes(type)) { fileStatus('Choose PDFs or PNG, JPEG, GIF, WebP or AVIF images'); return; }
+      if (!file.size || file.size > 10 * 1024 * 1024) { fileStatus('Choose files up to 10 MB each'); return; }
+      if (file.name.length > 160) { fileStatus('Use file names up to 160 characters'); return; }
+    }
+    pendingUploads = selected.map(file => ({ file: file.type ? file : new File([file], file.name, { type: types[file.name.split('.').pop()!.toLowerCase()] }), requestId: crypto.randomUUID() }));
+    void uploadFiles();
+  };
+  $('retry-file-upload').onclick = () => void uploadFiles();
+  $('cancel-file-upload').onclick = () => { fileAbort?.abort(); pendingUploads = []; };
   $('cancel-attachment').onclick = () => { $('attachment-editor').hidden = true; $<HTMLInputElement>('attachment-url').value = ''; $<HTMLInputElement>('attachment-name').value = ''; };
   $('save-attachment').onclick = () => {
     const url = $<HTMLInputElement>('attachment-url').value.trim(); const name = $<HTMLInputElement>('attachment-name').value.trim();
@@ -974,6 +1077,18 @@ async function start(root: HTMLElement) {
   window.addEventListener('beforeunload', event => { if (dirty()) event.preventDefault(); });
   $('new-item').onclick = () => openEditor(null);
   $('open-members').onclick = () => membersDialog.showModal();
+  $('sidebar-account').onclick = () => {
+    if (!access) return;
+    const profileForm = $<HTMLFormElement>('planner-profile-form'); (profileForm.elements.namedItem('displayName') as HTMLInputElement).value = access.name;
+    $('planner-profile-message').textContent = ''; $<HTMLDialogElement>('planner-profile-dialog').showModal();
+  };
+  $<HTMLFormElement>('planner-profile-form').onsubmit = event => { event.preventDefault(); void (async () => {
+    const profileForm = $<HTMLFormElement>('planner-profile-form'); const input = profileForm.elements.namedItem('displayName') as HTMLInputElement; const button = profileForm.querySelector<HTMLButtonElement>('button[type=submit]')!;
+    if (!profileForm.reportValidity()) return; button.disabled = true; $('planner-profile-message').textContent = '';
+    try { await authenticated(); await client.mutation(api.planner.setDisplayName, { name: input.value }); await refresh(); await loadNotifications('refresh'); $<HTMLDialogElement>('planner-profile-dialog').close(); }
+    catch (error) { showError(error, 'planner-profile-message'); }
+    finally { button.disabled = false; }
+  })(); };
   document.addEventListener('click', event => { if (!(event.target instanceof Element) || event.target.closest('.card-menu')) return; document.querySelectorAll<HTMLDetailsElement>('.card-menu[open]').forEach(menu => { menu.open = false; }); });
   function syncTeamFilters() { document.querySelectorAll<HTMLButtonElement>('[data-team]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.team === selectedTeam))); }
   document.querySelectorAll<HTMLButtonElement>('button[data-team]').forEach(button => button.onclick = () => { selectedTeam = button.dataset.team as typeof selectedTeam; syncTeamFilters(); render(); });
