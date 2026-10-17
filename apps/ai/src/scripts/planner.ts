@@ -103,6 +103,7 @@ async function start(root: HTMLElement) {
   let notificationRetry: ReturnType<typeof setTimeout> | null = null;
   let notificationRetryDelay = 1000;
   let highlightedComment: Id<'plannerComments'> | null = null;
+  let pendingEmailLink = new URLSearchParams(window.location.search);
   const commentMentionPicker = createMentionPicker(commentText, () => mentionPeople);
   let editMentionPicker: ReturnType<typeof createMentionPicker> | null = null;
   const commentDrafts = new Map<string, string>();
@@ -196,6 +197,19 @@ async function start(root: HTMLElement) {
       if (view === 'calendar') await loadCalendar(true);
       if (cardDialog.open && previewItem && !commentBusy) await refreshCard();
       startLiveNotifications(); await loadMentionPeople();
+      if (pendingEmailLink.has('item')) {
+        const link = pendingEmailLink; pendingEmailLink = new URLSearchParams();
+        const version = notificationsVersion;
+        try {
+          if (![link.get('item'), link.get('comment') || 'unused'].every(value => value && /^[a-zA-Z0-9_-]{1,100}$/.test(value))) throw new Error('Invalid comment link');
+          const item = await client.query(api.planner.get, { id: link.get('item') as Id<'plannerItems'> });
+          if (version !== notificationsVersion || !access) return;
+          if (!item) throw new Error('This card is no longer available.');
+          await openPreview(item, link.get('comment') as Id<'plannerComments'> || undefined);
+          const url = new URL(window.location.href); url.searchParams.delete('item'); url.searchParams.delete('comment');
+          window.history.replaceState(null, '', url);
+        } catch { status('This linked comment is no longer available. You can still browse the board.'); }
+      }
     } catch (error) {
       if (!access) showAccess('Could not check committee access. Try again, or sign out and back in.');
       showError(error);
@@ -296,7 +310,23 @@ async function start(root: HTMLElement) {
       }
     } } finally { if (version === notificationsVersion) { notificationsLoading = false; $<HTMLButtonElement>('older-notifications').disabled = notificationsBusy; $<HTMLButtonElement>('read-all-notifications').disabled = notificationsBusy; void flushNotificationChanges(); } }
   }
-  $('open-notifications').onclick = () => { notificationsDialog.showModal(); void loadNotifications('refresh'); };
+  $('open-notifications').onclick = () => {
+    notificationsDialog.showModal(); void loadNotifications('refresh');
+    const version = notificationsVersion; const toggle = $<HTMLInputElement>('mention-email-enabled'); toggle.disabled = true;
+    $('mention-email-status').textContent = '';
+    void (async () => {
+      try { await authenticated(); const enabled = await client.query(api.planner.emailPreference, {}); if (version === notificationsVersion && access) { toggle.checked = enabled; toggle.disabled = false; } }
+      catch { if (version === notificationsVersion && access) $('mention-email-status').textContent = 'Could not load email settings. Reopen notifications to retry.'; }
+    })();
+  };
+  $<HTMLInputElement>('mention-email-enabled').onchange = () => {
+    const toggle = $<HTMLInputElement>('mention-email-enabled'); const enabled = toggle.checked; const version = notificationsVersion; toggle.disabled = true;
+    void (async () => {
+      try { await authenticated(); await client.mutation(api.planner.setEmailPreference, { enabled }); if (version === notificationsVersion && access) $('mention-email-status').textContent = enabled ? 'Mention emails are on.' : 'Mention emails are off. Your planner inbox stays on.'; }
+      catch (error) { if (version === notificationsVersion && access) { toggle.checked = !enabled; showError(error, 'mention-email-status'); } }
+      finally { if (version === notificationsVersion && access) toggle.disabled = false; }
+    })();
+  };
   $('older-notifications').onclick = () => void loadNotifications('older');
   $('read-all-notifications').onclick = () => void (async () => {
     if (notificationsBusy || notificationsLoading) return; const version = notificationsVersion; notificationsBusy = true; renderNotifications();

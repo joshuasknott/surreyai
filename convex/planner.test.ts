@@ -10,6 +10,96 @@ import { mentionTokens } from './lib/plannerMentions';
 const modules = import.meta.glob('./**/*.ts');
 const activity: Activity = { title: 'AI workshop', kind: 'event', category: 'Workshop', description: 'A beginner workshop.', date: '2026-10-29', startTime: '18:00', endTime: '20:00', location: 'Stag Hill', registrationUrl: 'https://example.test/signup' };
 
+describe('mention email delivery', () => {
+  async function mentioned() {
+    const fixture = await setup();
+    const id = await fixture.owner.mutation(api.planner.create, { activity });
+    const commentArgs = { id, text: '@admin@example.test please review', requestId: '00000000-0000-4000-8000-000000000001' };
+    const commentId = await fixture.owner.mutation(api.planner.addComment, commentArgs);
+    const notification = (await fixture.t.run(ctx => ctx.db.query('plannerNotifications').first()))!;
+    await fixture.t.run(ctx => ctx.db.patch(notification._id, { emailDelivery: { status: 'pending', attempts: 0, nextAttemptAt: 0 } }));
+    return { ...fixture, id, commentArgs, commentId, notificationId: notification._id };
+  }
+  it('queues new mentions once, excludes self/unknown mentions and does not replay historic alerts', async () => {
+    const { t, owner, admin, id, commentArgs, commentId, notificationId } = await mentioned();
+    await owner.mutation(api.planner.addComment, commentArgs);
+    await owner.mutation(api.planner.editComment, { id: commentId, revision: 0, text: '@admin@example.test updated' });
+    await owner.mutation(api.planner.addComment, { id, text: '@joshhknott@gmail.com @unknown@example.test', requestId: '00000000-0000-4000-8000-000000000002' });
+    expect(await t.run(ctx => ctx.db.query('plannerNotifications').take(10))).toHaveLength(1);
+    expect(await admin.query(api.planner.emailPreference, {})).toBe(true);
+    expect(await t.mutation(internal.plannerEmail.prepare, { id: notificationId })).toMatchObject({ attempt: 1, payload: { recipientEmail: 'admin@example.test', excerpt: '@Admin updated' } });
+    await t.run(ctx => ctx.db.patch(notificationId, { emailDelivery: undefined }));
+    expect(await t.mutation(internal.plannerEmail.prepare, { id: notificationId })).toBeNull();
+  });
+  it.each(['disabled', 'revoked', 'deleted', 'removed'] as const)('does not send when %s before delivery', async state => {
+    const { t, owner, admin, grantId, commentId, notificationId } = await mentioned();
+    if (state === 'disabled') await admin.mutation(api.planner.setEmailPreference, { enabled: false });
+    if (state === 'revoked') await t.run(ctx => ctx.db.patch(grantId, { active: false }));
+    if (state === 'deleted') await owner.mutation(api.planner.deleteComment, { id: commentId });
+    if (state === 'removed') await owner.mutation(api.planner.editComment, { id: commentId, revision: 0, text: 'No longer needed' });
+    expect(await t.mutation(internal.plannerEmail.prepare, { id: notificationId })).toBeNull();
+  });
+  it('leases attempts, freezes retries after edits, and stops after confirmation', async () => {
+    const { t, owner, commentId, notificationId } = await mentioned();
+    const first = (await t.mutation(internal.plannerEmail.prepare, { id: notificationId }))!;
+    expect(await t.mutation(internal.plannerEmail.prepare, { id: notificationId })).toBeNull();
+    await owner.mutation(api.planner.editComment, { id: commentId, revision: 0, text: '@admin@example.test edited later' });
+    await t.mutation(internal.plannerEmail.finish, { id: notificationId, attempt: 1, result: 'retry' });
+    await t.run(async ctx => { const row = (await ctx.db.get(notificationId))!; await ctx.db.patch(notificationId, { emailDelivery: { ...row.emailDelivery!, nextAttemptAt: 0 } }); });
+    const second = (await t.mutation(internal.plannerEmail.prepare, { id: notificationId }))!;
+    expect(second.attempt).toBe(2); expect(second.payload).toEqual(first.payload);
+    await t.mutation(internal.plannerEmail.finish, { id: notificationId, attempt: 1, result: 'sent' });
+    expect((await t.run(ctx => ctx.db.get(notificationId)))?.emailDelivery?.status).toBe('pending');
+    await t.mutation(internal.plannerEmail.finish, { id: notificationId, attempt: 2, result: 'sent' });
+    expect(await t.mutation(internal.plannerEmail.prepare, { id: notificationId })).toBeNull();
+  });
+  it('protects preferences with verified committee access and recipient-scoped settings', async () => {
+    const { t, owner, admin } = await setup();
+    await expect(t.mutation(api.planner.setEmailPreference, { enabled: false })).rejects.toThrow('Committee access');
+    await admin.mutation(api.planner.setEmailPreference, { enabled: false });
+    expect(await admin.query(api.planner.emailPreference, {})).toBe(false);
+    expect(await owner.query(api.planner.emailPreference, {})).toBe(true);
+  });
+  it('executes signed background delivery and retries temporary failures before marking sent', async () => {
+    const { t, notificationId } = await mentioned();
+    vi.stubEnv('PLANNER_EMAIL_SECRET', 'local-test-only-email-relay-secret-1234');
+    const relay = vi.fn().mockResolvedValueOnce(new Response(null, { status: 502 })).mockResolvedValueOnce(new Response(null, { status: 204 }));
+    vi.stubGlobal('fetch', relay);
+    try {
+      await t.action(internal.plannerEmail.deliver, { id: notificationId });
+      expect((await t.run(ctx => ctx.db.get(notificationId)))?.emailDelivery).toMatchObject({ status: 'pending', attempts: 1 });
+      await t.run(async ctx => { const row = (await ctx.db.get(notificationId))!; await ctx.db.patch(notificationId, { emailDelivery: { ...row.emailDelivery!, nextAttemptAt: 0 } }); });
+      await t.action(internal.plannerEmail.deliver, { id: notificationId });
+      expect((await t.run(ctx => ctx.db.get(notificationId)))?.emailDelivery).toMatchObject({ status: 'sent', attempts: 2 });
+      expect(relay).toHaveBeenCalledTimes(2);
+      const first = relay.mock.calls[0];
+      expect(first[0]).toBe('https://surreyaisociety.org/api/planner-mention-email');
+      expect(first[1].headers['X-Planner-Signature']).toMatch(/^[a-f0-9]{64}$/);
+      expect(JSON.parse(relay.mock.calls[1][1].body).message).toEqual(JSON.parse(first[1].body).message);
+      await t.action(internal.plannerEmail.deliver, { id: notificationId });
+      expect(relay).toHaveBeenCalledTimes(2);
+    } finally { vi.unstubAllGlobals(); vi.unstubAllEnvs(); }
+  });
+  it('stops retrying after six unsuccessful attempts', async () => {
+    const { t, notificationId } = await mentioned();
+    for (let attempt = 1; attempt <= 6; attempt++) {
+      await t.run(async ctx => { const row = (await ctx.db.get(notificationId))!; await ctx.db.patch(notificationId, { emailDelivery: { ...row.emailDelivery!, nextAttemptAt: 0 } }); });
+      expect(await t.mutation(internal.plannerEmail.prepare, { id: notificationId })).toMatchObject({ attempt });
+      await t.mutation(internal.plannerEmail.finish, { id: notificationId, attempt, result: 'retry' });
+    }
+    expect((await t.run(ctx => ctx.db.get(notificationId)))?.emailDelivery?.status).toBe('failed');
+    expect(await t.mutation(internal.plannerEmail.prepare, { id: notificationId })).toBeNull();
+  });
+  it('expires uncertain delivery before the provider idempotency window ends', async () => {
+    const { t, notificationId } = await mentioned();
+    const clock = vi.spyOn(Date, 'now').mockReturnValue(Date.now() + 24 * 60 * 60 * 1000);
+    try {
+      expect(await t.mutation(internal.plannerEmail.prepare, { id: notificationId })).toBeNull();
+      expect((await t.run(ctx => ctx.db.get(notificationId)))?.emailDelivery?.status).toBe('failed');
+    } finally { clock.mockRestore(); }
+  });
+});
+
 describe('team board workflow', () => {
   it('saves and clears a private waiting status without leaking it into publication', async () => {
     const { admin, t } = await setup();

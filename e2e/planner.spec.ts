@@ -1,7 +1,8 @@
 import { expect, test, type BrowserContext, type Page, type Locator } from '@playwright/test';
 import { convexTest } from 'convex-test';
 import { makeFunctionReference } from 'convex/server';
-import { convexToJson, jsonToConvex } from 'convex/values';
+import { convexToJson, jsonToConvex, v } from 'convex/values';
+import { internalAction } from '../convex/_generated/server';
 import { mkdir } from 'node:fs/promises';
 import { api } from '../convex/_generated/api';
 import schema from '../convex/schema';
@@ -9,7 +10,9 @@ import type { Activity } from '../convex/plannerModel';
 import { londonToday } from '../apps/ai/src/lib/programme';
 
 const origin = process.env.PLANNER_TEST_ORIGIN || 'http://127.0.0.1:4321';
-const modules = { './_generated/server.js': () => import('../convex/_generated/server.js'), './planner.ts': () => import('../convex/planner'), './plannerSignIn.ts': () => import('../convex/plannerSignIn'), './users.ts': () => import('../convex/users'), './http.ts': () => import('../convex/http'), './plannerFiles.ts': () => import('../convex/plannerFiles') };
+// Browser fixtures exercise real planner functions; delivery is covered by the
+// backend/relay tests and must never send live emails from browser fixtures.
+const modules = { './_generated/server.js': () => import('../convex/_generated/server.js'), './planner.ts': () => import('../convex/planner'), './plannerSignIn.ts': () => import('../convex/plannerSignIn'), './users.ts': () => import('../convex/users'), './http.ts': () => import('../convex/http'), './plannerFiles.ts': () => import('../convex/plannerFiles'), './plannerEmail.ts': async () => ({ deliver: internalAction({ args: { id: v.id('plannerNotifications') }, returns: v.null(), handler: async () => null }) }) };
 const gateSecret = 'fixture-only-sign-in-gateway-secret';
 const future = new Date(`${londonToday()}T12:00:00Z`); future.setUTCDate(future.getUTCDate() + 7);
 const activity: Activity = { title: 'Build your first AI agent', kind: 'event', category: 'Workshop', description: 'A hands-on introduction. No experience needed.', date: future.toISOString().slice(0, 10), startTime: '18:00', endTime: '20:00', location: 'Stag Hill campus', registrationUrl: 'https://example.test/book' };
@@ -122,6 +125,36 @@ async function fixture(context: BrowserContext, mode: 'admin' | 'owner' | 'outsi
   return { t, admin, owner, pushNotifications, disconnectNotifications: async () => { await Promise.all([...streams].map(stream => stream.disconnect())); }, connections: () => connections, activeConnections: () => streams.size, readyConnections: () => [...streams].filter(stream => stream.subscribed).length };
 }
 async function ready(page: Page) { await page.goto(`${origin}/committee/planner`); await expect(page.locator('#workspace')).toBeVisible(); }
+
+for (const width of [1440, 390]) test(`mention email preference persists and remains usable at ${width}px`, async ({ page, context }) => {
+  const f = await fixture(context);
+  await page.setViewportSize({ width, height: 900 }); await ready(page);
+  await page.locator('#open-notifications').click();
+  const toggle = page.getByRole('checkbox', { name: 'Email me when I’m mentioned' });
+  await expect(toggle).toBeEnabled(); await expect(toggle).toBeChecked();
+  await toggle.uncheck(); await expect(page.locator('#mention-email-status')).toContainText('emails are off');
+  expect(await f.admin.query(api.planner.emailPreference, {})).toBe(false);
+  await page.getByRole('button', { name: 'Close notifications', exact: true }).click();
+  await page.reload(); await expect(page.locator('#workspace')).toBeVisible(); await page.locator('#open-notifications').click();
+  await expect(toggle).toBeEnabled(); await expect(toggle).not.toBeChecked(); await noOverflow(page);
+  await screenshot(page, `mention-email-${width}`);
+  await toggle.check(); await expect(page.locator('#mention-email-status')).toContainText('emails are on');
+});
+
+test('email link survives sign-in and opens an older comment on an archived card', async ({ page, context }) => {
+  const f = await fixture(context, 'signed-out');
+  const id = await f.owner.mutation(api.planner.create, { activity: { ...activity, title: 'Email link target' } });
+  const commentId = await f.owner.mutation(api.planner.addComment, { id, text: '@committee@example.test please review this', requestId: '00000000-0000-4000-8000-000000000001' });
+  for (let i = 2; i < 35; i++) await f.owner.mutation(api.planner.addComment, { id, text: `Later discussion ${i}`, requestId: `00000000-0000-4000-8000-${String(i).padStart(12, '0')}` });
+  await f.owner.mutation(api.planner.move, { id, revision: 1, stage: 'archived' });
+  await page.goto(`${origin}/committee/planner?item=${id}&comment=${commentId}`);
+  await page.locator('#sign-in-email').fill('committee@example.test'); await page.locator('#send-code').click();
+  await page.locator('#sign-in-code').fill('123456'); await page.locator('#verify-code').click();
+  await expect(page.locator('#card-dialog')).toBeVisible();
+  await expect(page.locator('.comment-highlight')).toContainText('please review this');
+  await expect(page).toHaveURL(`${origin}/committee/planner`);
+  await screenshot(page, 'mention-email-linked-comment');
+});
 async function navigate(page: Page, name: string) {
   if ((page.viewportSize()?.width || 1440) <= 720 && !await page.locator('body').evaluate(body => body.classList.contains('sidebar-mobile-open'))) await page.getByRole('button', { name: 'Open navigation', exact: true }).click();
   await page.getByRole('button', { name, exact: true }).click();
