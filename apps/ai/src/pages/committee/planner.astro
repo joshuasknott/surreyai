@@ -1,7 +1,7 @@
 ---
 export const prerender = false;
 import BaseLayout from '@surreysocieties/ui/components/BaseLayout';
-import { ArrowUpRight, ArrowLeft, Plus, X, CalendarDays, MapPin, UsersRound, Pencil, Sparkles, LockKeyhole, LogOut, Settings, Bell, Circle, AtSign, Send, Ellipsis, Columns3, Archive, ChevronsLeft, Menu, Search, MessageCircle, ListChecks } from 'lucide-astro';
+import { ArrowUpRight, ArrowLeft, Plus, X, CalendarDays, MapPin, UsersRound, Pencil, Sparkles, LockKeyhole, LogOut, Settings, Bell, Circle, AtSign, Send, Ellipsis, Columns3, Archive, ChevronsLeft, Menu, Search, MessageCircle, ListChecks, GripVertical } from 'lucide-astro';
 import { plannerTeams } from '../../../../../convex/plannerTeams';
 import '../../styles/planner.css';
 import { isAIEnabled } from '../../lib/server/ai/gemini';
@@ -157,6 +157,7 @@ const convexUrl = process.env.CONVEX_URL || import.meta.env.CONVEX_URL || '';
   </dialog>
 
   <template id="plus-icon"><Plus size={17} aria-hidden="true" /></template>
+  <template id="drag-icon"><GripVertical size={17} aria-hidden="true" /></template>
   <template id="external-icon"><ArrowUpRight size={15} aria-hidden="true" /></template>
   <template id="calendar-icon"><CalendarDays size={18} aria-hidden="true" /></template>
   <template id="location-icon"><MapPin size={16} aria-hidden="true" /></template>

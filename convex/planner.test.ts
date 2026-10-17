@@ -11,6 +11,19 @@ const modules = import.meta.glob('./**/*.ts');
 const activity: Activity = { title: 'AI workshop', kind: 'event', category: 'Workshop', description: 'A beginner workshop.', date: '2026-10-29', startTime: '18:00', endTime: '20:00', location: 'Stag Hill', registrationUrl: 'https://example.test/signup' };
 
 describe('team board workflow', () => {
+  it('shares list order with the committee and rejects stale or unauthorised changes', async () => {
+    const { admin, t } = await setup();
+    const original = ['ideas', 'planning', 'ready', 'done'] as const;
+    const changed = ['done', 'ideas', 'planning', 'ready'] as const;
+    expect(await admin.query(api.planner.boardLayout, {})).toEqual({ order: original, revision: 0 });
+    await expect(t.query(api.planner.boardLayout, {})).rejects.toThrow('Committee access');
+    await expect(t.mutation(api.planner.reorderBoard, { order: [...changed], revision: 0 })).rejects.toThrow('Committee access');
+    await expect(admin.mutation(api.planner.reorderBoard, { order: ['ideas', 'ideas', 'ready', 'done'], revision: 0 })).rejects.toThrow('exactly once');
+    expect(await admin.mutation(api.planner.reorderBoard, { order: [...changed], revision: 0 })).toBe(1);
+    expect(await admin.query(api.planner.boardLayout, {})).toEqual({ order: changed, revision: 1 });
+    await expect(admin.mutation(api.planner.reorderBoard, { order: [...original], revision: 0 })).rejects.toThrow('Someone else reordered');
+    expect(await admin.query(api.planner.boardLayout, {})).toEqual({ order: changed, revision: 1 });
+  });
   it('persists and clears teams, keeps internal work private and preserves overdue tasks', async () => {
     const { admin, t } = await setup();
     const id = await admin.mutation(api.planner.create, { activity: { ...activity, title: 'Sponsor proposal', date: '2020-01-01' }, team: 'industry', internalOnly: true, stage: 'ready' });

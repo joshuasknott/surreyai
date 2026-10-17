@@ -26,6 +26,8 @@ async function start(root: HTMLElement) {
   const commentForm = $<HTMLFormElement>('comment-form');
   const commentText = $<HTMLTextAreaElement>('comment-text');
   const stages = ['ideas', 'planning', 'ready', 'done'] as const;
+  const stageMime = 'application/x-planner-stage';
+  const cardMime = 'application/x-planner-card';
   const labels = { ideas: 'Ideas', planning: 'In progress', ready: 'Ready', done: 'Done', published: 'Ready', archived: 'Archived' };
   const boardStage = (item: Item) => item.stage === 'published' ? item.workflowStage || 'ready' : item.stage;
   let selectedTeam: PlannerTeam | 'all' = 'all';
@@ -36,6 +38,10 @@ async function start(root: HTMLElement) {
   let clerk: ClerkSDK;
   let access: Access | null = null;
   let items: Item[] = [];
+  let boardOrder: Stage[] = [...stages];
+  let boardRevision = 0;
+  let boardOrderSaving = false;
+  let draggedStage: Stage | null = null;
   let archived: Item[] = [];
   let current: Item | null = null;
   let tasks: Item['tasks'] = [];
@@ -112,7 +118,7 @@ async function start(root: HTMLElement) {
   }
   function clearPrivateData() {
     stopLiveNotifications();
-    access = null; items = []; archived = [];
+    access = null; items = []; archived = []; boardOrder = [...stages]; boardRevision = 0; boardOrderSaving = false;
     notificationsVersion++; notifications = []; mentionPeople = []; notificationsLoading = false; notificationsBusy = false; notificationsCursor = null; notificationsPages = 1; notificationsDone = true; unreadNotifications = 0; highlightedComment = null;
     commentMentionPicker.close(); editMentionPicker?.destroy(); editMentionPicker = null;
     $('open-notifications').hidden = true; $('notification-count').hidden = true; $('open-notifications').setAttribute('aria-label', 'Notifications');
@@ -147,7 +153,9 @@ async function start(root: HTMLElement) {
       await authenticated();
       access = await client.query(api.planner.access, {});
       if (!access) { showAccess('This board is for the AI Society committee. Ask Josh to add your sign-in email.'); return; }
-      items = await client.query(api.planner.list, {});
+      const [latestItems, layout] = await Promise.all([client.query(api.planner.list, {}), client.query(api.planner.boardLayout, {})]);
+      items = latestItems;
+      if (!boardOrderSaving) { boardOrder = layout.order; boardRevision = layout.revision; }
       if (view === 'archive') archived = await client.query(api.planner.list, { archived: true });
       $('access-state').hidden = true; $('workspace').hidden = false;
       $('workspace-nav').hidden = false; $('sidebar-account').hidden = false; $('account-name').textContent = access.name || access.email;
@@ -288,19 +296,77 @@ async function start(root: HTMLElement) {
     } } finally { if (version === notificationsVersion) { notificationsBusy = false; await loadNotifications('refresh'); } }
   }
 
+  function clearColumnDrop() {
+    document.querySelectorAll('.board-column').forEach(column => column.classList.remove('column-drop-before', 'column-drop-after'));
+  }
+
+  async function reorderColumn(source: Stage, target: Stage, after: boolean, focus = false) {
+    if (!access || boardOrderSaving || source === target) return;
+    const next = boardOrder.filter(stage => stage !== source);
+    next.splice(next.indexOf(target) + Number(after), 0, source);
+    if (next.every((stage, index) => stage === boardOrder[index])) return;
+    boardOrderSaving = true; boardOrder = next; render();
+    if (focus) document.querySelector<HTMLElement>(`.board-column[data-stage="${source}"] .column-drag-handle`)?.focus();
+    try {
+      await authenticated();
+      boardRevision = await client.mutation(api.planner.reorderBoard, { order: next, revision: boardRevision });
+      status('List order saved for the committee.');
+    } catch (error) {
+      try { const layout = await client.query(api.planner.boardLayout, {}); boardOrder = layout.order; boardRevision = layout.revision; }
+      catch { boardOrder = [...stages]; boardRevision = 0; }
+      render(); showError(error);
+    } finally { boardOrderSaving = false; }
+  }
+
   function render() {
     const board = $('board'); board.replaceChildren();
-    for (const stage of stages) {
+    for (const stage of boardOrder) {
       const column = el('section', undefined, 'board-column'); column.dataset.stage = stage; column.setAttribute('aria-label', labels[stage]);
       const cards = items.filter(item => boardStage(item) === stage && matches(item)).sort((a, b) => b.updatedAt - a.updatedAt);
       const heading = el('div', undefined, 'column-heading'); const title = el('h2', labels[stage]); heading.append(title, el('span', String(cards.length), 'column-count'));
+      const handle = el('button', undefined, 'column-drag-handle'); handle.type = 'button'; handle.draggable = true;
+      handle.title = 'Drag to reorder lists; use Left or Right arrow keys';
+      handle.setAttribute('aria-label', `Reorder ${labels[stage]} list`); handle.append(icon('drag'));
+      handle.addEventListener('dragstart', event => { draggedStage = stage; event.dataTransfer?.setData(stageMime, stage); if (event.dataTransfer) event.dataTransfer.effectAllowed = 'move'; });
+      handle.addEventListener('dragend', () => { draggedStage = null; clearColumnDrop(); });
+      handle.addEventListener('keydown', event => {
+        const offset = event.key === 'ArrowLeft' ? -1 : event.key === 'ArrowRight' ? 1 : 0;
+        if (!offset) return;
+        event.preventDefault(); const target = boardOrder[boardOrder.indexOf(stage) + offset];
+        if (target) void reorderColumn(stage, target, offset > 0, true);
+      });
+      let touchDragging = false;
+      handle.addEventListener('pointerdown', event => { if (event.pointerType !== 'mouse') { touchDragging = true; board.style.scrollSnapType = 'none'; handle.setPointerCapture(event.pointerId); } });
+      handle.addEventListener('pointermove', event => {
+        if (!touchDragging) return;
+        const bounds = board.getBoundingClientRect();
+        if (event.clientX < bounds.left + 36) board.scrollLeft -= 24;
+        if (event.clientX > bounds.right - 36) board.scrollLeft += 24;
+        const target = document.elementFromPoint(event.clientX, event.clientY)?.closest<HTMLElement>('.board-column');
+        clearColumnDrop();
+        if (target && target.dataset.stage !== stage) target.classList.add(event.clientX >= target.getBoundingClientRect().left + target.clientWidth / 2 ? 'column-drop-after' : 'column-drop-before');
+      });
+      handle.addEventListener('pointerup', event => {
+        if (!touchDragging) return; touchDragging = false; board.style.scrollSnapType = '';
+        const target = document.elementFromPoint(event.clientX, event.clientY)?.closest<HTMLElement>('.board-column'); clearColumnDrop();
+        if (target && target.dataset.stage !== stage) void reorderColumn(stage, target.dataset.stage as Stage, event.clientX >= target.getBoundingClientRect().left + target.clientWidth / 2);
+      });
+      handle.addEventListener('pointercancel', () => { touchDragging = false; board.style.scrollSnapType = ''; clearColumnDrop(); });
+      heading.append(handle);
       column.append(heading);
       for (const item of cards) column.append(card(item));
       const add = el('button', 'Add card', 'column-add'); add.prepend(icon('plus')); add.onclick = () => openEditor(null, stage); column.append(add);
-      column.addEventListener('dragover', event => { event.preventDefault(); column.classList.add('drag-over'); });
-      column.addEventListener('dragleave', () => column.classList.remove('drag-over'));
+      column.addEventListener('dragover', event => {
+        if (event.dataTransfer?.types.includes(stageMime)) {
+          event.preventDefault(); column.classList.remove('drag-over'); clearColumnDrop();
+          if (draggedStage !== stage) column.classList.add(event.clientX >= column.getBoundingClientRect().left + column.clientWidth / 2 ? 'column-drop-after' : 'column-drop-before');
+        } else if (event.dataTransfer?.types.includes(cardMime)) { event.preventDefault(); column.classList.add('drag-over'); }
+      });
+      column.addEventListener('dragleave', event => { if (!column.contains(event.relatedTarget as Node)) column.classList.remove('drag-over', 'column-drop-before', 'column-drop-after'); });
       column.addEventListener('drop', event => {
-        event.preventDefault(); column.classList.remove('drag-over');
+        event.preventDefault(); column.classList.remove('drag-over'); clearColumnDrop();
+        const source = event.dataTransfer?.getData(stageMime) as Stage | undefined;
+        if (source && stages.includes(source)) { void reorderColumn(source, stage, event.clientX >= column.getBoundingClientRect().left + column.clientWidth / 2); return; }
         const item = items.find(row => row._id === event.dataTransfer?.getData('text/plain'));
         if (!item || boardStage(item) === stage) return;
         void move(item, stage);
@@ -561,7 +627,7 @@ async function start(root: HTMLElement) {
 
   function card(item: Item) {
     const node = el('article', undefined, 'planner-card'); node.draggable = true; node.dataset.item = item._id;
-    node.addEventListener('dragstart', event => { event.dataTransfer?.setData('text/plain', item._id); });
+    node.addEventListener('dragstart', event => { event.dataTransfer?.setData(cardMime, item._id); event.dataTransfer?.setData('text/plain', item._id); });
     const open = el('button', undefined, 'card-open'); open.setAttribute('aria-label', `View ${item.title}`);
     open.append(el('strong', item.title));
     const team = plannerTeams.find(team => team.id === item.team);

@@ -197,6 +197,12 @@ dialog{border:1px solid #dcdde1;border-radius:10px;padding:0;background:#fafaf8;
 .board-column { background: #eef0f3; border-radius: 7px; padding: 14px 10px; min-height: calc(100dvh - 176px); min-width: 0; }
 .column-heading { margin: 0 4px 15px; min-height: 30px; gap: 9px; flex-wrap: nowrap; }
 .column-heading h2 { font-size: 17px; letter-spacing: -.025em; }
+.column-drag-handle { display: inline-flex; align-items: center; justify-content: center; margin-left: auto; width: 30px; height: 30px; min-width: 30px; padding: 0; border: 0; border-radius: 5px; background: transparent; color: #687187; cursor: grab; touch-action: none; }
+.column-drag-handle:hover { background: #e1e5eb; color: #352c44; }
+.column-drag-handle:focus-visible { outline: 2px solid #bd3800; outline-offset: 2px; }
+.column-drag-handle:active { cursor: grabbing; }
+.board-column.column-drop-before { box-shadow: inset 4px 0 #d9430b; }
+.board-column.column-drop-after { box-shadow: inset -4px 0 #d9430b; }
 .column-count { border: 0; background: #e1e4ea; color: #5c647c; min-width: 21px; height: 22px; font-size: 12px; }
 .planner-card { position: relative; margin-bottom: 9px; border: 1px solid #dfe3e9; border-radius: 7px; box-shadow: 0 1px 2px #21152f08; background: #fff; }
 .card-open { padding: 12px; gap: 7px; border-radius: 7px; min-height: 72px; }
