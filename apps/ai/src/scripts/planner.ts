@@ -90,7 +90,6 @@ async function start(root: HTMLElement) {
   let highlightedComment: Id<'plannerComments'> | null = null;
   const commentMentionPicker = createMentionPicker(commentText, () => mentionPeople);
   let editMentionPicker: ReturnType<typeof createMentionPicker> | null = null;
-  let returnToCard = false;
   const commentDrafts = new Map<string, string>();
 
   const el = <K extends keyof HTMLElementTagNameMap>(tag: K, text?: string, className?: string): HTMLElementTagNameMap[K] => {
@@ -110,8 +109,8 @@ async function start(root: HTMLElement) {
   };
   const selectedTeams = () => [...form.querySelectorAll<HTMLInputElement>('input[name="teams"]:checked')].map(input => input.value as PlannerTeam);
   const signature = () => JSON.stringify({ activity: readActivity(), stage: field('stage').value, teams: selectedTeams(), lead: field('lead').value, purpose: field('purpose').value, notes: field('notes').value, owner: field('owner').value, tasks });
-  const dirty = () => editor.open && signature() !== baseline;
-  const closeEditor = () => { if (busy || (dirty() && !window.confirm('Discard your unsaved changes?'))) return; const item = returnToCard ? current : null; returnToCard = false; editor.close(); if (item) openPreview(item); };
+  const dirty = () => (editor.open || cardDialog.open) && signature() !== baseline;
+  const closeEditor = () => { if (busy || (dirty() && !window.confirm('Discard your unsaved changes?'))) return; editor.close(); };
 
   async function authenticated() {
     const token = await clerk.session?.getToken({ template: 'convex' });
@@ -126,7 +125,6 @@ async function start(root: HTMLElement) {
     $('open-notifications').hidden = true; $('notification-count').hidden = true; $('open-notifications').setAttribute('aria-label', 'Notifications');
     for (const id of ['notification-list', 'notifications-status', 'notification-count']) $(id).replaceChildren();
     previewVersion++; previewItem = null; comments = []; commentDrafts.clear(); commentsCursor = null; commentBusy = false; commentRequest = null; commentEdit = null; commentDelete = null; commentsLoading = false; commentForm.reset(); commentText.disabled = false; $<HTMLButtonElement>('post-comment').disabled = false;
-    $<HTMLButtonElement>('edit-card').disabled = false;
     calendarVersion++; calendarItems = []; calendarLoadedMonth = ''; calendarError = ''; calendarLoading = false;
     $('workspace').hidden = true;
     for (const id of ['workspace-nav', 'open-members', 'sidebar-account']) $(id).hidden = true;
@@ -450,7 +448,8 @@ async function start(root: HTMLElement) {
     previewVersion++; previewItem = item; comments = []; commentsCursor = null; commentsDone = true; commentsLoading = false; commentPages = 1; commentRequest = null; commentEdit = null; commentDelete = null;
     commentForm.reset(); commentText.value = commentDrafts.get(item._id) || ''; $('comment-message').textContent = ''; $('comments-status').textContent = 'Loading comments…';
     highlightedComment = targetComment || null; commentMentionPicker.close();
-    $('comment-list').replaceChildren(); $('older-comments').hidden = true; renderCardPreview(); cardDialog.showModal();
+    $('comment-list').replaceChildren(); $('older-comments').hidden = true; renderCardPreview();
+    $('card-editor-slot').append(form); openEditor(item, 'ideas', '', true); cardDialog.showModal();
     const version = previewVersion;
     if (!await loadComments('initial')) return;
     while (targetComment && version === previewVersion && !comments.some(comment => comment._id === targetComment) && !commentsDone) {
@@ -463,7 +462,7 @@ async function start(root: HTMLElement) {
     }
   }
   function closeCard() {
-    if (commentBusy || (commentEdit && commentEdit.text !== commentEdit.original && !window.confirm('Discard your unsaved comment changes?'))) return false;
+    if (commentBusy || busy || (dirty() && !window.confirm('Discard your unsaved card changes?')) || (commentEdit && commentEdit.text !== commentEdit.original && !window.confirm('Discard your unsaved comment changes?'))) return false;
     cardDialog.close(); return true;
   }
   cardDialog.addEventListener('cancel', event => { event.preventDefault(); closeCard(); });
@@ -472,9 +471,9 @@ async function start(root: HTMLElement) {
     if (previewItem && access) { if (commentText.value.trim()) commentDrafts.set(previewItem._id, commentText.value); else commentDrafts.delete(previewItem._id); }
     previewVersion++; previewItem = null; comments = []; commentsLoading = false; commentEdit = null; commentDelete = null; commentText.value = '';
     highlightedComment = null; commentMentionPicker.close(); editMentionPicker?.destroy(); editMentionPicker = null;
+    editor.append(form); resetDescriptionHelp(); current = null;
     for (const id of ['card-title', 'card-description', 'card-people', 'card-facts', 'comment-list', 'comments-status', 'comment-message', 'card-state', 'comment-count']) $(id).replaceChildren();
   });
-  $('edit-card').onclick = () => { if (!previewItem || commentBusy) return; const item = previewItem; if (closeCard()) openEditor(item, 'ideas', '', true); };
   async function refreshCard() {
     if (!previewItem || !cardDialog.open) return;
     const id = previewItem._id; const version = previewVersion;
@@ -488,7 +487,6 @@ async function start(root: HTMLElement) {
     commentText.disabled = commentBusy;
     $<HTMLButtonElement>('mention-person').disabled = blocked || !!commentEdit || !!commentDelete;
     $<HTMLButtonElement>('post-comment').disabled = blocked || !!commentEdit || !!commentDelete;
-    $<HTMLButtonElement>('edit-card').disabled = commentBusy;
     $<HTMLButtonElement>('older-comments').disabled = blocked || !!commentEdit || !!commentDelete;
     for (const button of $('comment-list').querySelectorAll<HTMLButtonElement>('button')) {
       button.disabled = blocked || ((!!commentEdit || !!commentDelete) && button.dataset.commentAction === 'open');
@@ -777,7 +775,7 @@ async function start(root: HTMLElement) {
   }
 
   function openEditor(item: Item | null, stage: Stage = 'ideas', date = '', fromCard = false) {
-    returnToCard = fromCard; $('editor-back-label').textContent = fromCard ? 'Card' : 'Planner';
+    $('editor-back-label').textContent = fromCard ? 'Card' : 'Planner';
     resetDescriptionHelp(); current = item; form.reset(); $<HTMLDetailsElement>('private-options').open = false;
     const activity = item || { ...blankActivity(), date };
     for (const name of Object.keys(blankActivity())) field(name).value = activity[name as keyof Activity];
@@ -797,7 +795,7 @@ async function start(root: HTMLElement) {
     $('item-state').textContent = `${labels[item ? boardStage(item) : stage]} · ${item?.published ? 'Public version is live' : 'Private'}`;
     $('archive-item').hidden = !item || item.stage === 'archived'; $('unpublish-item').hidden = item?.stage !== 'published';
     $('item-message').textContent = '';
-    renderTasks(); updatePreview(); baseline = signature(); editor.showModal(); field('title').focus();
+    renderTasks(); updatePreview(); baseline = signature(); if (!fromCard) { editor.showModal(); field('title').focus(); }
   }
 
   function renderTasks() {
@@ -846,6 +844,7 @@ async function start(root: HTMLElement) {
     } else id = await client.mutation(api.planner.create, { ...payload, stage: field('stage').value as Stage });
     items = await client.query(api.planner.list, {}); current = await client.query(api.planner.get, { id });
     if (!current) throw new Error('Activity saved but could not be reloaded. Close and reopen the board.');
+    if (cardDialog.open) { previewItem = current; renderCardPreview(); }
     baseline = signature(); $('archive-item').hidden = current.stage === 'archived';
     $('item-state').textContent = `${labels[boardStage(current)]} · ${current.published ? 'Public version is live' : 'Private'}`;
     updatePreview(); render(); if (view === 'calendar') void loadCalendar(true); return true;
@@ -859,14 +858,14 @@ async function start(root: HTMLElement) {
   $('publish-item').onclick = () => void (async () => {
     if (busy) return; setBusy(true); try {
       if (!await persist() || !current) return;
-      await client.mutation(api.planner.publish, { id: current._id, revision: current.revision }); editor.close(); status('Published. This activity is now on the main website.');
+      await client.mutation(api.planner.publish, { id: current._id, revision: current.revision }); if (cardDialog.open) cardDialog.close(); else editor.close(); status('Published. This activity is now on the main website.');
     } catch (error) { showError(error, 'item-message'); } finally { setBusy(false); await refresh(); }
   })();
   $('unpublish-item').onclick = () => void (async () => { if (!current || !window.confirm('Remove this activity from the public website? Your draft and committee notes will stay on the private board.')) return;
-    setBusy(true); try { await authenticated(); await client.mutation(api.planner.move, { id: current._id, revision: current.revision, stage: 'ready' }); editor.close(); status('Unpublished. The activity is private in Ready.'); } catch (error) { showError(error, 'item-message'); } finally { setBusy(false); await refresh(); }
+    setBusy(true); try { await authenticated(); await client.mutation(api.planner.move, { id: current._id, revision: current.revision, stage: 'ready' }); if (cardDialog.open) cardDialog.close(); else editor.close(); status('Unpublished. The activity is private in Ready.'); } catch (error) { showError(error, 'item-message'); } finally { setBusy(false); await refresh(); }
   })();
   $('archive-item').onclick = () => void (async () => { if (!current || !window.confirm('Archive this activity? It will be removed from the public website if published. Unsaved edits will be discarded.')) return;
-    setBusy(true); try { await authenticated(); await client.mutation(api.planner.move, { id: current._id, revision: current.revision, stage: 'archived' }); editor.close(); status('Activity archived.'); } catch (error) { showError(error, 'item-message'); } finally { setBusy(false); await refresh(); }
+    setBusy(true); try { await authenticated(); await client.mutation(api.planner.move, { id: current._id, revision: current.revision, stage: 'archived' }); if (cardDialog.open) cardDialog.close(); else editor.close(); status('Activity archived.'); } catch (error) { showError(error, 'item-message'); } finally { setBusy(false); await refresh(); }
   })();
   $('add-task').onclick = () => { const input = $<HTMLInputElement>('task-text'); if (!input.value.trim() || tasks.length >= 30) return; tasks.push({ text: input.value.trim(), done: false }); input.value = ''; renderTasks(); };
   $('task-text').onkeydown = event => { if (event.key === 'Enter') { event.preventDefault(); $('add-task').click(); } };
@@ -922,7 +921,7 @@ async function start(root: HTMLElement) {
       const prompt = `Title: ${field('title').value}\nCurrent description: ${field('description').value.slice(0, 1500)}\nType: ${field('kind').value}`;
       const response = await fetch('/api/planner/draft', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ prompt, focus: 'description' }), signal: AbortSignal.any([signal, AbortSignal.timeout(45000)]) });
       const body = await response.json(); if (!response.ok) throw new Error(body.error || 'Could not draft this activity. Try again.');
-      if (version !== aiVersion || !editor.open) return;
+      if (version !== aiVersion || (!editor.open && !cardDialog.open)) return;
       if (typeof body.description !== 'string' || !body.description.trim() || body.description.length > 4000) throw new Error('Could not suggest a usable description. Try again.');
       suggestedDescription = body.description.trim(); $('suggested-description').textContent = suggestedDescription;
       $('description-suggestion').hidden = false; $('description-ai-message').textContent = '';

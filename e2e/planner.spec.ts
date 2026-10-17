@@ -131,10 +131,10 @@ async function editCard(page: Page, title: string) {
   if (await page.locator('#card-dialog').isVisible()) await page.getByRole('button', { name: 'Close card', exact: true }).click();
   await page.getByRole('button', { name: `View ${title}`, exact: true }).click();
   await expect(page.locator('#card-dialog')).toBeVisible();
-  await page.getByRole('button', { name: 'Edit', exact: true }).click();
+  await expect(page.locator('#card-dialog').getByLabel('Title', { exact: true })).toHaveValue(title);
 }
 async function closeActivity(page: Page) {
-  await page.getByRole('button', { name: 'Close activity', exact: true }).click();
+  if (await page.locator('#item-dialog').isVisible()) await page.getByRole('button', { name: 'Close activity', exact: true }).click();
   if (await page.locator('#card-dialog').isVisible()) await page.getByRole('button', { name: 'Close card', exact: true }).click();
 }
 
@@ -190,8 +190,7 @@ test('team board supports internal work, shared filters, members and collapsible
   await page.getByRole('button', { name: 'Events & Socials', exact: true }).click();
   await expect(page.locator('#board')).toContainText('Draft sponsor email');
   await page.getByRole('button', { name: 'View Draft sponsor email', exact: true }).click();
-  await expect(page.locator('#card-dialog')).toContainText('Lead: Ibrahim Haque');
-  await page.getByRole('button', { name: 'Edit', exact: true }).click();
+  await expect(page.locator('#card-dialog').getByRole('combobox', { name: 'Lead', exact: true })).toHaveValue('Ibrahim Haque');
   await expect(page.getByRole('checkbox', { name: 'Industry & Partnerships', exact: true })).toBeChecked();
   await expect(page.getByRole('checkbox', { name: 'Events & Socials', exact: true })).toBeChecked();
   await expect(page.getByRole('combobox', { name: 'Lead', exact: true })).toHaveValue('Ibrahim Haque');
@@ -223,6 +222,7 @@ test('team board supports internal work, shared filters, members and collapsible
 test('list drag handles reorder the shared board without moving cards', async ({ page, context }) => {
   const { admin } = await fixture(context, 'owner');
   await admin.mutation(api.planner.create, { activity: { ...activity, title: 'Keep this idea' }, stage: 'ideas', internalOnly: true });
+  await page.setViewportSize({ width: 1756, height: 896 });
   await ready(page);
   const order = () => page.locator('#board .board-column').evaluateAll(columns => columns.map(column => (column as HTMLElement).dataset.stage));
   expect(await order()).toEqual(['ideas', 'planning', 'ready', 'done']);
@@ -313,11 +313,11 @@ test('private board and publication review match the minimal layout on desktop a
   const project = await admin.mutation(api.planner.create, { activity: { ...activity, kind: 'project', title: 'Campus study assistant', date: '', startTime: '', endTime: '', location: '', description: 'Help build a useful study assistant for Surrey students.' }, stage: 'ready' }); await admin.mutation(api.planner.publish, { id: project, revision: 1 });
   await ready(page); await noOverflow(page); await screenshot(page, 'board-desktop');
   await editCard(page, 'Build night & project teams');
-  await expect(page.locator('#item-dialog')).toBeVisible(); await screenshot(page, 'publication-desktop');
+  await expect(page.locator('#card-dialog')).toBeVisible(); await screenshot(page, 'publication-desktop');
   await closeActivity(page);
   await page.setViewportSize({ width: 390, height: 844 }); await noOverflow(page); await screenshot(page, 'board-mobile');
   await editCard(page, 'Build night & project teams');
-  await expect(page.locator('#item-dialog')).toBeVisible(); await noOverflow(page); await screenshot(page, 'publication-mobile');
+  await expect(page.locator('#card-dialog')).toBeVisible(); await noOverflow(page); await screenshot(page, 'publication-mobile');
   await closeActivity(page);
   await page.setViewportSize({ width: 320, height: 760 }); await noOverflow(page);
   await navigate(page, 'Calendar'); await expect(page.locator('#calendar')).toBeVisible(); await noOverflow(page);
@@ -479,7 +479,7 @@ test('Ideas needs only a title, description and optional collaborators; details 
   await page.getByLabel('Description', { exact: true }).fill('A film and a discussion about AI.');
   await page.getByLabel('Collaborators (optional)', { exact: true }).fill('Josh, Mosie');
   await expect(page.locator('#activity-details')).not.toBeVisible(); await expect(page.locator('#private-options')).not.toBeVisible(); await expect(page.locator('#editor-preview')).not.toBeVisible();
-  await expect(page.locator('#item-form input:visible, #item-form textarea:visible')).toHaveCount(3);
+  await expect(page.locator('#item-form input:visible:not([name="teams"]), #item-form textarea:visible')).toHaveCount(3);
   await screenshot(page, 'simple-idea-desktop');
   await page.setViewportSize({ width: 390, height: 844 }); await noOverflow(page); await screenshot(page, 'simple-idea-mobile');
   await page.setViewportSize({ width: 320, height: 760 }); await noOverflow(page);
@@ -525,7 +525,6 @@ test('calendar retains archived events, orders times and uses a compact mobile a
   await expect(page.locator('[data-date="2026-10-15"]')).toHaveClass(/today/);
   await expect(page.locator('[data-date="2026-10-14"] .calendar-event')).toHaveAttribute('data-stage', 'archived');
   await page.locator('[data-date="2026-10-14"] .calendar-event').click();
-  await page.getByRole('button', { name: 'Edit', exact: true }).click();
   await expect(page.getByRole('combobox', { name: 'Stage', exact: true })).toHaveValue('archived');
   await page.locator('#private-options > summary').click();
   await expect(page.getByLabel('Notes', { exact: true })).toHaveValue('Keep the room notes');
@@ -673,9 +672,9 @@ test('approved board and opened card keep details inside and make comment action
   await expect(card.getByRole('button', { name: /^View / })).toHaveAccessibleDescription(/Joshua Knott.*Sam/);
   await noOverflow(page); await screenshot(page, 'approved-board-desktop');
   await card.getByRole('button', { name: /^View / }).focus(); await page.keyboard.press('Enter');
-  await expect(page.locator('#card-description')).toHaveText(workshop.description);
-  await expect(page.locator('#card-facts')).toContainText('22 Oct');
-  await expect(page.locator('#card-facts')).toContainText(workshop.location);
+  await expect(page.locator('#card-dialog').getByLabel('Description', { exact: true })).toHaveValue(workshop.description);
+  await expect(page.locator('#card-dialog').getByLabel('Date', { exact: true })).toHaveValue(workshop.date);
+  await expect(page.locator('#card-dialog').getByLabel('Room or location', { exact: true })).toHaveValue(workshop.location);
   await expect(page.locator('#comment-list .comment')).toHaveCount(3);
   await expect(page.locator('.comment-composer')).toContainText('Mention someone');
   const ownRow = page.locator(`[data-comment="${own}"]`);
@@ -703,7 +702,7 @@ test('approved board and opened card keep details inside and make comment action
   expect(errors).toEqual([]);
 });
 
-test('cards open a compact preview with comments and track the creator and editors as initials', async ({ page, context }) => {
+test('cards open fully editable beside comments and track the creator and editors as initials', async ({ page, context }) => {
   const { admin } = await fixture(context, 'owner');
   const id = await admin.mutation(api.planner.create, { activity: { ...activity, title: 'AI & creativity night', description: 'An evening of small creative experiments with AI.', date: '', startTime: '', endTime: '', location: '' } });
   await admin.mutation(api.planner.addComment, { id, text: 'Could we include a music activity?', requestId: '00000000-0000-4000-8000-000000000001' });
@@ -711,7 +710,7 @@ test('cards open a compact preview with comments and track the creator and edito
   await expect(page.locator(`[data-item="${id}"] .person-avatar`)).toHaveText(['C']);
   await page.getByRole('button', { name: 'View AI & creativity night', exact: true }).click();
   await expect(page.locator('#card-dialog')).toBeVisible(); await expect(page.locator('#item-dialog')).not.toBeVisible();
-  await expect(page.locator('#card-description')).toContainText('small creative experiments');
+  await expect(page.locator('#card-dialog').getByLabel('Description', { exact: true })).toHaveValue(/small creative experiments/);
   await expect(page.locator('#comment-list')).toContainText('music activity');
   await page.getByLabel('Add a comment', { exact: true }).fill('I can help with the creative coding session.');
   await page.getByRole('button', { name: 'Post comment', exact: true }).click();
@@ -721,15 +720,17 @@ test('cards open a compact preview with comments and track the creator and edito
   await expect(page.getByRole('button', { name: 'Edit comment', exact: true, includeHidden: true })).toHaveCount(1);
   expect((await admin.query(api.planner.get, { id }))?.contributors).toHaveLength(1);
   await page.getByLabel('Add a comment', { exact: true }).fill('Unposted comment draft');
-  await page.getByRole('button', { name: 'Edit', exact: true }).click();
-  await expect(page.locator('#card-dialog')).not.toBeVisible(); await expect(page.locator('#item-dialog')).toBeVisible();
   await page.getByLabel('Description', { exact: true }).fill('Bring your ideas for music, art and creative coding.');
   await page.getByRole('button', { name: 'Save idea', exact: true }).click(); await expect(page.locator('#item-message')).toContainText('Draft saved');
-  await page.getByRole('button', { name: 'Close activity', exact: true }).click();
   await expect(page.locator('#card-dialog')).toBeVisible();
-  await expect(page.locator('#card-description')).toContainText('music, art and creative coding');
+  await expect(page.getByLabel('Description', { exact: true })).toHaveValue('Bring your ideas for music, art and creative coding.');
   await expect(page.locator('#comment-text')).toHaveValue('Unposted comment draft');
-  await expect(page.locator('#card-people .person-avatar')).toHaveText(['C', 'JK']);
+  await expect(page.locator(`[data-item="${id}"] .person-avatar`)).toHaveText(['C', 'JK']);
+  await page.getByLabel('Title', { exact: true }).fill('Unsaved card title');
+  page.once('dialog', dialog => dialog.dismiss());
+  await page.getByRole('button', { name: 'Close card', exact: true }).click();
+  await expect(page.locator('#card-dialog')).toBeVisible();
+  await page.getByLabel('Title', { exact: true }).fill('AI & creativity night');
   await page.getByLabel('Add a comment', { exact: true }).fill('');
   await noOverflow(page); await screenshot(page, 'card-preview-desktop');
   await page.setViewportSize({ width: 390, height: 844 }); await noOverflow(page); await screenshot(page, 'card-preview-mobile');
