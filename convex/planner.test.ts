@@ -11,6 +11,18 @@ const modules = import.meta.glob('./**/*.ts');
 const activity: Activity = { title: 'AI workshop', kind: 'event', category: 'Workshop', description: 'A beginner workshop.', date: '2026-10-29', startTime: '18:00', endTime: '20:00', location: 'Stag Hill', registrationUrl: 'https://example.test/signup' };
 
 describe('team board workflow', () => {
+  it('keeps attachment links private and rejects unsafe or excessive links', async () => {
+    const { admin, t } = await setup();
+    const attachments = [{ name: 'Proposal.pdf', url: 'https://example.test/proposal.pdf' }];
+    const id = await admin.mutation(api.planner.create, { activity, attachments, stage: 'ready' });
+    expect((await admin.query(api.planner.get, { id }))?.attachments).toEqual(attachments);
+    await expect(admin.mutation(api.planner.save, { id, revision: 1, activity, notes: '', owner: '', tasks: [], attachments: [{ name: 'Unsafe', url: 'javascript:alert(1)' }] })).rejects.toThrow('https://');
+    await expect(admin.mutation(api.planner.create, { activity, attachments: Array.from({ length: 11 }, () => attachments[0]) })).rejects.toThrow('up to 10');
+    await admin.mutation(api.planner.publish, { id, revision: 1 });
+    expect(await t.query(api.planner.getPublished, { id })).toEqual({ id, ...activity });
+    await admin.mutation(api.planner.save, { id, revision: 2, activity, notes: '', owner: '', tasks: [], attachments: [] });
+    expect((await admin.query(api.planner.get, { id }))?.attachments).toEqual([]);
+  });
   it('shares list order with the committee and rejects stale or unauthorised changes', async () => {
     const { admin, t } = await setup();
     const original = ['ideas', 'planning', 'ready', 'done'] as const;

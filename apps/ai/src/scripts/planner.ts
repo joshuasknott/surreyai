@@ -46,6 +46,10 @@ async function start(root: HTMLElement) {
   let archived: Item[] = [];
   let current: Item | null = null;
   let tasks: Item['tasks'] = [];
+  let attachments: NonNullable<Item['attachments']> = [];
+  let autosaveTimer: ReturnType<typeof setTimeout> | undefined;
+  let autosavePromise: Promise<boolean> | null = null;
+  let cardReviewOpen = false;
   let baseline = '';
   let busy = false;
   let view: 'board' | 'calendar' | 'archive' = 'board';
@@ -98,6 +102,7 @@ async function start(root: HTMLElement) {
   const icon = (name: string) => ($<HTMLTemplateElement>(`${name}-icon`).content.cloneNode(true));
   const status = (message = '') => { $('planner-status').textContent = message; };
   const field = (name: string) => form.elements.namedItem(name) as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+  const inCard = () => form.parentElement?.id === 'card-editor-slot';
   const readActivity = (): Activity => {
     const result = blankActivity();
     for (const name of Object.keys(result) as (keyof Activity)[]) (result[name] as string) = field(name).value.trim();
@@ -105,10 +110,11 @@ async function start(root: HTMLElement) {
       result.kind = 'project'; result.category = ''; result.date = field('dueDate').value;
       result.startTime = ''; result.endTime = ''; result.location = ''; result.registrationUrl = '';
     }
+    if (inCard() && field('purpose').value !== 'internal') result.date = field('dueDate').value;
     return result;
   };
   const selectedTeams = () => [...form.querySelectorAll<HTMLInputElement>('input[name="teams"]:checked')].map(input => input.value as PlannerTeam);
-  const signature = () => JSON.stringify({ activity: readActivity(), stage: field('stage').value, teams: selectedTeams(), lead: field('lead').value, purpose: field('purpose').value, notes: field('notes').value, owner: field('owner').value, tasks });
+  const signature = () => JSON.stringify({ activity: readActivity(), stage: field('stage').value, teams: selectedTeams(), lead: field('lead').value, purpose: field('purpose').value, notes: field('notes').value, owner: field('owner').value, tasks, attachments });
   const dirty = () => (editor.open || cardDialog.open) && signature() !== baseline;
   const closeEditor = () => { if (busy || (dirty() && !window.confirm('Discard your unsaved changes?'))) return; editor.close(); };
 
@@ -131,12 +137,13 @@ async function start(root: HTMLElement) {
     $('open-members').replaceChildren(); $('team-members').replaceChildren(); $('account-name').textContent = '';
     selectedTeam = 'all'; search = ''; $<HTMLInputElement>('card-search').value = ''; syncTeamFilters();
     $('open-settings').hidden = true; $('committee-settings').hidden = true; $('settings-account').textContent = '';
-    for (const id of ['board', 'calendar', 'archive', 'access-list', 'public-preview', 'task-list', 'card-title', 'card-description', 'card-people', 'card-facts', 'comment-list', 'comments-status', 'comment-message', 'card-state', 'comment-count', 'comment-author', 'account-avatar']) $(id).replaceChildren();
+    clearTimeout(autosaveTimer);
+    for (const id of ['board', 'calendar', 'archive', 'access-list', 'public-preview', 'task-list', 'card-people', 'attachment-list', 'comment-list', 'comments-status', 'comment-message', 'comment-count', 'comment-author', 'account-avatar']) $(id).replaceChildren();
     $('account-avatar').hidden = true;
-    for (const dialog of [editor, settingsDialog, cardDialog, notificationsDialog, membersDialog]) if (dialog.open) dialog.close();
+    for (const dialog of [editor, settingsDialog, cardDialog, notificationsDialog, membersDialog, $<HTMLDialogElement>('card-people-dialog')]) if (dialog.open) dialog.close();
     resetDescriptionHelp(); form.reset(); $<HTMLFormElement>('access-form').reset();
     $('item-heading').textContent = 'New activity'; $('item-state').textContent = ''; $('item-message').textContent = '';
-    tasks = []; current = null;
+    tasks = []; attachments = []; current = null;
   }
   function showAccess(message: string) {
     clearPrivateData(); $('access-state').hidden = false; $('sign-in').hidden = true; $('access-message').textContent = message;
@@ -422,34 +429,21 @@ async function start(root: HTMLElement) {
     if (rows.length > 6) { const more = el('span', `+${rows.length - 6}`, 'person-avatar avatar-more'); more.title = rows.slice(6).map(person => person.name).join(', '); more.setAttribute('aria-label', `${rows.length - 6} more contributors: ${more.title}`); container.append(more); }
   }
   function renderCardPreview() {
-    if (!previewItem) return; const item = previewItem;
-    $('card-title').textContent = item.title;
-    const state = $('card-state'); state.replaceChildren(); state.dataset.stage = item.stage;
-    const stage = el('span', labels[boardStage(item)], 'card-state-label'); stage.prepend(icon('stage'));
-    const visibility = el('span', item.stage === 'published' ? 'Live on website' : 'Private', 'card-visibility');
-    if (item.stage !== 'published') visibility.prepend(icon('lock'));
-    state.append(stage, visibility);
-    for (const id of assignedTeams(item)) {
-      const team = plannerTeams.find(team => team.id === id);
-      if (team) state.append(el('span', team.name, 'card-team'));
-    }
-    $('card-description').textContent = item.description || 'No description yet.'; fillPeople($('card-people'), item);
-    $('card-contributors').hidden = !$('card-people').childElementCount;
-    const facts = $('card-facts'); facts.replaceChildren();
-    for (const [iconName, text] of [
-      ['calendar', [item.date ? activityDate(item.date) : '', item.startTime ? `${item.startTime}${item.endTime ? `–${item.endTime}` : ''}` : ''].filter(Boolean).join(' · ')],
-      ['location', item.location], ['collaborators', item.lead ? `Lead: ${item.lead}` : ''], ['collaborators', item.owner ? `Collaborators: ${item.owner}` : ''],
-    ]) { if (text) { const row = el('span', undefined, 'card-fact'); row.append(icon(iconName), el('span', text)); facts.append(row); } }
-    if (item.registrationUrl) { const link = el('a', item.kind === 'project' ? 'Project link' : 'Booking link'); link.href = item.registrationUrl; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.append(icon('external')); facts.append(link); }
-    if (item.stage === 'published') { const link = el('a', 'View on website'); link.href = `/activities/${item._id}`; link.target = '_blank'; link.rel = 'noopener'; link.append(icon('external')); facts.append(link); }
-    $('comment-count').textContent = String(item.commentCount ?? comments.length);
+    if (!previewItem) return;
+    fillPeople($('card-people'), previewItem);
+    $('comment-count').textContent = String(previewItem.commentCount ?? comments.length);
+    $('item-heading').textContent = previewItem.title;
   }
   async function openPreview(item: Item, targetComment?: Id<'plannerComments'>) {
     previewVersion++; previewItem = item; comments = []; commentsCursor = null; commentsDone = true; commentsLoading = false; commentPages = 1; commentRequest = null; commentEdit = null; commentDelete = null;
     commentForm.reset(); commentText.value = commentDrafts.get(item._id) || ''; $('comment-message').textContent = ''; $('comments-status').textContent = 'Loading comments…';
     highlightedComment = targetComment || null; commentMentionPicker.close();
     $('comment-list').replaceChildren(); $('older-comments').hidden = true; renderCardPreview();
-    $('card-editor-slot').append(form); openEditor(item, 'ideas', '', true); cardDialog.showModal();
+    $('card-editor-slot').append(form); $('card-stage-slot').append($('stage-field')); $('card-actions-slot').append($('editor-action-buttons'));
+    $('editor-action-buttons').append($('unpublish-item'));
+    $('card-collaborators-slot').append($('collaborators-field'));
+    cardReviewOpen = false; cardDialog.dataset.panel = targetComment ? 'discussion' : 'card'; syncCardTabs();
+    openEditor(item, 'ideas', '', true); setSaveStatus('All changes saved'); cardDialog.showModal();
     const version = previewVersion;
     if (!await loadComments('initial')) return;
     while (targetComment && version === previewVersion && !comments.some(comment => comment._id === targetComment) && !commentsDone) {
@@ -461,8 +455,10 @@ async function start(root: HTMLElement) {
       else $('comments-status').textContent = 'This comment is no longer available.';
     }
   }
-  function closeCard() {
-    if (commentBusy || busy || (dirty() && !window.confirm('Discard your unsaved card changes?')) || (commentEdit && commentEdit.text !== commentEdit.original && !window.confirm('Discard your unsaved comment changes?'))) return false;
+  async function closeCard() {
+    if (commentBusy || busy || (commentEdit && commentEdit.text !== commentEdit.original && !window.confirm('Discard your unsaved comment changes?'))) return false;
+    clearTimeout(autosaveTimer);
+    do { if (!await saveCardNow()) return false; } while (dirty());
     cardDialog.close(); return true;
   }
   cardDialog.addEventListener('cancel', event => { event.preventDefault(); closeCard(); });
@@ -471,8 +467,11 @@ async function start(root: HTMLElement) {
     if (previewItem && access) { if (commentText.value.trim()) commentDrafts.set(previewItem._id, commentText.value); else commentDrafts.delete(previewItem._id); }
     previewVersion++; previewItem = null; comments = []; commentsLoading = false; commentEdit = null; commentDelete = null; commentText.value = '';
     highlightedComment = null; commentMentionPicker.close(); editMentionPicker?.destroy(); editMentionPicker = null;
-    editor.append(form); resetDescriptionHelp(); current = null;
-    for (const id of ['card-title', 'card-description', 'card-people', 'card-facts', 'comment-list', 'comments-status', 'comment-message', 'card-state', 'comment-count']) $(id).replaceChildren();
+    clearTimeout(autosaveTimer); editor.append(form); form.querySelector('.editor-stage-bar')!.prepend($('stage-field')); form.querySelector('.editor-actions')!.append($('editor-action-buttons'));
+    $('collaborators-home').append($('collaborators-field'));
+    $('editor-preview').append($('unpublish-item'));
+    resetDescriptionHelp(); current = null; cardReviewOpen = false;
+    for (const id of ['card-people', 'attachment-list', 'comment-list', 'comments-status', 'comment-message', 'comment-count']) $(id).replaceChildren();
   });
   async function refreshCard() {
     if (!previewItem || !cardDialog.open) return;
@@ -621,6 +620,9 @@ async function start(root: HTMLElement) {
     }
   });
   cardDialog.addEventListener('keydown', event => {
+    const panel = cardDialog.querySelector<HTMLDetailsElement>('.card-detail-panel[open], #team-picker-menu[open], #card-actions[open]');
+    if (event.key === 'Escape' && panel) { event.preventDefault(); event.stopPropagation(); panel.open = false; return; }
+    if (event.key === 'Escape' && cardReviewOpen) { event.preventDefault(); event.stopPropagation(); cardReviewOpen = false; updatePreview(); return; }
     const menu = cardDialog.querySelector<HTMLDetailsElement>('.comment-menu[open]');
     if (event.key === 'Escape' && menu) {
       event.preventDefault(); event.stopPropagation(); menu.open = false; menu.querySelector('summary')?.focus();
@@ -776,7 +778,9 @@ async function start(root: HTMLElement) {
 
   function openEditor(item: Item | null, stage: Stage = 'ideas', date = '', fromCard = false) {
     $('editor-back-label').textContent = fromCard ? 'Card' : 'Planner';
-    resetDescriptionHelp(); current = item; form.reset(); $<HTMLDetailsElement>('private-options').open = false;
+    resetDescriptionHelp(); current = item; form.reset();
+    for (const id of ['private-options', 'activity-details', 'team-picker-menu', 'card-actions']) $<HTMLDetailsElement>(id).open = false;
+    $('attachment-editor').hidden = true;
     const activity = item || { ...blankActivity(), date };
     for (const name of Object.keys(blankActivity())) field(name).value = activity[name as keyof Activity];
     field('notes').value = item?.notes || ''; field('owner').value = item?.owner || '';
@@ -785,36 +789,59 @@ async function start(root: HTMLElement) {
     field('lead').value = item?.lead || '';
     field('purpose').value = item ? item.internalOnly ? 'internal' : 'activity' : date ? 'activity' : 'internal';
     field('purpose').disabled = !!item?.published;
-    field('dueDate').value = item?.internalOnly ? item.date : '';
+    field('dueDate').value = item?.date || date;
     const stageField = field('stage') as HTMLSelectElement;
     for (const value of ['published', 'archived']) stageField.querySelector(`[value=${value}]`)?.remove();
     if (item?.stage === 'archived') { const option = el('option', labels[item.stage]); option.value = item.stage; stageField.append(option); }
     stageField.value = item ? boardStage(item) : stage; stageField.disabled = false;
     tasks = structuredClone(item?.tasks || []);
+    attachments = structuredClone(item?.attachments || []);
     $('item-heading').textContent = item ? item.title : 'New card';
     $('item-state').textContent = `${labels[item ? boardStage(item) : stage]} · ${item?.published ? 'Public version is live' : 'Private'}`;
     $('archive-item').hidden = !item || item.stage === 'archived'; $('unpublish-item').hidden = item?.stage !== 'published';
     $('item-message').textContent = '';
-    renderTasks(); updatePreview(); baseline = signature(); if (!fromCard) { editor.showModal(); field('title').focus(); }
+    renderTasks(); renderAttachments(); updatePreview(); baseline = signature(); if (!fromCard) { editor.showModal(); field('title').focus(); }
   }
 
   function renderTasks() {
     const list = $('task-list'); list.replaceChildren();
     tasks.forEach((task, index) => {
       const row = el('div', undefined, 'checklist-row'); const label = el('label');
-      const check = el('input'); check.type = 'checkbox'; check.checked = task.done; check.onchange = () => { task.done = check.checked; };
-      label.append(check, el('span', task.text)); const remove = el('button', 'Remove', 'quiet-button'); remove.type = 'button'; remove.setAttribute('aria-label', `Remove task: ${task.text}`); remove.onclick = () => { tasks.splice(index, 1); renderTasks(); };
+      const check = el('input'); check.type = 'checkbox'; check.checked = task.done; check.setAttribute('aria-label', `Complete ${task.text}`); check.onchange = () => { task.done = check.checked; updateTaskProgress(); scheduleAutosave(); };
+      const text = el('input'); text.value = task.text; text.maxLength = 300; text.setAttribute('aria-label', `Checklist item ${index + 1}`); text.oninput = () => { task.text = text.value; scheduleAutosave(); };
+      label.append(check, text); const remove = el('button', undefined, 'quiet-button'); remove.append(icon('close')); remove.type = 'button'; remove.setAttribute('aria-label', `Remove task: ${task.text}`); remove.onclick = () => { tasks.splice(index, 1); renderTasks(); scheduleAutosave(); };
       row.append(label, remove); list.append(row);
     });
+    updateTaskProgress();
+  }
+
+  function updateTaskProgress() { $('task-progress').textContent = tasks.length ? `${tasks.filter(task => task.done).length} / ${tasks.length}` : ''; }
+
+  function renderAttachments() {
+    const list = $('attachment-list'); list.replaceChildren();
+    for (const [index, attachment] of attachments.entries()) {
+      const row = el('div', undefined, 'attachment-row'); const link = el('a'); link.href = attachment.url; link.target = '_blank'; link.rel = 'noopener noreferrer';
+      const text = el('span'); text.append(el('strong', attachment.name), el('small', new URL(attachment.url).hostname)); link.append(icon('attachment'), text);
+      const remove = el('button', undefined, 'icon-button'); remove.type = 'button'; remove.append(icon('close')); remove.setAttribute('aria-label', `Remove attachment: ${attachment.name}`); remove.onclick = () => { attachments.splice(index, 1); renderAttachments(); scheduleAutosave(); };
+      row.append(link, remove); list.append(row);
+    }
+    if (!attachments.length) { const add = el('button', 'Attach a document or link', 'attachment-empty'); add.type = 'button'; add.onclick = () => $('add-attachment').click(); list.append(add); }
   }
 
   function updatePreview() {
     const stage = field('stage').value;
     const internal = field('purpose').value === 'internal';
     const idea = stage === 'ideas'; const review = !internal && (stage === 'ready' || !!current?.published);
+    const compact = inCard();
     editor.classList.toggle('has-preview', review);
-    $('activity-details').hidden = internal || idea; $('private-options').hidden = !internal && idea; $('editor-preview').hidden = !review;
-    $('internal-due-label').hidden = !internal;
+    $('activity-details').hidden = internal || (!compact && idea); $('private-options').hidden = !compact && !internal && idea; $('editor-preview').hidden = compact ? !cardReviewOpen : !review;
+    if (!compact) $<HTMLDetailsElement>('activity-details').open = !idea;
+    $('card-checklist').hidden = !compact && idea; $('card-attachments').hidden = !compact && idea;
+    $('internal-due-label').hidden = !compact && !internal;
+    for (const id of ['card-review', 'card-notes', 'card-people-toggle']) $(id).hidden = !compact;
+    $('card-review').hidden = !compact || internal;
+    syncTeamPicker();
+    $('lead-avatar').textContent = field('lead').value ? field('lead').value.split(/\s+/).map(word => word[0]).filter(Boolean).slice(0, 2).join('') : '—';
     $('stage-help').textContent = idea ? 'Start with a title and a few words. Work out the details later.' : field('stage').value === 'archived' ? 'Archived events stay on the calendar. To reschedule, choose a future date and move it to Planning.' : review ? 'Check the public details here. Ready is still private.' : 'Add the practical details as they are confirmed.';
     $('save-item').textContent = idea ? 'Save idea' : field('stage').value === 'archived' ? 'Save changes' : 'Save draft';
     if (internal) { $('stage-help').textContent = 'Internal work stays on the committee board.'; $('save-item').textContent = 'Save card'; }
@@ -833,41 +860,113 @@ async function start(root: HTMLElement) {
     $('publication-help').textContent = current?.stage === 'published' ? 'Saved edits stay private until you publish changes. This preview shows your current draft.' : 'Ready stays private. Publish when the public details are confirmed.';
   }
 
-  async function persist() {
-    if (!form.reportValidity()) return false;
+  async function persist(silent = false) {
+    if (!(silent ? form.checkValidity() : form.reportValidity())) return false;
+    const savedSignature = signature(); const savingItem = current; const version = previewVersion;
+    const payload = structuredClone({ activity: readActivity(), teams: selectedTeams(), lead: field('lead').value || null, internalOnly: field('purpose').value === 'internal', notes: field('notes').value, owner: field('owner').value, tasks, attachments });
+    const stage = field('stage').value;
     await authenticated();
-    const payload = { activity: readActivity(), teams: selectedTeams(), lead: field('lead').value || null, internalOnly: field('purpose').value === 'internal', notes: field('notes').value, owner: field('owner').value, tasks };
     let id: Id<'plannerItems'>;
-    if (current) {
-      id = current._id;
-      await client.mutation(api.planner.save, { id, revision: current.revision, ...payload, ...(current.stage === 'published' ? { workflowStage: field('stage').value as Stage } : field('stage').value !== 'archived' ? { stage: field('stage').value as Stage } : {}) });
-    } else id = await client.mutation(api.planner.create, { ...payload, stage: field('stage').value as Stage });
-    items = await client.query(api.planner.list, {}); current = await client.query(api.planner.get, { id });
+    if (savingItem) {
+      id = savingItem._id;
+      await client.mutation(api.planner.save, { id, revision: savingItem.revision, ...payload, ...(savingItem.stage === 'published' ? { workflowStage: stage as Stage } : stage !== 'archived' ? { stage: stage as Stage } : {}) });
+    } else id = await client.mutation(api.planner.create, { ...payload, stage: stage as Stage });
+    const [savedItems, savedItem] = await Promise.all([client.query(api.planner.list, {}), client.query(api.planner.get, { id })]);
+    if (!access || version !== previewVersion) return false;
+    items = savedItems; current = savedItem;
     if (!current) throw new Error('Activity saved but could not be reloaded. Close and reopen the board.');
     if (cardDialog.open) { previewItem = current; renderCardPreview(); }
-    baseline = signature(); $('archive-item').hidden = current.stage === 'archived';
+    baseline = savedSignature; $('archive-item').hidden = current.stage === 'archived';
     $('item-state').textContent = `${labels[boardStage(current)]} · ${current.published ? 'Public version is live' : 'Private'}`;
     updatePreview(); render(); if (view === 'calendar') void loadCalendar(true); return true;
   }
 
-  function setBusy(value: boolean) { busy = value; for (const id of ['save-item', 'publish-item', 'archive-item', 'unpublish-item']) $<HTMLButtonElement>(id).disabled = value; $<HTMLButtonElement>('help-description').disabled = value || aiBusy; updatePreview(); }
-  form.addEventListener('input', updatePreview); form.addEventListener('change', updatePreview);
+  function setBusy(value: boolean) { busy = value; form.inert = value; field('stage').disabled = value; for (const id of ['save-item', 'publish-item', 'archive-item', 'unpublish-item']) $<HTMLButtonElement>(id).disabled = value; $<HTMLButtonElement>('help-description').disabled = value || aiBusy; updatePreview(); }
+  function syncTeamPicker() {
+    const summary = $('team-picker-summary'); summary.replaceChildren();
+    for (const id of selectedTeams()) { const team = plannerTeams.find(team => team.id === id)!; const badge = el('span', team.name, 'team-badge'); badge.dataset.team = team.id; summary.append(badge); }
+    if (!summary.childElementCount) summary.append(el('span', 'Unassigned', 'unassigned-team'));
+    summary.append(icon('plus'));
+  }
+  function setSaveStatus(message: string, error = false) {
+    $('card-save-status').textContent = message; $('card-save-status').title = message;
+    $('card-save-status').parentElement!.classList.toggle('save-error', error); $('retry-card-save').hidden = !error;
+  }
+  function scheduleAutosave() {
+    if (!cardDialog.open || !current) return;
+    clearTimeout(autosaveTimer);
+    setSaveStatus(dirty() ? 'Unsaved changes' : 'All changes saved');
+    autosaveTimer = setTimeout(() => void saveCardNow(), 700);
+  }
+  async function saveCardNow(): Promise<boolean> {
+    if (!cardDialog.open || !current) return true;
+    if (autosavePromise) { if (!await autosavePromise) return false; return saveCardNow(); }
+    if (!dirty()) return true;
+    if (busy) return false;
+    if (!form.checkValidity()) { setSaveStatus('Add a title and check the highlighted fields', true); return false; }
+    const version = previewVersion;
+    autosavePromise = (async () => {
+      setSaveStatus('Saving…');
+      try {
+        if (!await persist(true)) return false;
+        if (version === previewVersion) { setSaveStatus(dirty() ? 'Unsaved changes' : 'All changes saved'); }
+        return true;
+      } catch (error) {
+        if (version === previewVersion) { setSaveStatus(error instanceof Error ? error.message.replace(/\[.*?\]\s*/g, '') : 'Could not save changes', true); }
+        return false;
+      } finally { autosavePromise = null; }
+    })();
+    const saved = await autosavePromise;
+    if (saved && version === previewVersion && dirty()) { clearTimeout(autosaveTimer); autosaveTimer = setTimeout(() => void saveCardNow(), 150); }
+    return saved;
+  }
+  $('retry-card-save').onclick = () => void saveCardNow();
+  function syncCardTabs() {
+    $('card-tab').setAttribute('aria-selected', String(cardDialog.dataset.panel !== 'discussion'));
+    $('discussion-tab').setAttribute('aria-selected', String(cardDialog.dataset.panel === 'discussion'));
+    $('card-tab').tabIndex = cardDialog.dataset.panel === 'discussion' ? -1 : 0;
+    $('discussion-tab').tabIndex = cardDialog.dataset.panel === 'discussion' ? 0 : -1;
+  }
+  for (const [id, panel] of [['card-tab', 'card'], ['discussion-tab', 'discussion']]) $(id).onclick = () => { cardDialog.dataset.panel = panel; syncCardTabs(); };
+  for (const id of ['card-tab', 'discussion-tab']) $(id).onkeydown = event => { if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) { event.preventDefault(); const target = event.key === 'Home' ? 'card-tab' : event.key === 'End' ? 'discussion-tab' : id === 'card-tab' ? 'discussion-tab' : 'card-tab'; $(target).click(); $(target).focus(); } };
+  function closeCardOptions() { $<HTMLDetailsElement>('card-actions').open = false; }
+  $('card-notes').onclick = () => { closeCardOptions(); $<HTMLDetailsElement>('private-options').open = true; field('notes').focus(); };
+  $('card-review').onclick = () => { closeCardOptions(); cardReviewOpen = !cardReviewOpen; updatePreview(); };
+  $('card-people-toggle').onclick = () => { closeCardOptions(); $<HTMLDialogElement>('card-people-dialog').showModal(); };
+  document.querySelectorAll<HTMLButtonElement>('.close-card-panel').forEach(button => button.onclick = () => { const details = button.closest('details'); if (details) details.open = false; });
+  $('add-attachment').onclick = () => { $('attachment-editor').hidden = false; $('attachment-error').textContent = ''; $('attachment-url').focus(); };
+  $('cancel-attachment').onclick = () => { $('attachment-editor').hidden = true; $<HTMLInputElement>('attachment-url').value = ''; $<HTMLInputElement>('attachment-name').value = ''; };
+  $('save-attachment').onclick = () => {
+    const url = $<HTMLInputElement>('attachment-url').value.trim(); const name = $<HTMLInputElement>('attachment-name').value.trim();
+    try {
+      const parsed = new URL(url);
+      if (parsed.protocol !== 'https:' || parsed.username || parsed.password || url.length > 1500) throw new Error('Use a complete https:// link');
+      if (!name || name.length > 160) throw new Error('Add a name for this attachment');
+      if (attachments.length >= 10) throw new Error('Attach up to 10 links per card');
+      attachments.push({ name, url }); renderAttachments(); $('attachment-editor').hidden = true; $<HTMLInputElement>('attachment-url').value = ''; $<HTMLInputElement>('attachment-name').value = ''; scheduleAutosave();
+    } catch (error) { $('attachment-error').textContent = error instanceof Error ? error.message : 'Check the attachment link'; }
+  };
+  const changed = (event: Event) => { if (event.target === field('date') && inCard()) field('dueDate').value = field('date').value; updatePreview(); scheduleAutosave(); };
+  form.addEventListener('input', changed); form.addEventListener('change', changed);
+  $('stage-field').addEventListener('change', () => { updatePreview(); scheduleAutosave(); });
   form.addEventListener('submit', event => { event.preventDefault(); void (async () => {
+    if (inCard()) { await saveCardNow(); return; }
     if (busy) return; setBusy(true); try { if (await persist()) $('item-message').textContent = 'Draft saved. Public content is unchanged.'; } catch (error) { showError(error, 'item-message'); } finally { setBusy(false); }
   })(); });
   $('publish-item').onclick = () => void (async () => {
+    clearTimeout(autosaveTimer); if (autosavePromise) await autosavePromise;
     if (busy) return; setBusy(true); try {
       if (!await persist() || !current) return;
       await client.mutation(api.planner.publish, { id: current._id, revision: current.revision }); if (cardDialog.open) cardDialog.close(); else editor.close(); status('Published. This activity is now on the main website.');
     } catch (error) { showError(error, 'item-message'); } finally { setBusy(false); await refresh(); }
   })();
-  $('unpublish-item').onclick = () => void (async () => { if (!current || !window.confirm('Remove this activity from the public website? Your draft and committee notes will stay on the private board.')) return;
+  $('unpublish-item').onclick = () => void (async () => { clearTimeout(autosaveTimer); if (inCard() && !await saveCardNow()) return; if (!current || !window.confirm('Remove this activity from the public website? Your draft and committee notes will stay on the private board.')) return;
     setBusy(true); try { await authenticated(); await client.mutation(api.planner.move, { id: current._id, revision: current.revision, stage: 'ready' }); if (cardDialog.open) cardDialog.close(); else editor.close(); status('Unpublished. The activity is private in Ready.'); } catch (error) { showError(error, 'item-message'); } finally { setBusy(false); await refresh(); }
   })();
-  $('archive-item').onclick = () => void (async () => { if (!current || !window.confirm('Archive this activity? It will be removed from the public website if published. Unsaved edits will be discarded.')) return;
+  $('archive-item').onclick = () => void (async () => { clearTimeout(autosaveTimer); if (inCard() && !await saveCardNow()) return; if (!current || !window.confirm('Archive this activity? It will be removed from the public website if published.')) return;
     setBusy(true); try { await authenticated(); await client.mutation(api.planner.move, { id: current._id, revision: current.revision, stage: 'archived' }); if (cardDialog.open) cardDialog.close(); else editor.close(); status('Activity archived.'); } catch (error) { showError(error, 'item-message'); } finally { setBusy(false); await refresh(); }
   })();
-  $('add-task').onclick = () => { const input = $<HTMLInputElement>('task-text'); if (!input.value.trim() || tasks.length >= 30) return; tasks.push({ text: input.value.trim(), done: false }); input.value = ''; renderTasks(); };
+  $('add-task').onclick = () => { const input = $<HTMLInputElement>('task-text'); if (!input.value.trim() || tasks.length >= 30) return; tasks.push({ text: input.value.trim(), done: false }); input.value = ''; renderTasks(); scheduleAutosave(); };
   $('task-text').onkeydown = event => { if (event.key === 'Enter') { event.preventDefault(); $('add-task').click(); } };
   document.querySelectorAll<HTMLButtonElement>('[data-close]').forEach(button => button.onclick = () => { const dialog = button.closest('dialog'); if (dialog === editor) closeEditor(); else if (dialog === cardDialog) closeCard(); else dialog?.close(); });
   editor.addEventListener('cancel', event => { event.preventDefault(); closeEditor(); });
@@ -928,7 +1027,7 @@ async function start(root: HTMLElement) {
     } catch (error) { if (version === aiVersion && !signal.aborted) showError(error, 'description-ai-message'); }
     finally { if (version === aiVersion) { aiBusy = false; aiRequest = null; button.disabled = busy; button.setAttribute('aria-busy', 'false'); } }
   })(); };
-  $('use-description').onclick = () => { if (!suggestedDescription || busy) return; field('description').value = suggestedDescription; resetDescriptionHelp(); updatePreview(); };
+  $('use-description').onclick = () => { if (!suggestedDescription || busy) return; field('description').value = suggestedDescription; resetDescriptionHelp(); updatePreview(); scheduleAutosave(); };
   $('dismiss-description').onclick = resetDescriptionHelp;
   async function refreshAccess() {
     await authenticated(); const rows = await client.query(api.planner.listAccess, {}); const list = $('access-list'); list.replaceChildren();

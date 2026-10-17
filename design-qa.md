@@ -755,3 +755,46 @@ final result: passed
 **Verification.** All 129 unit/backend/server tests passed, as did root and Convex TypeScript and the AI production build. The 26 planner browser cases passed across the regression run and focused rerun after adapting the old Published-column count assertion. The final four-case rerun covers team persistence, responsive navigation, calendar history, drag/drop publication isolation and card/comment accessibility. Eighteen AI public launch checks also passed. The broader launch run was stopped when it attempted unrelated Business tests without a running Business preview; no Business or Neurotech acceptance is claimed for this change. The build still reports the existing large-client-chunk warning. Browser authentication/transport are fixtures backed by actual isolated Convex functions; live authenticated acceptance and production deployment remain unexercised.
 
 No remaining P0/P1/P2 visual findings in the reviewed states. Local preview remains at http://127.0.0.1:4321/committee/planner. The frontend and Convex changes must be released together before hosted use; this task did not commit, push or deploy.
+
+---
+
+# Committee card design QA
+
+Source visual: `C:/Users/Joshua Knott/.codex/generated_images/01a14232-e32b-7d61-8e02-31694b7fe854/exec-e1c205b5-f36b-45c4-97ef-47396850be97.png`.
+Implementation: `output/planner/compact-card-desktop.png`.
+Full comparison: `output/planner/compact-comparison.png`.
+Focused comparison: `output/planner/compact-comparison-detail.png`.
+Responsive evidence: `output/planner/compact-card-laptop.png`, `compact-card-mobile.png`, and `compact-discussion-mobile.png`.
+
+Source is 1586 x 992 pixels. Desktop implementation is 1600 x 1000 CSS/pixel viewport at device scale 1. The full comparison normalizes the source onto a 1600 x 1000 canvas, then places both views together. The focused comparison aligns the title, assignment controls, and description. State: In progress, internal NVIDIA workshop partnership, two teams, Ibrahim Haque as lead, three checklist items, one linked PDF, two discussion messages.
+
+## Findings and comparison history
+
+- Initial P1: checklist text inputs inherited checkbox width and clipped text. Fixed by giving text inputs the remaining row width. Final screenshots show all three editable items clearly.
+- Initial P2: the old form border rule and description margin made the view look like a form and caused 21px of content scrolling. Removed the conflicting rule and margin. Automated checks now confirm no dialog or main content scrolling in the sample at 1600 x 1000 and 1280 x 720.
+- Initial P2: frame was wider than the selected mock. Reduced desktop width to 1100px and increased the title to 30px. Final combined comparison preserves the compact two-column composition and title hierarchy.
+- No remaining actionable P0/P1/P2 findings.
+
+## Required fidelity surfaces
+
+- Typography: existing Inter/system sans stack; 30px title, 12px metadata, 13-14px editable copy, muted small timestamps. The 720px-high laptop layout uses a 27px title. Text is readable without permanent form borders.
+- Layout: white 12px-radius frame, compact header, approximately 62/38 content/discussion grid, thin divider and save footer. Description, checklist, and attachment each have a quiet divider. Discussion history scrolls independently from editing.
+- Color: white, deep plum text, pale blue/amber team chips, faint cool-purple borders. Existing app identity and navigation are retained. The source's invented navigation destinations are outside this card change.
+- Assets: existing society logo and Lucide icons retained. Initials represent existing committee identity data; no decorative raster assets are needed.
+- Copy: Team(s), Lead, Due, Card purpose, Description, Checklist, Attachments, Discussion and All changes saved match the selected information hierarchy. Fixture discussion authors differ from the mock and do not affect layout.
+
+## Functional and responsive checks
+
+- Browser-rendered screenshots at 1600 x 1000, 1280 x 720, 390 x 844; smaller 320px layouts covered by existing planner cases.
+- Direct title/description/assignment editing, checklist editing and completion, linked attachments, optional notes/activity panels, debounce autosave, edits typed during an in-flight save, retry after failure, close-to-save, comments and mentions.
+- Ordinary saved drafts retain explicit publication boundaries. Unpublish/archive wait for pending card saves. Access revocation clears loaded private data.
+- All 30 planner browser cases passed. These use Clerk transport fixtures with the actual Convex functions running in convex-test, not production data. No page errors in the new compact-card flow.
+- The in-app preview reaches the real committee sign-in gate. Authenticated production editing has not been exercised by this QA.
+
+## Intentional product constraints
+
+- Document attachments are private HTTPS links; file uploading is outside this release.
+- Mobile uses Card/Discussion tabs to preserve a full-height editing surface. Long descriptions, large checklists, attachment lists and long discussions have independent overflow regions.
+- Native date controls retain the full date for direct editing.
+
+final result: passed

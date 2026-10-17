@@ -6,7 +6,7 @@ import type { Doc, Id } from "./_generated/dataModel";
 import { OWNER_EMAIL, getUserByIdentity, ensureUser, logAction } from "./permissions";
 import {
   activityValidator, cleanActivity, planningStage, plannerTeam, publicFields,
-  plannerItemValidator, publicActivityValidator, taskValidator,
+  plannerItemValidator, publicActivityValidator, taskValidator, plannerAttachmentValidator,
   calendarItemValidator, plannerToday,
   plannerCommentValidator, personInitials, type PlannerPerson,
   plannerMentionValidator, plannerNotificationValidator, type PlannerMention, type PlannerNotification,
@@ -17,6 +17,18 @@ import { plannerLeads, plannerTeams, type PlannerTeam } from "./plannerTeams";
 function validateAssignment(teams?: PlannerTeam[], lead?: string | null) {
   if (teams && (teams.length > plannerTeams.length || new Set(teams).size !== teams.length)) throw new Error("Choose each team only once");
   if (lead !== undefined && lead !== null && !plannerLeads.includes(lead)) throw new Error("Choose a lead from the committee board");
+}
+
+function cleanAttachments(attachments: { name: string; url: string }[]) {
+  if (attachments.length > 10) throw new Error("Attach up to 10 links per card");
+  return attachments.map(attachment => {
+    const name = attachment.name.trim(); const url = attachment.url.trim();
+    if (!name || name.length > 160 || url.length > 1500) throw new Error("Add a name and a complete https:// link");
+    let parsed: URL;
+    try { parsed = new URL(url); } catch { throw new Error("Use a complete https:// attachment link"); }
+    if (parsed.protocol !== 'https:' || parsed.username || parsed.password) throw new Error("Use a secure https:// attachment link");
+    return { name, url };
+  });
 }
 
 async function society(ctx: QueryCtx | MutationCtx) {
@@ -404,7 +416,7 @@ export const archivePastEvents = internalMutation({
 });
 
 export const create = mutation({
-  args: { activity: activityValidator, stage: v.optional(planningStage), team: v.optional(v.union(plannerTeam, v.null())), teams: v.optional(v.array(plannerTeam)), lead: v.optional(v.union(v.string(), v.null())), internalOnly: v.optional(v.boolean()), notes: v.optional(v.string()), owner: v.optional(v.string()), tasks: v.optional(v.array(taskValidator)) },
+  args: { activity: activityValidator, stage: v.optional(planningStage), team: v.optional(v.union(plannerTeam, v.null())), teams: v.optional(v.array(plannerTeam)), lead: v.optional(v.union(v.string(), v.null())), internalOnly: v.optional(v.boolean()), notes: v.optional(v.string()), owner: v.optional(v.string()), tasks: v.optional(v.array(taskValidator)), attachments: v.optional(v.array(plannerAttachmentValidator)) },
   returns: v.id("plannerItems"),
   handler: async (ctx, args) => {
     const access = await requireCommittee(ctx);
@@ -413,14 +425,14 @@ export const create = mutation({
     validatePrivate(args.notes || "", args.owner || "", args.tasks || []);
     validateAssignment(args.teams, args.lead);
     const id = await ctx.db.insert("plannerItems", { ...activity, societyId: access.ai._id, createdBy: person, contributors: [person], commentCount: 0,
-      stage: args.stage || "ideas", team: args.teams ? null : args.team, teams: args.teams, lead: args.lead, internalOnly: args.internalOnly, notes: args.notes || "", owner: args.owner || "", tasks: args.tasks || [], revision: 1, updatedAt: Date.now() });
+      stage: args.stage || "ideas", team: args.teams ? null : args.team, teams: args.teams, lead: args.lead, internalOnly: args.internalOnly, notes: args.notes || "", owner: args.owner || "", tasks: args.tasks || [], attachments: cleanAttachments(args.attachments || []), revision: 1, updatedAt: Date.now() });
     await audit(ctx, "create_planner_item", id, activity.title);
     return id;
   },
 });
 
 export const save = mutation({
-  args: { id: v.id("plannerItems"), revision: v.number(), activity: activityValidator, stage: v.optional(planningStage), workflowStage: v.optional(planningStage), team: v.optional(v.union(plannerTeam, v.null())), teams: v.optional(v.array(plannerTeam)), lead: v.optional(v.union(v.string(), v.null())), internalOnly: v.optional(v.boolean()), notes: v.string(), owner: v.string(), tasks: v.array(taskValidator) },
+  args: { id: v.id("plannerItems"), revision: v.number(), activity: activityValidator, stage: v.optional(planningStage), workflowStage: v.optional(planningStage), team: v.optional(v.union(plannerTeam, v.null())), teams: v.optional(v.array(plannerTeam)), lead: v.optional(v.union(v.string(), v.null())), internalOnly: v.optional(v.boolean()), notes: v.string(), owner: v.string(), tasks: v.array(taskValidator), attachments: v.optional(v.array(plannerAttachmentValidator)) },
   returns: v.null(),
   handler: async (ctx, args) => {
     const access = await requireItem(ctx, args.id, args.revision);
@@ -434,6 +446,7 @@ export const save = mutation({
     await ctx.db.patch(item._id, { ...activity, stage: args.stage || item.stage, notes: args.notes.trim(), owner: args.owner.trim(), tasks: args.tasks,
       ...(args.teams !== undefined ? { teams: args.teams, team: null } : args.team !== undefined ? { team: args.team, teams: undefined } : {}),
       ...(args.lead !== undefined ? { lead: args.lead } : {}),
+      ...(args.attachments !== undefined ? { attachments: cleanAttachments(args.attachments) } : {}),
       ...(args.internalOnly !== undefined ? { internalOnly: args.internalOnly } : {}),
       ...(args.workflowStage !== undefined && item.stage === 'published' ? { workflowStage: args.workflowStage } : {}),
       contributors: contributorsFor(item, person), revision: item.revision + 1, updatedAt: Date.now() });

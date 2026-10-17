@@ -17,6 +17,7 @@ export const planningStage = v.union(v.literal("ideas"), v.literal("planning"), 
 export const plannerTeam = v.union(v.literal('learning'), v.literal('events'), v.literal('industry'), v.literal('projects'), v.literal('careers'));
 export const itemStage = v.union(planningStage, v.literal("published"), v.literal("archived"));
 export const taskValidator = v.object({ text: v.string(), done: v.boolean() });
+export const plannerAttachmentValidator = v.object({ name: v.string(), url: v.string() });
 export const plannerPersonValidator = v.object({
   userId: v.id("users"), name: v.string(), email: v.string(), initials: v.string(),
 });
@@ -58,6 +59,7 @@ export const plannerFields = {
   notes: v.string(),
   owner: v.string(),
   tasks: v.array(taskValidator),
+  attachments: v.optional(v.array(plannerAttachmentValidator)),
   revision: v.number(),
   updatedAt: v.number(),
   published: v.optional(activityValidator),

@@ -1,7 +1,7 @@
 ---
 export const prerender = false;
 import BaseLayout from '@surreysocieties/ui/components/BaseLayout';
-import { ArrowUpRight, ArrowLeft, Plus, X, CalendarDays, MapPin, UsersRound, Sparkles, LockKeyhole, LogOut, Settings, Bell, Circle, AtSign, Send, Ellipsis, Columns3, Archive, ChevronsLeft, Menu, Search, MessageCircle, ListChecks, GripVertical } from 'lucide-astro';
+import { ArrowUpRight, ArrowLeft, Plus, X, CalendarDays, MapPin, UsersRound, Sparkles, LockKeyhole, LogOut, Settings, Bell, Circle, AtSign, Send, Ellipsis, Columns3, Archive, ChevronsLeft, Menu, Search, MessageCircle, ListChecks, GripVertical, Check, Paperclip, FileText } from 'lucide-astro';
 import { plannerTeams } from '../../../../../convex/plannerTeams';
 import { SOCIETIES } from '@surreysocieties/admin/config';
 import '../../styles/planner.css';
@@ -77,63 +77,69 @@ const convexUrl = process.env.CONVEX_URL || import.meta.env.CONVEX_URL || '';
   </main>
 
   <dialog id="card-dialog" class="card-dialog" aria-labelledby="item-heading">
-    <div class="card-preview-top"><div id="card-state" class="card-state"></div><div class="card-preview-actions"><button type="button" data-close class="icon-button" aria-label="Close card"><X size={22} /></button></div></div>
-    <div id="card-editor-slot"></div>
-    <div id="card-contributors" class="card-contributors"><p class="card-section-label">Worked on by</p><div id="card-people" class="avatar-group" aria-label="Card contributors"></div></div>
-    <div class="card-readonly" hidden><div class="card-preview-heading"><h2 id="card-title"></h2></div>
-    <div class="card-description-section"><h3 class="card-section-label">Description</h3><p id="card-description" class="card-preview-description"></p></div>
-    <div id="card-facts" class="card-facts"></div></div>
+    <header class="card-preview-top"><div class="card-header-context"><LockKeyhole size={16} /><span>Committee board</span><div id="card-stage-slot"></div></div><div class="card-preview-actions"><details id="card-actions" class="card-options"><summary aria-label="Card options"><Ellipsis size={20} /></summary><div id="card-actions-slot" class="card-options-panel"></div></details><button type="button" data-close class="icon-button" aria-label="Close card"><X size={22} /></button></div></header>
+    <div class="card-mobile-tabs" role="tablist" aria-label="Card panels"><button type="button" role="tab" aria-selected="true" aria-controls="card-editor-slot" id="card-tab">Card</button><button type="button" role="tab" aria-selected="false" aria-controls="card-discussion" id="discussion-tab">Discussion</button></div>
+    <div class="card-workspace"><div id="card-editor-slot" role="region" aria-label="Card details"></div>
     <section class="card-comments" aria-labelledby="card-comments-title">
-      <h3 id="card-comments-title">Comments <span id="comment-count"></span></h3>
+      <h3 id="card-comments-title">Discussion <span id="comment-count"></span></h3>
+      <div id="card-discussion" class="card-discussion-history" role="region" aria-label="Discussion history">
       <button id="older-comments" type="button" class="quiet-button" hidden>Load earlier comments</button>
       <p id="comments-status" class="field-help" role="status"></p>
       <ol id="comment-list" class="comment-list"></ol>
+      </div>
       <form id="comment-form" class="comment-form">
         <label for="comment-text" class="sr-only">Add a comment</label>
         <div id="comment-author" class="composer-avatar" aria-hidden="true"></div>
         <div class="comment-composer">
-          <textarea id="comment-text" name="comment" rows="2" maxlength="2000" required placeholder="Share an update or ask a question…"></textarea>
+          <textarea id="comment-text" name="comment" rows="2" maxlength="2000" required placeholder="Write a comment…"></textarea>
           <div class="comment-actions"><button id="mention-person" type="button" class="mention-button" aria-label="Mention a committee member"><AtSign size={19} /><span>Mention someone</span></button><button id="post-comment" type="submit" class="primary-button" aria-label="Post comment"><Send size={16} />Send</button></div>
         </div>
         <p id="comment-message" class="form-message" role="status"></p>
       </form>
     </section>
+    </div>
+    <footer class="card-save-footer"><div class="card-save-state"><Check size={16} /><span id="card-save-status" role="status" aria-live="polite">All changes saved</span><button type="button" id="retry-card-save" class="quiet-button" hidden>Retry</button></div><span><LockKeyhole size={13} />Private to committee</span></footer>
   </dialog>
 
   <dialog id="item-dialog" class="item-dialog" aria-labelledby="item-heading">
     <form id="item-form">
       <div class="editor-top"><button type="button" data-close class="quiet-button"><ArrowLeft size={16} /><span id="editor-back-label">Planner</span></button><span id="item-state" class="muted">Idea · Private</span><button type="button" data-close class="icon-button" aria-label="Close activity"><X size={20} /></button></div>
-      <div class="editor-actions"><h2 id="item-heading">New activity</h2><div><button type="button" id="archive-item" class="quiet-button" hidden>Archive</button><button type="submit" id="save-item" class="secondary-button">Save draft</button><button type="button" id="publish-item" class="primary-button" hidden>Publish to website</button></div></div>
+      <div class="editor-actions"><h2 id="item-heading">New activity</h2><div id="editor-action-buttons"><button type="button" id="archive-item" class="quiet-button" hidden>Archive</button><button type="submit" form="item-form" id="save-item" class="secondary-button">Save draft</button><button type="button" id="publish-item" class="primary-button" hidden>Publish to website</button><button type="button" id="card-review" class="quiet-button" hidden>Review website details</button><button type="button" id="card-notes" class="quiet-button" hidden>Notes &amp; collaborators</button><button type="button" id="card-people-toggle" class="quiet-button" hidden>Worked on by</button></div></div>
       <p id="item-message" role="status" class="form-message"></p>
-      <div class="editor-stage-bar"><label>Stage<select name="stage"><option value="ideas">Ideas</option><option value="planning">In progress</option><option value="ready">Ready</option><option value="done">Done</option></select></label><p id="stage-help" class="field-help">Start with a title and a few words. Work out the details later.</p></div>
+      <div class="editor-stage-bar"><label id="stage-field">Stage<select name="stage" form="item-form"><option value="ideas">Ideas</option><option value="planning">In progress</option><option value="ready">Ready</option><option value="done">Done</option></select></label><p id="stage-help" class="field-help">Start with a title and a few words. Work out the details later.</p></div>
       <div class="editor-columns">
         <div class="editor-fields">
-          <label>Title<input name="title" maxlength="160" required autocomplete="off" /></label>
-          <fieldset class="team-picker"><legend>Team(s)</legend><div class="team-options">{plannerTeams.map(team => <label class="team-option"><input type="checkbox" name="teams" value={team.id} /><span>{team.name}</span></label>)}</div></fieldset>
-          <div class="field-pair"><label>Lead<select name="lead"><option value="">Unassigned</option><optgroup label="Signatories">{SOCIETIES.ai.signatories.map(person => <option value={person.name}>{person.name}</option>)}</optgroup>{plannerTeams.map(team => <optgroup label={team.name}>{team.members.map(name => <option value={name}>{name}</option>)}</optgroup>)}</select></label><label>Card purpose<select name="purpose"><option value="internal">Internal work</option><option value="activity">Website activity</option></select></label></div>
-          <label id="internal-due-label">Due date (optional)<input type="date" name="dueDate" /></label>
+          <label class="card-title-field">Title<input name="title" maxlength="160" required autocomplete="off" /></label>
+          <div class="card-metadata">
+          <div class="team-picker"><span class="metadata-label">Team(s)</span><details id="team-picker-menu"><summary id="team-picker-summary" aria-label="Choose teams">Choose teams <Plus size={16} /></summary><fieldset class="team-options"><legend class="sr-only">Team(s)</legend>{plannerTeams.map(team => <label class="team-option"><input type="checkbox" name="teams" value={team.id} /><span>{team.name}</span></label>)}</fieldset></details></div>
+          <label class="lead-field">Lead<div class="lead-control"><span id="lead-avatar" class="person-avatar" aria-hidden="true"></span><select name="lead"><option value="">Unassigned</option><optgroup label="Signatories">{SOCIETIES.ai.signatories.map(person => <option value={person.name}>{person.name}</option>)}</optgroup>{plannerTeams.map(team => <optgroup label={team.name}>{team.members.map(name => <option value={name}>{name}</option>)}</optgroup>)}</select></div></label>
+          <label id="internal-due-label">Due<input type="date" name="dueDate" aria-label="Due date (optional)" /></label>
+          <label class="purpose-field">Card purpose<select name="purpose"><option value="internal">Internal work</option><option value="activity">Website activity</option></select></label>
+          </div>
           <div class="description-field">
             <div class="field-label-row"><label for="activity-description">Description</label><button type="button" id="help-description" class="inline-ai" hidden><Sparkles size={14} />Help write this</button></div>
             <textarea id="activity-description" name="description" rows="4" maxlength="4000" placeholder="What’s the idea?"></textarea>
             <p id="description-ai-message" class="form-message" role="status"></p>
             <div id="description-suggestion" class="description-suggestion" hidden><strong>Suggested description</strong><p id="suggested-description"></p><div><button type="button" id="use-description" class="secondary-button">Use description</button><button type="button" id="dismiss-description" class="quiet-button">Dismiss</button></div></div>
           </div>
-          <label>Collaborators (optional)<input name="owner" maxlength="160" autocomplete="off" placeholder="Who might help with this?" /></label>
-          <section id="activity-details" class="activity-details" hidden aria-label="Activity details">
-            <h3>Activity details</h3>
+          <div id="collaborators-home"><label id="collaborators-field">Collaborators (optional)<input name="owner" maxlength="160" autocomplete="off" placeholder="Who might help with this?" /></label></div>
+          <details id="activity-details" class="activity-details card-detail-panel" hidden>
+            <summary>Activity details</summary><div class="detail-panel-content"><button type="button" class="close-card-panel icon-button" aria-label="Close activity details"><X size={18} /></button>
             <div class="field-pair"><label>Type<select name="kind"><option value="event">Event</option><option value="project">Project</option><option value="hackathon">Hackathon</option></select></label><label>Category<select name="category"><option>Workshop</option><option>Talk</option><option>Social</option><option>Project session</option><option>Other</option></select></label></div>
             <div class="field-pair"><label>Date<input type="date" name="date" /></label><label>Room or location<input name="location" maxlength="200" autocomplete="off" placeholder="Room number, venue or online" /></label></div>
             <div class="field-pair"><label>Start time<input type="time" name="startTime" /></label><label>End time<input type="time" name="endTime" /></label></div>
             <label>Booking or project link<input type="url" name="registrationUrl" maxlength="1500" placeholder="https://" /></label>
             <p class="field-help">Times use Europe/London. Events need a room or location and booking link before publishing. Ongoing projects can stay undated.</p>
-          </section>
-          <details id="private-options" class="private-fields" hidden><summary>Notes &amp; checklist <span>Private · optional</span></summary><label>Notes<textarea name="notes" rows="3" maxlength="8000"></textarea></label>
-          <fieldset class="checklist"><legend>Preparation checklist</legend><div id="task-list"></div><div class="add-task"><input id="task-text" maxlength="300" aria-label="New checklist task" placeholder="Add a task" /><button type="button" id="add-task" class="quiet-button">Add</button></div></fieldset></details>
+          </div></details>
+          <details id="private-options" class="private-fields card-detail-panel" hidden><summary>Notes &amp; collaborators <span>Private · optional</span></summary><div class="detail-panel-content"><button type="button" class="close-card-panel icon-button" aria-label="Close private details"><X size={18} /></button><div id="card-collaborators-slot"></div><label>Notes<textarea name="notes" rows="3" maxlength="8000"></textarea></label></div></details>
+          <fieldset id="card-checklist" class="checklist"><legend>Checklist <span id="task-progress"></span></legend><div id="task-list"></div><div class="add-task"><input id="task-text" maxlength="300" aria-label="New checklist task" placeholder="Add an item…" /><button type="button" id="add-task" class="quiet-button" aria-label="Add checklist item"><Plus size={16} /></button></div></fieldset>
+          <section id="card-attachments" class="card-attachments"><div class="attachment-heading"><h3>Attachments</h3><button type="button" id="add-attachment" class="icon-button" aria-label="Attach a link"><Paperclip size={17} /></button></div><div id="attachment-list"></div><div id="attachment-editor" hidden><label>Link<input type="text" inputmode="url" id="attachment-url" placeholder="https://" /></label><label>Name<input id="attachment-name" maxlength="160" placeholder="Document or link name" /></label><div><button type="button" id="save-attachment" class="quiet-button">Add link</button><button type="button" id="cancel-attachment" class="quiet-button">Cancel</button></div><p id="attachment-error" role="status" class="form-message"></p></div></section>
         </div>
         <aside id="editor-preview" class="editor-preview" aria-labelledby="preview-heading" hidden><h3 id="preview-heading">Website preview</h3><p class="muted">surreyaisociety.org</p><div id="public-preview" class="public-preview"></div><p id="publication-help" class="field-help">Ready stays private. Publish when the public details are confirmed.</p><ul id="publication-missing" class="publication-missing"></ul><button type="button" id="unpublish-item" class="quiet-button danger" hidden>Unpublish and move to Ready</button><p class="field-help">Collaborators, committee notes and preparation tasks stay private.</p></aside>
       </div>
     </form>
   </dialog>
+  <dialog id="card-people-dialog" class="small-dialog" aria-labelledby="card-people-heading"><div class="dialog-heading"><h2 id="card-people-heading">Worked on by</h2><button type="button" data-close class="icon-button" aria-label="Close contributors"><X size={20} /></button></div><div id="card-people" class="avatar-group"></div></dialog>
 
   <dialog id="members-dialog" class="small-dialog members-dialog" aria-labelledby="members-heading">
     <div class="dialog-heading"><h2 id="members-heading">Committee members</h2><button type="button" data-close class="icon-button" aria-label="Close members"><X size={20} /></button></div>
@@ -160,11 +166,13 @@ const convexUrl = process.env.CONVEX_URL || import.meta.env.CONVEX_URL || '';
   </dialog>
 
   <template id="plus-icon"><Plus size={17} aria-hidden="true" /></template>
+  <template id="close-icon"><X size={15} aria-hidden="true" /></template>
   <template id="drag-icon"><GripVertical size={17} aria-hidden="true" /></template>
   <template id="external-icon"><ArrowUpRight size={15} aria-hidden="true" /></template>
   <template id="calendar-icon"><CalendarDays size={18} aria-hidden="true" /></template>
   <template id="location-icon"><MapPin size={16} aria-hidden="true" /></template>
   <template id="collaborators-icon"><UsersRound size={16} aria-hidden="true" /></template>
+  <template id="attachment-icon"><FileText size={20} aria-hidden="true" /></template>
   <template id="stage-icon"><Circle size={12} fill="currentColor" aria-hidden="true" /></template>
   <template id="lock-icon"><LockKeyhole size={14} aria-hidden="true" /></template>
   <template id="more-icon"><Ellipsis size={19} aria-hidden="true" /></template>
