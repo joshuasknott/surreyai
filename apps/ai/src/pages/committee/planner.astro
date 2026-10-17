@@ -3,6 +3,7 @@ export const prerender = false;
 import BaseLayout from '@surreysocieties/ui/components/BaseLayout';
 import { ArrowUpRight, ArrowLeft, Plus, X, CalendarDays, MapPin, UsersRound, Pencil, Sparkles, LockKeyhole, LogOut, Settings, Bell, Circle, AtSign, Send, Ellipsis, Columns3, Archive, ChevronsLeft, Menu, Search, MessageCircle, ListChecks, GripVertical } from 'lucide-astro';
 import { plannerTeams } from '../../../../../convex/plannerTeams';
+import { SOCIETIES } from '@surreysocieties/admin/config';
 import '../../styles/planner.css';
 import { isAIEnabled } from '../../lib/server/ai/gemini';
 
@@ -107,7 +108,8 @@ const convexUrl = process.env.CONVEX_URL || import.meta.env.CONVEX_URL || '';
       <div class="editor-columns">
         <div class="editor-fields">
           <label>Title<input name="title" maxlength="160" required autocomplete="off" /></label>
-          <div class="field-pair"><label>Lead team<select name="team"><option value="">Unassigned</option>{plannerTeams.map(team => <option value={team.id}>{team.name}</option>)}</select></label><label>Card purpose<select name="purpose"><option value="internal">Internal work</option><option value="activity">Website activity</option></select></label></div>
+          <fieldset class="team-picker"><legend>Team(s)</legend><div class="team-options">{plannerTeams.map(team => <label class="team-option"><input type="checkbox" name="teams" value={team.id} /><span>{team.name}</span></label>)}</div></fieldset>
+          <div class="field-pair"><label>Lead<select name="lead"><option value="">Unassigned</option><optgroup label="Signatories">{SOCIETIES.ai.signatories.map(person => <option value={person.name}>{person.name}</option>)}</optgroup>{plannerTeams.map(team => <optgroup label={team.name}>{team.members.map(name => <option value={name}>{name}</option>)}</optgroup>)}</select></label><label>Card purpose<select name="purpose"><option value="internal">Internal work</option><option value="activity">Website activity</option></select></label></div>
           <label id="internal-due-label">Due date (optional)<input type="date" name="dueDate" /></label>
           <div class="description-field">
             <div class="field-label-row"><label for="activity-description">Description</label><button type="button" id="help-description" class="inline-ai" hidden><Sparkles size={14} />Help write this</button></div>

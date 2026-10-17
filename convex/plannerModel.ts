@@ -50,6 +50,8 @@ export const plannerFields = {
   societyId: v.id("societies"),
   stage: itemStage,
   team: v.optional(v.union(plannerTeam, v.null())),
+  teams: v.optional(v.array(plannerTeam)),
+  lead: v.optional(v.union(v.string(), v.null())),
   internalOnly: v.optional(v.boolean()),
   // Published rows keep their legacy stage/index; board progress is independent.
   workflowStage: v.optional(planningStage),
@@ -71,6 +73,7 @@ export const publicActivityValidator = v.object({ id: v.id("plannerItems"), ...a
 export const calendarItemValidator = v.object({
   _id: v.id("plannerItems"), stage: itemStage,
   team: v.optional(v.union(plannerTeam, v.null())),
+  teams: v.optional(v.array(plannerTeam)),
   internalOnly: v.optional(v.boolean()),
   title: v.string(), kind: activityFields.kind, category: v.string(),
   date: v.string(), startTime: v.string(), endTime: v.string(), location: v.string(),
