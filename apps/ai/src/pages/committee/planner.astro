@@ -1,7 +1,7 @@
 ---
 export const prerender = false;
 import BaseLayout from '@surreysocieties/ui/components/BaseLayout';
-import { ArrowUpRight, ArrowLeft, Plus, X, CalendarDays, MapPin, UsersRound, Pencil, Sparkles, LockKeyhole, LogOut, Settings, Bell, Circle, AtSign, Send, Ellipsis, Columns3, Archive, ChevronsLeft, Menu, Search, MessageCircle, ListChecks, GripVertical } from 'lucide-astro';
+import { ArrowUpRight, ArrowLeft, Plus, X, CalendarDays, MapPin, UsersRound, Sparkles, LockKeyhole, LogOut, Settings, Bell, Circle, AtSign, Send, Ellipsis, Columns3, Archive, ChevronsLeft, Menu, Search, MessageCircle, ListChecks, GripVertical } from 'lucide-astro';
 import { plannerTeams } from '../../../../../convex/plannerTeams';
 import { SOCIETIES } from '@surreysocieties/admin/config';
 import '../../styles/planner.css';
@@ -76,12 +76,13 @@ const convexUrl = process.env.CONVEX_URL || import.meta.env.CONVEX_URL || '';
     <p id="planner-status" class="planner-status" role="status" aria-live="polite"></p>
   </main>
 
-  <dialog id="card-dialog" class="card-dialog" aria-labelledby="card-title">
-    <div class="card-preview-top"><div id="card-state" class="card-state"></div><div class="card-preview-actions"><button id="edit-card" type="button" class="secondary-button"><Pencil size={15} />Edit</button><button type="button" data-close class="icon-button" aria-label="Close card"><X size={22} /></button></div></div>
-    <div class="card-preview-heading"><h2 id="card-title"></h2></div>
+  <dialog id="card-dialog" class="card-dialog" aria-labelledby="item-heading">
+    <div class="card-preview-top"><div id="card-state" class="card-state"></div><div class="card-preview-actions"><button type="button" data-close class="icon-button" aria-label="Close card"><X size={22} /></button></div></div>
+    <div id="card-editor-slot"></div>
     <div id="card-contributors" class="card-contributors"><p class="card-section-label">Worked on by</p><div id="card-people" class="avatar-group" aria-label="Card contributors"></div></div>
+    <div class="card-readonly" hidden><div class="card-preview-heading"><h2 id="card-title"></h2></div>
     <div class="card-description-section"><h3 class="card-section-label">Description</h3><p id="card-description" class="card-preview-description"></p></div>
-    <div id="card-facts" class="card-facts"></div>
+    <div id="card-facts" class="card-facts"></div></div>
     <section class="card-comments" aria-labelledby="card-comments-title">
       <h3 id="card-comments-title">Comments <span id="comment-count"></span></h3>
       <button id="older-comments" type="button" class="quiet-button" hidden>Load earlier comments</button>
