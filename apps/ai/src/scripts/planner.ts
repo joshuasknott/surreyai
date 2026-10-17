@@ -32,7 +32,8 @@ async function start(root: HTMLElement) {
   const boardStage = (item: Item) => item.stage === 'published' ? item.workflowStage || 'ready' : item.stage;
   let selectedTeam: PlannerTeam | 'all' = 'all';
   let search = '';
-  const matches = (item: { title: string; team?: PlannerTeam | null }) => (selectedTeam === 'all' || item.team === selectedTeam) && item.title.toLowerCase().includes(search);
+  const assignedTeams = (item: { team?: PlannerTeam | null; teams?: PlannerTeam[] }) => item.teams ?? (item.team ? [item.team] : []);
+  const matches = (item: { title: string; team?: PlannerTeam | null; teams?: PlannerTeam[] }) => (selectedTeam === 'all' || assignedTeams(item).includes(selectedTeam)) && item.title.toLowerCase().includes(search);
   const membersDialog = $<HTMLDialogElement>('members-dialog');
   let client: ConvexHttpClient;
   let clerk: ClerkSDK;
@@ -107,7 +108,8 @@ async function start(root: HTMLElement) {
     }
     return result;
   };
-  const signature = () => JSON.stringify({ activity: readActivity(), stage: field('stage').value, team: field('team').value, purpose: field('purpose').value, notes: field('notes').value, owner: field('owner').value, tasks });
+  const selectedTeams = () => [...form.querySelectorAll<HTMLInputElement>('input[name="teams"]:checked')].map(input => input.value as PlannerTeam);
+  const signature = () => JSON.stringify({ activity: readActivity(), stage: field('stage').value, teams: selectedTeams(), lead: field('lead').value, purpose: field('purpose').value, notes: field('notes').value, owner: field('owner').value, tasks });
   const dirty = () => editor.open && signature() !== baseline;
   const closeEditor = () => { if (busy || (dirty() && !window.confirm('Discard your unsaved changes?'))) return; const item = returnToCard ? current : null; returnToCard = false; editor.close(); if (item) openPreview(item); };
 
@@ -429,14 +431,16 @@ async function start(root: HTMLElement) {
     const visibility = el('span', item.stage === 'published' ? 'Live on website' : 'Private', 'card-visibility');
     if (item.stage !== 'published') visibility.prepend(icon('lock'));
     state.append(stage, visibility);
-    const team = plannerTeams.find(team => team.id === item.team);
-    if (team) state.append(el('span', team.name, 'card-team'));
+    for (const id of assignedTeams(item)) {
+      const team = plannerTeams.find(team => team.id === id);
+      if (team) state.append(el('span', team.name, 'card-team'));
+    }
     $('card-description').textContent = item.description || 'No description yet.'; fillPeople($('card-people'), item);
     $('card-contributors').hidden = !$('card-people').childElementCount;
     const facts = $('card-facts'); facts.replaceChildren();
     for (const [iconName, text] of [
       ['calendar', [item.date ? activityDate(item.date) : '', item.startTime ? `${item.startTime}${item.endTime ? `–${item.endTime}` : ''}` : ''].filter(Boolean).join(' · ')],
-      ['location', item.location], ['collaborators', item.owner ? `Collaborators: ${item.owner}` : ''],
+      ['location', item.location], ['collaborators', item.lead ? `Lead: ${item.lead}` : ''], ['collaborators', item.owner ? `Collaborators: ${item.owner}` : ''],
     ]) { if (text) { const row = el('span', undefined, 'card-fact'); row.append(icon(iconName), el('span', text)); facts.append(row); } }
     if (item.registrationUrl) { const link = el('a', item.kind === 'project' ? 'Project link' : 'Booking link'); link.href = item.registrationUrl; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.append(icon('external')); facts.append(link); }
     if (item.stage === 'published') { const link = el('a', 'View on website'); link.href = `/activities/${item._id}`; link.target = '_blank'; link.rel = 'noopener'; link.append(icon('external')); facts.append(link); }
@@ -630,8 +634,14 @@ async function start(root: HTMLElement) {
     node.addEventListener('dragstart', event => { event.dataTransfer?.setData(cardMime, item._id); event.dataTransfer?.setData('text/plain', item._id); });
     const open = el('button', undefined, 'card-open'); open.setAttribute('aria-label', `View ${item.title}`);
     open.append(el('strong', item.title));
-    const team = plannerTeams.find(team => team.id === item.team);
-    if (team && selectedTeam === 'all') { const badge = el('span', team.name, 'team-badge'); badge.dataset.team = team.id; open.append(badge); }
+    if (selectedTeam === 'all') {
+      const teams = assignedTeams(item);
+      for (const id of teams.slice(0, 2)) {
+        const team = plannerTeams.find(team => team.id === id);
+        if (team) { const badge = el('span', team.name, 'team-badge'); badge.dataset.team = team.id; open.append(badge); }
+      }
+      if (teams.length > 2) { const more = el('span', `+${teams.length - 2} teams`, 'team-badge'); more.title = teams.slice(2).map(id => plannerTeams.find(team => team.id === id)?.name).filter(Boolean).join(', '); open.append(more); }
+    }
     const footer = el('span', undefined, 'card-footer');
     if (item.date) footer.append(el('span', activityDate(item.date, { day: 'numeric', month: 'short' }), 'card-date'));
     if (item.published) footer.append(el('span', 'Live on website', 'card-live'));
@@ -772,7 +782,9 @@ async function start(root: HTMLElement) {
     const activity = item || { ...blankActivity(), date };
     for (const name of Object.keys(blankActivity())) field(name).value = activity[name as keyof Activity];
     field('notes').value = item?.notes || ''; field('owner').value = item?.owner || '';
-    field('team').value = item?.team || (item ? '' : selectedTeam === 'all' ? '' : selectedTeam);
+    const teams = item ? assignedTeams(item) : selectedTeam === 'all' ? [] : [selectedTeam];
+    form.querySelectorAll<HTMLInputElement>('input[name="teams"]').forEach(input => { input.checked = teams.includes(input.value as PlannerTeam); });
+    field('lead').value = item?.lead || '';
     field('purpose').value = item ? item.internalOnly ? 'internal' : 'activity' : date ? 'activity' : 'internal';
     field('purpose').disabled = !!item?.published;
     field('dueDate').value = item?.internalOnly ? item.date : '';
@@ -826,7 +838,7 @@ async function start(root: HTMLElement) {
   async function persist() {
     if (!form.reportValidity()) return false;
     await authenticated();
-    const payload = { activity: readActivity(), team: (field('team').value || null) as PlannerTeam | null, internalOnly: field('purpose').value === 'internal', notes: field('notes').value, owner: field('owner').value, tasks };
+    const payload = { activity: readActivity(), teams: selectedTeams(), lead: field('lead').value || null, internalOnly: field('purpose').value === 'internal', notes: field('notes').value, owner: field('owner').value, tasks };
     let id: Id<'plannerItems'>;
     if (current) {
       id = current._id;

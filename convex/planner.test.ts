@@ -37,6 +37,20 @@ describe('team board workflow', () => {
     expect(await t.query(api.planner.listPublished, {})).toEqual([]);
   });
 
+  it('assigns multiple teams and a roster lead while preserving private metadata', async () => {
+    const { admin, t } = await setup();
+    const id = await admin.mutation(api.planner.create, { activity, teams: ['industry', 'events'], lead: 'Ibrahim Haque', stage: 'ready' });
+    expect(await admin.query(api.planner.get, { id })).toMatchObject({ teams: ['industry', 'events'], lead: 'Ibrahim Haque', team: null });
+    expect((await admin.query(api.planner.calendar, { month: '2026-10' })).items).toContainEqual(expect.objectContaining({ _id: id, teams: ['industry', 'events'] }));
+    await expect(admin.mutation(api.planner.save, { id, revision: 1, activity, teams: ['events', 'events'], notes: '', owner: '', tasks: [] })).rejects.toThrow('only once');
+    await expect(admin.mutation(api.planner.save, { id, revision: 1, activity, lead: 'Someone Else', notes: '', owner: '', tasks: [] })).rejects.toThrow('committee board');
+    await admin.mutation(api.planner.save, { id, revision: 1, activity, teams: ['learning'], lead: 'Poppy Holmes', notes: '', owner: '', tasks: [] });
+    expect(await admin.query(api.planner.get, { id })).toMatchObject({ teams: ['learning'], lead: 'Poppy Holmes' });
+    await admin.mutation(api.planner.publish, { id, revision: 2 });
+    expect(await t.query(api.planner.getPublished, { id })).toEqual({ id, ...activity });
+    expect(JSON.stringify(await t.query(api.planner.listPublished, {}))).not.toContain('Poppy Holmes');
+  });
+
   it('moves published cards without changing public content and still supports explicit unpublish', async () => {
     const { admin, t } = await setup();
     const id = await admin.mutation(api.planner.create, { activity, team: 'learning', stage: 'ready' });
