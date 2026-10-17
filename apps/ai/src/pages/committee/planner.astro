@@ -156,6 +156,8 @@ const convexUrl = process.env.CONVEX_URL || import.meta.env.CONVEX_URL || '';
   <dialog id="notifications-dialog" class="notifications-dialog" aria-labelledby="notifications-heading">
     <div class="dialog-heading"><h2 id="notifications-heading">Notifications</h2><button type="button" data-close class="icon-button" aria-label="Close notifications"><X size={20} /></button></div>
     <div class="notifications-intro"><p>Mentions from your committee.</p><button id="read-all-notifications" type="button" class="quiet-button" hidden>Mark all as read</button></div>
+    <label class="mention-email-setting"><input id="mention-email-enabled" type="checkbox" checked disabled /> Email me when I’m mentioned</label>
+    <p id="mention-email-status" class="field-help" role="status"></p>
     <p id="notifications-status" class="field-help" role="status"></p>
     <ol id="notification-list" class="notification-list"></ol>
     <button id="older-notifications" type="button" class="quiet-button" hidden>Load earlier notifications</button>

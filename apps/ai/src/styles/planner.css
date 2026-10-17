@@ -523,3 +523,5 @@ dialog{border:1px solid #dcdde1;border-radius:10px;padding:0;background:#fafaf8;
 @media(max-width:720px) { .sidebar-account .profile-edit-icon { opacity: .7; } }
 .card-dialog #attachment-editor label:not(.file-upload-picker) { margin-bottom: 12px; }
 #attachment-editor > div:not(.attachment-link-divider) { display: flex; align-items: center; gap: 10px; }
+.mention-email-setting { display: flex; flex-direction: row; align-items: center; gap: 10px; min-height: 44px; margin-bottom: 0; font-size: 13px; cursor: pointer; }
+.mention-email-setting input { width: 18px; height: 18px; min-height: 18px; margin: 0; padding: 0; accent-color: #735194; flex-shrink: 0; }

@@ -23,6 +23,11 @@ export default defineSchema({
   plannerNotifications: defineTable({
     societyId: v.id("societies"), itemId: v.id("plannerItems"), commentId: v.id("plannerComments"),
     recipientEmail: v.string(), read: v.boolean(),
+    emailDelivery: v.optional(v.object({
+      status: v.union(v.literal('pending'), v.literal('sent'), v.literal('failed'), v.literal('skipped')),
+      attempts: v.number(), nextAttemptAt: v.number(),
+      payload: v.optional(v.object({ notificationId: v.string(), recipientEmail: v.string(), author: v.string(), title: v.string(), excerpt: v.string(), itemId: v.string(), commentId: v.string() })),
+    })),
   })
     .index("by_societyId_and_recipientEmail", ["societyId", "recipientEmail"])
     .index("by_societyId_and_recipientEmail_and_read", ["societyId", "recipientEmail", "read"])
@@ -31,6 +36,9 @@ export default defineSchema({
   plannerNotificationState: defineTable({
     societyId: v.id("societies"), recipientEmail: v.string(), revision: v.number(),
   }).index("by_societyId_and_recipientEmail", ["societyId", "recipientEmail"]),
+
+  plannerEmailPreferences: defineTable({ societyId: v.id('societies'), email: v.string(), enabled: v.boolean() })
+    .index('by_societyId_and_email', ['societyId', 'email']),
 
   plannerAccess: defineTable({
     societyId: v.id("societies"),

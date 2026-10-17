@@ -255,12 +255,34 @@ async function syncMentionNotifications(ctx: MutationCtx, item: Doc<"plannerItem
   for (const email of recipients) if (!existing.some(notification => notification.recipientEmail === email)) {
     // An allowed email can be mentioned before its first sign-in. Reading is bound
     // to the verified session email, using the same allowlist as committee access.
-    await ctx.db.insert("plannerNotifications", { societyId: item.societyId, itemId: item._id, commentId, recipientEmail: email, read: false });
+    const id = await ctx.db.insert("plannerNotifications", { societyId: item.societyId, itemId: item._id, commentId, recipientEmail: email, read: false,
+      emailDelivery: { status: 'pending', attempts: 0, nextAttemptAt: Date.now() + 10_000 } });
+    await ctx.scheduler.runAfter(10_000, internal.plannerEmail.deliver, { id });
   }
   // One small reactive document invalidates the recipient's entire loaded inbox,
   // including edited/deleted/read notifications beyond the first history page.
   for (const email of new Set([...recipients, ...existing.map(notification => notification.recipientEmail)])) await notifyInboxChanged(ctx, item.societyId, email);
 }
+
+export const emailPreference = query({
+  args: {}, returns: v.boolean(),
+  handler: async ctx => {
+    const { ai, email } = await requireCommittee(ctx);
+    const preference = await ctx.db.query('plannerEmailPreferences').withIndex('by_societyId_and_email', q => q.eq('societyId', ai._id).eq('email', email)).unique();
+    return preference?.enabled ?? true;
+  },
+});
+
+export const setEmailPreference = mutation({
+  args: { enabled: v.boolean() }, returns: v.null(),
+  handler: async (ctx, { enabled }) => {
+    const { ai, email } = await requireCommittee(ctx);
+    const preference = await ctx.db.query('plannerEmailPreferences').withIndex('by_societyId_and_email', q => q.eq('societyId', ai._id).eq('email', email)).unique();
+    if (preference) await ctx.db.patch(preference._id, { enabled });
+    else await ctx.db.insert('plannerEmailPreferences', { societyId: ai._id, email, enabled });
+    return null;
+  },
+});
 
 export const notificationChanges = query({
   args: {}, returns: v.number(),
