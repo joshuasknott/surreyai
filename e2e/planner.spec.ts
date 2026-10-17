@@ -9,7 +9,7 @@ import type { Activity } from '../convex/plannerModel';
 import { londonToday } from '../apps/ai/src/lib/programme';
 
 const origin = process.env.PLANNER_TEST_ORIGIN || 'http://127.0.0.1:4321';
-const modules = { './_generated/server.js': () => import('../convex/_generated/server.js'), './planner.ts': () => import('../convex/planner'), './plannerSignIn.ts': () => import('../convex/plannerSignIn'), './users.ts': () => import('../convex/users') };
+const modules = { './_generated/server.js': () => import('../convex/_generated/server.js'), './planner.ts': () => import('../convex/planner'), './plannerSignIn.ts': () => import('../convex/plannerSignIn'), './users.ts': () => import('../convex/users'), './http.ts': () => import('../convex/http'), './plannerFiles.ts': () => import('../convex/plannerFiles') };
 const gateSecret = 'fixture-only-sign-in-gateway-secret';
 const future = new Date(`${londonToday()}T12:00:00Z`); future.setUTCDate(future.getUTCDate() + 7);
 const activity: Activity = { title: 'Build your first AI agent', kind: 'event', category: 'Workshop', description: 'A hands-on introduction. No experience needed.', date: future.toISOString().slice(0, 10), startTime: '18:00', endTime: '20:00', location: 'Stag Hill campus', registrationUrl: 'https://example.test/book' };
@@ -18,6 +18,7 @@ const activity: Activity = { title: 'Build your first AI agent', kind: 'event', 
  * Nothing is inserted into a hosted database and no production auth bypass exists. */
 async function fixture(context: BrowserContext, mode: 'admin' | 'owner' | 'outsider' | 'signed-out' = 'admin') {
   process.env.PLANNER_SIGN_IN_SECRET = gateSecret;
+  process.env.CONVEX_SITE_URL = 'https://fixture.convex.site';
   const t = convexTest(schema, modules);
   await t.run(async ctx => {
     const societyId = await ctx.db.insert('societies', { name: 'Surrey AI Society', shortName: 'AI', slug: 'ai', domain: 'surreyaisociety.org' });
@@ -103,6 +104,11 @@ async function fixture(context: BrowserContext, mode: 'admin' | 'owner' | 'outsi
     } catch (error) { await route.fulfill({ json: { status: 'error', errorMessage: error instanceof Error ? error.message : 'Failed' }, headers }); }
   });
   await context.route('**/api/programme', async route => route.fulfill({ json: await t.query(api.planner.listPublished, {}), headers: { 'Cache-Control': 'no-store' } }));
+  await context.route('https://fixture.convex.site/planner/files**', async route => {
+    const request = route.request(); const url = new URL(request.url()); const bytes = request.postDataBuffer();
+    const response = await actor.fetch(`${url.pathname}${url.search}`, { method: request.method(), headers: request.headers(), ...(bytes ? { body: new Uint8Array(bytes) } : {}) });
+    await route.fulfill({ status: response.status, headers: Object.fromEntries(response.headers), body: Buffer.from(await response.arrayBuffer()) });
+  });
   await context.route('**/api/planner/sign-in', async route => {
     const { email } = route.request().postDataJSON();
     const result = await t.mutation(api.plannerSignIn.requestCode, { email, requester: 'a'.repeat(64), secret: gateSecret });
@@ -196,6 +202,70 @@ test('compact cards autosave in place, retain newer edits and keep discussion be
   expect(await t.query(api.planner.listPublished, {})).toEqual([]); expect(errors).toEqual([]);
 });
 
+test('committee members upload PDFs and images alongside links and can download or remove them', async ({ page, context }) => {
+  const { owner } = await fixture(context, 'owner');
+  const id = await owner.mutation(api.planner.create, { activity: { ...activity, title: 'Files and links' }, internalOnly: true, attachments: [{ name: 'Reference link', url: 'https://example.test/reference' }] });
+  await page.setViewportSize({ width: 1600, height: 1000 }); await ready(page); await editCard(page, 'Files and links');
+  await page.getByRole('button', { name: 'Add attachment', exact: true }).click();
+  await screenshot(page, 'attachment-picker-desktop');
+  const pdf = Buffer.from('%PDF-1.4\nprivate committee document\n%%EOF');
+  const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jq1sAAAAASUVORK5CYII=', 'base64');
+  await page.locator('#attachment-file').setInputFiles([{ name: 'Speaker brief.pdf', mimeType: 'application/pdf', buffer: pdf }, { name: 'Workshop photo.png', mimeType: 'image/png', buffer: png }]);
+  await expect(page.locator('#file-upload-status')).toHaveText('Files attached');
+  await expect(page.locator('.file-attachment-row')).toHaveCount(2);
+  await expect(page.getByRole('link', { name: /Reference link/ })).toBeVisible();
+  await screenshot(page, 'uploaded-files-desktop');
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Download Speaker brief.pdf', exact: true }).click();
+  const download = await downloadPromise; expect(download.suggestedFilename()).toBe('Speaker brief.pdf');
+  expect((await owner.query(api.planner.listFiles, { id })).map(file => file.name)).toEqual(['Speaker brief.pdf', 'Workshop photo.png']);
+  await page.setViewportSize({ width: 390, height: 844 }); await screenshot(page, 'uploaded-files-mobile'); await noOverflow(page);
+  page.once('dialog', dialog => dialog.accept());
+  await page.getByRole('button', { name: 'Remove file: Workshop photo.png', exact: true }).click();
+  await expect(page.locator('.file-attachment-row')).toHaveCount(1);
+  await closeActivity(page); await page.reload(); await editCard(page, 'Files and links');
+  await expect(page.getByRole('button', { name: 'Download Speaker brief.pdf', exact: true })).toBeVisible();
+});
+
+test('planner display names update existing activity and other open tabs without changing public user data', async ({ page, context }) => {
+  const { owner, t } = await fixture(context, 'owner');
+  const id = await owner.mutation(api.planner.create, { activity: { ...activity, title: 'Display name card' }, internalOnly: true, lead: 'Joshua Knott' });
+  await owner.mutation(api.planner.addComment, { id, text: 'A comment written before the name change.', requestId: '00000000-0000-4000-8000-000000000001' });
+  await ready(page); const other = await context.newPage(); await ready(other); await editCard(other, 'Display name card');
+  await page.getByRole('button', { name: 'Edit your planner name', exact: true }).click();
+  await page.getByLabel('Your name', { exact: true }).fill('Josh'); await screenshot(page, 'planner-profile-desktop');
+  await page.getByRole('button', { name: 'Save name', exact: true }).click();
+  await expect(page.locator('#planner-profile-dialog')).not.toBeVisible(); await expect(page.locator('#account-name')).toHaveText('Josh');
+  await expect(other.locator('#account-name')).toHaveText('Josh');
+  await expect(other.locator('#comment-list .comment-heading strong')).toHaveText('Josh');
+  await expect(other.locator('#comment-list .person-avatar')).toHaveText('J');
+  await expect(other.getByRole('combobox', { name: 'Lead', exact: true }).locator('option:checked')).toHaveText('Josh');
+  await page.getByRole('button', { name: 'View committee members', exact: true }).click();
+  await expect(page.locator('#team-members')).toContainText('Josh'); await page.getByRole('button', { name: 'Close members', exact: true }).click();
+  expect((await t.run(ctx => ctx.db.query('users').withIndex('by_email', q => q.eq('email', 'joshhknott@gmail.com')).unique()))?.name).toBe('Joshua Knott');
+  await page.reload(); await expect(page.locator('#account-name')).toHaveText('Josh');
+  await page.setViewportSize({ width: 390, height: 844 }); await page.getByRole('button', { name: 'Open navigation', exact: true }).click();
+  await page.getByRole('button', { name: 'Edit your planner name', exact: true }).click();
+  await screenshot(page, 'planner-profile-mobile'); await noOverflow(page);
+});
+
+test('failed file uploads can be retried without losing the selected file or creating duplicates', async ({ page, context }) => {
+  const { owner } = await fixture(context, 'owner');
+  const id = await owner.mutation(api.planner.create, { activity: { ...activity, title: 'Retry file upload' }, internalOnly: true });
+  await ready(page); await editCard(page, 'Retry file upload');
+  let fail = true;
+  await context.route('https://fixture.convex.site/planner/files**', async route => {
+    if (fail && route.request().method() === 'POST') return route.fulfill({ status: 503, headers: { 'Access-Control-Allow-Origin': origin }, json: { error: 'Upload connection interrupted' } });
+    await route.fallback();
+  });
+  await page.getByRole('button', { name: 'Add attachment', exact: true }).click();
+  await page.locator('#attachment-file').setInputFiles({ name: 'Retry.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4\nretry\n%%EOF') });
+  await expect(page.locator('#file-upload-status')).toHaveText('Upload connection interrupted');
+  fail = false; await page.getByRole('button', { name: 'Retry upload', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Download Retry.pdf', exact: true })).toBeVisible();
+  expect(await owner.query(api.planner.listFiles, { id })).toHaveLength(1);
+});
+
 test('autosave failures retain drafts, retry safely and leave the published version unchanged', async ({ page, context }) => {
   const { admin, t } = await fixture(context, 'owner');
   const id = await admin.mutation(api.planner.create, { activity, stage: 'ready' });
@@ -213,7 +283,7 @@ test('autosave failures retain drafts, retry safely and leave the published vers
   await expect(page.locator('#card-save-status')).toHaveText('All changes saved');
   expect((await admin.query(api.planner.get, { id }))?.description).toBe('A private draft with more detail.');
   expect(await t.query(api.planner.getPublished, { id })).toEqual({ id, ...activity });
-  await page.getByRole('button', { name: 'Attach a link', exact: true }).click();
+  await page.getByRole('button', { name: 'Add attachment', exact: true }).click();
   await page.getByLabel('Link', { exact: true }).fill('https://example.test/brief.pdf');
   await page.getByLabel('Name', { exact: true }).fill('Workshop brief.pdf');
   await page.getByRole('button', { name: 'Add link', exact: true }).click();

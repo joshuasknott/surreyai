@@ -1,8 +1,15 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
-import { plannerFields, plannerCommentFields } from "./plannerModel";
+import { plannerFields, plannerCommentFields, plannerFileFields } from "./plannerModel";
 
 export default defineSchema({
+  plannerProfiles: defineTable({ societyId: v.id('societies'), userId: v.id('users'), email: v.string(), displayName: v.string(), rosterName: v.optional(v.string()) })
+    .index('by_societyId_and_userId', ['societyId', 'userId'])
+    .index('by_societyId_and_email', ['societyId', 'email'])
+    .index('by_societyId', ['societyId']),
+  plannerFiles: defineTable(plannerFileFields)
+    .index('by_itemId', ['itemId'])
+    .index('by_itemId_and_requestId', ['itemId', 'requestId']),
   plannerItems: defineTable(plannerFields)
     .index("by_societyId_and_updatedAt", ["societyId", "updatedAt"])
     .index("by_societyId_and_stage", ["societyId", "stage"])

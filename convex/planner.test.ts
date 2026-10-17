@@ -11,6 +11,72 @@ const modules = import.meta.glob('./**/*.ts');
 const activity: Activity = { title: 'AI workshop', kind: 'event', category: 'Workshop', description: 'A beginner workshop.', date: '2026-10-29', startTime: '18:00', endTime: '20:00', location: 'Stag Hill', registrationUrl: 'https://example.test/signup' };
 
 describe('team board workflow', () => {
+  it('uses planner-only display names for previous activity, mentions and notifications', async () => {
+    const { admin, owner, t } = await setup();
+    const id = await admin.mutation(api.planner.create, { activity, stage: 'ready' });
+    const commentId = await admin.mutation(api.planner.addComment, { id, text: '@joshhknott@gmail.com please review', requestId: '00000000-0000-4000-8000-000000000001' });
+    await admin.mutation(api.planner.setDisplayName, { name: 'Samuel Young' });
+    await admin.mutation(api.planner.setDisplayName, { name: 'Sam' });
+    expect(await admin.query(api.planner.access, {})).toMatchObject({ name: 'Sam' });
+    expect((await owner.query(api.planner.get, { id }))?.createdBy).toMatchObject({ name: 'Sam', initials: 'S' });
+    expect((await owner.query(api.planner.list, {}))[0].contributors?.[0].name).toBe('Sam');
+    expect((await owner.query(api.planner.listComments, { id, paginationOpts: { numItems: 30, cursor: null } })).page[0]).toMatchObject({ _id: commentId, author: { name: 'Sam' } });
+    expect((await owner.query(api.planner.notifications, { paginationOpts: { numItems: 30, cursor: null } })).page[0].author.name).toBe('Sam');
+    expect((await owner.query(api.planner.mentionPeople, {})).find(person => person.email === 'admin@example.test')?.name).toBe('Sam');
+    expect(await owner.query(api.planner.profiles, {})).toContainEqual(expect.objectContaining({ name: 'Sam', rosterName: 'Samuel Young' }));
+    expect((await t.run(ctx => ctx.db.query('users').withIndex('by_email', q => q.eq('email', 'admin@example.test')).unique()))?.name).toBe('Admin');
+    await admin.mutation(api.planner.publish, { id, revision: 1 });
+    expect(await t.query(api.planner.getPublished, { id })).toEqual({ id, ...activity });
+    await expect(t.mutation(api.planner.setDisplayName, { name: 'Imposter' })).rejects.toThrow('Committee access required');
+    await expect(admin.mutation(api.planner.setDisplayName, { name: ' '.repeat(4) })).rejects.toThrow('between 1 and 80');
+    await expect(admin.mutation(api.planner.setDisplayName, { name: 'x'.repeat(81) })).rejects.toThrow('between 1 and 80');
+  });
+
+  it('uploads and downloads private PDFs and images, retries idempotently, and deletes stored files', async () => {
+    const { admin, t, grantId } = await setup();
+    const id = await admin.mutation(api.planner.create, { activity });
+    const pdf = new TextEncoder().encode('%PDF-1.4\nprivate committee document\n%%EOF');
+    const upload = (requestId: string, body: Uint8Array = pdf, type = 'application/pdf', filename = 'Proposal.pdf') => admin.fetch(`/planner/files?itemId=${id}`, { method: 'POST', headers: { 'Content-Type': type, 'X-File-Name': encodeURIComponent(filename), 'X-Request-Id': requestId, Origin: 'https://surreyaisociety.org' }, body });
+    const requestId = '00000000-0000-4000-8000-000000000001';
+    const response = await upload(requestId); expect(response.status).toBe(200);
+    const { fileId } = await response.json();
+    expect((await upload(requestId)).status).toBe(200);
+    expect(await admin.query(api.planner.listFiles, { id })).toHaveLength(1);
+    expect(await t.run(ctx => ctx.db.system.query('_storage').take(20))).toHaveLength(1);
+    const download = await admin.fetch(`/planner/files?fileId=${fileId}`);
+    expect(download.status).toBe(200); expect(new Uint8Array(await download.arrayBuffer())).toEqual(pdf);
+    expect(download.headers.get('cache-control')).toContain('no-store'); expect(download.headers.get('content-disposition')).toContain('attachment');
+    expect((await t.fetch(`/planner/files?fileId=${fileId}`)).status).toBe(401);
+    const gif = new TextEncoder().encode('GIF89a test image');
+    expect((await upload('00000000-0000-4000-8000-000000000002', gif, 'image/gif', 'Photo.gif')).status).toBe(200);
+    expect((await upload('00000000-0000-4000-8000-000000000003', new TextEncoder().encode('<html>unsafe</html>'), 'image/png', 'not-an-image.png')).status).toBe(415);
+    expect((await upload('00000000-0000-4000-8000-000000000004', pdf, 'text/html', 'bad.html')).status).toBe(415);
+    expect((await admin.fetch(`/planner/files?itemId=${id}`, { method: 'POST', headers: { Origin: 'https://unrelated.test' }, body: pdf })).status).toBe(403);
+    await t.run(ctx => ctx.db.patch(grantId, { active: false }));
+    expect((await admin.fetch(`/planner/files?fileId=${fileId}`)).status).toBe(403);
+    await expect(admin.mutation(api.planner.removeFile, { id: fileId })).rejects.toThrow('Committee access required');
+    await t.run(ctx => ctx.db.patch(grantId, { active: true }));
+    await admin.mutation(api.planner.removeFile, { id: fileId });
+    expect((await admin.fetch(`/planner/files?fileId=${fileId}`)).status).toBe(403);
+    expect(await t.run(ctx => ctx.db.system.query('_storage').take(20))).toHaveLength(1);
+  });
+
+  it('enforces file size, card scope and file counts without leaving rejected uploads in storage', async () => {
+    const { admin, t, otherId } = await setup();
+    const id = await admin.mutation(api.planner.create, { activity });
+    const headers = { 'Content-Type': 'application/pdf', 'X-File-Name': 'Test.pdf', 'X-Request-Id': '00000000-0000-4000-8000-000000000001' };
+    const body = new TextEncoder().encode('%PDF-1.4\ntest\n%%EOF');
+    expect((await t.fetch(`/planner/files?itemId=${id}`, { method: 'POST', headers, body })).status).toBe(401);
+    expect((await admin.fetch(`/planner/files?itemId=${id}`, { method: 'POST', headers: { ...headers, 'Content-Length': String(10 * 1024 * 1024 + 1) }, body })).status).toBe(413);
+    await t.run(ctx => ctx.db.patch(id, { societyId: otherId }));
+    expect((await admin.fetch(`/planner/files?itemId=${id}`, { method: 'POST', headers, body })).status).toBe(403);
+    const ai = await t.run(ctx => ctx.db.query('societies').withIndex('by_slug', q => q.eq('slug', 'ai')).unique());
+    await t.run(ctx => ctx.db.patch(id, { societyId: ai!._id }));
+    for (let index = 0; index < 10; index++) expect((await admin.fetch(`/planner/files?itemId=${id}`, { method: 'POST', headers: { ...headers, 'X-Request-Id': `00000000-0000-4000-8000-${String(index).padStart(12, '0')}` }, body })).status).toBe(200);
+    expect((await admin.fetch(`/planner/files?itemId=${id}`, { method: 'POST', headers: { ...headers, 'X-Request-Id': '00000000-0000-4000-8000-000000000099' }, body })).status).toBe(403);
+    expect((await admin.fetch(`/planner/files?itemId=${id}`, { method: 'POST', headers, body })).status).toBe(200);
+    expect(await t.run(ctx => ctx.db.system.query('_storage').take(20))).toHaveLength(10);
+  });
   it('keeps attachment links private and rejects unsafe or excessive links', async () => {
     const { admin, t } = await setup();
     const attachments = [{ name: 'Proposal.pdf', url: 'https://example.test/proposal.pdf' }];

@@ -1,12 +1,12 @@
 import { v } from "convex/values";
 import { paginationOptsValidator } from "convex/server";
-import { query, mutation, internalMutation, type QueryCtx, type MutationCtx } from "./_generated/server";
+import { query, mutation, internalMutation, internalQuery, type QueryCtx, type MutationCtx } from "./_generated/server";
 import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
 import { OWNER_EMAIL, getUserByIdentity, ensureUser, logAction } from "./permissions";
 import {
   activityValidator, cleanActivity, planningStage, plannerTeam, publicFields,
-  plannerItemValidator, publicActivityValidator, taskValidator, plannerAttachmentValidator,
+  plannerItemValidator, publicActivityValidator, taskValidator, plannerAttachmentValidator, plannerFileValidator, plannerProfileValidator,
   calendarItemValidator, plannerToday,
   plannerCommentValidator, personInitials, type PlannerPerson,
   plannerMentionValidator, plannerNotificationValidator, type PlannerMention, type PlannerNotification,
@@ -75,7 +75,8 @@ async function audit(ctx: MutationCtx, action: string, targetId: string, title: 
 
 async function actor(ctx: MutationCtx, access: Awaited<ReturnType<typeof requireCommittee>>): Promise<PlannerPerson> {
   const user = await ensureUser(ctx, access.identity);
-  const name = (access.identity.name || user.name || access.email.split("@")[0]).trim().slice(0, 100);
+  const profile = await ctx.db.query('plannerProfiles').withIndex('by_societyId_and_userId', q => q.eq('societyId', access.ai._id).eq('userId', user._id)).unique();
+  const name = (profile?.displayName || access.identity.name || user.name || access.email.split("@")[0]).trim().slice(0, 100);
   return { userId: user._id, name, email: access.email, initials: personInitials(name, access.email) };
 }
 
@@ -85,6 +86,121 @@ function contributorsFor(item: Pick<Doc<"plannerItems">, "createdBy" | "contribu
   if (item.createdBy) people.delete(item.createdBy.userId);
   return [...(item.createdBy ? [item.createdBy] : []), ...[...people.values()].slice(-199)];
 }
+
+async function profileNames(ctx: QueryCtx | MutationCtx, societyId: Id<'societies'>) {
+  const profiles = await ctx.db.query('plannerProfiles').withIndex('by_societyId', q => q.eq('societyId', societyId)).take(200);
+  const byUser = new Map(profiles.map(profile => [profile.userId, profile]));
+  const byEmail = new Map(profiles.map(profile => [profile.email, profile]));
+  const person = (value: PlannerPerson): PlannerPerson => {
+    const profile = byUser.get(value.userId);
+    return profile ? { ...value, name: profile.displayName, initials: personInitials(profile.displayName, value.email) } : value;
+  };
+  const mention = (value: PlannerMention): PlannerMention => {
+    const profile = byEmail.get(value.email);
+    return profile ? { ...value, name: profile.displayName, initials: personInitials(profile.displayName, value.email) } : value;
+  };
+  return { person, mention, item: (item: Doc<'plannerItems'>) => ({ ...item, ...(item.createdBy ? { createdBy: person(item.createdBy) } : {}), ...(item.contributors ? { contributors: item.contributors.map(person) } : {}) }) };
+}
+
+export const profiles = query({
+  args: {}, returns: v.array(plannerProfileValidator),
+  handler: async ctx => {
+    const { ai } = await requireCommittee(ctx);
+    return (await ctx.db.query('plannerProfiles').withIndex('by_societyId', q => q.eq('societyId', ai._id)).take(200))
+      .map(profile => ({ userId: profile.userId, email: profile.email, name: profile.displayName, initials: personInitials(profile.displayName, profile.email), rosterName: profile.rosterName }));
+  },
+});
+
+export const setDisplayName = mutation({
+  args: { name: v.string() }, returns: v.null(),
+  handler: async (ctx, { name }) => {
+    const access = await requireCommittee(ctx); const user = await ensureUser(ctx, access.identity);
+    const clean = name.trim().replace(/\s+/gu, ' ');
+    if (!clean || clean.length > 80 || /[\p{Cc}\p{Cf}]/u.test(clean)) throw new Error('Use a name between 1 and 80 characters');
+    const existing = await ctx.db.query('plannerProfiles').withIndex('by_societyId_and_userId', q => q.eq('societyId', access.ai._id).eq('userId', user._id)).unique();
+    const knownNames = [access.identity.name, user.name, clean];
+    const rosterName = existing?.rosterName || (access.email === OWNER_EMAIL ? 'Joshua Knott' : plannerLeads.find(value => knownNames.some(name => name?.trim().toLocaleLowerCase() === value.toLocaleLowerCase())));
+    const fields = { societyId: access.ai._id, userId: user._id, email: access.email, displayName: clean, rosterName };
+    if (existing) await ctx.db.patch(existing._id, fields); else await ctx.db.insert('plannerProfiles', fields);
+    return null;
+  },
+});
+
+export const fileService = query({
+  args: {}, returns: v.string(),
+  handler: async ctx => {
+    await requireCommittee(ctx);
+    const siteUrl = process.env.CONVEX_SITE_URL;
+    if (!siteUrl) throw new Error('File storage is not configured');
+    return `${siteUrl}/planner/files`;
+  },
+});
+
+export const listFiles = query({
+  args: { id: v.id('plannerItems') }, returns: v.array(plannerFileValidator),
+  handler: async (ctx, { id }) => {
+    const { ai } = await requireCommittee(ctx); const item = await ctx.db.get(id);
+    if (!item || item.societyId !== ai._id) throw new Error('Activity not found');
+    return (await ctx.db.query('plannerFiles').withIndex('by_itemId', q => q.eq('itemId', id)).take(10))
+      .map(file => ({ _id: file._id, name: file.name, contentType: file.contentType, size: file.size }));
+  },
+});
+
+export const fileUploadAccess = internalQuery({
+  args: { id: v.id('plannerItems'), requestId: v.string() }, returns: v.null(),
+  handler: async (ctx, { id, requestId }) => {
+    const { ai, user } = await requireCommittee(ctx); const item = await ctx.db.get(id);
+    if (!item || item.societyId !== ai._id) throw new Error('Activity not found');
+    const existing = await ctx.db.query('plannerFiles').withIndex('by_itemId_and_requestId', q => q.eq('itemId', id).eq('requestId', requestId)).unique();
+    if (existing) { if (existing.uploadedBy !== user?._id) throw new Error('Upload request belongs to another person'); return null; }
+    const files = await ctx.db.query('plannerFiles').withIndex('by_itemId', q => q.eq('itemId', id)).take(10);
+    if (files.length >= 10) throw new Error('Attach up to 10 files per card');
+    return null;
+  },
+});
+
+export const attachUploadedFile = internalMutation({
+  args: { id: v.id('plannerItems'), storageId: v.id('_storage'), name: v.string(), contentType: v.string(), requestId: v.string() },
+  returns: v.object({ id: v.id('plannerFiles'), reused: v.boolean() }),
+  handler: async (ctx, args) => {
+    const access = await requireCommittee(ctx); const item = await ctx.db.get(args.id);
+    if (!item || item.societyId !== access.ai._id) throw new Error('Activity not found');
+    const person = await actor(ctx, access);
+    const existing = await ctx.db.query('plannerFiles').withIndex('by_itemId_and_requestId', q => q.eq('itemId', args.id).eq('requestId', args.requestId)).unique();
+    if (existing) {
+      if (existing.uploadedBy !== person.userId) throw new Error('Upload request belongs to another person');
+      return { id: existing._id, reused: true };
+    }
+    if ((await ctx.db.query('plannerFiles').withIndex('by_itemId', q => q.eq('itemId', args.id)).take(10)).length >= 10) throw new Error('Attach up to 10 files per card');
+    const metadata = await ctx.db.system.get(args.storageId);
+    if (!metadata || metadata.size > 10 * 1024 * 1024 || metadata.size === 0) throw new Error('Choose a file up to 10 MB');
+    const id = await ctx.db.insert('plannerFiles', { societyId: access.ai._id, itemId: item._id, storageId: args.storageId, name: args.name, contentType: args.contentType, size: metadata.size, uploadedBy: person.userId, requestId: args.requestId });
+    await ctx.db.patch(item._id, { contributors: contributorsFor(item, person), updatedAt: Date.now() });
+    return { id, reused: false };
+  },
+});
+
+export const fileDownloadAccess = internalQuery({
+  args: { id: v.id('plannerFiles') }, returns: v.object({ storageId: v.id('_storage'), name: v.string(), contentType: v.string() }),
+  handler: async (ctx, { id }) => {
+    const { ai } = await requireCommittee(ctx); const file = await ctx.db.get(id);
+    if (!file || file.societyId !== ai._id) throw new Error('Attachment not found');
+    const item = await ctx.db.get(file.itemId);
+    if (!item || item.societyId !== ai._id) throw new Error('Attachment not found');
+    return { storageId: file.storageId, name: file.name, contentType: file.contentType };
+  },
+});
+
+export const removeFile = mutation({
+  args: { id: v.id('plannerFiles') }, returns: v.null(),
+  handler: async (ctx, { id }) => {
+    const { ai } = await requireCommittee(ctx); const file = await ctx.db.get(id);
+    if (!file) return null;
+    const item = await ctx.db.get(file.itemId);
+    if (file.societyId !== ai._id || !item || item.societyId !== ai._id) throw new Error('Attachment not found');
+    await ctx.storage.delete(file.storageId); await ctx.db.delete(id); return null;
+  },
+});
 
 function cleanComment(text: string) {
   const clean = text.trim();
@@ -102,9 +218,10 @@ async function ownComment(ctx: MutationCtx, id: Id<"plannerComments">) {
   return { comment, item };
 }
 
-async function mentionPerson(ctx: QueryCtx | MutationCtx, email: string): Promise<PlannerMention> {
+async function mentionPerson(ctx: QueryCtx | MutationCtx, email: string, societyId: Id<'societies'>): Promise<PlannerMention> {
   const user = await ctx.db.query("users").withIndex("by_email", q => q.eq("email", email)).first();
-  const name = user?.name || email.split("@")[0];
+  const profile = await ctx.db.query('plannerProfiles').withIndex('by_societyId_and_email', q => q.eq('societyId', societyId).eq('email', email)).unique();
+  const name = profile?.displayName || user?.name || email.split("@")[0];
   return { email, name, initials: personInitials(name, email) };
 }
 
@@ -114,7 +231,7 @@ async function resolveMentions(ctx: MutationCtx, societyId: Id<"societies">, tex
   const people: PlannerMention[] = [];
   for (const email of emails) {
     const grant = await ctx.db.query("plannerAccess").withIndex("by_societyId_and_email", q => q.eq("societyId", societyId).eq("email", email)).unique();
-    if (email === OWNER_EMAIL || grant?.active) people.push(await mentionPerson(ctx, email));
+    if (email === OWNER_EMAIL || grant?.active) people.push(await mentionPerson(ctx, email, societyId));
   }
   return people;
 }
@@ -153,7 +270,9 @@ export const access = query({
   returns: v.union(v.null(), v.object({ name: v.string(), email: v.string(), userId: v.union(v.id("users"), v.null()), canManageAccess: v.boolean() })),
   handler: async ctx => {
     const result = await committeeAccess(ctx);
-    return result ? { name: result.user?.name || result.identity.name || result.email, email: result.email, userId: result.user?._id || null, canManageAccess: result.manager } : null;
+    if (!result) return null;
+    const profile = await ctx.db.query('plannerProfiles').withIndex('by_societyId_and_email', q => q.eq('societyId', result.ai._id).eq('email', result.email)).unique();
+    return { name: profile?.displayName || result.user?.name || result.identity.name || result.email, email: result.email, userId: result.user?._id || null, canManageAccess: result.manager };
   },
 });
 
@@ -163,7 +282,7 @@ export const mentionPeople = query({
     const { ai } = await requireCommittee(ctx);
     const grants = await ctx.db.query("plannerAccess").withIndex("by_societyId_and_active_and_email", q => q.eq("societyId", ai._id).eq("active", true)).take(200);
     const emails = [...new Set([OWNER_EMAIL, ...grants.map(grant => grant.email)])];
-    return (await Promise.all(emails.map(email => mentionPerson(ctx, email)))).sort((a, b) => a.name.localeCompare(b.name));
+    return (await Promise.all(emails.map(email => mentionPerson(ctx, email, ai._id)))).sort((a, b) => a.name.localeCompare(b.name));
   },
 });
 
@@ -176,11 +295,12 @@ export const notifications = query({
       .order("desc").paginate({ ...paginationOpts, numItems: Math.min(30, Math.max(1, paginationOpts.numItems)) });
     const unread = await ctx.db.query("plannerNotifications").withIndex("by_societyId_and_recipientEmail_and_read", q => q.eq("societyId", ai._id).eq("recipientEmail", email).eq("read", false)).take(100);
     const page: PlannerNotification[] = [];
+    const names = await profileNames(ctx, ai._id);
     for (const notification of result.page) {
       const comment = await ctx.db.get(notification.commentId); const item = await ctx.db.get(notification.itemId);
       if (!comment || !item || comment.societyId !== ai._id || item.societyId !== ai._id || comment.itemId !== item._id) continue;
       page.push({ _id: notification._id, _creationTime: notification._creationTime, read: notification.read,
-        itemId: item._id, commentId: comment._id, title: item.title, author: comment.author, text: comment.text.slice(0, 220), mentions: comment.mentions || [] });
+        itemId: item._id, commentId: comment._id, title: item.title, author: names.person(comment.author), text: comment.text.slice(0, 220), mentions: (comment.mentions || []).map(names.mention) });
     }
     return { page, isDone: result.isDone, continueCursor: result.continueCursor, unreadCount: unread.length };
   },
@@ -216,11 +336,12 @@ export const list = query({
   returns: v.array(plannerItemValidator),
   handler: async (ctx, { archived }) => {
     const { ai } = await requireCommittee(ctx);
-    if (archived) return await ctx.db.query("plannerItems")
-      .withIndex("by_societyId_and_stage", q => q.eq("societyId", ai._id).eq("stage", "archived")).order("desc").take(200);
+    const names = await profileNames(ctx, ai._id);
+    if (archived) return (await ctx.db.query("plannerItems")
+      .withIndex("by_societyId_and_stage", q => q.eq("societyId", ai._id).eq("stage", "archived")).order("desc").take(200)).map(names.item);
     const stages = ["ideas", "planning", "ready", "done", "published"] as const;
     return (await Promise.all(stages.map(stage => ctx.db.query("plannerItems")
-      .withIndex("by_societyId_and_stage", q => q.eq("societyId", ai._id).eq("stage", stage)).order("desc").take(100)))).flat();
+      .withIndex("by_societyId_and_stage", q => q.eq("societyId", ai._id).eq("stage", stage)).order("desc").take(100)))).flat().map(names.item);
   },
 });
 
@@ -255,7 +376,7 @@ export const get = query({
   handler: async (ctx, { id }) => {
     const { ai } = await requireCommittee(ctx);
     const item = await ctx.db.get(id);
-    return item?.societyId === ai._id ? item : null;
+    return item?.societyId === ai._id ? (await profileNames(ctx, ai._id)).item(item) : null;
   },
 });
 
@@ -268,7 +389,8 @@ export const listComments = query({
     if (!item || item.societyId !== ai._id) throw new Error("Activity not found");
     const result = await ctx.db.query("plannerComments").withIndex("by_itemId", q => q.eq("itemId", id))
       .order("desc").paginate({ ...paginationOpts, numItems: Math.min(30, Math.max(1, paginationOpts.numItems)) });
-    return { page: result.page, isDone: result.isDone, continueCursor: result.continueCursor };
+    const names = await profileNames(ctx, ai._id);
+    return { page: result.page.map(comment => ({ ...comment, author: names.person(comment.author), ...(comment.mentions ? { mentions: comment.mentions.map(names.mention) } : {}) })), isDone: result.isDone, continueCursor: result.continueCursor };
   },
 });
 
