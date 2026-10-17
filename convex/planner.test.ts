@@ -11,6 +11,20 @@ const modules = import.meta.glob('./**/*.ts');
 const activity: Activity = { title: 'AI workshop', kind: 'event', category: 'Workshop', description: 'A beginner workshop.', date: '2026-10-29', startTime: '18:00', endTime: '20:00', location: 'Stag Hill', registrationUrl: 'https://example.test/signup' };
 
 describe('team board workflow', () => {
+  it('saves and clears a private waiting status without leaking it into publication', async () => {
+    const { admin, t } = await setup();
+    const id = await admin.mutation(api.planner.create, { activity, stage: 'ready', waitingOn: '  Budget approval  ' });
+    expect(await admin.query(api.planner.get, { id })).toMatchObject({ waitingOn: 'Budget approval' });
+    await admin.mutation(api.planner.publish, { id, revision: 1 });
+    expect(await t.query(api.planner.getPublished, { id })).toEqual({ id, ...activity });
+    await admin.mutation(api.planner.save, { id, revision: 2, activity, notes: '', owner: '', tasks: [] });
+    expect(await admin.query(api.planner.get, { id })).toMatchObject({ waitingOn: 'Budget approval' });
+    await expect(admin.mutation(api.planner.save, { id, revision: 3, activity, waitingOn: 'x'.repeat(161), notes: '', owner: '', tasks: [] })).rejects.toThrow('160 characters');
+    await admin.mutation(api.planner.save, { id, revision: 3, activity, waitingOn: '', notes: '', owner: '', tasks: [] });
+    expect(await admin.query(api.planner.get, { id })).toMatchObject({ waitingOn: '' });
+    await expect(admin.mutation(api.planner.create, { activity, waitingOn: 'x'.repeat(161) })).rejects.toThrow('160 characters');
+  });
+
   it('uses planner-only display names for previous activity, mentions and notifications', async () => {
     const { admin, owner, t } = await setup();
     const id = await admin.mutation(api.planner.create, { activity, stage: 'ready' });

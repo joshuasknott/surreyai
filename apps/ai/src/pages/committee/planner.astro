@@ -1,7 +1,7 @@
 ---
 export const prerender = false;
 import BaseLayout from '@surreysocieties/ui/components/BaseLayout';
-import { ArrowUpRight, ArrowLeft, Plus, X, CalendarDays, MapPin, UsersRound, Sparkles, LockKeyhole, LogOut, Settings, Bell, Circle, AtSign, Send, Ellipsis, Columns3, Archive, ChevronsLeft, Menu, Search, MessageCircle, ListChecks, GripVertical, Check, Paperclip, FileText, Pencil, Upload, Image as ImageIcon } from 'lucide-astro';
+import { ArrowUpRight, ArrowLeft, Plus, X, CalendarDays, MapPin, UsersRound, Sparkles, LockKeyhole, LogOut, Settings, Bell, Circle, AtSign, Send, Ellipsis, Columns3, Archive, ChevronsLeft, Menu, Search, MessageCircle, ListChecks, GripVertical, Check, Paperclip, FileText, Pencil, Upload, Image as ImageIcon, SlidersHorizontal, Clock3 } from 'lucide-astro';
 import { plannerTeams } from '../../../../../convex/plannerTeams';
 import { SOCIETIES } from '@surreysocieties/admin/config';
 import '../../styles/planner.css';
@@ -65,10 +65,15 @@ const convexUrl = process.env.CONVEX_URL || import.meta.env.CONVEX_URL || '';
     </section>
     <section id="workspace" hidden>
       <div class="planner-toolbar">
-        <div class="team-filters" role="group" aria-label="Filter by team"><button data-team="all" aria-pressed="true">All</button>{plannerTeams.map(team => <button data-team={team.id} aria-pressed="false">{team.name}</button>)}</div>
+        <div class="board-controls">
+          <div id="board-scope" class="board-scope" role="group" aria-label="Show work for"><button type="button" data-scope="everyone" aria-pressed="true">Everyone</button><button type="button" data-scope="mine" aria-pressed="false">My work</button></div>
+          <label class="board-team-select"><span class="sr-only">Filter by team</span><select id="team-filter" aria-label="Filter by team"><option value="all">All teams</option>{plannerTeams.map(team => <option value={team.id}>{team.name}</option>)}</select></label>
+          <details id="board-filters" class="board-filters"><summary aria-label="More board filters"><SlidersHorizontal size={19} /><span id="active-filter-count" hidden></span></summary><div class="board-filter-panel"><label><input id="filter-due" type="checkbox" />Due this week</label><label><input id="filter-waiting" type="checkbox" />Waiting on someone</label><button id="clear-board-filters" type="button" class="quiet-button">Clear filters</button></div></details>
+        </div>
         <div class="planner-tools"><button id="toggle-search" class="icon-button" aria-label="Search cards" aria-expanded="false" aria-controls="board-search"><Search size={20} /></button><button id="new-item" class="primary-button"><Plus size={18} /><span>New card</span></button></div>
       </div>
       <div id="board-search" class="board-search" hidden><label for="card-search" class="sr-only">Search cards</label><input id="card-search" type="search" placeholder="Search cards…" autocomplete="off" /></div>
+      <div id="board-stage-tabs" class="board-stage-tabs" role="tablist" aria-label="Board stages"></div>
       <div id="board" class="planner-board"></div>
       <div id="calendar" class="planner-calendar" hidden></div>
       <div id="archive" hidden></div>
@@ -104,18 +109,19 @@ const convexUrl = process.env.CONVEX_URL || import.meta.env.CONVEX_URL || '';
   <dialog id="item-dialog" class="item-dialog" aria-labelledby="item-heading">
     <form id="item-form">
       <div class="editor-top"><button type="button" data-close class="quiet-button"><ArrowLeft size={16} /><span id="editor-back-label">Planner</span></button><span id="item-state" class="muted">Idea · Private</span><button type="button" data-close class="icon-button" aria-label="Close activity"><X size={20} /></button></div>
-      <div class="editor-actions"><h2 id="item-heading">New activity</h2><div id="editor-action-buttons"><button type="button" id="archive-item" class="quiet-button" hidden>Archive</button><button type="submit" form="item-form" id="save-item" class="secondary-button">Save draft</button><button type="button" id="publish-item" class="primary-button" hidden>Publish to website</button><button type="button" id="card-review" class="quiet-button" hidden>Review website details</button><button type="button" id="card-notes" class="quiet-button" hidden>Notes &amp; collaborators</button><button type="button" id="card-people-toggle" class="quiet-button" hidden>Worked on by</button></div></div>
+      <div class="editor-actions"><h2 id="item-heading">New activity</h2><div id="editor-action-buttons"><button type="button" id="archive-item" class="quiet-button" hidden>Archive</button><button type="submit" form="item-form" id="save-item" class="secondary-button">Save draft</button><button type="button" id="publish-item" class="primary-button" hidden>Publish to website</button><button type="button" id="card-review" class="quiet-button" hidden>Review website details</button><button type="button" id="card-notes" class="quiet-button" hidden>Notes &amp; collaborators</button><button type="button" id="card-waiting-toggle" class="quiet-button" hidden>Set waiting status</button><button type="button" id="card-people-toggle" class="quiet-button" hidden>Worked on by</button></div></div>
       <p id="item-message" role="status" class="form-message"></p>
       <div class="editor-stage-bar"><label id="stage-field">Stage<select name="stage" form="item-form"><option value="ideas">Ideas</option><option value="planning">In progress</option><option value="ready">Ready</option><option value="done">Done</option></select></label><p id="stage-help" class="field-help">Start with a title and a few words. Work out the details later.</p></div>
       <div class="editor-columns">
         <div class="editor-fields">
-          <label class="card-title-field">Title<input name="title" maxlength="160" required autocomplete="off" /></label>
+          <label class="card-title-field">Title<textarea name="title" maxlength="160" required autocomplete="off" rows="1"></textarea></label>
           <div class="card-metadata">
           <div class="team-picker"><span class="metadata-label">Team(s)</span><details id="team-picker-menu"><summary id="team-picker-summary" aria-label="Choose teams">Choose teams <Plus size={16} /></summary><fieldset class="team-options"><legend class="sr-only">Team(s)</legend>{plannerTeams.map(team => <label class="team-option"><input type="checkbox" name="teams" value={team.id} /><span>{team.name}</span></label>)}</fieldset></details></div>
           <label class="lead-field">Lead<div class="lead-control"><span id="lead-avatar" class="person-avatar" aria-hidden="true"></span><select name="lead"><option value="">Unassigned</option><optgroup label="Signatories">{SOCIETIES.ai.signatories.map(person => <option value={person.name}>{person.name}</option>)}</optgroup>{plannerTeams.map(team => <optgroup label={team.name}>{team.members.map(name => <option value={name}>{name}</option>)}</optgroup>)}</select></div></label>
           <label id="internal-due-label">Due<input type="date" name="dueDate" aria-label="Due date (optional)" /></label>
           <label class="purpose-field">Card purpose<select name="purpose"><option value="internal">Internal work</option><option value="activity">Website activity</option></select></label>
           </div>
+
           <div class="description-field">
             <div class="field-label-row"><label for="activity-description">Description</label><button type="button" id="help-description" class="inline-ai" hidden><Sparkles size={14} />Help write this</button></div>
             <textarea id="activity-description" name="description" rows="4" maxlength="4000" placeholder="What’s the idea?"></textarea>
@@ -131,7 +137,7 @@ const convexUrl = process.env.CONVEX_URL || import.meta.env.CONVEX_URL || '';
             <label>Booking or project link<input type="url" name="registrationUrl" maxlength="1500" placeholder="https://" /></label>
             <p class="field-help">Times use Europe/London. Events need a room or location and booking link before publishing. Ongoing projects can stay undated.</p>
           </div></details>
-          <details id="private-options" class="private-fields card-detail-panel" hidden><summary>Notes &amp; collaborators <span>Private · optional</span></summary><div class="detail-panel-content"><button type="button" class="close-card-panel icon-button" aria-label="Close private details"><X size={18} /></button><div id="card-collaborators-slot"></div><label>Notes<textarea name="notes" rows="3" maxlength="8000"></textarea></label></div></details>
+          <details id="private-options" class="private-fields card-detail-panel" hidden><summary>Notes &amp; collaborators <span>Private · optional</span></summary><div class="detail-panel-content"><button type="button" class="close-card-panel icon-button" aria-label="Close private details"><X size={18} /></button><div id="card-collaborators-slot"></div><details id="waiting-details" class="waiting-details"><summary><Clock3 size={16} /><span>Set waiting status</span></summary><label class="waiting-field">Waiting on (optional)<input name="waitingOn" aria-label="Waiting on (optional)" maxlength="160" placeholder="e.g. Room confirmation or budget approval" /><span class="field-help">Shown on the board until you clear it.</span></label></details><label>Notes<textarea name="notes" rows="3" maxlength="8000"></textarea></label></div></details>
           <fieldset id="card-checklist" class="checklist"><legend>Checklist <span id="task-progress"></span></legend><div id="task-list"></div><div class="add-task"><input id="task-text" maxlength="300" aria-label="New checklist task" placeholder="Add an item…" /><button type="button" id="add-task" class="quiet-button" aria-label="Add checklist item"><Plus size={16} /></button></div></fieldset>
           <section id="card-attachments" class="card-attachments"><div class="attachment-heading"><h3>Attachments</h3><button type="button" id="add-attachment" class="icon-button" aria-label="Add attachment"><Paperclip size={17} /></button></div><div id="attachment-list"></div><p id="file-upload-status" role="status" class="file-upload-status" hidden></p><div class="file-upload-actions"><button type="button" id="retry-file-upload" class="quiet-button" hidden>Retry upload</button><button type="button" id="cancel-file-upload" class="quiet-button" hidden>Cancel upload</button></div><div id="attachment-editor" hidden><label class="file-upload-picker" for="attachment-file"><Upload size={20} /><strong>Upload files</strong><span>PDFs and images · up to 10 MB each</span></label><input type="file" id="attachment-file" class="sr-only" aria-label="Choose attachment files" accept=".pdf,.png,.jpg,.jpeg,.gif,.webp,.avif" multiple /><p id="file-upload-help" class="field-help" hidden>Save this card before uploading files.</p><div class="attachment-link-divider">or add a link</div><label>Link<input type="text" inputmode="url" id="attachment-url" placeholder="https://" /></label><label>Name<input id="attachment-name" maxlength="160" placeholder="Document or link name" /></label><div><button type="button" id="save-attachment" class="quiet-button">Add link</button><button type="button" id="cancel-attachment" class="quiet-button">Cancel</button></div><p id="attachment-error" role="status" class="form-message"></p></div></section>
         </div>
@@ -169,6 +175,7 @@ const convexUrl = process.env.CONVEX_URL || import.meta.env.CONVEX_URL || '';
   <template id="plus-icon"><Plus size={17} aria-hidden="true" /></template>
   <template id="close-icon"><X size={15} aria-hidden="true" /></template>
   <template id="drag-icon"><GripVertical size={17} aria-hidden="true" /></template>
+  <template id="waiting-icon"><Clock3 size={15} aria-hidden="true" /></template>
   <template id="external-icon"><ArrowUpRight size={15} aria-hidden="true" /></template>
   <template id="calendar-icon"><CalendarDays size={18} aria-hidden="true" /></template>
   <template id="location-icon"><MapPin size={16} aria-hidden="true" /></template>

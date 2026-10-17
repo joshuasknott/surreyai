@@ -1,3 +1,51 @@
+# Committee planner board implementation — 17 October 2026
+
+final result: passed
+
+## Scope and visual targets
+
+Implemented the selected desktop board and mobile board. Card details remain a native modal with the existing discussion, autosave and publishing flows. The separate right-side drawer concept was not implemented.
+
+- Desktop source: C:/Users/Joshua Knott/.codex/generated_images/01a14a55-1fc9-7eb3-a0a6-90d60cbac7c3/exec-35899718-f173-4a7c-99ec-c9cf8d96b248.png (1487 x 1058).
+- Mobile source: C:/Users/Joshua Knott/.codex/generated_images/01a14a55-1fc9-7eb3-a0a6-90d60cbac7c3/exec-bb62ecc2-ca44-4fe7-a242-9b6ea6e6e0ef.png (853 x 1844).
+- Browser-rendered implementation: output/planner/board-first-desktop.png (1440 x 1024), output/planner/board-first-mobile.png (390 x 844), output/planner/board-first-mobile-modal.png (390 x 844). Desktop Chrome, deviceScaleFactor 1, fixture authentication and in-memory Convex functions. No hosted data was created or mutated.
+- Full-view comparison: output/planner/qa/desktop-comparison.png and output/planner/qa/mobile-comparison.png. Source images were normalized to the matching CSS viewport before composition; each pair places the reference on the left and implementation on the right.
+- Focused comparison: output/planner/qa/toolbar-comparison.png, matching main-header and filter regions with source above implementation. The mobile full-view pair is also large enough to inspect complete cards, owner names, due dates and stage tabs.
+
+## Findings and iteration history
+
+- P2 fixed: the first mobile capture wrapped In progress awkwardly. Gave that stage additional space; all four tabs remain visible at 390 and 320 pixels, and the active column uses a vertical card list without horizontal scrolling.
+- P2 fixed: an autosizing title missed its border height. Added the border allowance, then reclaimed two pixels of bottom spacing so the existing compact desktop modal still fits. Final title overflow and compact-modal regression checks pass.
+- P2 fixed: putting the waiting editor in the primary card body introduced unnecessary scrolling. Moved it into the existing optional-details modal panel, accessible through Set waiting status in Card options. It saves, reloads and clears through the normal revision-checked card mutations.
+- Updated obsolete creator-avatar assertions: board cards now show their assigned lead, while creator/editor history remains available through Worked on by inside the modal.
+- Final post-fix evidence is the board-first captures above and the complete 34-test planner browser run. No actionable P0/P1/P2 issue remains in this scope.
+
+## Fidelity surfaces
+
+- Fonts and typography: retained the existing Inter/system sans stack; stronger wrapping titles, readable owner names and next-action text. Existing authenticated header is slightly more compact than the concept; acceptable product continuity, not a clipping defect.
+- Spacing and layout: retained the navigation rail, four desktop columns and single compact filter row. Mobile selects one stage at a time. Actual full roster names and existing update-time sorting make card heights/order differ from the illustrative mock data.
+- Colors and tokens: retained plum navigation, warm orange actions, pale grey columns, existing team colors, amber waiting status and green publication badge.
+- Image quality: existing society mark and Lucide icons are reused. No generated screenshot is shipped as UI and no new raster asset is required.
+- Copy and content: real leads, first unfinished checklist action, saved private waiting status and explicit event-date labels replace illustrative text. Missing teams remain unlabelled instead of inventing an Admin team. Existing Archive, website and account controls are preserved.
+
+## Verification and limits
+
+- npm run typecheck: passed.
+- npx tsc --noEmit -p convex/tsconfig.json: passed.
+- npm test: 136 passed across 16 files, including waiting-status validation, omitted-field compatibility and public snapshot privacy.
+- npm run test:e2e -- --config e2e/planner.config.ts planner.spec.ts: 34 passed. Covers Everyone/My work, display-name mapping, combined team/search/due/waiting filters, empty states, default lead under My work, mobile stages and keyboard control, 320/390 layouts, desktop drag/reorder, true modal behavior, autosave/retry, files, sign-in/access revocation, comments, mentions, realtime notifications and publication/privacy.
+- npm run build:ai: passed. Vite reports a non-blocking large-chunk warning.
+- New board flow asserts no browser page errors. The live in-app local preview was opened and reaches the committee-email sign-in form; authenticated board evidence comes from the browser fixtures, not a live account.
+- No production deploy, hosted schema/function push, production sign-in or physical-device acceptance was performed. Release the optional waitingOn backend change with the AI frontend. Unit/browser verification uses the actual Convex functions in convex-test.
+
+## Follow-up polish
+
+- The compact authenticated mobile header and full roster names intentionally differ from the illustrative artwork. A physical-phone pass is still useful after release.
+
+---
+
+## Previous QA report (preserved)
+
 # Neurotech presentation and mascot QA - 15 October 2026
 
 final result: passed

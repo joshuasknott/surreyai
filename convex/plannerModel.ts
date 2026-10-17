@@ -63,6 +63,7 @@ export const plannerFields = {
   team: v.optional(v.union(plannerTeam, v.null())),
   teams: v.optional(v.array(plannerTeam)),
   lead: v.optional(v.union(v.string(), v.null())),
+  waitingOn: v.optional(v.string()),
   internalOnly: v.optional(v.boolean()),
   // Published rows keep their legacy stage/index; board progress is independent.
   workflowStage: v.optional(planningStage),
