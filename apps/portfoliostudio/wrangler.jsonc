@@ -1,0 +1,28 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "portfolio-studio",
+  "pages_build_output_dir": "./dist",
+  "compatibility_date": "2026-10-22",
+  "compatibility_flags": ["nodejs_compat"],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "portfolio-studio",
+      "database_id": "65b2f207-de7d-498c-a535-92df74da9689",
+      "migrations_dir": "./migrations",
+    },
+  ],
+  "ai": {
+    "binding": "AI",
+    "remote": true,
+  },
+  "vars": {
+    "PAGES_ACCOUNT_ID": "94e53728b92c0b8a3d621f72ad9c8eb4",
+    "PAGES_PROJECT_NAME": "portfolio-studio",
+    "PAGES_PROJECT_SUBDOMAIN": "portfolio-studio-1uu.pages.dev",
+    "ADMIN_USER_IDS": "",
+    "ENVIRONMENT": "production",
+    "APP_ORIGIN": "https://portfolio-studio-1uu.pages.dev",
+    "PUBLIC_APP_URL": "https://portfolio-studio-1uu.pages.dev",
+  },
+}

@@ -1,0 +1,50 @@
+.onboarding-simple {
+  padding-top: 28px;
+}
+
+.onboarding-simple > .workshop-steps {
+  width: min(100%, 760px);
+  margin: 0 auto 48px;
+}
+
+.onboarding-simple .onboarding-heading {
+  max-width: 700px;
+}
+
+.onboarding-simple .onboarding-form {
+  width: min(100%, 640px);
+}
+
+.onboarding-simple label > .help-text {
+  display: block;
+  margin: 7px 0 0;
+  line-height: 1.45;
+}
+.onboarding-simple .privacy-note,
+.onboarding-simple .upload-zone small {
+  font-size: 12px;
+  color: #746e65;
+}
+.onboarding-gallery .onboarding-bottom {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  max-width: none;
+  padding: 16px 0;
+  background: #fff;
+}
+
+.onboarding-simple .creation-tabs {
+  width: min(100%, 760px);
+  margin-inline: auto;
+}
+
+@media (max-width: 720px) {
+  .onboarding-simple {
+    padding-top: 16px;
+  }
+
+  .onboarding-simple > .workshop-steps {
+    margin-bottom: 32px;
+  }
+}
