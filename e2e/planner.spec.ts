@@ -1301,7 +1301,7 @@ test('approved board and opened card keep details inside and make comment action
   });
   const person = (name: string) => t.withIdentity({ subject: name.toLowerCase(), issuer: 'https://fixture.test', tokenIdentifier: `https://fixture.test|${name.toLowerCase()}`, name, email: `${name.toLowerCase()}@example.test`, emailVerified: true });
   const maya = person('Maya'); const alex = person('Alex');
-  const workshop: Activity = { ...activity, description: 'A hands-on workshop to build a simple AI agent. No experience needed — just bring your laptop.', date: '2026-10-22' };
+  const workshop: Activity = { ...activity, description: 'A hands-on workshop to build a simple AI agent. No experience needed — just bring your laptop.' };
   const cards = [
     { title: 'Intro to machine learning', stage: 'published', people: [alex] },
     { title: 'Welcome to Surrey AI', stage: 'published', people: [owner] },
