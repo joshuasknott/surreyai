@@ -2,6 +2,9 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig({
+  // Keep Vite/Oxc on Portfolio Studio's own TypeScript project when this app
+  // is tested from the Surrey AI monorepo without the root dependencies.
+  tsconfig: "./tsconfig.json",
   plugins: [react()],
   server: {
     port: 5173,
