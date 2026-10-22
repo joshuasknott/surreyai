@@ -1,0 +1,266 @@
+.ai-hack-page {
+  --hack-paper: #faf8f3;
+  --hack-ink: #111;
+  --hack-orange: #ff4a00;
+  --hack-muted: #5b5752;
+  background: var(--hack-paper);
+  color: var(--hack-ink);
+}
+
+.ai-hack-page .hack-shell {
+  overflow: clip;
+}
+
+.ai-hack-page .hack-hero,
+.ai-hack-page .hack-facts,
+.ai-hack-page .hack-note {
+  width: min(1120px, calc(100% - 48px));
+  margin-inline: auto;
+}
+
+.ai-hack-page .hack-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, .48fr);
+  align-items: center;
+  min-height: min(620px, calc(100dvh - 84px));
+  padding-block: 96px 84px;
+}
+
+.ai-hack-page .hack-hero::before {
+  content: '';
+  position: absolute;
+  inset: 7% -22% 9% 53%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(132deg, transparent 0 48%, #ff4a0030 48.2% 48.7%, transparent 49%),
+    linear-gradient(90deg, transparent 0 66%, #11111112 66.2% 66.5%, transparent 66.7%),
+    radial-gradient(circle at 65% 35%, #ff4a0028, transparent 17rem);
+}
+
+.ai-hack-page .hack-hero__copy,
+.ai-hack-page .hack-hero__mark {
+  position: relative;
+  z-index: 1;
+}
+
+.ai-hack-page .hack-kicker {
+  margin: 0 0 18px;
+  color: var(--hack-orange);
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .14em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.ai-hack-page .hack-hero h1 {
+  max-width: 10ch;
+  margin: 0;
+  font-size: clamp(3.4rem, 8vw, 7.4rem);
+  font-weight: 850;
+  letter-spacing: -.065em;
+  line-height: .94;
+  text-wrap: balance;
+}
+
+.ai-hack-page .hack-hero__intro {
+  max-width: 39rem;
+  margin: 28px 0 0;
+  color: var(--hack-muted);
+  font-size: clamp(1.08rem, 2vw, 1.35rem);
+  line-height: 1.55;
+}
+
+.ai-hack-page .hack-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 34px;
+}
+
+.ai-hack-page .hack-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 48px;
+  padding: 12px 18px;
+  border-radius: 999px;
+  font-size: .95rem;
+  font-weight: 750;
+  text-decoration: none;
+  transition: transform 160ms ease, background-color 160ms ease;
+}
+
+.ai-hack-page .hack-button:hover,
+.ai-hack-page .hack-text-link:hover {
+  transform: translateY(-2px);
+}
+
+.ai-hack-page .hack-button--primary {
+  background: var(--hack-ink);
+  color: var(--hack-paper);
+}
+
+.ai-hack-page .hack-button--primary:hover { background: #b73500; }
+
+.ai-hack-page .hack-button--secondary {
+  border: 1px solid #bdb5a9;
+  color: var(--hack-ink);
+}
+
+.ai-hack-page .hack-button--secondary:hover { background: #f1ede5; }
+
+.ai-hack-page .hack-hero__mark {
+  display: grid;
+  place-items: center;
+  justify-self: end;
+  width: min(31vw, 330px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--hack-orange);
+  color: var(--hack-ink);
+  transform: rotate(7deg);
+  box-shadow: 22px 28px 0 #11111112;
+}
+
+.ai-hack-page .hack-hero__mark span {
+  font-size: clamp(2.8rem, 7vw, 6rem);
+  font-weight: 900;
+  letter-spacing: -.09em;
+  line-height: .8;
+}
+
+.ai-hack-page .hack-hero__mark strong {
+  position: absolute;
+  right: 18%;
+  bottom: 18%;
+  font: 800 clamp(1.2rem, 2vw, 2rem)/1 'IBM Plex Mono', ui-monospace, monospace;
+}
+
+.ai-hack-page .hack-facts {
+  padding-block: 84px 112px;
+  border-top: 1px solid #ded8ce;
+}
+
+.ai-hack-page .hack-facts__heading {
+  display: grid;
+  grid-template-columns: minmax(0, .75fr) minmax(0, 1fr);
+  align-items: end;
+  gap: 32px;
+  margin-bottom: 46px;
+}
+
+.ai-hack-page .hack-facts__heading .hack-kicker { margin: 0; }
+
+.ai-hack-page .hack-facts h2,
+.ai-hack-page .hack-note h2 {
+  max-width: 13ch;
+  margin: 0;
+  font-size: clamp(2.5rem, 5vw, 5.2rem);
+  font-weight: 800;
+  letter-spacing: -.055em;
+  line-height: .96;
+  text-wrap: balance;
+}
+
+.ai-hack-page .hack-facts__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.ai-hack-page .hack-facts article {
+  min-height: 220px;
+  padding: 26px;
+  border: 1px solid #ded8ce;
+  background: #fffdf8;
+}
+
+.ai-hack-page .hack-fact-label {
+  margin: 0 0 28px;
+  color: #b73500;
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.ai-hack-page .hack-facts h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  letter-spacing: -.03em;
+  line-height: 1.08;
+}
+
+.ai-hack-page .hack-facts article > p:last-child {
+  margin: 18px 0 0;
+  color: var(--hack-muted);
+  line-height: 1.55;
+}
+
+.ai-hack-page .hack-note {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, .72fr) auto;
+  align-items: end;
+  gap: 28px;
+  padding-block: 76px 112px;
+  border-top: 1px solid #ded8ce;
+}
+
+.ai-hack-page .hack-note h2 { max-width: 10ch; }
+
+.ai-hack-page .hack-note > p {
+  max-width: 30ch;
+  margin: 0;
+  color: var(--hack-muted);
+  line-height: 1.6;
+}
+
+.ai-hack-page .hack-text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: var(--hack-orange);
+  color: var(--hack-ink);
+  font-weight: 750;
+  text-decoration: none;
+  transition: transform 160ms ease;
+  white-space: nowrap;
+}
+
+.ai-hack-page :is(a, button):focus-visible {
+  outline: 3px solid var(--hack-orange);
+  outline-offset: 4px;
+}
+
+@media (max-width: 780px) {
+  .ai-hack-page .hack-hero,
+  .ai-hack-page .hack-facts,
+  .ai-hack-page .hack-note { width: min(100% - 32px, 1120px); }
+  .ai-hack-page .hack-hero {
+    grid-template-columns: 1fr;
+    min-height: 0;
+    padding-block: 68px 72px;
+  }
+  .ai-hack-page .hack-hero__mark {
+    justify-self: start;
+    width: min(48vw, 230px);
+    margin-top: 58px;
+  }
+  .ai-hack-page .hack-facts { padding-block: 68px 84px; }
+  .ai-hack-page .hack-facts__heading { grid-template-columns: 1fr; gap: 26px; margin-bottom: 32px; }
+  .ai-hack-page .hack-facts__grid { grid-template-columns: 1fr; }
+  .ai-hack-page .hack-facts article { min-height: 0; }
+  .ai-hack-page .hack-note { grid-template-columns: 1fr; align-items: start; padding-block: 64px 88px; }
+  .ai-hack-page .hack-note > p { max-width: 42rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-hack-page .hack-button,
+  .ai-hack-page .hack-text-link { transition: none; }
+}

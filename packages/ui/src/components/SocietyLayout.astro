@@ -45,12 +45,14 @@ const socialLinks = Object.entries(socialNames).filter(([key]) => society.social
         <a href="#about">About</a>
         <a href="#programme">Events</a>
         <a href="#committee">Committee</a>
+        <a href="/hack">Hack</a>
         <a href="/resources">Resources</a>
       </nav>}
       {!curiousHome && societyKey === 'ai' && <nav class="ai-page-nav" aria-label="Main navigation">
         <a href="/#about">About</a>
         <a href="/#programme">Events</a>
         <a href="/#committee">Committee</a>
+        <a href="/hack">Hack</a>
         <a href="/resources">Resources</a>
       </nav>}
       <slot name="join-menu"><details class="society-join-menu" data-join-menu>
@@ -229,7 +231,7 @@ const socialLinks = Object.entries(socialNames).filter(([key]) => society.social
     .society-footer > div { flex-direction: column; align-items: start; }
   }
   @media (max-width: 850px) {
-    .ai-page-nav a:not(:last-child) { display: none; }
+    .ai-page-nav a:not(:nth-last-child(-n + 2)) { display: none; }
     .society-committee-banner__inner { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 10px; min-height: 0; padding: 6px 16px; }
     .society-committee-banner strong { grid-column: 1; grid-row: 1; font-size: 15px; }
     .society-committee-banner__label { display: none; }

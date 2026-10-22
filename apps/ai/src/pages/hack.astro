@@ -1,0 +1,77 @@
+---
+export const prerender = false;
+import Layout from '../layouts/Layout.astro';
+import '../styles/global.css';
+import '../styles/hack.css';
+
+const hackOrigin = 'https://surrey-ai-hack-2027.vercel.app/';
+const waitlistUrl = `${hackOrigin}#waitlist`;
+---
+
+<Layout
+  title="Surrey AI Hack"
+  description="Surrey AI Hack 2027 is a national weekend for UK university students to build and demo AI projects."
+  bodyClass="ai-hack-page"
+>
+  <div class="hack-shell">
+    <section class="hack-hero" aria-labelledby="hack-title">
+      <div class="hack-hero__copy">
+        <p class="hack-kicker">Surrey AI Society / The hack</p>
+        <h1 id="hack-title">Build something worth showing.</h1>
+        <p class="hack-hero__intro">
+          Surrey AI Hack 2027 is a national weekend for UK university students to build and demo AI projects.
+        </p>
+        <div class="hack-actions" data-hero-actions>
+          <a class="hack-button hack-button--primary" href={hackOrigin} target="_blank" rel="noopener noreferrer">
+            Explore the hack <span aria-hidden="true">↗</span>
+          </a>
+          <a class="hack-button hack-button--secondary" href={waitlistUrl} target="_blank" rel="noopener noreferrer">
+            Join the waitlist <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </div>
+      <div class="hack-hero__mark" aria-hidden="true">
+        <span>SAH</span>
+        <strong>27</strong>
+      </div>
+    </section>
+
+    <section class="hack-facts" aria-labelledby="hack-facts-title">
+      <div class="hack-facts__heading">
+        <p class="hack-kicker">What we know so far</p>
+        <h2 id="hack-facts-title">A national build weekend, taking shape from Surrey.</h2>
+      </div>
+      <div class="hack-facts__grid">
+        <article>
+          <p class="hack-fact-label">When</p>
+          <h3>2026/27 academic year</h3>
+          <p>Specific dates are still to be announced.</p>
+        </article>
+        <article>
+          <p class="hack-fact-label">Where</p>
+          <h3>Surrey, UK</h3>
+          <p>The University of Surrey / Stag Hill Campus is the preferred host location, with arrangements pending.</p>
+        </article>
+        <article>
+          <p class="hack-fact-label">Who</p>
+          <h3>UK university students</h3>
+          <p>Bring your discipline, your idea and whatever helps you make a working demonstration.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="hack-note" aria-labelledby="hack-note-title">
+      <div>
+        <p class="hack-kicker">Keep the details close</p>
+        <h2 id="hack-note-title">Join the waitlist for confirmed updates.</h2>
+      </div>
+      <p>
+        The waitlist records your interest; it does not reserve a place. Dates, venue and other event details will be
+        announced on the Hack site when they are confirmed.
+      </p>
+      <a class="hack-text-link" href={waitlistUrl} target="_blank" rel="noopener noreferrer">
+        Join the waitlist <span aria-hidden="true">↗</span>
+      </a>
+    </section>
+  </div>
+</Layout>

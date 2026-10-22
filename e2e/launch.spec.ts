@@ -146,7 +146,7 @@ for (const site of sites.filter(site => site.key === 'ai')) {
         expect(response.headers()['content-type']).toContain('image/png');
       }
       const sitemap = await (await request.get(`${site.origin}/sitemap.xml`)).text();
-      expect(sitemap.match(/<loc>/g)).toHaveLength(site.key === 'ai' ? 7 : 1);
+      expect(sitemap.match(/<loc>/g)).toHaveLength(site.key === 'ai' ? 8 : 1);
       for (const width of [320, 390, 768, 1440]) {
         await page.setViewportSize({ width, height: 900 });
         await expectNoHorizontalOverflow(page);
