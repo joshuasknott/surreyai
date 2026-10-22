@@ -27,7 +27,9 @@
     "typecheck:portfolio": "npm --prefix apps/portfoliostudio run typecheck",
     "test:e2e:portfolio": "npm --prefix apps/portfoliostudio run test:e2e",
     "deploy:portfolio": "npm --prefix apps/portfoliostudio run deploy",
-    "backend:check": "tsc --noEmit -p convex/tsconfig.json"
+    "backend:check": "tsc --noEmit -p convex/tsconfig.json",
+    "build:hack": "npm --prefix apps/hack run build",
+    "test:hack": "npm --prefix apps/hack test"
   },
   "overrides": {
     "esbuild": "0.28.1",

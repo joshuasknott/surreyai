@@ -1,6 +1,13 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
   "buildCommand": "npm run build",
-  "outputDirectory": "dist/client",
-  "framework": "vite"
+  "installCommand": "npm ci --ignore-scripts",
+  "outputDirectory": "dist",
+  "regions": ["lhr1"],
+  "functions": {"api/waitlist.mjs": {"maxDuration": 15}},
+  "cleanUrls": true,
+  "headers": [
+    {"source":"/(.*)","headers":[{"key":"X-Content-Type-Options","value":"nosniff"},{"key":"Referrer-Policy","value":"strict-origin-when-cross-origin"},{"key":"X-Frame-Options","value":"DENY"},{"key":"Content-Security-Policy","value":"default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self' mailto:"}]}
+  ]
 }

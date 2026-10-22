@@ -1,6 +1,6 @@
 # Surrey AI repository
 
-This repository contains the Surrey AI Society website, private committee planner, resources hub, and the imported Portfolio Studio source. Keep the two applications independently deployable and preserve their existing data, authentication, cookies, domains, and published links.
+This repository contains the Surrey AI Society website, private committee planner, resources hub, the imported Portfolio Studio source, and Surrey AI Hack. Keep the applications independently deployable and preserve their existing data, authentication, cookies, domains, and published links.
 
 ## Boundaries and commands
 
@@ -31,3 +31,5 @@ Preserve the current society visual language, accessible controls, asset identit
 When changing Convex code, read `convex/_generated/ai/guidelines.md` and the applicable Convex guidance. Keep generated files generated and preserve validators, auth checks, and data ownership.
 
 Local previews, source history, and passing builds do not prove that a production deployment changed. Verify the intended app, preview, deployment, and live route separately. Do not move or recreate existing Convex, D1, Cloudflare, auth, email, Blob, or domain resources as part of a source-layout change.
+
+Surrey AI Hack lives in `apps/hack`, outside the root npm workspace with its own lockfile. Preserve its existing Vercel project, live origin, Blob store, consent checks and email configuration. Use `npm --prefix apps/hack ci --ignore-scripts`, `npm run test:hack`, and `npm run build:hack`. It has its own `/hack` society section; Portfolio Studio remains under `/resources`.
