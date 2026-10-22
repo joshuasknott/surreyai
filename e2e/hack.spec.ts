@@ -9,11 +9,6 @@ for (const viewport of [
 ]) {
   test(`Hack page links to the live event site at ${viewport.name} size`, async ({ page }) => {
     await page.setViewportSize(viewport);
-    await page.goto(`${aiOrigin}/`, { waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('link', { name: 'Hack', exact: true }).first()).toHaveAttribute('href', '/hack');
-    await page.getByRole('link', { name: 'Hack', exact: true }).first().click();
-    await expect(page).toHaveURL(`${aiOrigin}/hack`);
-
     await page.goto(`${aiOrigin}/hack`, { waitUntil: 'domcontentloaded' });
 
     await expect(page.getByRole('heading', { name: 'Build something worth showing.' })).toBeVisible();

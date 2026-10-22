@@ -7,6 +7,7 @@ import "../styles/flow-home.css";
 import HomeHero from "../components/home/HomeHero.astro";
 import FlowHomeSections from "../components/home/FlowHomeSections.astro";
 import Programme from "../components/home/Programme.astro";
+import HackPromotion from "../components/home/HackPromotion.astro";
 import { getSocietyById } from '@surreysocieties/admin/config';
 import { queryPublicConvex } from "@surreysocieties/admin";
 import { api } from "../../../../convex/_generated/api.js";
@@ -24,5 +25,6 @@ const society = getSocietyById('ai')!;
 >
   <HomeHero slot="hero" />
   <Programme activities={activities} />
+  <HackPromotion />
   <FlowHomeSections society={society} committee={committee} />
 </Layout>

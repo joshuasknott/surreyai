@@ -259,7 +259,7 @@ for (const site of sites.filter(site => site.key === 'ai')) {
         const height = width === 768 ? 390 : 844;
         await page.setViewportSize({ width, height });
         await expect(panel).toBeHidden();
-        await expect(header.locator('a:visible')).toHaveCount(site.key === 'ai' ? 6 : site.key === 'business' && width > 700 ? 4 : 1);
+        await expect(header.locator('a:visible')).toHaveCount(site.key === 'ai' ? 5 : site.key === 'business' && width > 700 ? 4 : 1);
         expect((await trigger.boundingBox())?.height).toBeGreaterThanOrEqual(44);
         await trigger.click();
         await expect(panel).toBeVisible();

@@ -1,0 +1,133 @@
+---
+import { ArrowUpRight } from 'lucide-astro';
+import hackLogo from '../../assets/brand/surrey-ai-hack-2027.webp';
+---
+
+<section id="surrey-ai-hack" class="home-hack" aria-label="Surrey AI Hack 2027">
+  <div class="home-hack__inner">
+    <div class="home-hack__brand">
+      <img src={hackLogo.src} alt="Surrey AI Hack 2027" width={hackLogo.width} height={hackLogo.height} loading="lazy" decoding="async" />
+    </div>
+    <div class="home-hack__copy">
+      <h2><span>Build something</span> <span>worth showing.</span></h2>
+      <p class="home-hack__intro">A national weekend for UK university students to build and demo AI projects.</p>
+      <p class="home-hack__welcome">Beginners welcome. Every discipline welcome.</p>
+      <a class="home-hack__link" href="https://surrey-ai-hack-2027.vercel.app/" target="_blank" rel="noopener noreferrer">
+        <span>Explore Surrey AI Hack 2027</span>
+        <ArrowUpRight aria-hidden="true" />
+      </a>
+    </div>
+  </div>
+  <p class="home-hack__details">2026/27 academic year · Details to be announced</p>
+</section>
+
+<style>
+  .home-hack {
+    --hack-yellow: #fff34f;
+    --hack-ink: #21113a;
+    padding: clamp(64px, 7.3vw, 144px) 2.9% 24px;
+    background: var(--hack-yellow);
+    color: var(--hack-ink);
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  }
+
+  .home-hack__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    column-gap: 7%;
+    max-width: 1856px;
+    margin-inline: auto;
+  }
+
+  .home-hack__brand img {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-inline-start: 8%;
+  }
+
+  .home-hack__copy { min-width: 0; width: 90%; }
+
+  .home-hack h2 {
+    margin: 0;
+    color: inherit;
+    font-size: clamp(40px, 5vw, 100px);
+    font-weight: 800;
+    line-height: 1.03;
+    letter-spacing: -.035em;
+  }
+
+  .home-hack h2 span { display: block; }
+
+  .home-hack__intro {
+    margin: clamp(24px, 1.8vw, 36px) 0 0;
+    font-size: clamp(20px, 2.05vw, 41px);
+    line-height: 1.25;
+    letter-spacing: -.025em;
+  }
+
+  .home-hack__welcome {
+    margin: clamp(16px, 1vw, 20px) 0 0;
+    font-size: clamp(16px, 1.45vw, 29px);
+    line-height: 1.45;
+    letter-spacing: -.02em;
+  }
+
+  .home-hack__link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: clamp(12px, 1.6vw, 32px);
+    width: 100%;
+    min-height: 56px;
+    margin-top: clamp(24px, 2.15vw, 43px);
+    padding: clamp(18px, 1.5vw, 30px) clamp(20px, 3vw, 60px);
+    border-radius: 100px;
+    background: var(--hack-ink);
+    color: var(--hack-yellow);
+    font-size: clamp(16px, 1.95vw, 39px);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -.025em;
+    text-decoration: none;
+    transition: background-color 160ms ease;
+  }
+
+  .home-hack__link svg { flex: 0 0 auto; width: 1.4em; height: 1.4em; }
+  .home-hack__link:hover { background: #392151; }
+  .home-hack__link:focus-visible { outline: 3px solid var(--hack-ink); outline-offset: 6px; }
+
+  .home-hack__details {
+    max-width: 1856px;
+    margin: clamp(32px, 2vw, 40px) auto 0;
+    font-size: clamp(14px, 1.1vw, 22px);
+    line-height: 1.5;
+    letter-spacing: -.02em;
+  }
+
+  @media (max-width: 900px) {
+    .home-hack { padding: 48px 6% 28px; }
+    .home-hack__inner { grid-template-columns: minmax(0, 1fr); gap: 30px; max-width: 600px; }
+    .home-hack__copy { width: 100%; }
+    .home-hack__brand img { width: min(100%, 480px); margin-inline: auto; }
+    .home-hack h2 { font-size: clamp(36px, 7vw, 58px); }
+    .home-hack__intro { font-size: 23px; }
+    .home-hack__welcome { font-size: 18px; }
+    .home-hack__link { font-size: 21px; padding: 20px 28px; }
+    .home-hack__details { max-width: 600px; margin-top: 32px; }
+  }
+
+  @media (max-width: 480px) {
+    .home-hack { padding: 32px 6% 24px; }
+    .home-hack__inner { gap: 20px; }
+    .home-hack h2 { font-size: clamp(32px, 9.5vw, 44px); }
+    .home-hack__intro { margin-top: 20px; font-size: 20px; line-height: 1.4; }
+    .home-hack__welcome { font-size: 16px; }
+    .home-hack__link { gap: 10px; padding: 18px 20px; font-size: clamp(15px, 4.3vw, 20px); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .home-hack__link { transition: none; }
+  }
+</style>

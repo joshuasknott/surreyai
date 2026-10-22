@@ -1,0 +1,220 @@
+---
+import { Image } from 'astro:assets';
+import type { Society } from '@surreysocieties/admin/types';
+import joshua from '../../assets/committee/joshua.webp';
+import poppy from '../../assets/committee/poppy.webp';
+import vinayak from '../../assets/committee/vinayak.webp';
+import amanda from '../../assets/committee/amanda.webp';
+import samuelJoyson from '../../assets/committee/samuel-joyson.webp';
+import kusumitha from '../../assets/committee/kusumitha.webp';
+import fatima from '../../assets/committee/fatima.webp';
+import george from '../../assets/committee/george.webp';
+import miguel from '../../assets/committee/miguel.webp';
+import ibrahim from '../../assets/committee/ibrahim.webp';
+import samuelYoung from '../../assets/committee/samuel-young.webp';
+import bibek from '../../assets/committee/bibek.webp';
+import zain from '../../assets/committee/zain.webp';
+import deepanshu from '../../assets/committee/deepanshu.webp';
+import branches from '../../assets/committee/branches.png';
+
+interface Props {
+  society: Society;
+  committee?: Array<{ name: string; role?: string }>;
+}
+
+const { society, committee = [] } = Astro.props;
+const signatoryPortraits = new Map([
+  ['Joshua Knott', joshua],
+  ['Poppy Holmes', poppy],
+  ['Vinayak Manojkumar Vadhera', vinayak],
+]);
+const officers = society.signatories.map(officer => {
+  const member = committee.find(member => member.role === officer.role && member.name.trim()) ?? officer;
+  const name = member.name.trim().replace(/\s+/g, ' ').replace(/^Josh Knott$/, 'Joshua Knott');
+  // Match the person, so a future roster change cannot reuse somebody else's face.
+  const portrait = signatoryPortraits.get(name);
+  const initials = name.split(' ').filter((_, i, parts) => i === 0 || i === parts.length - 1).map(part => part[0]).join('');
+  return { name, role: officer.role, portrait, initials };
+});
+const teams = [
+  { role: 'Workshops & Learning', members: [
+    { name: "Amanda Lages O'Connor", portrait: amanda },
+    { name: 'Samuel Joyson Rekala', portrait: samuelJoyson },
+    { name: 'Tadavarthi Kusumitha', portrait: kusumitha },
+  ] },
+  { role: 'Events & Socials', members: [
+    { name: 'Fatima Waheed', portrait: fatima },
+    { name: 'George Mahon', portrait: george },
+    { name: 'Miguel Antonio', portrait: miguel },
+  ] },
+  { role: 'Industry & Partnerships', members: [
+    { name: 'Ibrahim Haque', portrait: ibrahim },
+    { name: 'Samuel Young', portrait: samuelYoung },
+  ] },
+  { role: 'Projects & Hackathons', members: [
+    { name: 'Bibek Limbu', portrait: bibek },
+    { name: 'Muhammad Zain Khan', portrait: zain },
+  ] },
+  { role: 'Careers & Opportunities', members: [
+    { name: 'Deepanshu Dariya', portrait: deepanshu },
+  ] },
+];
+---
+
+<section id="committee" class="flow-section flow-committee" aria-labelledby="committee-title">
+  <div class="flow-shell">
+    <h2 id="committee-title" class="flow-heading">Meet the <span>committee.</span></h2>
+    <p id="signatories-title" class="flow-committee__signatories">Signatories</p>
+    <div class="flow-officers" role="group" aria-labelledby="signatories-title">
+      {officers.map(officer => <article class="flow-officer">
+        {officer.portrait
+          ? <Image class="flow-committee__portrait" src={officer.portrait} width={360} height={360} alt="" loading="lazy" decoding="async" />
+          : <div class="flow-committee__portrait flow-committee__initials" aria-hidden="true">{officer.initials}</div>}
+        <div class="flow-officer__identity">
+          <h3>{officer.name}</h3>
+          <p class="flow-officer__role">{officer.role}</p>
+        </div>
+      </article>)}
+    </div>
+    <img class="flow-committee__branches" src={branches.src} width={branches.width} height={branches.height} alt="" aria-hidden="true" loading="lazy" />
+    <div class="flow-teams">
+      {teams.map(team => <article class="flow-team">
+        <h3><span>{team.role.split(' & ')[0]} &amp;</span> <span>{team.role.split(' & ')[1]}</span></h3>
+        <ul>
+          {team.members.map(member => <li>
+            <Image class="flow-committee__portrait" src={member.portrait} width={360} height={360} alt="" loading="lazy" decoding="async" />
+            <span>{member.name}</span>
+          </li>)}
+        </ul>
+      </article>)}
+    </div>
+  </div>
+</section>
+
+<style>
+  .flow-committee { padding: 60px 0 150px; }
+  .flow-committee > .flow-shell { width: min(1280px, calc(100% - 32px)); }
+  .flow-committee .flow-heading {
+    text-align: center;
+    font-size: clamp(40px, 7.7vw, 104px);
+    transform: none;
+  }
+  .flow-committee .flow-committee__signatories {
+    margin: 26px 0 16px;
+    color: var(--flow-ink);
+    font-size: 28px;
+    font-weight: 750;
+    line-height: 1.25;
+    text-align: center;
+  }
+  .flow-officers {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+    width: min(700px, 85%);
+    margin-inline: auto;
+  }
+  .flow-officer { min-width: 0; text-align: center; }
+  .flow-committee__portrait {
+    display: block;
+    width: 144px;
+    height: 144px;
+    margin: 0 auto 10px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .flow-officer .flow-committee__portrait { width: 154px; height: 154px; }
+  .flow-committee__initials {
+    display: grid;
+    place-items: center;
+    background: #eee7dc;
+    font: 800 40px/1 var(--flow-display);
+  }
+  .flow-officer h3 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -.03em;
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+  }
+  .flow-committee .flow-officer__role {
+    margin: 4px 0 0;
+    color: #cc3b00;
+    font-size: 21px;
+    font-weight: 550;
+    line-height: 1.3;
+  }
+  .flow-committee__branches {
+    display: block;
+    width: 80%;
+    height: 83px;
+    margin: -16px auto 16px;
+  }
+  .flow-teams {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0;
+    text-align: center;
+  }
+  .flow-team { min-width: 0; padding-inline: 8px; }
+  .flow-team h3 {
+    max-width: 180px;
+    min-height: 55px;
+    margin: 0 auto 22px;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -.035em;
+    text-wrap: balance;
+  }
+  .flow-team h3 > span { display: block; }
+  .flow-team ul { display: grid; grid-auto-rows: 206px; gap: 8px; padding: 0; margin: 0; list-style: none; }
+  .flow-team li { min-width: 0; min-height: 194px; }
+  .flow-team li > span {
+    display: block;
+    max-width: 180px;
+    margin-inline: auto;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -.025em;
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+  }
+  @media (max-width: 1023px) {
+    .flow-committee { padding-bottom: 120px; }
+    .flow-committee > .flow-shell { width: calc(100% - 48px); }
+    .flow-committee__branches { display: none; }
+    .flow-officers { width: min(700px, 100%); }
+    .flow-officer .flow-committee__portrait { width: 120px; height: 120px; }
+    .flow-officer h3 { font-size: 20px; }
+    .flow-committee .flow-officer__role { font-size: 18px; }
+    .flow-teams { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px 32px; margin-top: 44px; }
+    .flow-team { border-top: 2px solid var(--flow-orange); padding: 22px 0 0; }
+    .flow-team h3 { max-width: none; min-height: 0; margin-bottom: 22px; font-size: 23px; }
+    .flow-team h3 > span { display: inline; }
+    .flow-team ul { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: auto; gap: 20px 12px; }
+    .flow-team li { min-height: 0; }
+    .flow-team .flow-committee__portrait { width: 112px; height: 112px; }
+    .flow-team li > span { font-size: 18px; }
+  }
+  @media (max-width: 599px) {
+    .flow-committee { padding: 36px 0 105px; }
+    .flow-committee > .flow-shell { width: calc(100% - 40px); }
+    .flow-committee .flow-heading { font-size: clamp(36px, 9.5vw, 52px); }
+    .flow-committee .flow-committee__signatories { margin-top: 26px; font-size: 23px; }
+    .flow-officers { grid-template-columns: 1fr; gap: 22px; max-width: 350px; }
+    .flow-officer { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 18px; align-items: center; text-align: left; }
+    .flow-officer .flow-committee__portrait { width: 96px; height: 96px; margin: 0; }
+    .flow-officer h3 { font-size: 20px; text-wrap: initial; }
+    .flow-committee .flow-officer__role { margin-top: 5px; font-size: 17px; }
+    .flow-teams { grid-template-columns: 1fr; gap: 32px; margin-top: 36px; }
+    .flow-team h3 { font-size: 22px; }
+    .flow-team ul { gap: 22px 16px; }
+    .flow-team .flow-committee__portrait { width: 96px; height: 96px; }
+    .flow-team li > span { max-width: 155px; font-size: 17px; }
+    .flow-team li:last-child:nth-child(odd) { grid-column: 1 / -1; width: calc(50% - 8px); justify-self: center; }
+  }
+</style>

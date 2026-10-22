@@ -4,33 +4,20 @@ import { ArrowRight, ArrowUpRight } from 'lucide-astro';
 import type { Society } from '@surreysocieties/admin/types';
 import ContactForm from '@surreysocieties/ui/components/ContactForm';
 import SocialIcon from '@surreysocieties/ui/components/SocialIcon';
+import Committee from './Committee.astro';
 import glassLoop from '../../assets/generated/flow/glass-loop.webp';
 import glassOrb from '../../assets/generated/flow/glass-orb.webp';
 import orangeCube from '../../assets/generated/flow/orange-cube.webp';
 import orangeStar from '../../assets/generated/flow/orange-star.webp';
-import orangeBadge from '../../assets/generated/flow/orange-badge.webp';
-import blackPebble from '../../assets/generated/flow/black-pebble.webp';
 
 interface Props { society: Society; committee?: Array<{ name: string; role?: string }>; }
 const { society, committee = [] } = Astro.props;
-const officers = society.signatories.map((officer, index) => {
-  const member = committee.find(member => member.role === officer.role && member.name.trim()) ?? officer;
-  const name = member.name === 'Josh Knott' ? 'Joshua Knott' : member.name;
-  return { ...member, name, initials: name.trim().split(/\s+/).filter((_, i, names) => i === 0 || i === names.length - 1).map(part => part[0]).join(''), artwork: [orangeBadge, glassOrb, blackPebble][index % 3] };
-});
 const activities = [
   { title: 'Workshops', text: 'Learn new skills, hands-on and together.', image: orangeCube, href: society.socials.instagram, label: 'Find workshops on Instagram' },
   { title: 'Projects & challenges', text: 'Turn ideas into real projects with a supportive community.', image: glassOrb, href: society.socials.discord, label: 'Talk projects with us on Discord', id: 'projects' },
   { title: 'Talks & socials', text: 'Fresh perspectives, interesting people, great conversations.', image: orangeStar, href: society.socials.whatsapp, label: 'Find talks and socials on WhatsApp' },
 ];
 const socials = [ ['instagram', 'Instagram'], ['linkedin', 'LinkedIn'], ['discord', 'Discord'], ['linktree', 'Linktree'] ];
-const teams = [
-  { role: 'Workshops & Learning', members: ["Amanda Lages O'Connor", 'Samuel Joyson Rekala', 'Tadavarthi Kusumitha'] },
-  { role: 'Events & Socials', members: ['Fatima Waheed', 'George Mahon', 'Miguel Antonio'] },
-  { role: 'Industry & Partnerships', members: ['Ibrahim Haque', 'Samuel Young'] },
-  { role: 'Projects & Hackathons', members: ['Bibek Limbu', 'Muhammad Zain Khan'] },
-  { role: 'Careers & Opportunities', members: ['Deepanshu Dariya'] },
-];
 ---
 
 <section id="about" class="flow-section flow-about" aria-labelledby="about-title">
@@ -64,28 +51,7 @@ const teams = [
   </div>
 </section>
 
-<section id="committee" class="flow-section flow-committee" aria-labelledby="committee-title">
-  <div class="flow-shell">
-    <h2 id="committee-title" class="flow-heading">Meet the <span>committee.</span></h2>
-    <p class="flow-note flow-committee__note" aria-hidden="true">Students<br />ideas<br />impact</p>
-    <div class="flow-officers">
-      {officers.map((officer, index) => <article class:list={['flow-officer', index === 1 && 'flow-officer--glass']}>
-        <div class="flow-officer__portrait" aria-hidden="true">
-          <Image src={officer.artwork} width={320} height={320} alt="" loading="lazy" />
-          <span>{officer.initials}</span>
-        </div>
-        <h3>{officer.name}</h3>
-        <p>{officer.role}</p>
-      </article>)}
-    </div>
-    <div class="flow-teams">
-      {teams.map(team => <article class="flow-team">
-        <h3>{team.role}</h3>
-        <ul>{team.members.map(name => <li>{name}</li>)}</ul>
-      </article>)}
-    </div>
-  </div>
-</section>
+<Committee society={society} committee={committee} />
 
 <section id="join" class="flow-section flow-join" aria-labelledby="join-title">
   <Image class="flow-join__loop" src={glassLoop} width={620} alt="" loading="lazy" />
