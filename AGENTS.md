@@ -1,30 +1,33 @@
-# Surrey Societies
+# Surrey AI repository
 
-Three distinct Astro sites share packages and a Convex backend. Confirm the requested society, edited app, preview URL, build, and screenshots all match.
+This repository contains the Surrey AI Society website, private committee planner, resources hub, and the imported Portfolio Studio source. Keep the two applications independently deployable and preserve their existing data, authentication, cookies, domains, and published links.
 
-## Commands and scope
+## Boundaries and commands
 
-Use npm workspaces and package-lock.json.
+The root npm workspace contains `apps/ai` and `packages/*`. The planner frontend and public resources page live in `apps/ai`; its Convex backend and schema live in `convex`. Portfolio Studio at `apps/portfoliostudio` is a separate nested npm project with its own lockfile and Cloudflare Pages, Worker, D1, and Workers AI resources. Do not add it to the root workspace or share its runtime secrets with the planner.
 
-| Site | Source | Development | Build |
-| --- | --- | --- | --- |
-| AI | apps/ai | `npm run dev:ai` | `npm run build:ai` |
-| Business | apps/business | `npm run dev:business` | `npm run build:business` |
-| Neurotech | apps/neurotech | `npm run dev:neurotech` | `npm run build:neurotech` |
+Root commands:
 
-Use `npm run typecheck` and `npm test` for affected shared logic; `npm run test:e2e` for changed user flows. Shared changes may require `npm run build:all`. Use the actual server output to identify each preview port. Keep requested previews running through handoff.
+- `npm ci`
+- `npm run dev:ai`
+- `npm run build:ai`
+- `npm run build:vercel`
+- `npm run typecheck`
+- `npm run backend:check`
+- `npm test`
+- `npm run test:e2e`
+- `npm run test:planner`
 
-## Design and data
+Portfolio Studio commands from the root are `npm --prefix apps/portfoliostudio ci`, `npm run dev:portfolio`, `npm run build:portfolio`, `npm run typecheck:portfolio`, `npm run test:portfolio`, and `npm run test:e2e:portfolio`. Its direct scripts and Wrangler setup remain documented in `apps/portfoliostudio/README.md`.
 
-- Use the selected mockup, existing assets, and current user direction. Public society pages can be expressive. Keep events and join actions visible early. There is no per-site admin CMS in the public product.
-- For substantial design work, consult [.agents/skills/surreysocieties-design/SKILL.md](.agents/skills/surreysocieties-design/SKILL.md). Small fixes do not need a new design brief or reference hunt.
-- For an existing /ai robot-head hero, Three.js owns the robot; Anime.js is for scroll/reveal choreography. Preserve reduced-motion fallback.
-- Inspect affected desktop/mobile views before UI handoff. Preserve society labels, asset identity, accessible controls, and member-data privacy.
-- Confirm the intended deployment before data mutations. Public sites do not ship an admin CMS UI.
+Put Astro and planner server variables in `apps/ai/.env.local`; Astro reads that app-local file. Keep Convex CLI deployment settings in the root `.env.local` when needed. Never commit either file or any provider credentials.
 
-<!-- convex-ai-start -->
-When changing Convex code, read convex/_generated/ai/guidelines.md and the applicable Convex skill. Keep generated files generated. A missing optional skill is not a reason to reinstall tooling or block unrelated frontend work.
-<!-- convex-ai-end -->
+The public resources catalogue is `/resources` and currently links to the existing Portfolio Studio origin. Keep entries factual and do not add placeholder products or invented claims. On non-home AI pages, homepage section links use `/#about`, `/#programme`, and `/#committee`.
 
+## Changes and verification
 
-Installed Convex skills provide task-specific technical guidance. A complex fix already authorized by the user does not need a second approval just because a skill suggests presenting options. Prepare and verify local changes within scope; pause only the step that needs missing credentials, a material product decision, or ungranted production authority.
+Preserve the current society visual language, accessible controls, asset identity, member-data privacy, and reduced-motion behavior. Inspect affected desktop and mobile layouts for overflow and focus states. For substantial UI changes, read the applicable frontend design and visual QA guidance before editing.
+
+When changing Convex code, read `convex/_generated/ai/guidelines.md` and the applicable Convex guidance. Keep generated files generated and preserve validators, auth checks, and data ownership.
+
+Local previews, source history, and passing builds do not prove that a production deployment changed. Verify the intended app, preview, deployment, and live route separately. Do not move or recreate existing Convex, D1, Cloudflare, auth, email, Blob, or domain resources as part of a source-layout change.

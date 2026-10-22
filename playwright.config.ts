@@ -1,50 +1,9 @@
 import { defineConfig, devices } from '@playwright/test';
-
-const isCI = Boolean(process.env.CI);
-const previewHost = process.env.E2E_HOST || '127.0.0.1';
-const webServerEnv = { ...process.env, ASTRO_DEV_BACKGROUND: '0' };
-
+const host=process.env.E2E_HOST || '127.0.0.1';
 export default defineConfig({
-  testDir: './e2e',
-  timeout: 30_000,
-  expect: {
-    timeout: 8_000,
-  },
-  fullyParallel: false,
-  workers: 1,
-  forbidOnly: isCI,
-  retries: isCI ? 2 : 0,
-  reporter: 'list',
-  use: {
-    trace: 'on-first-retry',
-  },
-  webServer: [
-    {
-      command: `npm run dev -w apps/ai -- --host ${previewHost}`,
-      env: webServerEnv,
-      url: `http://${previewHost}:4321`,
-      reuseExistingServer: !isCI,
-      timeout: 120_000,
-    },
-    {
-      command: `npm run dev -w apps/business -- --host ${previewHost}`,
-      env: webServerEnv,
-      url: `http://${previewHost}:4322`,
-      reuseExistingServer: !isCI,
-      timeout: 120_000,
-    },
-    {
-      command: `npm run dev -w apps/neurotech -- --host ${previewHost}`,
-      env: webServerEnv,
-      url: `http://${previewHost}:4323`,
-      reuseExistingServer: !isCI,
-      timeout: 120_000,
-    },
-  ],
-  projects: [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
-  ],
+  testDir:'./e2e', testIgnore:['planner.spec.ts'], timeout:30000,
+  expect:{timeout:8000}, fullyParallel:false, workers:1,
+  forbidOnly:Boolean(process.env.CI), retries:process.env.CI?1:0, reporter:'list',
+  use:{...devices['Desktop Chrome'],baseURL:`http://${host}:4321`,trace:'on-first-retry'},
+  webServer:{command:`npm run dev -w apps/ai -- --host ${host}`,env:{...process.env,ASTRO_DEV_BACKGROUND:'0'},url:`http://${host}:4321`,reuseExistingServer:!process.env.CI,timeout:120000},
 });

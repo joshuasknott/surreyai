@@ -1,5 +1,5 @@
 {
-  "name": "surreysocieties",
+  "name": "surreyai",
   "private": true,
   "type": "module",
   "version": "0.0.1",
@@ -7,24 +7,27 @@
     "node": ">=22.12.0"
   },
   "workspaces": [
-    "apps/*",
+    "apps/ai",
     "packages/*"
   ],
   "scripts": {
+    "dev": "npm run dev:ai",
     "dev:ai": "npm run dev -w apps/ai",
-    "dev:business": "npm run dev -w apps/business",
-    "dev:neurotech": "npm run dev -w apps/neurotech",
-    "dev:neurotech-applications": "npm run dev -w apps/neurotech-applications -- --port 4324",
+    "build": "npm run build:ai",
     "build:ai": "npm run build -w apps/ai",
-    "build:business": "npm run build -w apps/business",
-    "build:neurotech": "npm run build -w apps/neurotech",
-    "build:neurotech-applications": "npm run build -w apps/neurotech-applications",
-    "build:all": "npm run build -w apps/ai && npm run build -w apps/business && npm run build -w apps/neurotech",
+    "build:vercel": "node scripts/build-vercel.mjs ai",
     "typecheck": "tsc -b --pretty false",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "e2e": "npm run test:e2e"
+    "test:planner": "playwright test --config e2e/planner.config.ts planner.spec.ts",
+    "dev:portfolio": "npm --prefix apps/portfoliostudio run dev",
+    "build:portfolio": "npm --prefix apps/portfoliostudio run build",
+    "test:portfolio": "npm --prefix apps/portfoliostudio test",
+    "typecheck:portfolio": "npm --prefix apps/portfoliostudio run typecheck",
+    "test:e2e:portfolio": "npm --prefix apps/portfoliostudio run test:e2e",
+    "deploy:portfolio": "npm --prefix apps/portfoliostudio run deploy",
+    "backend:check": "tsc --noEmit -p convex/tsconfig.json"
   },
   "overrides": {
     "esbuild": "0.28.1",

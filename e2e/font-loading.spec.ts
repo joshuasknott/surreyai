@@ -8,7 +8,7 @@ const pages = [
 ];
 
 for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
-  for (const target of pages) {
+  for (const target of pages.filter(target => target.name === 'AI' || target.name === 'planner')) {
     test(`${target.name} paints at ${viewport.width}px while Google Fonts is stalled`, async ({ page }, testInfo) => {
       await page.setViewportSize(viewport);
       const fontRequests: Route[] = [];

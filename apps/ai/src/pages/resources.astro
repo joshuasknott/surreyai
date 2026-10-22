@@ -1,0 +1,50 @@
+---
+export const prerender = false;
+import Layout from '../layouts/Layout.astro';
+import { societyResources } from '../data/resources';
+import '../styles/global.css';
+import '../styles/resources.css';
+---
+
+<Layout
+  title="Resources"
+  description="Practical tools and resources from Surrey AI Society for learning, building and sharing your work."
+  bodyClass="ai-resources-page"
+>
+  <section class="resources-hero" aria-labelledby="resources-title">
+    <div class="resources-shell resources-hero__inner">
+      <p class="resources-kicker">Surrey AI Society / Resources</p>
+      <h1 id="resources-title">Useful things to help you build.</h1>
+      <p class="resources-hero__intro">
+        Start with a practical tool for turning your work and ideas into something you can share.
+      </p>
+    </div>
+  </section>
+
+  <section class="resources-list" aria-labelledby="resources-list-title">
+    <div class="resources-shell">
+      <div class="resources-list__heading">
+        <p class="resources-kicker">One place to start</p>
+        <h2 id="resources-list-title">Build your portfolio.</h2>
+      </div>
+      <div class="resources-grid">
+        {societyResources.map((resource) => (
+          <article class="resource-card">
+            <div class="resource-card__visual" aria-hidden="true">
+              <img src="/logos/brand/surrey-ai-avatar-light.png" alt="" width="76" height="76" loading="lazy" />
+              <span>PS / 01</span>
+            </div>
+            <div class="resource-card__body">
+              <p class="resource-card__label">{resource.label}</p>
+              <h3>{resource.title}</h3>
+              <p>{resource.description}</p>
+              <a class="resource-card__link" href={resource.href} target="_blank" rel="noopener noreferrer">
+                {resource.action}<span aria-hidden="true">↗</span>
+              </a>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+</Layout>

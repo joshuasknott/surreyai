@@ -215,7 +215,7 @@
   .ai-curious-home .society-header .society-brand { font-size: 17px; gap: 8px; }
   .ai-curious-home .society-header .society-brand img { width: 42px; height: 42px; }
   .ai-curious-home .society-header .society-nav-join { padding: 12px 20px; font-size: 15px; }
-  .ai-curious-home .ai-home-nav { order: 1; width: 100%; justify-content: center; gap: 28px; }
+  .ai-curious-home .ai-home-nav { order: 1; width: 100%; justify-content: center; gap: 12px 20px; flex-wrap: wrap; }
   .ai-curious-home .ai-home-nav a { font-size: 15px; }
   .ai-curious-home .flow-footer { padding: 10px 0 18px; }
   .ai-curious-home .flow-footer::before { height: 40px; }

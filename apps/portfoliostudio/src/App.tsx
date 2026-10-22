@@ -145,7 +145,7 @@ function Legal({ privacy = false }: { privacy?: boolean }) {
             <p>
               Portfolio Studio is maintained by Surrey AI Society. Report issues
               or request support through the{" "}
-              <a href="https://github.com/joshuasknott/portfoliostudio/issues">
+              <a href="https://github.com/joshuasknott/surreyai/issues">
                 project repository
               </a>
               .

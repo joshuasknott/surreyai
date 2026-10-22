@@ -2,6 +2,8 @@
 
 A portfolio builder by **Surrey AI Society**. Start with a considered design or a blank canvas, make it your own, and publish a website you can take with you.
 
+Portfolio Studio is maintained in the [`surreyai`](https://github.com/joshuasknott/surreyai) repository under `apps/portfoliostudio`. Its Cloudflare Pages project, D1 database, authentication and published portfolio addresses remain independent of the society website. Visit the [Surrey AI resources hub](https://surreyaisociety.org/resources) to return to the society’s tools.
+
 [Open Portfolio Studio](https://portfolio-studio-1uu.pages.dev) · [Browse the ten designs](https://portfolio-studio-1uu.pages.dev/designs)
 
 ## Features
@@ -71,7 +73,7 @@ Students retain their content and exported websites. The export contains static 
 
 Uploaded images are compressed in the browser and kept private until included in a published snapshot. Current limits are 400 KB per image, 40 images per portfolio and 5 MB of uploaded media per account. Accounts can keep up to 20 active portfolios; cloud history retains the ten most recent versions. Downloaded `portfolio.json` files can be imported from the dashboard. Public URLs remain managed by this instance until the student exports and moves their website.
 
-Published websites have no compulsory Surrey AI Society branding. The Studio itself uses the original Society brand assets from [SurreySocieties](https://github.com/joshuasknott/surreysocieties). Fictional gallery profiles illustrate the designs and are not inserted as a student's experience.
+Published websites have no compulsory Surrey AI Society branding. The Studio itself uses Society brand assets maintained in the [Surrey AI repository](https://github.com/joshuasknott/surreyai). Fictional gallery profiles illustrate the designs and are not inserted as a student's experience.
 
 ## Project structure
 
@@ -82,4 +84,4 @@ Published websites have no compulsory Surrey AI Society branding. The Studio its
 - `public/` — maintained brand, font and portfolio assets
 - `tests/` — export, domain and browser coverage
 
-Report problems through [GitHub issues](https://github.com/joshuasknott/portfoliostudio/issues).
+Report problems through [GitHub issues](https://github.com/joshuasknott/surreyai/issues).

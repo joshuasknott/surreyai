@@ -8,14 +8,21 @@
     "skipLibCheck": true
   },
   "references": [
-    { "path": "./apps/ai" },
-    { "path": "./apps/business" },
-    { "path": "./apps/neurotech" },
-    { "path": "./apps/neurotech-applications" },
-    { "path": "./packages/assistant" },
-    { "path": "./packages/ui" },
-    { "path": "./packages/admin" }
+    {
+      "path": "./apps/ai"
+    },
+    {
+      "path": "./packages/assistant"
+    },
+    {
+      "path": "./packages/ui"
+    },
+    {
+      "path": "./packages/admin"
+    }
   ],
   "include": [],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }

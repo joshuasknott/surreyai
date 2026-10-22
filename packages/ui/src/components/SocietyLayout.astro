@@ -37,7 +37,7 @@ const socialLinks = Object.entries(socialNames).filter(([key]) => society.social
     <div class="society-header__inner">
       <a class="society-brand" href="/" aria-label={`${society.name} home`}>
         <img src={curiousHome ? '/logos/brand/surrey-ai-logo-transparent.png' : society.logo} alt="" width="56" height="56" fetchpriority="high" />
-        <span>{curiousHome ? society.shortName : society.name}</span>
+        <span>{societyKey === 'ai' ? society.shortName : society.name}</span>
       </a>
       <div class="society-header__actions">
       <slot name="header-actions" />
@@ -45,6 +45,13 @@ const socialLinks = Object.entries(socialNames).filter(([key]) => society.social
         <a href="#about">About</a>
         <a href="#programme">Events</a>
         <a href="#committee">Committee</a>
+        <a href="/resources">Resources</a>
+      </nav>}
+      {!curiousHome && societyKey === 'ai' && <nav class="ai-page-nav" aria-label="Main navigation">
+        <a href="/#about">About</a>
+        <a href="/#programme">Events</a>
+        <a href="/#committee">Committee</a>
+        <a href="/resources">Resources</a>
       </nav>}
       <slot name="join-menu"><details class="society-join-menu" data-join-menu>
         <summary class="society-nav-join">{curiousHome ? 'Join' : 'Join us'}{!curiousHome && <svg class="society-join-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>}</summary>
@@ -84,11 +91,12 @@ const socialLinks = Object.entries(socialNames).filter(([key]) => society.social
         <p>© {new Date().getFullYear()} {society.shortName}</p>
         <a href={society.studentsUnionUrl} target="_blank" rel="noopener noreferrer">Surrey Students’ Union ↗</a>
       </div>
-      <nav aria-label="Footer navigation"><a href="#about">About</a><a href="#programme">Events</a><a href="#committee">Committee</a><a href="#contact">Contact</a></nav>
+      <nav aria-label="Footer navigation"><a href="#about">About</a><a href="#programme">Events</a><a href="#committee">Committee</a><a href="#contact">Contact</a><a href="/resources">Resources</a></nav>
     </div> :
     <div>
       <a class="society-brand" href="/"><img src={society.logo} alt="" width="44" height="44" loading="lazy" /><span>{society.shortName}</span></a>
       <a href={society.studentsUnionUrl} target="_blank" rel="noopener noreferrer">Surrey Students’ Union ↗</a>
+      {societyKey === 'ai' && <a href="/resources">Resources</a>}
       <p>© {new Date().getFullYear()} {society.shortName}</p>
     </div>}
   </footer>
@@ -159,6 +167,9 @@ const socialLinks = Object.entries(socialNames).filter(([key]) => society.social
   .society-header { background: var(--society-ink); color: #fffaf1; position: sticky; top: 0; z-index: 50; border-bottom: 1px solid #ffffff26; }
   .society-header__inner { width: min(100%, 1280px); margin: auto; padding: 12px 28px; display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 84px; }
   .society-header__actions { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+  .ai-page-nav { display: flex; align-items: center; gap: 16px; }
+  .ai-page-nav a { display: inline-flex; align-items: center; min-height: 44px; padding: 10px 4px; color: inherit; font-size: 15px; font-weight: 650; text-decoration: none; border-radius: 6px; }
+  .ai-page-nav a:hover { background: color-mix(in srgb, currentColor 12%, transparent); text-decoration: underline; text-underline-offset: 4px; }
   .society-committee-banner { display: block; position: sticky; top: 84px; z-index: 49; width: 100%; color: #111; background: #ff4a00; }
   .society-neurotech .society-committee-banner { background: #e5bb52; color: #071a39; }
   .society-committee-banner__inner { width: min(100%, 1280px); min-height: 66px; margin: auto; padding: 9px 28px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
@@ -208,6 +219,9 @@ const socialLinks = Object.entries(socialNames).filter(([key]) => society.social
     .society-brand { gap: 9px; font-size: 14px; }
     .society-brand img { width: 42px; height: 42px; }
     .society-ai .society-header .society-brand span { font-size: 13px; line-height: 1.15; }
+    .society-ai .society-header__actions { gap: 4px; min-width: 0; }
+    .ai-page-nav { gap: 2px; }
+    .ai-page-nav a { padding-inline: 1px; font-size: 14px; }
     .society-public .society-nav-join { min-height: 44px; }
     .society-public .society-nav-join { padding: 12px; gap: 8px; font-size: 15px; }
     .society-join-panel { top: calc(100% + 12px); }
@@ -215,6 +229,7 @@ const socialLinks = Object.entries(socialNames).filter(([key]) => society.social
     .society-footer > div { flex-direction: column; align-items: start; }
   }
   @media (max-width: 850px) {
+    .ai-page-nav a:not(:last-child) { display: none; }
     .society-committee-banner__inner { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 10px; min-height: 0; padding: 6px 16px; }
     .society-committee-banner strong { grid-column: 1; grid-row: 1; font-size: 15px; }
     .society-committee-banner__label { display: none; }

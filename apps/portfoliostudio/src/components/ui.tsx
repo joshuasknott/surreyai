@@ -28,6 +28,7 @@ export function Header({ children }: { children?: ReactNode }) {
         {children || (
           <>
             <Link to="/designs">Explore designs</Link>
+            <a href="https://surreyaisociety.org/resources">Society resources</a>
             {user ? (
               <>
                 <Link to="/dashboard">My portfolios</Link>
@@ -58,8 +59,9 @@ export function Footer() {
       <span>
         <Link to="/privacy">Privacy</Link>
         <Link to="/terms">Terms</Link>
+        <a href="https://surreyaisociety.org/resources">Society resources</a>
         <a
-          href="https://github.com/joshuasknott/portfoliostudio"
+          href="https://github.com/joshuasknott/surreyai/tree/main/apps/portfoliostudio"
           target="_blank"
           rel="noreferrer"
         >

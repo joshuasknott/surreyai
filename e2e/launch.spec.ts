@@ -119,7 +119,7 @@ async function expectAccessibilityBasics(page: Page) {
   });
 }
 
-for (const site of sites) {
+for (const site of sites.filter(site => site.key === 'ai')) {
   test.describe(`${site.name} public launch checks`, () => {
     test('old society pages permanently redirect to homepage sections', async ({ request }) => {
       for (const [route, anchor] of [['about', 'about'], ['events', 'activities'], ['committee', 'committee'], ['join', 'join']]) {
@@ -146,7 +146,7 @@ for (const site of sites) {
         expect(response.headers()['content-type']).toContain('image/png');
       }
       const sitemap = await (await request.get(`${site.origin}/sitemap.xml`)).text();
-      expect(sitemap.match(/<loc>/g)).toHaveLength(site.key === 'ai' ? 6 : 1);
+      expect(sitemap.match(/<loc>/g)).toHaveLength(site.key === 'ai' ? 7 : 1);
       for (const width of [320, 390, 768, 1440]) {
         await page.setViewportSize({ width, height: 900 });
         await expectNoHorizontalOverflow(page);
@@ -259,7 +259,7 @@ for (const site of sites) {
         const height = width === 768 ? 390 : 844;
         await page.setViewportSize({ width, height });
         await expect(panel).toBeHidden();
-        await expect(header.locator('a:visible')).toHaveCount(site.key === 'ai' || (site.key === 'business' && width > 700) ? 4 : 1);
+        await expect(header.locator('a:visible')).toHaveCount(site.key === 'ai' ? 5 : site.key === 'business' && width > 700 ? 4 : 1);
         expect((await trigger.boundingBox())?.height).toBeGreaterThanOrEqual(44);
         await trigger.click();
         await expect(panel).toBeVisible();

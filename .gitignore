@@ -46,3 +46,12 @@ convex/*.js.map
 convex/*.d.ts
 convex/*.d.ts.map
 **/tsconfig.tsbuildinfo
+
+# Private runtime configuration and independent app caches
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*
+.wrangler/
+coverage/
+playwright-report/

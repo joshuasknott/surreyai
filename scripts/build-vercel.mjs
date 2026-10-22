@@ -3,9 +3,9 @@ import { cp, mkdir, access } from 'node:fs/promises';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const society = process.argv[2];
-if (!['ai', 'business', 'neurotech'].includes(society)) {
-  throw new Error('Specify one society: ai, business, or neurotech.');
+const society = process.argv[2] || 'ai';
+if (society !== 'ai') {
+  throw new Error('This repository builds the AI society website only.');
 }
 
 const root = fileURLToPath(new URL('../', import.meta.url));
