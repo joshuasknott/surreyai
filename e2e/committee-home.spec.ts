@@ -8,7 +8,7 @@ const screenshotWidths = [320, 390, 768, 1024, 1182, 1440];
 const officers = [
   { name: 'Joshua Knott', role: 'President' },
   { name: 'Poppy Holmes', role: 'Vice President' },
-  { name: 'Vinayak Manojkumar Vadhera', role: 'Treasurer' },
+  { name: 'Vinayak Vadhera', role: 'Treasurer' },
 ];
 
 const teams = [
@@ -108,6 +108,23 @@ test('AI homepage committee preserves roster, portraits, hierarchy and responsiv
     await section.scrollIntoViewIfNeeded();
     await expectNoCommitteeOverflow(page, section);
     await page.evaluate(() => document.fonts.ready);
+
+    const treasurerName = officerCards.nth(2).locator('h3');
+    const nameLineCount = await treasurerName.evaluate((element) => {
+      const range = document.createRange();
+      range.selectNodeContents(element);
+      return new Set([...range.getClientRects()].map(rect => Math.round(rect.top))).size;
+    });
+    expect(nameLineCount).toBe(1);
+
+    if (width >= 1024) {
+      const connectorGap = await section.evaluate((element) => {
+        const connector = element.querySelector('.flow-committee__branches')!.getBoundingClientRect();
+        const officers = element.querySelector('.flow-officers')!.getBoundingClientRect();
+        return connector.top - officers.bottom;
+      });
+      expect(connectorGap).toBeGreaterThan(0);
+    }
 
     const tierBounds = await section.evaluate((element) => [...element.querySelectorAll<HTMLElement>('.flow-officers .flow-committee__portrait, .flow-teams .flow-committee__portrait')]
       .reduce((tiers, portrait) => {

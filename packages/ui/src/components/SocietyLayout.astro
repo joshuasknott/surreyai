@@ -20,6 +20,7 @@ const { societyKey, title, description, ogImage, bodyClass = '', extraFontHrefs 
 const society = getSocietyById(societyKey)!;
 const committeeDeadline = societyKey === 'neurotech' ? NEUROTECH_COMMITTEE_APPLICATIONS_CLOSE_AT : COMMITTEE_APPLICATIONS_CLOSE_AT;
 const curiousHome = societyKey === 'ai' && bodyClass.split(' ').includes('ai-curious-home');
+const resourcesPage = societyKey === 'ai' && bodyClass.split(' ').includes('ai-resources-page');
 const socialNames: Record<string, string> = { whatsapp: 'WhatsApp', instagram: 'Instagram', linkedin: 'LinkedIn', discord: 'Discord', tiktok: 'TikTok' };
 const socialLinks = Object.entries(socialNames).filter(([key]) => society.socials[key as keyof typeof society.socials]);
 ---
@@ -36,7 +37,7 @@ const socialLinks = Object.entries(socialNames).filter(([key]) => society.social
   <header class="society-header">
     <div class="society-header__inner">
       <a class="society-brand" href="/" aria-label={`${society.name} home`}>
-        <img src={curiousHome ? '/logos/brand/surrey-ai-logo-transparent.png' : society.logo} alt="" width="56" height="56" fetchpriority="high" />
+        <img src={curiousHome || resourcesPage ? '/logos/brand/surrey-ai-logo-transparent.png' : society.logo} alt="" width="56" height="56" fetchpriority="high" />
         <span>{societyKey === 'ai' ? society.shortName : society.name}</span>
       </a>
       <div class="society-header__actions">
@@ -51,7 +52,7 @@ const socialLinks = Object.entries(socialNames).filter(([key]) => society.social
         <a href="/#about">About</a>
         <a href="/#programme">Events</a>
         <a href="/#committee">Committee</a>
-        <a href="/resources">Resources</a>
+        <a href="/resources" aria-current={resourcesPage ? 'page' : undefined}>Resources</a>
       </nav>}
       <slot name="join-menu"><details class="society-join-menu" data-join-menu>
         <summary class="society-nav-join">{curiousHome ? 'Join' : 'Join us'}{!curiousHome && <svg class="society-join-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>}</summary>
@@ -94,7 +95,7 @@ const socialLinks = Object.entries(socialNames).filter(([key]) => society.social
       <nav aria-label="Footer navigation"><a href="#about">About</a><a href="#programme">Events</a><a href="#committee">Committee</a><a href="#contact">Contact</a><a href="/resources">Resources</a></nav>
     </div> :
     <div>
-      <a class="society-brand" href="/"><img src={society.logo} alt="" width="44" height="44" loading="lazy" /><span>{society.shortName}</span></a>
+      <a class="society-brand" href="/"><img src={resourcesPage ? '/logos/brand/surrey-ai-logo-transparent.png' : society.logo} alt="" width="44" height="44" loading="lazy" /><span>{society.shortName}</span></a>
       <a href={society.studentsUnionUrl} target="_blank" rel="noopener noreferrer">Surrey Students’ Union ↗</a>
       {societyKey === 'ai' && <a href="/resources">Resources</a>}
       <p>© {new Date().getFullYear()} {society.shortName}</p>

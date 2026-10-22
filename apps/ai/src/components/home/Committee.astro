@@ -1,21 +1,20 @@
 ---
 import { Image } from 'astro:assets';
 import type { Society } from '@surreysocieties/admin/types';
-import joshua from '../../assets/committee/joshua.webp';
-import poppy from '../../assets/committee/poppy.webp';
-import vinayak from '../../assets/committee/vinayak.webp';
-import amanda from '../../assets/committee/amanda.webp';
-import samuelJoyson from '../../assets/committee/samuel-joyson.webp';
-import kusumitha from '../../assets/committee/kusumitha.webp';
-import fatima from '../../assets/committee/fatima.webp';
-import george from '../../assets/committee/george.webp';
-import miguel from '../../assets/committee/miguel.webp';
-import ibrahim from '../../assets/committee/ibrahim.webp';
-import samuelYoung from '../../assets/committee/samuel-young.webp';
-import bibek from '../../assets/committee/bibek.webp';
-import zain from '../../assets/committee/zain.webp';
-import deepanshu from '../../assets/committee/deepanshu.webp';
-import branches from '../../assets/committee/branches.png';
+import joshua from '../../assets/committee/joshua-refined.webp';
+import poppy from '../../assets/committee/poppy-refined.webp';
+import vinayak from '../../assets/committee/vinayak-refined.webp';
+import amanda from '../../assets/committee/amanda-refined.webp';
+import samuelJoyson from '../../assets/committee/samuel-joyson-refined.webp';
+import kusumitha from '../../assets/committee/kusumitha-refined.webp';
+import fatima from '../../assets/committee/fatima-refined.webp';
+import george from '../../assets/committee/george-refined.webp';
+import miguel from '../../assets/committee/miguel-refined.webp';
+import ibrahim from '../../assets/committee/ibrahim-refined.webp';
+import samuelYoung from '../../assets/committee/samuel-young-refined.webp';
+import bibek from '../../assets/committee/bibek-refined.webp';
+import zain from '../../assets/committee/zain-refined.webp';
+import deepanshu from '../../assets/committee/deepanshu-refined.webp';
 
 interface Props {
   society: Society;
@@ -26,11 +25,11 @@ const { society, committee = [] } = Astro.props;
 const signatoryPortraits = new Map([
   ['Joshua Knott', joshua],
   ['Poppy Holmes', poppy],
-  ['Vinayak Manojkumar Vadhera', vinayak],
+  ['Vinayak Vadhera', vinayak],
 ]);
 const officers = society.signatories.map(officer => {
   const member = committee.find(member => member.role === officer.role && member.name.trim()) ?? officer;
-  const name = member.name.trim().replace(/\s+/g, ' ').replace(/^Josh Knott$/, 'Joshua Knott');
+  const name = member.name.trim().replace(/\s+/g, ' ').replace(/^Josh Knott$/, 'Joshua Knott').replace(/^Vinayak Manojkumar Vadhera$/, 'Vinayak Vadhera');
   // Match the person, so a future roster change cannot reuse somebody else's face.
   const portrait = signatoryPortraits.get(name);
   const initials = name.split(' ').filter((_, i, parts) => i === 0 || i === parts.length - 1).map(part => part[0]).join('');
@@ -76,7 +75,9 @@ const teams = [
         </div>
       </article>)}
     </div>
-    <img class="flow-committee__branches" src={branches.src} width={branches.width} height={branches.height} alt="" aria-hidden="true" loading="lazy" />
+    <svg class="flow-committee__branches" viewBox="0 0 1000 40" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+      <path d="M1 40V11Q1 1 11 1H989Q999 1 999 11V40M250 1V40M500 1V40M750 1V40" fill="none" stroke="currentColor" stroke-width="2" vector-effect="non-scaling-stroke" />
+    </svg>
     <div class="flow-teams">
       {teams.map(team => <article class="flow-team">
         <h3><span>{team.role.split(' & ')[0]} &amp;</span> <span>{team.role.split(' & ')[1]}</span></h3>
@@ -149,8 +150,9 @@ const teams = [
   .flow-committee__branches {
     display: block;
     width: 80%;
-    height: 83px;
-    margin: -16px auto 16px;
+    height: 40px;
+    margin: 55px auto 16px;
+    color: var(--flow-orange);
   }
   .flow-teams {
     display: grid;

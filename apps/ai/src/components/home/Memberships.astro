@@ -1,0 +1,74 @@
+---
+import { ArrowRight, ArrowUpRight, Check } from 'lucide-astro';
+import type { Society } from '@surreysocieties/admin/types';
+import '../../styles/memberships.css';
+
+interface Props { society: Society; }
+const { society } = Astro.props;
+const freeBenefits = [
+  'Events, talks and workshops',
+  'Community and networking',
+  'WhatsApp and Discord communities',
+  'Hackathons and collaborative projects',
+  'Selected free learning resources',
+  'Society updates and opportunities',
+];
+const premiumGroups = [
+  { title: 'Society & support', benefits: [
+    'Discounts on paid society events',
+    'Priority for limited-capacity events',
+    'Private AI+ club',
+    'Exclusive 1:1 mentoring from the committee',
+  ] },
+  { title: 'Tools & resources', benefits: [
+    'Portfolio Studio + exclusive resource hub',
+    'Automated internship and application tracker',
+    'Advanced CV, interview and career toolkits',
+    'AI workflows and reusable templates',
+    'Project kits, development tools and utilities',
+    'Potential partner perks and discounts',
+  ] },
+];
+---
+
+<section id="memberships" class="memberships" aria-labelledby="memberships-title">
+  <div class="memberships-shell">
+    <div class="memberships-heading">
+      <h2 id="memberships-title">Memberships</h2>
+      <p class="memberships-year">2026–27 academic year</p>
+      <p>Find your people. Build your skills. Every degree welcome.</p>
+    </div>
+    <div class="membership-grid">
+      <article class="membership-card membership-card--free" aria-labelledby="free-membership-title">
+        <header class="membership-card-heading">
+          <h3 id="free-membership-title">Free Membership</h3>
+          <p>Learn, meet people and build together.</p>
+        </header>
+        <p class="membership-price"><strong>£0</strong></p>
+        <ul class="membership-benefits membership-benefits--free">
+          {freeBenefits.map(benefit => <li><span class="membership-check"><Check size={18} aria-hidden="true" /></span><span>{benefit}</span></li>)}
+        </ul>
+        <a class="membership-action membership-action--free" href={society.membershipUrl} target="_blank" rel="noopener noreferrer">
+          Join for free <ArrowUpRight size={23} aria-hidden="true" />
+        </a>
+      </article>
+      <article class="membership-card membership-card--plus" aria-labelledby="plus-membership-title">
+        <header class="membership-card-heading">
+          <div class="membership-title-row"><h3 id="plus-membership-title">Surrey AI+</h3><span class="membership-status">COMING SOON</span></div>
+          <p>More ways to connect, build and get ahead.</p>
+        </header>
+        <p class="membership-price"><strong>£8</strong></p>
+        {premiumGroups.map(group => <div class="membership-benefit-group">
+          <h4>{group.title}</h4>
+          <ul class="membership-benefits">
+            {group.benefits.map(benefit => <li><span class="membership-check"><Check size={18} aria-hidden="true" /></span><span>{benefit}</span></li>)}
+          </ul>
+        </div>)}
+        <a class="membership-action membership-action--plus" href="/resources?access=ai-plus">
+          Explore AI+ <ArrowRight size={23} aria-hidden="true" />
+        </a>
+      </article>
+    </div>
+    <a class="memberships-resources" href="/resources">Explore our resources <ArrowUpRight size={22} aria-hidden="true" /></a>
+  </div>
+</section>

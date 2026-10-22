@@ -2,6 +2,7 @@
 export const prerender = false;
 import Layout from '../layouts/Layout.astro';
 import { societyResources } from '../data/resources';
+import { AppWindow, ArrowUpRight, BookOpen, CalendarDays, Code2, FileText, Workflow, Clock3 } from 'lucide-astro';
 import '../styles/global.css';
 import '../styles/resources.css';
 ---
@@ -13,38 +14,90 @@ import '../styles/resources.css';
 >
   <section class="resources-hero" aria-labelledby="resources-title">
     <div class="resources-shell resources-hero__inner">
-      <p class="resources-kicker">Surrey AI Society / Resources</p>
-      <h1 id="resources-title">Useful things to help you build.</h1>
+      <h1 id="resources-title">Resources</h1>
+      <p class="resources-hero__lead">Useful tools for learning, building and getting ahead.</p>
       <p class="resources-hero__intro">
-        Start with a practical tool for turning your work and ideas into something you can share.
+        Explore Portfolio Studio now. More free and AI+ resources are planned.
       </p>
+      <div class="resources-filters" role="group" aria-label="Filter resources" hidden>
+        <button type="button" class="resources-filter is-active" data-resource-filter="all" aria-pressed="true">All resources</button>
+        <button type="button" class="resources-filter" data-resource-filter="free" aria-pressed="false">Free</button>
+        <button type="button" class="resources-filter" data-resource-filter="ai-plus" aria-pressed="false">AI+</button>
+      </div>
     </div>
   </section>
 
-  <section class="resources-list" aria-labelledby="resources-list-title">
+  <section class="resources-library" aria-labelledby="resources-library-title">
     <div class="resources-shell">
-      <div class="resources-list__heading">
-        <p class="resources-kicker">One place to start</p>
-        <h2 id="resources-list-title">Build your portfolio.</h2>
-      </div>
+      <h2 id="resources-library-title" class="sr-only">Resource library</h2>
       <div class="resources-grid">
         {societyResources.map((resource) => (
-          <article class="resource-card">
-            <div class="resource-card__visual" aria-hidden="true">
-              <img src="/logos/brand/surrey-ai-avatar-light.png" alt="" width="76" height="76" loading="lazy" />
-              <span>PS / 01</span>
+          <article class="resource-card" data-resource-card data-resource-access={resource.access}>
+            <div class="resource-card__topline">
+              <span class="resource-card__icon" aria-hidden="true">
+                {resource.icon === 'book' && <BookOpen size={38} strokeWidth={1.8} />}
+                {resource.icon === 'code' && <Code2 size={38} strokeWidth={1.8} />}
+                {resource.icon === 'file' && <FileText size={38} strokeWidth={1.8} />}
+                {resource.icon === 'layout' && <AppWindow size={38} strokeWidth={1.8} />}
+                {resource.icon === 'calendar' && <CalendarDays size={38} strokeWidth={1.8} />}
+                {resource.icon === 'workflow' && <Workflow size={38} strokeWidth={1.8} />}
+              </span>
+              <span class:list={['resource-card__badge', resource.access === 'ai-plus' && 'resource-card__badge--plus']}>
+                {resource.access === 'free' ? 'Free' : resource.status === 'available' ? 'AI+ planned' : 'AI+'}
+              </span>
             </div>
-            <div class="resource-card__body">
-              <p class="resource-card__label">{resource.label}</p>
-              <h3>{resource.title}</h3>
-              <p>{resource.description}</p>
-              <a class="resource-card__link" href={resource.href} target="_blank" rel="noopener noreferrer">
-                {resource.action}<span aria-hidden="true">↗</span>
+            <h3>{resource.title}</h3>
+            <p>{resource.description}</p>
+            {resource.href ? (
+              <a class="resource-card__status resource-card__status--link" href={resource.href} target="_blank" rel="noopener noreferrer">
+                {resource.action}<ArrowUpRight size={20} aria-hidden="true" />
               </a>
-            </div>
+            ) : (
+              <span class="resource-card__status"><Clock3 size={20} aria-hidden="true" />Planned</span>
+            )}
           </article>
         ))}
       </div>
+      <p class="sr-only" data-resource-status role="status" aria-live="polite">Showing all resources.</p>
     </div>
   </section>
 </Layout>
+
+<script>
+  const filterButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-resource-filter]'));
+  const resourceCards = Array.from(document.querySelectorAll<HTMLElement>('[data-resource-card]'));
+  const filterControls = document.querySelector<HTMLElement>('.resources-filters');
+  const status = document.querySelector<HTMLElement>('[data-resource-status]');
+  const validFilters = new Set(['all', 'free', 'ai-plus']);
+
+  const updateFilter = (filter: string, updateUrl = false) => {
+    const activeFilter = validFilters.has(filter) ? filter : 'all';
+    filterButtons.forEach((button) => {
+      const isActive = button.dataset.resourceFilter === activeFilter;
+      button.classList.toggle('is-active', isActive);
+      button.setAttribute('aria-pressed', String(isActive));
+    });
+    resourceCards.forEach((card) => {
+      const access = card.dataset.resourceAccess;
+      card.hidden = activeFilter !== 'all' && access !== activeFilter;
+    });
+    const visibleCount = resourceCards.filter((card) => !card.hidden).length;
+    if (status) status.textContent = activeFilter === 'all'
+      ? `Showing all ${visibleCount} resources.`
+      : `Showing ${visibleCount} ${activeFilter === 'free' ? 'free' : 'AI+'} resources.`;
+
+    if (updateUrl) {
+      const url = new URL(window.location.href);
+      if (activeFilter === 'all') url.searchParams.delete('access');
+      else url.searchParams.set('access', activeFilter);
+      window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+    }
+  };
+
+  if (filterControls) filterControls.hidden = false;
+  const requestedFilter = new URL(window.location.href).searchParams.get('access') ?? 'all';
+  updateFilter(requestedFilter);
+  filterButtons.forEach((button) => {
+    button.addEventListener('click', () => updateFilter(button.dataset.resourceFilter ?? 'all', true));
+  });
+</script>

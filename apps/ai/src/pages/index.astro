@@ -5,6 +5,7 @@ import "../styles/global.css";
 import "../styles/flow-home.css";
 
 import HomeHero from "../components/home/HomeHero.astro";
+import Memberships from "../components/home/Memberships.astro";
 import FlowHomeSections from "../components/home/FlowHomeSections.astro";
 import Programme from "../components/home/Programme.astro";
 import HackPromotion from "../components/home/HackPromotion.astro";
@@ -24,6 +25,7 @@ const society = getSocietyById('ai')!;
   description="Surrey Artificial Intelligence Society is a student-led community for anyone curious about artificial intelligence, machine learning and data science, whatever their degree or experience."
 >
   <HomeHero slot="hero" />
+  <Memberships society={society} />
   <Programme activities={activities} />
   <HackPromotion />
   <FlowHomeSections society={society} committee={committee} />
