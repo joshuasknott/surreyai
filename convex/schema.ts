@@ -31,6 +31,7 @@ export default defineSchema({
   })
     .index("by_societyId_and_recipientEmail", ["societyId", "recipientEmail"])
     .index("by_societyId_and_recipientEmail_and_read", ["societyId", "recipientEmail", "read"])
+    .index("by_itemId", ["itemId"])
     .index("by_commentId", ["commentId"]),
 
   plannerNotificationState: defineTable({
@@ -190,6 +191,9 @@ export default defineSchema({
     targetId: v.optional(v.string()),
     targetType: v.optional(v.string()),
     details: v.optional(v.string()),
+    // Optional planner-only narration. Existing audit rows remain valid and
+    // keep their original details field for backwards compatibility.
+    plannerMessage: v.optional(v.string()),
   })
     .index("by_society", ["societyId"])
     .index("by_societyId_and_targetId", ["societyId", "targetId"]),

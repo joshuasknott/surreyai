@@ -146,6 +146,7 @@ describe('team board workflow', () => {
     const { fileId } = await response.json();
     expect((await upload(requestId)).status).toBe(200);
     expect(await admin.query(api.planner.listFiles, { id })).toHaveLength(1);
+    expect((await admin.query(api.planner.listFiles, { id }))[0]).toMatchObject({ name: 'Proposal.pdf', uploadedBy: { name: 'Admin', initials: 'A' }, _creationTime: expect.any(Number) });
     expect(await t.run(ctx => ctx.db.system.query('_storage').take(20))).toHaveLength(1);
     const download = await admin.fetch(`/planner/files?fileId=${fileId}`);
     expect(download.status).toBe(200); expect(new Uint8Array(await download.arrayBuffer())).toEqual(pdf);
@@ -194,17 +195,19 @@ describe('team board workflow', () => {
     expect((await admin.query(api.planner.get, { id }))?.attachments).toEqual([]);
   });
   it('shares list order with the committee and rejects stale or unauthorised changes', async () => {
-    const { admin, t } = await setup();
-    const original = ['ideas', 'planning', 'ready', 'done'] as const;
-    const changed = ['done', 'ideas', 'planning', 'ready'] as const;
+    const { admin, t, societyId } = await setup();
+    const original = ['ideas', 'planning', 'ready'] as const;
+    const changed = ['ready', 'ideas', 'planning'] as const;
     expect(await admin.query(api.planner.boardLayout, {})).toEqual({ order: original, revision: 0 });
+    await t.run(ctx => ctx.db.insert('plannerBoardLayouts', { societyId, order: ['done', 'ready', 'ideas', 'planning'], revision: 4 }));
+    expect(await admin.query(api.planner.boardLayout, {})).toEqual({ order: ['ready', 'ideas', 'planning'], revision: 4 });
     await expect(t.query(api.planner.boardLayout, {})).rejects.toThrow('Committee access');
     await expect(t.mutation(api.planner.reorderBoard, { order: [...changed], revision: 0 })).rejects.toThrow('Committee access');
-    await expect(admin.mutation(api.planner.reorderBoard, { order: ['ideas', 'ideas', 'ready', 'done'], revision: 0 })).rejects.toThrow('exactly once');
-    expect(await admin.mutation(api.planner.reorderBoard, { order: [...changed], revision: 0 })).toBe(1);
-    expect(await admin.query(api.planner.boardLayout, {})).toEqual({ order: changed, revision: 1 });
+    await expect(admin.mutation(api.planner.reorderBoard, { order: ['ideas', 'ideas', 'ready'], revision: 0 })).rejects.toThrow('exactly once');
+    expect(await admin.mutation(api.planner.reorderBoard, { order: [...changed], revision: 4 })).toBe(5);
+    expect(await admin.query(api.planner.boardLayout, {})).toEqual({ order: changed, revision: 5 });
     await expect(admin.mutation(api.planner.reorderBoard, { order: [...original], revision: 0 })).rejects.toThrow('Someone else reordered');
-    expect(await admin.query(api.planner.boardLayout, {})).toEqual({ order: changed, revision: 1 });
+    expect(await admin.query(api.planner.boardLayout, {})).toEqual({ order: changed, revision: 5 });
   });
   it('persists and clears teams, keeps internal work private and preserves overdue tasks', async () => {
     const { admin, t } = await setup();
@@ -215,7 +218,8 @@ describe('team board workflow', () => {
     await t.mutation(internal.planner.archivePastEvents, {});
     expect((await admin.query(api.planner.get, { id }))?.stage).toBe('ready');
     await admin.mutation(api.planner.save, { id, revision: 1, activity, team: null, stage: 'done', notes: '', owner: '', tasks: [] });
-    expect(await admin.query(api.planner.list, {})).toContainEqual(expect.objectContaining({ _id: id, team: null, stage: 'done', internalOnly: true }));
+    expect(await admin.query(api.planner.list, {})).not.toContainEqual(expect.objectContaining({ _id: id }));
+    expect(await admin.query(api.planner.list, { archived: true })).toContainEqual(expect.objectContaining({ _id: id, team: null, stage: 'archived', internalOnly: true }));
     expect(await t.query(api.planner.listPublished, {})).toEqual([]);
   });
 
@@ -238,8 +242,8 @@ describe('team board workflow', () => {
     const id = await admin.mutation(api.planner.create, { activity, team: 'learning', stage: 'ready' });
     await admin.mutation(api.planner.publish, { id, revision: 1 });
     await admin.mutation(api.planner.moveOnBoard, { id, revision: 2, stage: 'done' });
-    expect(await admin.query(api.planner.get, { id })).toMatchObject({ stage: 'published', workflowStage: 'done' });
-    expect(await t.query(api.planner.getPublished, { id })).toEqual({ id, ...activity });
+    expect(await admin.query(api.planner.get, { id })).toMatchObject({ stage: 'archived' });
+    expect(await t.query(api.planner.getPublished, { id })).toBeNull();
     expect(JSON.stringify(await t.query(api.planner.listPublished, {}))).not.toContain('learning');
     await expect(admin.mutation(api.planner.moveOnBoard, { id, revision: 2, stage: 'ideas' })).rejects.toThrow('Someone else updated');
     await expect(t.mutation(api.planner.moveOnBoard, { id, revision: 3, stage: 'ideas' })).rejects.toThrow('Committee access');
@@ -397,6 +401,62 @@ describe('explicit publication and privacy', () => {
   });
 });
 
+describe('private card activity', () => {
+  it('returns card authors and stage changes, omits no-op saves, and paginates', async () => {
+    const { admin, owner } = await setup();
+    await owner.mutation(api.planner.setDisplayName, { name: 'Maya Patel' });
+    const id = await admin.mutation(api.planner.create, { activity });
+    await owner.mutation(api.planner.save, { id, revision: 1, activity, notes: '', owner: '', tasks: [] });
+    await owner.mutation(api.planner.move, { id, revision: 2, stage: 'planning' });
+    await owner.mutation(api.planner.move, { id, revision: 3, stage: 'ready' });
+    await owner.mutation(api.planner.move, { id, revision: 4, stage: 'done' });
+    const first = await admin.query(api.planner.listActivity, { id, paginationOpts: { numItems: 2, cursor: null } });
+    expect(first.page).toHaveLength(2);
+    expect(first.page[0]).toMatchObject({ author: { name: 'Maya Patel' }, text: expect.stringContaining('Done') });
+    expect(first.isDone).toBe(false);
+    const second = await admin.query(api.planner.listActivity, { id, paginationOpts: { numItems: 30, cursor: first.continueCursor } });
+    const all = [...first.page, ...second.page];
+    expect(all).toHaveLength(4);
+    expect(all.map(row => row.text).join(' ')).not.toContain('Updated this card');
+    expect(all.map(row => row.text).join(' ')).toContain('Created this card');
+  });
+
+  it('records meaningful edits and keeps activity private to the card society', async () => {
+    const { t, admin, otherId } = await setup();
+    const id = await admin.mutation(api.planner.create, { activity });
+    const edited = { ...activity, date: '2026-11-02' };
+    await admin.mutation(api.planner.save, { id, revision: 1, activity: edited, notes: '', owner: '', tasks: [] });
+    const activityRows = await admin.query(api.planner.listActivity, { id, paginationOpts: { numItems: 30, cursor: null } });
+    expect(activityRows.page[0].text).toContain('due date');
+    const other = await t.run(ctx => ctx.db.insert('plannerItems', { ...activity, societyId: otherId, stage: 'ideas', notes: '', owner: '', tasks: [], revision: 1, updatedAt: Date.now() }));
+    await expect(admin.query(api.planner.listActivity, { id: other, paginationOpts: { numItems: 30, cursor: null } })).rejects.toThrow('Activity not found');
+  });
+
+  it('normalizes frontend null defaults without inventing lead or team changes', async () => {
+    const { admin } = await setup();
+    const id = await admin.mutation(api.planner.create, { activity });
+    await admin.mutation(api.planner.save, {
+      id, revision: 1, activity, lead: null, team: null, internalOnly: false,
+      notes: '', owner: '', tasks: [{ text: 'Confirm the room', done: true }],
+    });
+    const rows = await admin.query(api.planner.listActivity, { id, paginationOpts: { numItems: 30, cursor: null } });
+    expect(rows.page[0].text).toContain('checklist');
+    expect(rows.page[0].text).not.toContain('lead');
+    expect(rows.page[0].text).not.toContain('teams');
+  });
+
+  it('keeps attribution and updated time stable for a true no-op save', async () => {
+    const { admin } = await setup();
+    const id = await admin.mutation(api.planner.create, { activity });
+    const before = await admin.query(api.planner.get, { id });
+    await admin.mutation(api.planner.save, { id, revision: 1, activity, notes: '', owner: '', tasks: [] });
+    const after = await admin.query(api.planner.get, { id });
+    expect(after?.updatedAt).toBe(before?.updatedAt);
+    expect(after?.contributors).toEqual(before?.contributors);
+    expect(after?.revision).toBe(2);
+  });
+});
+
 it('limits AI drafting by the authenticated identity', async () => {
   const { admin, t } = await setup();
   await expect(t.mutation(api.planner.reserveDraft, {})).rejects.toThrow('Committee access required');
@@ -405,17 +465,83 @@ it('limits AI drafting by the authenticated identity', async () => {
 });
 
 describe('calendar history and automatic archiving', () => {
-  it('waits until the event date has passed in London, then preserves the archived calendar entry', async () => {
+  it('archives an active published card when its due date is edited into the past', async () => {
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(new Date('2026-10-21T12:00:00Z'));
+      const { admin, t } = await setup();
+      const id = await admin.mutation(api.planner.create, { activity, stage: 'ready' });
+      await admin.mutation(api.planner.publish, { id, revision: 1 });
+      await admin.mutation(api.planner.save, { id, revision: 2, activity: { ...activity, date: '2026-10-20' }, workflowStage: 'ready', notes: 'Keep the event history', owner: '', tasks: [] });
+      const saved = await t.run(ctx => ctx.db.get(id));
+      expect(saved).toMatchObject({ stage: 'archived', date: '2026-10-20', revision: 3, notes: 'Keep the event history' });
+      expect(saved?.published).toBeUndefined(); expect(saved?.workflowStage).toBeUndefined();
+      expect(await admin.query(api.planner.list, {})).toEqual([]);
+      expect(await admin.query(api.planner.list, { archived: true })).toContainEqual(expect.objectContaining({ _id: id }));
+      expect((await admin.query(api.planner.calendar, { month: '2026-10' })).items).toContainEqual(expect.objectContaining({ _id: id, stage: 'archived' }));
+    } finally { vi.useRealTimers(); }
+  });
+
+  it('clears a projected published archive snapshot when rescheduling back to the board', async () => {
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(new Date('2026-10-29T19:59:00Z'));
+      const { admin, t } = await setup();
+      const id = await admin.mutation(api.planner.create, { activity, stage: 'ready' });
+      await admin.mutation(api.planner.publish, { id, revision: 1 });
+      vi.setSystemTime(new Date('2026-10-29T20:01:00Z'));
+      expect(await admin.query(api.planner.get, { id })).toMatchObject({ stage: 'archived', revision: 2 });
+      await admin.mutation(api.planner.save, { id, revision: 2, activity: { ...activity, date: '2026-11-02' }, stage: 'planning', notes: '', owner: '', tasks: [] });
+      const saved = await t.run(ctx => ctx.db.get(id));
+      expect(saved).toMatchObject({ stage: 'planning', date: '2026-11-02', revision: 3 });
+      expect(saved?.published).toBeUndefined(); expect(saved?.publishedAt).toBeUndefined(); expect(saved?.workflowStage).toBeUndefined();
+      expect(await t.query(api.planner.listPublished, {})).toEqual([]);
+    } finally { vi.useRealTimers(); }
+  });
+
+  it('projects a timed due card into archive before the cron runs and keeps the upcoming card active', async () => {
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(new Date('2026-10-29T20:01:00Z'));
+      const { admin, t } = await setup();
+      const now = new Date('2026-10-29T20:01:00Z').getTime();
+      const due = await admin.mutation(api.planner.create, { activity, stage: 'ready' });
+      const upcoming = await admin.mutation(api.planner.create, { activity: { ...activity, title: 'Later workshop', endTime: '21:00' }, stage: 'ready' });
+      expect((await admin.query(api.planner.list, { now })).map(item => item._id)).toContain(upcoming);
+      expect((await admin.query(api.planner.list, { now })).map(item => item._id)).not.toContain(due);
+      expect(await admin.query(api.planner.get, { id: due, now })).toMatchObject({ _id: due, stage: 'archived', revision: 1 });
+      expect(await admin.query(api.planner.get, { id: upcoming, now })).toMatchObject({ _id: upcoming, stage: 'ready' });
+      expect(await admin.query(api.planner.list, { archived: true, now })).toContainEqual(expect.objectContaining({ _id: due, stage: 'archived' }));
+      expect((await admin.query(api.planner.calendar, { month: '2026-10', now })).items).toContainEqual(expect.objectContaining({ _id: due, stage: 'archived' }));
+      expect(await t.mutation(internal.planner.archivePastEvents, {})).toBe(1);
+    } finally { vi.useRealTimers(); }
+  });
+
+  it('reschedules a projected archived card before restoring it to the board', async () => {
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(new Date('2026-10-29T20:01:00Z'));
+      const { admin, t } = await setup();
+      const id = await admin.mutation(api.planner.create, { activity: { ...activity, date: '2026-10-01' }, stage: 'ready' });
+      await t.mutation(internal.planner.archivePastEvents, {});
+      await expect(admin.mutation(api.planner.move, { id, revision: 2, stage: 'ideas' })).rejects.toThrow('future date');
+      await admin.mutation(api.planner.save, { id, revision: 2, activity: { ...activity, date: '2026-11-02' }, stage: 'planning', notes: '', owner: '', tasks: [] });
+      expect(await admin.query(api.planner.get, { id })).toMatchObject({ stage: 'planning', date: '2026-11-02', revision: 3 });
+      expect(await admin.query(api.planner.list, {})).toContainEqual(expect.objectContaining({ _id: id, stage: 'planning' }));
+    } finally { vi.useRealTimers(); }
+  });
+
+  it('archives a finished timed event immediately and preserves its calendar entry', async () => {
     vi.useFakeTimers();
     try {
       vi.setSystemTime(new Date('2026-07-14T22:59:59Z'));
       const { t, admin } = await setup();
       const id = await admin.mutation(api.planner.create, { activity: { ...activity, date: '2026-07-14' }, stage: 'ready', notes: 'Keep these notes', owner: 'Josh, Mosie', tasks: [{ text: 'Prepare room', done: true }] });
       await admin.mutation(api.planner.publish, { id, revision: 1 });
-      expect(await t.mutation(internal.planner.archivePastEvents, {})).toBe(0);
+      expect(await t.mutation(internal.planner.archivePastEvents, {})).toBe(1);
       vi.setSystemTime(new Date('2026-07-14T23:00:01Z'));
       expect(plannerToday()).toBe('2026-07-15');
-      expect(await t.mutation(internal.planner.archivePastEvents, {})).toBe(1);
+      expect(await t.mutation(internal.planner.archivePastEvents, {})).toBe(0);
       expect(await admin.query(api.planner.list, {})).toEqual([]);
       expect(await admin.query(api.planner.list, { archived: true })).toContainEqual(expect.objectContaining({ _id: id, date: '2026-07-14', stage: 'archived', notes: 'Keep these notes', owner: 'Josh, Mosie', tasks: [{ text: 'Prepare room', done: true }], revision: 3 }));
       expect((await admin.query(api.planner.calendar, { month: '2026-07' })).items).toContainEqual(expect.objectContaining({ _id: id, date: '2026-07-14', stage: 'archived' }));
@@ -801,5 +927,87 @@ describe('private committee mentions and notifications', () => {
     expect(await owner.query(api.planner.notificationChanges, {})).toBe(0);
     await t.run(ctx => ctx.db.patch(grantId, { active: false }));
     await expect(admin.query(api.planner.notificationChanges, {})).rejects.toThrow('Committee access required');
+  });
+});
+
+describe('archived card deletion', () => {
+  it('requires committee access, an archived card and the current revision', async () => {
+    const { t, admin, otherId } = await setup();
+    const id = await admin.mutation(api.planner.create, { activity, internalOnly: true });
+    await expect(t.mutation(api.planner.deleteArchived, { id, revision: 1 })).rejects.toThrow('Committee access required');
+    await expect(admin.mutation(api.planner.deleteArchived, { id, revision: 1 })).rejects.toThrow('Archive this card');
+    await expect(admin.mutation(api.planner.deleteArchived, { id, revision: 0 })).rejects.toThrow('Someone else updated');
+    await admin.mutation(api.planner.move, { id, revision: 1, stage: 'archived' });
+    await expect(admin.mutation(api.planner.deleteArchived, { id, revision: 1 })).rejects.toThrow('Someone else updated');
+    await admin.mutation(api.planner.move, { id, revision: 2, stage: 'ready' });
+    await expect(admin.mutation(api.planner.deleteArchived, { id, revision: 2 })).rejects.toThrow('Someone else updated');
+
+    const foreign = await t.run(ctx => ctx.db.insert('plannerItems', {
+      ...activity, societyId: otherId, stage: 'archived', notes: '', owner: '', tasks: [], revision: 1, updatedAt: Date.now(),
+    }));
+    await expect(admin.mutation(api.planner.deleteArchived, { id: foreign, revision: 1 })).rejects.toThrow('Activity not found');
+
+    const overdue = await admin.mutation(api.planner.create, { activity: { ...activity, date: '2020-01-01' } });
+    await admin.mutation(api.planner.deleteArchived, { id: overdue, revision: 1 });
+    expect(await t.run(ctx => ctx.db.get(overdue))).toBeNull();
+  });
+
+  it('removes the card, private files, comments, notifications and activity, and invalidates the inbox', async () => {
+    const { t, admin, owner, societyId } = await setup();
+    const id = await owner.mutation(api.planner.create, { activity, internalOnly: true });
+    const commentId = await owner.mutation(api.planner.addComment, { id, text: '@admin@example.test please review', requestId: '00000000-0000-4000-8000-000000000901' });
+    const notification = (await admin.query(api.planner.notifications, { paginationOpts: { numItems: 30, cursor: null } })).page.find(row => row.commentId === commentId);
+    if (!notification) throw new Error('Notification fixture missing');
+    const storageId = await t.run(async ctx => {
+      const user = (await ctx.db.query('users').withIndex('by_email', q => q.eq('email', 'joshhknott@gmail.com')).unique())!;
+      const stored = await ctx.storage.store(new Blob(['private planner file'], { type: 'text/plain' }));
+      await ctx.db.insert('plannerFiles', { societyId, itemId: id, storageId: stored, name: 'private.txt', contentType: 'text/plain', size: 20, uploadedBy: user._id, requestId: '00000000-0000-4000-8000-000000000902' });
+      await ctx.db.insert('auditLogs', { societyId, userId: user._id, action: 'move_planner_item', targetId: id, targetType: 'plannerItem', details: 'Private activity row' });
+      return stored;
+    });
+    await owner.mutation(api.planner.move, { id, revision: 1, stage: 'archived' });
+    expect(await admin.query(api.planner.notificationChanges, {})).toBe(1);
+    await admin.mutation(api.planner.deleteArchived, { id, revision: 2 });
+
+    expect(await t.run(ctx => ctx.db.get(id))).toBeNull();
+    expect(await t.run(ctx => ctx.db.system.get('_storage', storageId))).toBeNull();
+    expect(await t.run(ctx => ctx.db.query('plannerFiles').withIndex('by_itemId', q => q.eq('itemId', id)).take(10))).toHaveLength(0);
+    expect(await t.run(ctx => ctx.db.query('plannerComments').withIndex('by_itemId', q => q.eq('itemId', id)).take(10))).toHaveLength(0);
+    expect(await t.run(ctx => ctx.db.query('plannerNotifications').withIndex('by_itemId', q => q.eq('itemId', id)).take(10))).toHaveLength(0);
+    expect(await t.run(ctx => ctx.db.query('auditLogs').withIndex('by_societyId_and_targetId', q => q.eq('societyId', societyId).eq('targetId', id)).take(10))).toHaveLength(0);
+    expect(await admin.query(api.planner.notificationChanges, {})).toBe(2);
+    expect(await admin.query(api.planner.notifications, { paginationOpts: { numItems: 30, cursor: null } })).toMatchObject({ page: [], unreadCount: 0 });
+    expect(await t.run(ctx => ctx.db.get(notification._id))).toBeNull();
+  });
+
+  it('drains scheduled cleanup batches for unbounded children and invalidates the recipient state', async () => {
+    vi.useFakeTimers();
+    try {
+      const { t, admin, societyId } = await setup();
+      const id = await admin.mutation(api.planner.create, { activity, internalOnly: true });
+      await t.run(async ctx => {
+        const item = await ctx.db.get(id);
+        if (!item?.createdBy) throw new Error('Card attribution fixture missing');
+        for (let index = 0; index < 101; index++) {
+          const suffix = String(index).padStart(12, '0');
+          const commentId = await ctx.db.insert('plannerComments', {
+            societyId, itemId: id, author: item.createdBy, text: `Bulk comment ${index}`,
+            requestId: `00000000-0000-4000-8000-${suffix}`,
+          });
+          await ctx.db.insert('plannerNotifications', { societyId, itemId: id, commentId, recipientEmail: 'admin@example.test', read: false });
+          await ctx.db.insert('auditLogs', { societyId, userId: item.createdBy.userId, action: 'move_planner_item', targetId: id, targetType: 'plannerItem', details: `Bulk activity ${index}` });
+        }
+      });
+      await admin.mutation(api.planner.move, { id, revision: 1, stage: 'archived' });
+      await admin.mutation(api.planner.deleteArchived, { id, revision: 2 });
+      await t.finishAllScheduledFunctions(() => vi.runAllTimers());
+
+      expect(await t.run(ctx => ctx.db.query('plannerComments').withIndex('by_itemId', q => q.eq('itemId', id)).take(10))).toHaveLength(0);
+      expect(await t.run(ctx => ctx.db.query('plannerNotifications').withIndex('by_itemId', q => q.eq('itemId', id)).take(10))).toHaveLength(0);
+      expect(await t.run(ctx => ctx.db.query('auditLogs').withIndex('by_societyId_and_targetId', q => q.eq('societyId', societyId).eq('targetId', id)).take(10))).toHaveLength(0);
+      expect(await admin.query(api.planner.notificationChanges, {})).toBe(2);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
