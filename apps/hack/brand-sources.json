@@ -1,0 +1,109 @@
+{
+  "retrieved": "2026-10-21",
+  "reference": "https://getmivlet.vercel.app/",
+  "note": "Unmodified product marks. Logos and brand names belong to their respective owners. These examples do not imply partnership or endorsement.",
+  "sources": [
+    {
+      "file": "brand-openai.svg",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/openai.svg",
+      "bytes": 1687,
+      "sha256": "a595df6b423920c67a7f8f73c063e4bfb72d415948097b6cac063a2366bb5186"
+    },
+    {
+      "file": "brand-anthropic.svg",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/anthropic.svg",
+      "bytes": 368,
+      "sha256": "e833fdfa7e7187a86a05b870925067556a506dcd4239089aed73e1e58c9366a3"
+    },
+    {
+      "file": "brand-claude-color.svg",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/claude-color.svg",
+      "bytes": 1696,
+      "sha256": "a3101f3047a119aa11825ad9369510f0c472428c8c52d420e31bc62db44a8364"
+    },
+    {
+      "file": "brand-gemini-color.svg",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/gemini-color.svg",
+      "bytes": 2836,
+      "sha256": "8ab0a9bafec11f7e69bcb9fc4ffd8f1bc927d1ddcbbb6ff36dee5ae8b5a9d602"
+    },
+    {
+      "file": "brand-cursor.svg",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/cursor.svg",
+      "bytes": 547,
+      "sha256": "0cb51bddf264ae108926fd554c063ef40fc1aac3c5c921ddb39ad184e4e5d0ef"
+    },
+    {
+      "file": "brand-figma-color.svg",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/figma-color.svg",
+      "bytes": 476,
+      "sha256": "526eea0bdd16f60ca9251fd371a09a3211762a8c41e15ef085d351c2b0078c3b"
+    },
+    {
+      "file": "brand-aistudio.svg",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/aistudio.svg",
+      "bytes": 833,
+      "sha256": "ca05675a319ba0b530fe396150357f5dddd7f7bbb2d15ffe5e21178e568a167c"
+    },
+    {
+      "file": "brand-githubcopilot.svg",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/githubcopilot.svg",
+      "bytes": 2019,
+      "sha256": "bbc7fddc13448236e5edea8c399d2072dc40aa5da5bca07f7a2f412405c500a3"
+    },
+    {
+      "file": "brand-huggingface-color.svg",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/huggingface-color.svg",
+      "bytes": 3768,
+      "sha256": "5d39d66bb6c9b026d3cb5de7bd9978dad3906570df2aca8f00078a6f8a3d0f5e"
+    },
+    {
+      "file": "brand-lovable-color.svg",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/lovable-color.svg",
+      "bytes": 801,
+      "sha256": "ab3b36b92ef69561b00f963eb3edaef9afdd598d67424991d74157419cd1d44e"
+    },
+    {
+      "file": "brand-perplexity-color.svg",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/perplexity-color.svg",
+      "bytes": 603,
+      "sha256": "8353f3ab20822f1a933224b0ea32cc39f0c32d5740f4af8c254b0f418e0a3a70"
+    },
+    {
+      "file": "brand-replit-color.svg",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/replit-color.svg",
+      "bytes": 506,
+      "sha256": "7d803ffdfc0d46aec134f656fd3c8815ee936a6726295eea5173d7122007eae5"
+    },
+    {
+      "file": "brand-v0.svg",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/v0.svg",
+      "bytes": 555,
+      "sha256": "fc253b71563a3a4db26ebc5a7b5402b30fb52d3f1f600025381e4f734ef1a2c3"
+    },
+    {
+      "file": "brand-vscode.svg",
+      "url": "https://raw.githubusercontent.com/devicons/devicon/master/icons/vscode/vscode-original.svg",
+      "bytes": 3404,
+      "sha256": "503d580c442a7071aae180d9b4766e312e4600bf0e9d842b30f56d0e614eceb8"
+    },
+    {
+      "file": "brand-canva.png",
+      "url": "https://getmivlet.vercel.app/plugins/canva.png",
+      "bytes": 26676,
+      "sha256": "83ba647ee60b13c7420b4a969bf7ea76eac6bc6031bdeb55345ab507af66657c"
+    },
+    {
+      "file": "LOBE-ICONS-LICENSE",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/LICENSE",
+      "bytes": 1064,
+      "sha256": "add9d7531d1b21646317a8958e38fc727506fa39d24bdecb44154d943c82753a"
+    },
+    {
+      "file": "DEVICON-LICENSE",
+      "url": "https://raw.githubusercontent.com/devicons/devicon/master/LICENSE",
+      "bytes": 1072,
+      "sha256": "121194741d4a915b9f5890fdd6dd95121f9b1f816517c792358d72d7c838d664"
+    }
+  ]
+}

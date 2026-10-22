@@ -1,10 +1,11 @@
 # Surrey AI
 
-Surrey AI Society’s website, private committee planner, resources hub and Portfolio Studio source live in this repository. Each application keeps its own runtime and data boundary so the source can be maintained together without moving accounts, databases or published sites.
+Surrey AI Society’s website, private committee planner, resources hub, Portfolio Studio and Surrey AI Hack source live in this repository. Each application keeps its own runtime and data boundary so the source can be maintained together without moving accounts, databases or published sites.
 
 Live surfaces:
 
 - [Surrey AI Society](https://surreyaisociety.org) — the public Astro site and private `/committee/planner` route.
+- [Surrey AI Hack](https://surreyaisociety.org/hack) — dedicated event section; the event website remains at [its existing origin](https://surrey-ai-hack-2027.vercel.app).
 - [Resources](https://surreyaisociety.org/resources) — the public catalogue of Society tools.
 - [Portfolio Studio](https://portfolio-studio-1uu.pages.dev) — the independently hosted portfolio builder.
 
@@ -17,6 +18,7 @@ The existing production origins, planner Convex data, Portfolio Studio D1 databa
 | AI Society website, planner frontend and resources | `apps/ai` | Astro/Vercel, connected to the root Convex deployment |
 | Planner backend and shared society data | `convex` | Convex; private planner access and mutations live here |
 | Shared site foundations | `packages/ui`, `packages/admin`, `packages/assistant` | Root npm workspace |
+| Surrey AI Hack | `apps/hack` | Independent static site + Vercel waitlist function and private Blob storage |
 | Portfolio Studio | `apps/portfoliostudio` | Separate Vite/React + Cloudflare Pages Worker, D1 and Workers AI |
 
 Portfolio Studio is deliberately outside the root npm workspace. Its toolchain and lockfile are independent, and its Wrangler configuration must continue to point at the existing Portfolio Studio resources.
@@ -78,3 +80,9 @@ The planner’s `convex/` directory is the single source of truth for its functi
 Keep `CLERK_SECRET_KEY`, provider API keys, Resend credentials, Blob tokens, Convex secrets, signing keys and deployment tokens in hosting or local environment configuration. Never put them in `PUBLIC_` variables, source, tests or documentation.
 
 For planner ownership, access grants, notifications and the required environment names, read [`docs/planner.md`](docs/planner.md). For Portfolio Studio’s auth, publishing, D1 migrations and Cloudflare settings, read [`apps/portfoliostudio/README.md`](apps/portfoliostudio/README.md).
+
+## Surrey AI Hack
+
+The event is a separate section at `/hack`; Portfolio Studio stays in `/resources`. The production event source is in `apps/hack`, outside the root npm workspace, with its own lockfile. Run `npm --prefix apps/hack ci --ignore-scripts`, `npm run test:hack`, and `npm run build:hack`. See [its README](apps/hack/README.md) for deployment and waitlist operations.
+
+The existing Vercel project `surrey-ai-hack-2027` uses this repository with Root Directory `apps/hack`, install `npm ci --ignore-scripts`, build `npm run build`, and output `dist`. Retain its existing Blob store and server environment variables. Do not create a new store or move signup records. Original hackathon repository history is preserved; the active source is the verified production implementation, replacing the earlier prototype.
