@@ -1,7 +1,8 @@
 import { ConvexClient, ConvexHttpClient } from 'convex/browser';
 import { api } from '../../../../convex/_generated/api';
 import type { Doc, Id } from '../../../../convex/_generated/dataModel';
-import type { Activity, PlannerCalendarItem, PlannerPerson, PlannerMention, PlannerNotification, PlannerProfile, PlannerFile, PlannerActivity } from '../../../../convex/plannerModel';
+import type { Activity, PlannerCalendarItem, PlannerPerson, PlannerMention, PlannerNotification, PlannerProfile, PlannerFile, PlannerActivity, PlannerWorkspace } from '../../../../convex/plannerModel';
+import { HACK_CHECKLIST_GROUPS } from '../../../../convex/plannerHackTemplate';
 import { activityDate, activityKind, blankActivity, londonToday } from '../lib/programme';
 import { createPlannerSignIn, type ClerkSDK, type ClerkSession } from './plannerSignIn';
 import { appendMentionText, createMentionPicker } from './plannerMentions';
@@ -30,6 +31,22 @@ async function start(root: HTMLElement) {
   const stageMime = 'application/x-planner-stage';
   const cardMime = 'application/x-planner-card';
   const labels = { ideas: 'Ideas', planning: 'In progress', ready: 'Ready', done: 'Archived', published: 'Ready', archived: 'Archived' };
+  const workspaceNames = { events: 'Events', outreach: 'Outreach', hack2027: 'Surrey AI Hack 2027' };
+  const workspaceFromUrl = (): PlannerWorkspace => {
+    const part = window.location.pathname.split('/').filter(Boolean).at(-1);
+    return part === 'outreach' || part === 'hack2027' ? part : 'events';
+  };
+  let workspace = workspaceFromUrl();
+  let lastPlannerUrl = window.location.href;
+  let workspaceVersion = 0;
+  let hackInitialized = false;
+  const itemWorkspace = (item: Item) => item.workspace || 'events';
+  const stageLabel = (stage: keyof typeof labels, item?: Item) => {
+    const area = item ? itemWorkspace(item) : workspace;
+    return area === 'outreach' && stage === 'ideas' ? 'To approach' : area === 'outreach' && stage === 'planning' ? 'Waiting for reply' : area === 'outreach' && stage === 'ready' ? 'In conversation' : labels[stage];
+  };
+  const collapsedHackGroups = new Set<string>(HACK_CHECKLIST_GROUPS.slice(3).map(group => group.id));
+  const checklistSaving = new Set<string>();
   const boardStage = (item: Item) => item.stage === 'done' || item.stage === 'published' && item.workflowStage === 'done' ? 'archived' : item.stage === 'published' ? item.workflowStage || 'ready' : item.stage;
   const activeOrder = (order: Item['stage'][]) => order.filter((stage): stage is Stage => stages.includes(stage as Stage));
   const timeBucket = () => Math.floor(Date.now() / 60000) * 60000;
@@ -40,7 +57,7 @@ async function start(root: HTMLElement) {
   let dueThisWeek = false;
   let waitingOnly = false;
   const assignedTeams = (item: { team?: PlannerTeam | null; teams?: PlannerTeam[] }) => item.teams ?? (item.team ? [item.team] : []);
-  const matches = (item: { title: string; team?: PlannerTeam | null; teams?: PlannerTeam[] }) => (selectedTeam === 'all' || assignedTeams(item).includes(selectedTeam)) && item.title.toLowerCase().includes(search);
+  const matches = (item: { title: string; team?: PlannerTeam | null; teams?: PlannerTeam[]; nextAction?: string; outreachKind?: string }) => (selectedTeam === 'all' || assignedTeams(item).includes(selectedTeam)) && `${item.title} ${item.nextAction || ''} ${item.outreachKind || ''}`.toLowerCase().includes(search);
   const membersDialog = $<HTMLDialogElement>('members-dialog');
   let client: ConvexHttpClient;
   let clerk: ClerkSDK;
@@ -74,7 +91,7 @@ async function start(root: HTMLElement) {
   let deleteAttempt = 0;
   let baseline = '';
   let busy = false;
-  let view: 'board' | 'calendar' | 'archive' = 'board';
+  let view: 'board' | 'calendar' | 'archive' = new URLSearchParams(window.location.search).get('view') === 'calendar' ? 'calendar' : new URLSearchParams(window.location.search).get('view') === 'archive' ? 'archive' : 'board';
   let calendarMonth = new Date(`${londonToday().slice(0, 7)}-01T12:00:00Z`);
   let calendarItems: PlannerCalendarItem[] = [];
   let calendarLoadedMonth = '';
@@ -84,6 +101,7 @@ async function start(root: HTMLElement) {
   let calendarVersion = 0;
   let sessionId: string | null = null;
   let refreshing = false;
+  let refreshPending = false;
   let aiVersion = 0;
   let aiBusy = false;
   let aiRequest: AbortController | null = null;
@@ -145,7 +163,7 @@ async function start(root: HTMLElement) {
     return result;
   };
   const selectedTeams = () => [...form.querySelectorAll<HTMLInputElement>('input[name="teams"]:checked')].map(input => input.value as PlannerTeam);
-  const signature = () => JSON.stringify({ activity: readActivity(), stage: field('stage').value, teams: selectedTeams(), lead: field('lead').value, waitingOn: field('waitingOn').value, purpose: field('purpose').value, notes: field('notes').value, owner: field('owner').value, tasks, attachments });
+  const signature = () => JSON.stringify({ activity: readActivity(), stage: field('stage').value, workspace: field('workspace').value, outreachKind: field('outreachKind').value, nextAction: field('nextAction').value, checklistGroup: field('checklistGroup').value, checklistDone: (field('checklistDone') as HTMLInputElement).checked, teams: selectedTeams(), lead: field('lead').value, waitingOn: field('waitingOn').value, purpose: field('purpose').value, notes: field('notes').value, owner: field('owner').value, tasks, attachments });
   const dirty = () => (editor.open || cardDialog.open) && signature() !== baseline;
   const closeEditor = () => { if (busy || (dirty() && !window.confirm('Discard your unsaved changes?'))) return; editor.close(); };
 
@@ -160,6 +178,7 @@ async function start(root: HTMLElement) {
     $<HTMLInputElement>('attachment-file').value = ''; $<HTMLFormElement>('planner-profile-form').reset(); $('planner-profile-message').textContent = '';
     stopLiveNotifications();
     access = null; items = []; archived = []; boardOrder = [...stages]; boardRevision = 0; boardOrderSaving = false;
+    hackInitialized = false; checklistSaving.clear();
     archiveVersion++; archiveLoadedAt = 0; archiveLoading = false; archiveError = ''; archiveRequest = null;
     notificationsVersion++; notifications = []; mentionPeople = []; notificationsLoading = false; notificationsBusy = false; notificationsCursor = null; notificationsPages = 1; notificationsDone = true; unreadNotifications = 0; highlightedComment = null;
     commentMentionPicker.close(); editMentionPicker?.destroy(); editMentionPicker = null;
@@ -173,7 +192,7 @@ async function start(root: HTMLElement) {
     selectedTeam = 'all'; search = ''; workScope = 'everyone'; mobileStage = 'ideas'; dueThisWeek = false; waitingOnly = false; $<HTMLInputElement>('card-search').value = ''; syncTeamFilters(); syncBoardFilters(); $('board-stage-tabs').replaceChildren();
     $('open-settings').hidden = true; $('committee-settings').hidden = true; $('settings-account').textContent = '';
     clearTimeout(autosaveTimer);
-    for (const id of ['board', 'calendar', 'archive', 'access-list', 'public-preview', 'task-list', 'card-people', 'card-attribution', 'attachment-list', 'comment-list', 'comments-status', 'activity-status', 'comment-message', 'comment-count', 'comment-author', 'account-avatar']) $(id).replaceChildren();
+    for (const id of ['board', 'hack-checklist', 'calendar', 'archive', 'access-list', 'public-preview', 'task-list', 'card-people', 'card-attribution', 'attachment-list', 'comment-list', 'comments-status', 'activity-status', 'comment-message', 'comment-count', 'comment-author', 'account-avatar']) $(id).replaceChildren();
     $('account-avatar').hidden = true;
     deleteRequest = null; deleteAttempt++;
     if (deleteBusy) setBusy(false);
@@ -193,9 +212,11 @@ async function start(root: HTMLElement) {
     $(target).textContent = message.split('Uncaught Error: ').pop()?.split('\n')[0] || 'Could not save. Try again.';
   }
   async function refresh() {
-    if (!clerk?.session || refreshing || busy) return;
+    if (!clerk?.session) return;
+    if (refreshing || busy) { refreshPending = true; return; }
     const requestSession = sessionId;
-    refreshing = true; profileRefreshPending = false;
+    const requestWorkspace = workspace; const requestWorkspaceVersion = workspaceVersion;
+    refreshing = true; refreshPending = false; profileRefreshPending = false;
     try {
       await authenticated();
       const latestAccess = await client.query(api.planner.access, {});
@@ -203,8 +224,13 @@ async function start(root: HTMLElement) {
       access = latestAccess;
       if (!access) { showAccess('This board is for the AI Society committee. Ask Josh to add your sign-in email.'); return; }
       void loadArchive(true);
-      const [latestItems, layout, latestProfiles] = await Promise.all([client.query(api.planner.list, { now: timeBucket() }), client.query(api.planner.boardLayout, {}), client.query(api.planner.profiles, {})]);
-      if (requestSession !== sessionId || !access) return;
+      if (requestWorkspace === 'hack2027' && !hackInitialized) {
+        await client.mutation(api.planner.seedHackChecklist, {});
+        if (requestSession !== sessionId) return;
+        hackInitialized = true;
+      }
+      const [latestItems, layout, latestProfiles] = await Promise.all([client.query(api.planner.list, { now: timeBucket(), workspace: requestWorkspace }), client.query(api.planner.boardLayout, { workspace: requestWorkspace }), client.query(api.planner.profiles, {})]);
+      if (requestSession !== sessionId || requestWorkspaceVersion !== workspaceVersion || !access) return;
       profiles = latestProfiles; syncProfileLabels();
       items = latestItems;
       if (!boardOrderSaving) { boardOrder = activeOrder(layout.order); boardRevision = layout.revision; }
@@ -244,7 +270,7 @@ async function start(root: HTMLElement) {
       if (!access) showAccess('Could not check committee access. Try again, or sign out and back in.');
       showError(error);
       $('retry-access').hidden = false;
-    } finally { refreshing = false; if (!busy && (profileRefreshPending && access || requestSession !== sessionId && clerk.session)) void refresh(); }
+    } finally { refreshing = false; if (!busy && ((profileRefreshPending || refreshPending) && access || (requestSession !== sessionId || requestWorkspaceVersion !== workspaceVersion) && clerk.session)) void refresh(); }
   }
 
   function stopLiveNotifications() {
@@ -398,10 +424,10 @@ async function start(root: HTMLElement) {
     if (focus) document.querySelector<HTMLElement>(`.board-column[data-stage="${source}"] .column-drag-handle`)?.focus();
     try {
       await authenticated();
-      boardRevision = await client.mutation(api.planner.reorderBoard, { order: next, revision: boardRevision });
+      boardRevision = await client.mutation(api.planner.reorderBoard, { order: next, revision: boardRevision, workspace });
       status('List order saved for the committee.');
     } catch (error) {
-      try { const layout = await client.query(api.planner.boardLayout, {}); boardOrder = activeOrder(layout.order); boardRevision = layout.revision; }
+      try { const layout = await client.query(api.planner.boardLayout, { workspace }); boardOrder = activeOrder(layout.order); boardRevision = layout.revision; }
       catch { boardOrder = [...stages]; boardRevision = 0; }
       render(); showError(error);
     } finally { boardOrderSaving = false; }
@@ -427,7 +453,7 @@ async function start(root: HTMLElement) {
   }
   function syncMobileBoard() {
     const mobile = window.matchMedia('(max-width: 720px)').matches;
-    $('board-stage-tabs').hidden = view !== 'board';
+    $('board-stage-tabs').hidden = view !== 'board' || workspace === 'hack2027';
     for (const stage of boardOrder) {
       const column = document.getElementById(`board-stage-${stage}`);
       if (!column) continue;
@@ -443,7 +469,7 @@ async function start(root: HTMLElement) {
     for (const stage of boardOrder) {
       const tab = el('button', undefined, 'board-stage-tab'); tab.type = 'button'; tab.id = `stage-tab-${stage}`;
       tab.setAttribute('role', 'tab'); tab.setAttribute('aria-controls', `board-stage-${stage}`);
-      tab.append(el('span', labels[stage]), el('span', String(items.filter(item => boardStage(item) === stage && boardMatches(item)).length), 'stage-count'));
+      tab.append(el('span', stageLabel(stage)), el('span', String(items.filter(item => boardStage(item) === stage && boardMatches(item)).length), 'stage-count'));
       tab.onclick = () => { mobileStage = stage; syncMobileBoard(); };
       tab.onkeydown = event => {
         if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
@@ -459,14 +485,16 @@ async function start(root: HTMLElement) {
   }
 
   function render() {
+    syncWorkspaceView();
+    if (workspace === 'hack2027' && view === 'board') { renderHackChecklist(); renderCalendar(); renderArchive(); return; }
     const board = $('board'); board.replaceChildren();
     for (const stage of boardOrder) {
-      const column = el('section', undefined, 'board-column'); column.id = `board-stage-${stage}`; column.dataset.stage = stage; column.setAttribute('aria-label', labels[stage]);
+      const column = el('section', undefined, 'board-column'); column.id = `board-stage-${stage}`; column.dataset.stage = stage; column.setAttribute('aria-label', stageLabel(stage));
       const cards = items.filter(item => boardStage(item) === stage && boardMatches(item)).sort((a, b) => b.updatedAt - a.updatedAt);
-      const heading = el('div', undefined, 'column-heading'); const title = el('h2', labels[stage]); heading.append(title, el('span', String(cards.length), 'column-count'));
+      const heading = el('div', undefined, 'column-heading'); const title = el('h2', stageLabel(stage)); heading.append(title, el('span', String(cards.length), 'column-count'));
       const handle = el('button', undefined, 'column-drag-handle'); handle.type = 'button'; handle.draggable = true;
       handle.title = 'Drag to reorder lists; use Left or Right arrow keys';
-      handle.setAttribute('aria-label', `Reorder ${labels[stage]} list`); handle.append(icon('drag'));
+      handle.setAttribute('aria-label', `Reorder ${stageLabel(stage)} list`); handle.append(icon('drag'));
       handle.addEventListener('dragstart', event => { draggedStage = stage; event.dataTransfer?.setData(stageMime, stage); if (event.dataTransfer) event.dataTransfer.effectAllowed = 'move'; });
       handle.addEventListener('dragend', () => { draggedStage = null; clearColumnDrop(); });
       handle.addEventListener('keydown', event => {
@@ -494,7 +522,7 @@ async function start(root: HTMLElement) {
       handle.addEventListener('pointercancel', () => { touchDragging = false; board.style.scrollSnapType = ''; clearColumnDrop(); });
       heading.append(handle);
       column.append(heading);
-      for (const item of cards) column.append(card(item));
+      for (const item of cards) column.append(workspace === 'outreach' ? outreachCard(item) : card(item));
       if (!cards.length) column.append(el('p', workScope === 'mine' ? 'No cards assigned to you here.' : selectedTeam !== 'all' || search || dueThisWeek || waitingOnly ? 'No cards match these filters.' : 'No cards here yet.', 'column-empty'));
       const add = el('button', 'Add card', 'column-add'); add.prepend(icon('plus')); add.onclick = () => openEditor(null, stage); column.append(add);
       column.addEventListener('dragover', event => {
@@ -518,6 +546,103 @@ async function start(root: HTMLElement) {
       status('Showing the latest 100 activities per stage. Archive finished items to keep the board manageable.');
     }
     renderStageTabs(); renderCalendar(); renderArchive();
+  }
+
+  function syncWorkspaceView() {
+    root.dataset.workspace = workspace;
+    $('workspace-title').textContent = view === 'board' ? workspaceNames[workspace] : view === 'calendar' ? 'Calendar' : 'Archive';
+    document.title = `${view === 'board' ? workspaceNames[workspace] : view === 'calendar' ? 'Calendar' : 'Archive'} | Committee planner`;
+    document.querySelectorAll<HTMLElement>('[data-view]').forEach(link => {
+      const selected = link.dataset.view === view && (view !== 'board' || link.dataset.workspace === workspace);
+      if (selected) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
+    });
+    $('board').hidden = view !== 'board' || workspace === 'hack2027';
+    $('hack-checklist').hidden = view !== 'board' || workspace !== 'hack2027';
+    $('calendar').hidden = view !== 'calendar'; $('archive').hidden = view !== 'archive';
+    $('board-scope').hidden = view !== 'board';
+    $('board-filters').hidden = view !== 'board';
+    $('board-stage-tabs').hidden = view !== 'board' || workspace === 'hack2027';
+  }
+
+  function ownerMark(item: Item) {
+    if (!item.lead) return el('span', 'Unassigned', 'hack-unassigned');
+    const name = plannerName(item.lead);
+    const mark = el('span', nameInitials(name), 'person-avatar'); mark.title = `Lead: ${name}`; mark.setAttribute('aria-label', mark.title);
+    return mark;
+  }
+
+  function outreachCard(item: Item) {
+    const node = card(item); node.classList.add('outreach-card');
+    const open = node.querySelector<HTMLButtonElement>('.card-open')!;
+    open.replaceChildren(el('strong', item.title));
+    if (item.outreachKind) open.append(el('span', item.outreachKind, 'outreach-kind'));
+    if (item.nextAction) { const action = el('span', undefined, 'outreach-next-action'); action.append(icon('attachment'), el('span', item.nextAction)); open.append(action); }
+    const footer = el('span', undefined, 'outreach-footer'); footer.append(ownerMark(item));
+    if (item.date) { const due = el('span', activityDate(item.date, { day: 'numeric', month: 'short' }), 'card-date'); due.prepend(icon('calendar')); footer.append(due); }
+    open.append(footer); return node;
+  }
+
+  async function toggleChecklist(item: Item, done: boolean) {
+    if (checklistSaving.has(item._id)) return;
+    const requestSession = sessionId; checklistSaving.add(item._id); renderHackChecklist();
+    try {
+      await authenticated();
+      const revision = await client.mutation(api.planner.setChecklistDone, { id: item._id, revision: item.revision, done });
+      if (sessionId !== requestSession || !access) return;
+      item.checklistDone = done; item.revision = revision;
+      const latest = items.find(candidate => candidate._id === item._id);
+      if (latest && latest.revision <= revision) { latest.checklistDone = done; latest.revision = revision; }
+      status(done ? 'Task completed.' : 'Task reopened.');
+    } catch (error) { if (sessionId === requestSession && access) { showError(error); void refresh(); } }
+    finally {
+      checklistSaving.delete(item._id);
+      if (sessionId === requestSession && access && workspace === 'hack2027' && view === 'board') {
+        renderHackChecklist(); $('hack-checklist').querySelector<HTMLInputElement>(`[data-item="${item._id}"] input[type=checkbox]`)?.focus({ preventScroll: true });
+      }
+    }
+  }
+
+  function renderHackChecklist() {
+    const container = $('hack-checklist'); container.replaceChildren();
+    const visible = items.filter(boardMatches);
+    const completed = items.filter(item => item.checklistDone).length;
+    const heading = el('div', undefined, 'hack-checklist-heading');
+    const intro = el('div'); intro.append(el('h2', 'Hackathon readiness'), el('p', 'Plan the essentials, delivery and follow-up together.'));
+    heading.append(intro, el('p', `${completed} of ${items.length} complete`, 'hack-total'));
+    const controls = el('div', undefined, 'hack-list-controls');
+    for (const [text, collapse] of [['Expand all', false], ['Collapse all', true]] as const) {
+      const control = el('button', text, 'quiet-button'); control.type = 'button';
+      control.onclick = () => { for (const group of HACK_CHECKLIST_GROUPS) { if (collapse) collapsedHackGroups.add(group.id); else collapsedHackGroups.delete(group.id); } renderHackChecklist(); };
+      controls.append(control);
+    }
+    container.append(heading, controls);
+    if (!visible.length) container.append(el('p', workScope === 'mine' ? 'No hackathon tasks are assigned to you yet. Open a task to choose a lead.' : 'No tasks match these filters.', 'hack-empty'));
+    const groups = [...HACK_CHECKLIST_GROUPS, { id: 'other', title: 'Other tasks', description: '' }];
+    for (const group of groups) {
+      const groupItems = visible.filter(item => (HACK_CHECKLIST_GROUPS.some(known => known.id === item.checklistGroup) ? item.checklistGroup : 'other') === group.id).sort((a, b) => a._creationTime - b._creationTime || a._id.localeCompare(b._id));
+      if (!groupItems.length) continue;
+      const section = el('details', undefined, 'hack-group'); section.dataset.group = group.id;
+      section.open = !!search || !collapsedHackGroups.has(group.id);
+      section.ontoggle = () => { if (section.open) collapsedHackGroups.delete(group.id); else collapsedHackGroups.add(group.id); };
+      const summary = el('summary'); summary.append(el('h3', group.title), el('span', `${groupItems.filter(item => item.checklistDone).length}/${groupItems.length}`, 'hack-group-count'), icon('disclosure'));
+      section.append(summary);
+      const rows = el('div', undefined, 'hack-group-rows');
+      for (const item of groupItems) {
+        const row = el('div', undefined, 'hack-task-row'); row.dataset.item = item._id; row.classList.toggle('is-complete', !!item.checklistDone);
+        const check = el('input'); check.type = 'checkbox'; check.checked = !!item.checklistDone; check.disabled = checklistSaving.has(item._id);
+        check.setAttribute('aria-label', `Complete ${item.title}`); check.onchange = () => void toggleChecklist(item, check.checked);
+        const title = el('button', item.title, 'hack-task-open'); title.type = 'button'; title.setAttribute('aria-label', `View ${item.title}`); title.onclick = () => void openPreview(item);
+        const taskStage = boardStage(item);
+        const state = item.checklistDone ? 'Complete' : taskStage === 'planning' ? 'In progress' : taskStage === 'ready' ? 'Ready for review' : 'To do';
+        const badge = el('span', state, 'hack-task-status'); badge.dataset.state = item.checklistDone ? 'complete' : taskStage;
+        const due = el('span', undefined, 'hack-task-due');
+        if (item.date) { due.append(icon('calendar'), document.createTextNode(activityDate(item.date, { day: 'numeric', month: 'short' }))); }
+        const more = el('button', undefined, 'icon-button hack-task-more'); more.type = 'button'; more.setAttribute('aria-label', `Edit ${item.title}`); more.append(icon('more')); more.onclick = () => void openPreview(item);
+        row.append(check, title, badge, ownerMark(item), due, more); rows.append(row);
+      }
+      const add = el('button', 'Add task', 'column-add'); add.prepend(icon('plus')); add.onclick = () => { openEditor(null); field('checklistGroup').value = group.id; };
+      rows.append(add); section.append(rows); container.append(section);
+    }
   }
 
   function renderMembers() {
@@ -595,6 +720,11 @@ async function start(root: HTMLElement) {
     container.append(created, updated);
   }
   async function openPreview(item: Item, targetComment?: Id<'plannerComments'>) {
+    if (workspace !== itemWorkspace(item)) {
+      workspaceVersion++; workspace = itemWorkspace(item); items = []; boardOrder = [...stages]; boardRevision = 0;
+      if (view === 'board') { window.history.replaceState(null, '', `/committee/planner/${workspace}`); lastPlannerUrl = window.location.href; }
+      syncWorkspaceView(); void refresh();
+    }
     previewVersion++; previewItem = item; comments = []; commentsCursor = null; commentsDone = true; commentsLoading = false; commentsError = false; commentPages = 1; commentRequest = null; commentEdit = null; commentDelete = null;
     activity = []; activityCursor = null; activityDone = true; activityLoading = false; activityRefreshPending = false; activityPages = 1; activityFilter = 'all'; syncActivityFilter();
     commentForm.reset(); commentText.value = commentDrafts.get(item._id) || ''; $('comment-message').textContent = ''; $('comments-status').textContent = 'Loading comments…';
@@ -928,7 +1058,7 @@ async function start(root: HTMLElement) {
     const menu = el('details', undefined, 'card-menu'); const trigger = el('summary'); trigger.setAttribute('aria-label', `Actions for ${item.title}`); trigger.append(icon('more'));
     const actions = el('div', undefined, 'card-menu-actions');
     for (const stage of stages.filter(stage => stage !== boardStage(item))) {
-      const button = el('button', `Move to ${labels[stage]}`); button.type = 'button'; button.onclick = () => { menu.open = false; void move(item, stage); }; actions.append(button);
+      const button = el('button', `Move to ${stageLabel(stage, item)}`); button.type = 'button'; button.onclick = () => { menu.open = false; void move(item, stage); }; actions.append(button);
     }
     menu.addEventListener('toggle', () => { if (menu.open) document.querySelectorAll<HTMLDetailsElement>('.card-menu[open]').forEach(other => { if (other !== menu) other.open = false; }); });
     menu.addEventListener('keydown', event => { if (event.key === 'Escape' && menu.open) { event.preventDefault(); event.stopPropagation(); menu.open = false; trigger.focus(); } });
@@ -1094,12 +1224,19 @@ async function start(root: HTMLElement) {
     const activity = item || { ...blankActivity(), date };
     for (const name of Object.keys(blankActivity())) field(name).value = activity[name as keyof Activity];
     field('notes').value = item?.notes || ''; field('owner').value = item?.owner || '';
+    field('workspace').value = item ? itemWorkspace(item) : view === 'calendar' ? 'events' : workspace;
+    field('workspace').disabled = !!item?.published;
+    field('outreachKind').value = item?.outreachKind || '';
+    field('nextAction').value = item?.nextAction || '';
+    field('checklistGroup').value = item?.checklistGroup || HACK_CHECKLIST_GROUPS[0].id;
+    (field('checklistDone') as HTMLInputElement).checked = !!item?.checklistDone;
     const teams = item ? assignedTeams(item) : selectedTeam === 'all' ? [] : [selectedTeam];
     form.querySelectorAll<HTMLInputElement>('input[name="teams"]').forEach(input => { input.checked = teams.includes(input.value as PlannerTeam); });
     field('lead').value = item ? item.lead || '' : workScope === 'mine' && view === 'board' ? myLeadName() : '';
     field('waitingOn').value = item?.waitingOn || '';
     field('purpose').value = item ? item.internalOnly ? 'internal' : 'activity' : date ? 'activity' : 'internal';
     field('purpose').disabled = !!item?.published;
+    syncWorkspaceFields();
     field('dueDate').value = item?.date || date;
     const stageField = field('stage') as HTMLSelectElement;
     for (const value of ['published', 'archived']) stageField.querySelector(`[value=${value}]`)?.remove();
@@ -1110,10 +1247,23 @@ async function start(root: HTMLElement) {
     files = []; pendingUploads = []; $('file-upload-status').hidden = true; $('retry-file-upload').hidden = true; $('cancel-file-upload').hidden = true;
     $('item-heading').textContent = item ? item.title : 'New card';
     renderAttribution(item);
-    $('item-state').textContent = `${labels[item ? boardStage(item) : stage]} · ${item?.published ? 'Public version is live' : 'Private'}`;
+    $('item-state').textContent = `${stageLabel(item ? boardStage(item) : stage, item || undefined)} · ${item?.published ? 'Public version is live' : 'Private'}`;
     $('delete-card').hidden = !item || item.stage === 'archived'; $('unpublish-item').hidden = item?.stage !== 'published';
     $('item-message').textContent = '';
     renderTasks(); renderAttachments(); updatePreview(); baseline = signature(); if (!fromCard) { editor.showModal(); resizeEditorFields(); field('title').focus(); }
+  }
+
+  function syncWorkspaceFields() {
+    const area = field('workspace').value as PlannerWorkspace;
+    $('outreach-fields').hidden = area !== 'outreach'; $('hack-fields').hidden = area !== 'hack2027';
+    $('card-workspace-label').textContent = workspaceNames[area];
+    if (area !== 'events') field('purpose').value = 'internal';
+    field('purpose').disabled = area !== 'events' || !!current?.published;
+    const stageField = field('stage') as HTMLSelectElement;
+    for (const option of stageField.options) {
+      const stage = option.value as keyof typeof labels;
+      option.textContent = area === 'outreach' && stage === 'ideas' ? 'To approach' : area === 'outreach' && stage === 'planning' ? 'Waiting for reply' : area === 'outreach' && stage === 'ready' ? 'In conversation' : labels[stage];
+    }
   }
 
   function renderTasks() {
@@ -1214,6 +1364,7 @@ async function start(root: HTMLElement) {
     $('card-checklist').hidden = !compact && idea; $('card-attachments').hidden = !compact && idea;
     $('internal-due-label').hidden = !compact && !internal;
     for (const id of ['card-review', 'card-notes', 'card-waiting-toggle', 'card-people-toggle']) $(id).hidden = !compact;
+    $('card-area').hidden = !compact || !!current?.published;
     $('card-review').hidden = !compact || internal;
     syncTeamPicker();
     updateLeadAvatar();
@@ -1227,7 +1378,7 @@ async function start(root: HTMLElement) {
     preview.append(el('p', [activity.startTime ? `${activity.startTime}${activity.endTime ? `–${activity.endTime}` : ''}` : '', activity.location].filter(Boolean).join(' · ')));
     preview.append(el('p', activity.description || 'Your public description will appear here.'));
     preview.append(el('span', activity.kind === 'project' ? 'Explore project' : 'View details', 'preview-cta'));
-    const missing = [!activity.title && 'Title', !activity.description && 'Description', activity.kind !== 'project' && !activity.date && 'Date', activity.kind !== 'project' && !activity.startTime && 'Start time', activity.kind !== 'project' && !activity.location && 'Room or location', activity.kind !== 'project' && !activity.registrationUrl && 'Booking link'].filter((value): value is string => !!value);
+    const missing = [!activity.title && 'Title', !activity.description && 'Description', activity.kind !== 'project' && !activity.date && 'Date', activity.kind !== 'project' && !activity.startTime && 'Start time', activity.kind !== 'project' && !activity.location && 'Room or location'].filter((value): value is string => !!value);
     const list = $('publication-missing'); list.replaceChildren();
     for (const detail of missing) list.append(el('li', `Add ${detail.toLowerCase()}`));
     list.hidden = !missing.length;
@@ -1240,7 +1391,11 @@ async function start(root: HTMLElement) {
   async function persist(silent = false) {
     if (!(silent ? form.checkValidity() : form.reportValidity())) return false;
     const savedSignature = signature(); const savingItem = current; const version = previewVersion;
-    const payload = structuredClone({ activity: readActivity(), teams: selectedTeams(), lead: field('lead').value || null, waitingOn: field('waitingOn').value, internalOnly: field('purpose').value === 'internal', notes: field('notes').value, owner: field('owner').value, tasks, attachments });
+    const area = field('workspace').value as PlannerWorkspace;
+    const payload = structuredClone({ activity: readActivity(), workspace: area,
+      ...(area === 'outreach' ? { outreachKind: field('outreachKind').value, nextAction: field('nextAction').value } : {}),
+      ...(area === 'hack2027' ? { checklistGroup: field('checklistGroup').value, checklistDone: (field('checklistDone') as HTMLInputElement).checked } : {}),
+      teams: selectedTeams(), lead: field('lead').value || null, waitingOn: field('waitingOn').value, internalOnly: field('purpose').value === 'internal', notes: field('notes').value, owner: field('owner').value, tasks, attachments });
     const stage = field('stage').value;
     await authenticated();
     let id: Id<'plannerItems'>;
@@ -1248,7 +1403,7 @@ async function start(root: HTMLElement) {
       id = savingItem._id;
       await client.mutation(api.planner.save, { id, revision: savingItem.revision, ...payload, ...(savingItem.stage === 'published' ? { workflowStage: stage as Stage } : stage !== 'archived' ? { stage: stage as Stage } : {}) });
     } else id = await client.mutation(api.planner.create, { ...payload, stage: stage as Stage });
-    const [savedItems, savedItem] = await Promise.all([client.query(api.planner.list, { now: timeBucket() }), client.query(api.planner.get, { id, now: timeBucket() })]);
+    const [savedItems, savedItem] = await Promise.all([client.query(api.planner.list, { now: timeBucket(), workspace }), client.query(api.planner.get, { id, now: timeBucket() })]);
     if (!access || version !== previewVersion) return false;
     items = savedItems; current = savedItem;
     if (!current) throw new Error('Activity saved but could not be reloaded. Close and reopen the board.');
@@ -1262,11 +1417,11 @@ async function start(root: HTMLElement) {
     }
     if (cardDialog.open) { previewItem = current; renderCardPreview(); void loadActivity('refresh'); }
     $('delete-card').hidden = current.stage === 'archived';
-    $('item-state').textContent = `${labels[boardStage(current)]} · ${current.published ? 'Public version is live' : 'Private'}`;
+    $('item-state').textContent = `${stageLabel(boardStage(current), current)} · ${current.published ? 'Public version is live' : 'Private'}`;
     updatePreview(); render(); void loadArchive(true); if (view === 'calendar') void loadCalendar(true); return true;
   }
 
-  function setBusy(value: boolean) { busy = value; form.inert = value; field('stage').disabled = value; for (const id of ['save-item', 'publish-item', 'delete-card', 'unpublish-item']) $<HTMLButtonElement>(id).disabled = value; $<HTMLButtonElement>('help-description').disabled = value || aiBusy; updatePreview(); if (!value && profileRefreshPending && access) void refresh(); }
+  function setBusy(value: boolean) { busy = value; form.inert = value; field('stage').disabled = value; for (const id of ['save-item', 'publish-item', 'delete-card', 'unpublish-item']) $<HTMLButtonElement>(id).disabled = value; $<HTMLButtonElement>('help-description').disabled = value || aiBusy; updatePreview(); if (!value && (profileRefreshPending || refreshPending) && access) void refresh(); }
   function syncTeamPicker() {
     const summary = $('team-picker-summary'); summary.replaceChildren();
     for (const id of selectedTeams()) { const team = plannerTeams.find(team => team.id === id)!; const badge = el('span', team.name, 'team-badge'); badge.dataset.team = team.id; summary.append(badge); }
@@ -1327,6 +1482,7 @@ async function start(root: HTMLElement) {
   for (const id of ['card-tab', 'discussion-tab']) $(id).onkeydown = event => { if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) { event.preventDefault(); const target = event.key === 'Home' ? 'card-tab' : event.key === 'End' ? 'discussion-tab' : id === 'card-tab' ? 'discussion-tab' : 'card-tab'; $(target).click(); $(target).focus(); } };
   function closeCardOptions() { $<HTMLDetailsElement>('card-actions').open = false; }
   $('card-notes').onclick = () => { closeCardOptions(); $<HTMLDetailsElement>('private-options').open = true; field('notes').focus(); };
+  $('card-area').onclick = () => { closeCardOptions(); $<HTMLDetailsElement>('private-options').open = true; field('workspace').focus(); };
   $('card-waiting-toggle').onclick = () => { closeCardOptions(); $<HTMLDetailsElement>('private-options').open = true; $<HTMLDetailsElement>('waiting-details').open = true; field('waitingOn').focus(); };
   $('card-review').onclick = () => { closeCardOptions(); cardReviewOpen = !cardReviewOpen; updatePreview(); };
   $('card-people-toggle').onclick = () => { closeCardOptions(); $<HTMLDialogElement>('card-people-dialog').showModal(); };
@@ -1499,15 +1655,32 @@ async function start(root: HTMLElement) {
   $('sidebar-scrim').onclick = () => { setSidebar(true); $('toggle-sidebar').focus(); };
   document.addEventListener('keydown', event => { if (event.key === 'Escape' && document.body.classList.contains('sidebar-mobile-open')) { setSidebar(true); $('toggle-sidebar').focus(); } });
   window.matchMedia('(max-width: 720px)').addEventListener('change', () => { let collapsed = false; try { collapsed = localStorage.getItem('ai-planner-sidebar') === 'collapsed'; } catch {} setSidebar(mobileNav() || collapsed); syncMobileBoard(); resizeEditorFields(); });
-  document.querySelectorAll<HTMLButtonElement>('[data-view]').forEach(button => button.onclick = () => { view = button.dataset.view as typeof view;
-    document.querySelectorAll<HTMLButtonElement>('[data-view]').forEach(tab => tab.setAttribute('aria-pressed', String(tab === button)));
-    for (const name of ['board', 'calendar', 'archive']) $(name).hidden = name !== view;
-    $('board-scope').hidden = view !== 'board'; $('board-filters').hidden = view !== 'board'; $<HTMLDetailsElement>('board-filters').open = false; syncMobileBoard();
-    $('workspace-title').textContent = view === 'board' ? 'Committee board' : view === 'calendar' ? 'Calendar' : 'Archive';
+  async function navigatePlanner(area: PlannerWorkspace, nextView: typeof view, targetUrl?: string) {
+    if (boardOrderSaving) return false;
+    if (cardDialog.open && !await closeCard()) return false;
+    if (editor.open) { closeEditor(); if (editor.open) return false; }
+    if (targetUrl) window.history.pushState(null, '', targetUrl);
+    lastPlannerUrl = window.location.href;
+    workspaceVersion++; workspace = area; view = nextView; items = []; boardOrder = [...stages]; boardRevision = 0;
+    $<HTMLDetailsElement>('board-filters').open = false;
+    syncWorkspaceView(); render(); syncMobileBoard();
     if (mobileNav()) { setSidebar(true); $('toggle-sidebar').focus(); }
     if (view === 'archive') { renderArchive(); void loadArchive(); }
-    else void refresh();
+    void refresh();
+    return true;
+  }
+  document.querySelectorAll<HTMLAnchorElement>('[data-view]').forEach(link => link.onclick = event => {
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    if (boardOrderSaving) return;
+    void navigatePlanner((link.dataset.workspace as PlannerWorkspace) || workspace, link.dataset.view as typeof view, link.href);
   });
+  window.addEventListener('popstate', () => {
+    const next = new URLSearchParams(window.location.search).get('view');
+    void navigatePlanner(workspaceFromUrl(), next === 'calendar' || next === 'archive' ? next : 'board').then(changed => { if (!changed) window.history.pushState(null, '', lastPlannerUrl); });
+  });
+  field('workspace').addEventListener('change', () => { syncWorkspaceFields(); updatePreview(); scheduleAutosave(); });
+  syncWorkspaceView();
   function resetDescriptionHelp() {
     aiVersion++; aiRequest?.abort(); aiRequest = null; aiBusy = false; suggestedDescription = '';
     $('description-suggestion').hidden = true; $('suggested-description').textContent = ''; $('description-ai-message').textContent = '';

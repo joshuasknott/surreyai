@@ -13,6 +13,8 @@ export default defineSchema({
   plannerItems: defineTable(plannerFields)
     .index("by_societyId_and_updatedAt", ["societyId", "updatedAt"])
     .index("by_societyId_and_stage", ["societyId", "stage"])
+    .index("by_societyId_and_workspace_and_stage", ["societyId", "workspace", "stage"])
+    .index("by_societyId_and_workspace_and_updatedAt", ["societyId", "workspace", "updatedAt"])
     .index("by_societyId_and_date", ["societyId", "date"])
     .index("by_societyId_and_stage_and_kind_and_date", ["societyId", "stage", "kind", "date"]),
 
@@ -52,9 +54,19 @@ export default defineSchema({
 
   plannerBoardLayouts: defineTable({
     societyId: v.id("societies"),
+    // Legacy rows omit workspace and represent the Events list order.
+    workspace: v.optional(v.union(v.literal("events"), v.literal("outreach"), v.literal("hack2027"))),
     order: v.array(v.union(v.literal("ideas"), v.literal("planning"), v.literal("ready"), v.literal("done"))),
     revision: v.number(),
-  }).index("by_societyId", ["societyId"]),
+  }).index("by_societyId", ["societyId"])
+    .index("by_societyId_and_workspace", ["societyId", "workspace"]),
+
+  plannerSetups: defineTable({
+    societyId: v.id("societies"),
+    key: v.string(),
+    version: v.number(),
+    createdAt: v.number(),
+  }).index("by_societyId_and_key", ["societyId", "key"]),
 
   societies: defineTable({
     name: v.string(),

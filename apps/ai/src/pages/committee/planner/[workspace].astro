@@ -1,0 +1,9 @@
+---
+export const prerender = false;
+import Planner from '../planner.astro';
+
+if (!['events', 'outreach', 'hack2027'].includes(Astro.params.workspace || '')) {
+  return new Response('Not found', { status: 404 });
+}
+---
+<Planner />

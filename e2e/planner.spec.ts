@@ -8,6 +8,7 @@ import { api } from '../convex/_generated/api';
 import schema from '../convex/schema';
 import type { Activity } from '../convex/plannerModel';
 import { londonToday } from '../apps/ai/src/lib/programme';
+import { HACK_CHECKLIST_TEMPLATE, HACK_CHECKLIST_GROUPS } from '../convex/plannerHackTemplate';
 
 const origin = process.env.PLANNER_TEST_ORIGIN || 'http://127.0.0.1:4321';
 // Browser fixtures exercise real planner functions; delivery is covered by the
@@ -193,7 +194,8 @@ test('email link survives sign-in and opens an older comment on an archived card
 });
 async function navigate(page: Page, name: string) {
   if ((page.viewportSize()?.width || 1440) <= 720 && !await page.locator('body').evaluate(body => body.classList.contains('sidebar-mobile-open'))) await page.getByRole('button', { name: 'Open navigation', exact: true }).click();
-  await page.getByRole('button', { name, exact: true }).click();
+  const role = ['Board', 'Events', 'Outreach', 'Surrey AI Hack 2027', 'Calendar', 'Archive'].includes(name) ? 'link' : 'button';
+  await page.getByRole(role, { name: name === 'Board' ? 'Events' : name, exact: true }).click();
 }
 async function noOverflow(page: Page) { expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(1); }
 async function commentAction(scope: Page | Locator, name: 'Edit comment' | 'Delete comment') {
@@ -785,8 +787,12 @@ test('committee can prepare, publish, revise and unpublish without exposing priv
   await page.getByLabel('Start time', { exact: true }).fill('18:00');
   await page.getByLabel('End time', { exact: true }).fill('20:00');
   await page.getByLabel('Room or location', { exact: true }).fill('Stag Hill');
-  await page.getByLabel('Booking or project link', { exact: true }).fill('https://example.test/book');
+  await expect(page.getByLabel('Booking or project link (optional)', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Publish to website', exact: true })).toBeDisabled();
+  await expect(page.locator('#publication-missing')).toContainText('description');
+  await expect(page.locator('#publication-missing')).not.toContainText('booking link');
   await page.getByLabel('Description', { exact: true }).fill('Open to every degree.');
+  await expect(page.getByRole('button', { name: 'Publish to website', exact: true })).toBeEnabled();
   await page.locator('#private-options > summary').click();
   await page.getByLabel('Notes', { exact: true }).fill('PRIVATE_ONLY_COMMITTEE_NOTES');
   await saveActivity(page, 'Save draft');
@@ -797,14 +803,20 @@ test('committee can prepare, publish, revise and unpublish without exposing priv
   await expect(page.locator('#item-dialog')).not.toBeVisible();
   await publicPage.reload(); await expect(publicPage.locator('#programme')).toContainText('Committee integration workshop');
   await expect(publicPage.locator('body')).not.toContainText('PRIVATE_ONLY_COMMITTEE_NOTES');
+  const [published] = await t.query(api.planner.listPublished, {});
+  expect(published.registrationUrl).toBe('');
   await editCard(page, 'Committee integration workshop');
+  await page.locator('#activity-details > summary').click();
+  await page.getByLabel('Booking or project link (optional)', { exact: true }).fill('https://example.test/book');
   await page.getByLabel('Title', { exact: true }).fill('Revised committee workshop');
   await saveActivity(page, 'Save draft');
   await publicPage.reload(); await expect(publicPage.locator('#programme')).toContainText('Committee integration workshop');
   await expect(publicPage.locator('#programme')).not.toContainText('Revised committee workshop');
+  expect((await t.query(api.planner.getPublished, { id: published.id }))?.registrationUrl).toBe('');
   await cardAction(page, 'Publish changes');
   await expect(page.locator('#item-dialog')).not.toBeVisible();
   await publicPage.reload(); await expect(publicPage.locator('#programme')).toContainText('Revised committee workshop');
+  expect((await t.query(api.planner.getPublished, { id: published.id }))?.registrationUrl).toBe('https://example.test/book');
   await editCard(page, 'Revised committee workshop');
   page.once('dialog', dialog => dialog.accept());
   await cardAction(page, 'Unpublish and move to Ready');
@@ -1004,13 +1016,12 @@ test('Ideas needs only a title, description and optional collaborators; details 
   await page.getByLabel('Start time', { exact: true }).fill('18:00');
   await page.getByRole('combobox', { name: 'Stage', exact: true }).selectOption('ready');
   await expect(page.locator('#editor-preview')).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Publish to website', exact: true })).toBeDisabled();
-  await expect(page.locator('#publication-missing')).toContainText('booking link');
-  await page.getByLabel('Booking or project link', { exact: true }).fill('https://example.test/book');
   await expect(page.getByRole('button', { name: 'Publish to website', exact: true })).toBeEnabled();
+  await expect(page.getByLabel('Booking or project link (optional)', { exact: true })).toBeVisible();
+  await expect(page.locator('#publication-missing')).not.toContainText('booking link');
   await page.getByRole('combobox', { name: 'Stage', exact: true }).selectOption('ideas');
   await saveActivity(page, 'Save idea');
-  expect((await admin.query(api.planner.list, {}))[0]).toMatchObject({ location: '03AC01', registrationUrl: 'https://example.test/book', stage: 'ideas', owner: 'Josh, Mosie' });
+  expect((await admin.query(api.planner.list, {}))[0]).toMatchObject({ location: '03AC01', registrationUrl: '', stage: 'ideas', owner: 'Josh, Mosie' });
   await closeActivity(page);
   await expect(page.locator('[data-stage=ideas]')).not.toContainText('No date yet');
 });
@@ -2113,3 +2124,96 @@ for (const width of [1440, 390]) {
     await screenshot(page, `delete-flow-archive-${width}`);
   });
 }
+
+test('planning areas keep Events and Outreach separate and save relationship details', async ({ page, context }) => {
+  const { admin } = await fixture(context);
+  await admin.mutation(api.planner.create, { activity: { ...activity, title: 'Existing society event' }, internalOnly: true });
+  const outreachId = await admin.mutation(api.planner.create, { activity: { ...activity, title: 'Guest speaker conversation', date: '' }, workspace: 'outreach', outreachKind: 'Speakers', nextAction: 'Send a workshop brief' });
+  await page.goto(`${origin}/committee/planner/outreach`);
+  await expect(page.locator('#workspace')).toBeVisible();
+  await expect(page.locator('#workspace-title')).toHaveText('Outreach');
+  await expect(page.locator('#board')).toContainText('Send a workshop brief');
+  await expect(page.locator('#board')).not.toContainText('Existing society event');
+  await expect(page.getByRole('heading', { name: 'To approach', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Waiting for reply', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'In conversation', exact: true })).toBeVisible();
+  await editCard(page, 'Guest speaker conversation');
+  await page.getByLabel('Next action', { exact: true }).fill('Arrange a short call');
+  await page.getByRole('combobox', { name: 'Stage', exact: true }).selectOption('planning');
+  await closeActivity(page);
+  await expect.poll(async () => (await admin.query(api.planner.get, { id: outreachId }))?.nextAction).toBe('Arrange a short call');
+  await expect(page.locator('#board-stage-planning')).toContainText('Guest speaker conversation');
+  await page.reload();
+  await expect(page.locator('#board-stage-planning')).toContainText('Arrange a short call');
+  await screenshot(page, 'segmented-outreach-desktop');
+  await navigate(page, 'Events');
+  await expect(page).toHaveURL(`${origin}/committee/planner/events`);
+  await expect(page.locator('#board')).toContainText('Existing society event');
+  await expect(page.locator('#board')).not.toContainText('Guest speaker conversation');
+  await page.goBack();
+  await expect(page.locator('#workspace-title')).toHaveText('Outreach');
+  await expect(page.locator('#board')).toContainText('Guest speaker conversation');
+});
+
+test('Hack checklist seeds once, supports completion and retains editable task details', async ({ page, context }) => {
+  const count = HACK_CHECKLIST_TEMPLATE.length;
+  const { admin } = await fixture(context);
+  await page.goto(`${origin}/committee/planner/hack2027`);
+  await expect(page.locator('#hack-checklist')).toBeVisible();
+  await expect(page.locator('.hack-task-row')).toHaveCount(count);
+  await expect(page.locator('.hack-total')).toHaveText(`0 of ${count} complete`);
+  const title = 'Define the event purpose and audience';
+  await page.getByRole('checkbox', { name: `Complete ${title}`, exact: true }).check();
+  await expect(page.locator('.hack-total')).toHaveText(`1 of ${count} complete`);
+  const items = await admin.query(api.planner.list, { workspace: 'hack2027' });
+  const seeded = items.find(item => item.title === title)!;
+  expect(seeded.checklistDone).toBe(true);
+  expect(items.every(item => !item.lead && !item.date)).toBe(true);
+  await editCard(page, title);
+  await expect(page.locator('#task-list input[type=checkbox]')).toHaveCount(4);
+  await expect(page.locator('#item-form select[name=purpose]')).toBeDisabled();
+  await page.getByLabel('Description', { exact: true }).fill('Reviewed by the committee for the local preview.');
+  await closeActivity(page);
+  await expect.poll(async () => (await admin.query(api.planner.get, { id: seeded._id }))?.description).toBe('Reviewed by the committee for the local preview.');
+  await page.reload();
+  await expect(page.locator('.hack-task-row')).toHaveCount(count);
+  await expect(page.locator('.hack-total')).toHaveText(`1 of ${count} complete`);
+  await screenshot(page, 'segmented-hack-desktop');
+  const latest = (await admin.query(api.planner.get, { id: seeded._id }))!;
+  await admin.mutation(api.planner.move, { id: latest._id, revision: latest.revision, stage: 'archived' });
+  await page.reload();
+  await expect(page.locator('.hack-task-row')).toHaveCount(count - 1);
+  await expect(page.locator('.hack-total')).toHaveText(`0 of ${count - 1} complete`);
+  expect(await admin.mutation(api.planner.seedHackChecklist, {})).toEqual({ created: 0, alreadySeeded: true });
+});
+
+test('segmented planning pages support search, mobile navigation and responsive checklist rows', async ({ page, context }) => {
+  const count = HACK_CHECKLIST_TEMPLATE.length;
+  const { admin } = await fixture(context);
+  const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
+  await admin.mutation(api.planner.create, { activity: { ...activity, title: 'Alumni speaker network', date: '' }, workspace: 'outreach', outreachKind: 'Speakers', nextAction: 'Ask for introductions' });
+  await page.goto(`${origin}/committee/planner/hack2027`);
+  await expect(page.locator('.hack-task-row')).toHaveCount(count);
+  await page.getByRole('button', { name: 'Search cards', exact: true }).click();
+  await page.getByRole('searchbox').fill('catering');
+  await expect(page.locator('.hack-task-row')).not.toHaveCount(count);
+  await expect(page.locator('.hack-task-row')).not.toHaveCount(0);
+  await page.getByRole('searchbox').fill('');
+  await page.getByRole('button', { name: 'Collapse all', exact: true }).click();
+  await expect(page.locator('.hack-group[open]')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Expand all', exact: true }).click();
+  await expect(page.locator('.hack-group[open]')).toHaveCount(HACK_CHECKLIST_GROUPS.length);
+  for (const width of [320, 390, 834, 1485]) {
+    await page.setViewportSize({ width, height: width < 721 ? 844 : 1059 });
+    await noOverflow(page);
+    await screenshot(page, `segmented-hack-${width}`);
+    await navigate(page, 'Outreach');
+    await expect(page.locator('#workspace-title')).toHaveText('Outreach');
+    await expect(page.locator('#board')).toContainText('Ask for introductions');
+    await noOverflow(page);
+    await screenshot(page, `segmented-outreach-${width}`);
+    await navigate(page, 'Surrey AI Hack 2027');
+    await expect(page.locator('#hack-checklist')).toBeVisible();
+  }
+  expect(errors).toEqual([]);
+});

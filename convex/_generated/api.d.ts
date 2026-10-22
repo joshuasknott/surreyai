@@ -23,6 +23,7 @@ import type * as permissions from "../permissions.js";
 import type * as planner from "../planner.js";
 import type * as plannerEmail from "../plannerEmail.js";
 import type * as plannerFiles from "../plannerFiles.js";
+import type * as plannerHackTemplate from "../plannerHackTemplate.js";
 import type * as plannerModel from "../plannerModel.js";
 import type * as plannerSignIn from "../plannerSignIn.js";
 import type * as plannerTeams from "../plannerTeams.js";
@@ -54,6 +55,7 @@ declare const fullApi: ApiFromModules<{
   planner: typeof planner;
   plannerEmail: typeof plannerEmail;
   plannerFiles: typeof plannerFiles;
+  plannerHackTemplate: typeof plannerHackTemplate;
   plannerModel: typeof plannerModel;
   plannerSignIn: typeof plannerSignIn;
   plannerTeams: typeof plannerTeams;

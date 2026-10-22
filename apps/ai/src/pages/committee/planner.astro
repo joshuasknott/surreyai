@@ -1,8 +1,9 @@
 ---
 export const prerender = false;
 import BaseLayout from '@surreysocieties/ui/components/BaseLayout';
-import { ArrowUpRight, ArrowLeft, Plus, X, CalendarDays, MapPin, UsersRound, Sparkles, LockKeyhole, LogOut, Settings, Bell, Circle, AtSign, Send, Ellipsis, Columns3, Archive, ChevronsLeft, Menu, Search, MessageCircle, ListChecks, GripVertical, Check, Paperclip, FileText, Pencil, Upload, Image as ImageIcon, SlidersHorizontal, Clock3, Trash2 } from 'lucide-astro';
+import { ArrowUpRight, ArrowLeft, Plus, X, CalendarDays, MapPin, UsersRound, Sparkles, LockKeyhole, LogOut, Settings, Bell, Circle, AtSign, Send, Ellipsis, Columns3, Archive, ChevronsLeft, Menu, Search, MessageCircle, ListChecks, GripVertical, Check, Paperclip, FileText, Pencil, Upload, Image as ImageIcon, SlidersHorizontal, Clock3, Trash2, Megaphone, Trophy, ChevronDown } from 'lucide-astro';
 import { plannerTeams } from '../../../../../convex/plannerTeams';
+import { HACK_CHECKLIST_GROUPS } from '../../../../../convex/plannerHackTemplate';
 import { SOCIETIES } from '@surreysocieties/admin/config';
 import '../../styles/planner.css';
 import { isAIEnabled } from '../../lib/server/ai/gemini';
@@ -21,9 +22,13 @@ const convexUrl = process.env.CONVEX_URL || import.meta.env.CONVEX_URL || '';
     <button id="collapse-sidebar" class="icon-button" aria-label="Collapse navigation" aria-expanded="true" aria-controls="planner-sidebar"><ChevronsLeft size={18} /></button>
     </div>
     <nav id="workspace-nav" class="sidebar-nav" aria-label="Planner views" hidden>
-      <button data-view="board" aria-pressed="true" title="Board"><Columns3 size={20} /><span>Board</span></button>
-      <button data-view="calendar" aria-pressed="false" title="Calendar"><CalendarDays size={20} /><span>Calendar</span></button>
-      <button data-view="archive" aria-pressed="false" title="Archive"><Archive size={20} /><span>Archive</span></button>
+      <span class="sidebar-section-label">Planner</span>
+      <a href="/committee/planner/events" data-view="board" data-workspace="events" aria-current="page" title="Events"><CalendarDays size={20} /><span>Events</span></a>
+      <a href="/committee/planner/outreach" data-view="board" data-workspace="outreach" title="Outreach"><Megaphone size={20} /><span>Outreach</span></a>
+      <a href="/committee/planner/hack2027" data-view="board" data-workspace="hack2027" title="Surrey AI Hack 2027"><Trophy size={20} /><span>Surrey AI Hack<br />2027</span></a>
+      <span class="sidebar-nav-divider" aria-hidden="true"></span>
+      <a href="/committee/planner?view=calendar" data-view="calendar" title="Calendar"><CalendarDays size={20} /><span>Calendar</span></a>
+      <a href="/committee/planner?view=archive" data-view="archive" title="Archive"><Archive size={20} /><span>Archive</span></a>
     </nav>
     <div class="sidebar-bottom">
       <a href="/" target="_blank" rel="noopener" title="View website"><ArrowUpRight size={20} /><span>View website</span></a>
@@ -36,7 +41,7 @@ const convexUrl = process.env.CONVEX_URL || import.meta.env.CONVEX_URL || '';
   <main id="planner-main" data-planner data-key={publishableKey} data-convex={convexUrl} data-ai={String(isAIEnabled())}>
     <header class="planner-header">
       <button id="toggle-sidebar" class="icon-button" aria-label="Open navigation" aria-expanded="false" aria-controls="planner-sidebar"><Menu size={22} /></button>
-      <h1><LockKeyhole size={18} aria-hidden="true" /><span id="workspace-title">Committee board</span></h1>
+      <h1><LockKeyhole size={18} aria-hidden="true" /><span id="workspace-title">Events</span></h1>
       <div class="planner-header-actions">
         <button id="open-members" class="member-stack" hidden aria-label="View committee members" title="Committee members"></button>
         <button id="open-notifications" class="icon-button notification-trigger" hidden aria-label="Notifications" title="Notifications"><Bell size={22} /><span id="notification-count" class="notification-count" aria-hidden="true" hidden></span></button>
@@ -75,6 +80,7 @@ const convexUrl = process.env.CONVEX_URL || import.meta.env.CONVEX_URL || '';
       <div id="board-search" class="board-search" hidden><label for="card-search" class="sr-only">Search cards</label><input id="card-search" type="search" placeholder="Search cards…" autocomplete="off" /></div>
       <div id="board-stage-tabs" class="board-stage-tabs" role="tablist" aria-label="Board stages"></div>
       <div id="board" class="planner-board"></div>
+      <div id="hack-checklist" class="hack-checklist" hidden></div>
       <div id="calendar" class="planner-calendar" hidden></div>
       <div id="archive" hidden></div>
     </section>
@@ -82,7 +88,7 @@ const convexUrl = process.env.CONVEX_URL || import.meta.env.CONVEX_URL || '';
   </main>
 
   <dialog id="card-dialog" class="card-dialog" aria-labelledby="item-heading">
-    <header class="card-preview-top"><div class="card-header-context"><LockKeyhole size={16} /><span>Committee board</span><div id="card-stage-slot"></div></div><div class="card-preview-actions"><details id="card-actions" class="card-options"><summary aria-label="Card options"><Ellipsis size={20} /></summary><div id="card-actions-slot" class="card-options-panel"></div></details><button type="button" id="delete-card" class="icon-button danger" aria-label="Delete card" title="Delete card" hidden><Trash2 size={20} /></button><button type="button" data-close class="icon-button" aria-label="Close card"><X size={22} /></button></div></header>
+    <header class="card-preview-top"><div class="card-header-context"><LockKeyhole size={16} /><span id="card-workspace-label">Events</span><div id="card-stage-slot"></div></div><div class="card-preview-actions"><details id="card-actions" class="card-options"><summary aria-label="Card options"><Ellipsis size={20} /></summary><div id="card-actions-slot" class="card-options-panel"></div></details><button type="button" id="delete-card" class="icon-button danger" aria-label="Delete card" title="Delete card" hidden><Trash2 size={20} /></button><button type="button" data-close class="icon-button" aria-label="Close card"><X size={22} /></button></div></header>
     <div class="card-mobile-tabs" role="tablist" aria-label="Card panels"><button type="button" role="tab" aria-selected="true" aria-controls="card-editor-slot" id="card-tab">Card</button><button type="button" role="tab" aria-selected="false" aria-controls="card-discussion" id="discussion-tab">Discussion</button></div>
     <div class="card-workspace"><div id="card-editor-slot" role="region" aria-label="Card details"></div>
     <section class="card-comments" aria-labelledby="card-comments-title">
@@ -111,7 +117,7 @@ const convexUrl = process.env.CONVEX_URL || import.meta.env.CONVEX_URL || '';
   <dialog id="item-dialog" class="item-dialog" aria-labelledby="item-heading">
     <form id="item-form">
       <div class="editor-top"><button type="button" data-close class="quiet-button"><ArrowLeft size={16} /><span id="editor-back-label">Planner</span></button><span id="item-state" class="muted">Idea · Private</span><button type="button" data-close class="icon-button" aria-label="Close activity"><X size={20} /></button></div>
-      <div class="editor-actions"><h2 id="item-heading">New activity</h2><div id="editor-action-buttons"><button type="submit" form="item-form" id="save-item" class="secondary-button">Save draft</button><button type="button" id="publish-item" class="primary-button" hidden>Publish to website</button><button type="button" id="card-review" class="quiet-button" hidden>Review website details</button><button type="button" id="card-notes" class="quiet-button" hidden>Notes &amp; collaborators</button><button type="button" id="card-waiting-toggle" class="quiet-button" hidden>Set waiting status</button><button type="button" id="card-people-toggle" class="quiet-button" hidden>Worked on by</button></div></div>
+      <div class="editor-actions"><h2 id="item-heading">New activity</h2><div id="editor-action-buttons"><button type="submit" form="item-form" id="save-item" class="secondary-button">Save draft</button><button type="button" id="publish-item" class="primary-button" hidden>Publish to website</button><button type="button" id="card-review" class="quiet-button" hidden>Review website details</button><button type="button" id="card-notes" class="quiet-button" hidden>Notes &amp; collaborators</button><button type="button" id="card-area" class="quiet-button" hidden>Change planning area</button><button type="button" id="card-waiting-toggle" class="quiet-button" hidden>Set waiting status</button><button type="button" id="card-people-toggle" class="quiet-button" hidden>Worked on by</button></div></div>
       <p id="item-message" role="status" class="form-message"></p>
       <div class="editor-stage-bar"><label id="stage-field">Stage<select name="stage" form="item-form"><option value="ideas">Ideas</option><option value="planning">In progress</option><option value="ready">Ready</option></select></label><p id="stage-help" class="field-help">Start with a title and a few words. Work out the details later.</p></div>
       <div class="editor-columns">
@@ -123,6 +129,15 @@ const convexUrl = process.env.CONVEX_URL || import.meta.env.CONVEX_URL || '';
           <label class="lead-field">Lead<div class="lead-control"><span id="lead-avatar" class="person-avatar" aria-hidden="true"></span><select name="lead"><option value="">Unassigned</option><optgroup label="Signatories">{SOCIETIES.ai.signatories.map(person => <option value={person.name}>{person.name}</option>)}</optgroup>{plannerTeams.map(team => <optgroup label={team.name}>{team.members.map(name => <option value={name}>{name}</option>)}</optgroup>)}</select></div></label>
           <label id="internal-due-label">Due<input type="date" name="dueDate" aria-label="Due date (optional)" /></label>
           <label class="purpose-field">Card purpose<select name="purpose"><option value="internal">Internal work</option><option value="activity">Website activity</option></select></label>
+          </div>
+
+          <div id="outreach-fields" class="workspace-extra-fields" hidden>
+            <label>Relationship type<select name="outreachKind"><option value="">Choose a type</option><option>Speakers</option><option>Sponsorship</option><option>University</option><option>Collaboration</option><option>Community</option><option>Other</option></select></label>
+            <label>Next action<input name="nextAction" maxlength="300" placeholder="What should happen next?" autocomplete="off" /></label>
+          </div>
+          <div id="hack-fields" class="workspace-extra-fields" hidden>
+            <label>Planning group<select name="checklistGroup">{HACK_CHECKLIST_GROUPS.map(group => <option value={group.id}>{group.title}</option>)}<option value="other">Other tasks</option></select></label>
+            <label class="hack-complete-field"><input type="checkbox" name="checklistDone" />Completed</label>
           </div>
 
           <div class="description-field">
@@ -137,10 +152,10 @@ const convexUrl = process.env.CONVEX_URL || import.meta.env.CONVEX_URL || '';
             <div class="field-pair"><label>Type<select name="kind"><option value="event">Event</option><option value="project">Project</option><option value="hackathon">Hackathon</option></select></label><label>Category<select name="category"><option>Workshop</option><option>Talk</option><option>Social</option><option>Project session</option><option>Other</option></select></label></div>
             <div class="field-pair"><label>Date<input type="date" name="date" /></label><label>Room or location<input name="location" maxlength="200" autocomplete="off" placeholder="Room number, venue or online" /></label></div>
             <div class="field-pair"><label>Start time<input type="time" name="startTime" /></label><label>End time<input type="time" name="endTime" /></label></div>
-            <label>Booking or project link<input type="url" name="registrationUrl" maxlength="1500" placeholder="https://" /></label>
-            <p class="field-help">Times use Europe/London. Events need a room or location and booking link before publishing. Ongoing projects can stay undated.</p>
+            <label>Booking or project link (optional)<input type="url" name="registrationUrl" maxlength="1500" placeholder="https://" /></label>
+            <p class="field-help">Times use Europe/London. Publishing needs a description; events also need a date, start time and room or location. Booking and project links are optional. Ongoing projects can stay undated.</p>
           </div></details>
-          <details id="private-options" class="private-fields card-detail-panel" hidden><summary>Notes &amp; collaborators <span>Private · optional</span></summary><div class="detail-panel-content"><button type="button" class="close-card-panel icon-button" aria-label="Close private details"><X size={18} /></button><div id="card-collaborators-slot"></div><details id="waiting-details" class="waiting-details"><summary><Clock3 size={16} /><span>Set waiting status</span></summary><label class="waiting-field">Waiting on (optional)<input name="waitingOn" aria-label="Waiting on (optional)" maxlength="160" placeholder="e.g. Room confirmation or budget approval" /><span class="field-help">Shown on the board until you clear it.</span></label></details><label>Notes<textarea name="notes" rows="3" maxlength="8000"></textarea></label></div></details>
+          <details id="private-options" class="private-fields card-detail-panel" hidden><summary>Notes &amp; collaborators <span>Private · optional</span></summary><div class="detail-panel-content"><button type="button" class="close-card-panel icon-button" aria-label="Close private details"><X size={18} /></button><label class="workspace-field">Planning area<select name="workspace"><option value="events">Events</option><option value="outreach">Outreach</option><option value="hack2027">Surrey AI Hack 2027</option></select></label><div id="card-collaborators-slot"></div><details id="waiting-details" class="waiting-details"><summary><Clock3 size={16} /><span>Set waiting status</span></summary><label class="waiting-field">Waiting on (optional)<input name="waitingOn" aria-label="Waiting on (optional)" maxlength="160" placeholder="e.g. Room confirmation or budget approval" /><span class="field-help">Shown on the board until you clear it.</span></label></details><label>Notes<textarea name="notes" rows="3" maxlength="8000"></textarea></label></div></details>
           <fieldset id="card-checklist" class="checklist"><legend>Checklist <progress id="task-progress-bar" max="1" value="0" aria-label="Checklist progress" hidden></progress><span id="task-progress"></span></legend><div id="task-list"></div><div class="add-task"><input id="task-text" maxlength="300" aria-label="New checklist task" placeholder="Add an item…" /><button type="button" id="add-task" class="quiet-button" aria-label="Add checklist item"><Plus size={16} /></button></div></fieldset>
           <section id="card-attachments" class="card-attachments"><div class="attachment-heading"><h3>Attachments</h3><button type="button" id="add-attachment" class="icon-button" aria-label="Add attachment"><Plus size={15} /><span>Add attachment</span></button></div><div id="attachment-list"></div><p id="file-upload-status" role="status" class="file-upload-status" hidden></p><div class="file-upload-actions"><button type="button" id="retry-file-upload" class="quiet-button" hidden>Retry upload</button><button type="button" id="cancel-file-upload" class="quiet-button" hidden>Cancel upload</button></div><div id="attachment-editor" hidden><label class="file-upload-picker" for="attachment-file"><Upload size={20} /><strong>Upload files</strong><span>PDFs and images · up to 10 MB each</span></label><input type="file" id="attachment-file" class="sr-only" aria-label="Choose attachment files" accept=".pdf,.png,.jpg,.jpeg,.gif,.webp,.avif" multiple /><p id="file-upload-help" class="field-help" hidden>Save this card before uploading files.</p><div class="attachment-link-divider">or add a link</div><label>Link<input type="text" inputmode="url" id="attachment-url" placeholder="https://" /></label><label>Name<input id="attachment-name" maxlength="160" placeholder="Document or link name" /></label><div><button type="button" id="save-attachment" class="quiet-button">Add link</button><button type="button" id="cancel-attachment" class="quiet-button">Cancel</button></div><p id="attachment-error" role="status" class="form-message"></p></div></section>
         </div>
@@ -185,6 +200,7 @@ const convexUrl = process.env.CONVEX_URL || import.meta.env.CONVEX_URL || '';
   </dialog>
 
   <template id="plus-icon"><Plus size={17} aria-hidden="true" /></template>
+  <template id="disclosure-icon"><ChevronDown size={16} aria-hidden="true" /></template>
   <template id="close-icon"><X size={15} aria-hidden="true" /></template>
   <template id="drag-icon"><GripVertical size={17} aria-hidden="true" /></template>
   <template id="waiting-icon"><Clock3 size={15} aria-hidden="true" /></template>

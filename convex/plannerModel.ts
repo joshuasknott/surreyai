@@ -19,6 +19,9 @@ export const activePlanningStage = v.union(v.literal("ideas"), v.literal("planni
 export type ActivePlanningStage = Infer<typeof activePlanningStage>;
 export const planningStage = v.union(activePlanningStage, v.literal("done"));
 export const plannerTeam = v.union(v.literal('learning'), v.literal('events'), v.literal('industry'), v.literal('projects'), v.literal('careers'));
+export const plannerWorkspace = v.union(v.literal('events'), v.literal('outreach'), v.literal('hack2027'));
+export type PlannerWorkspace = Infer<typeof plannerWorkspace>;
+export const defaultPlannerWorkspace: PlannerWorkspace = 'events';
 export const itemStage = v.union(planningStage, v.literal("published"), v.literal("archived"));
 export const taskValidator = v.object({ text: v.string(), done: v.boolean() });
 export const plannerAttachmentValidator = v.object({ name: v.string(), url: v.string() });
@@ -69,6 +72,13 @@ export type PlannerNotification = Infer<typeof plannerNotificationValidator>;
 export const plannerFields = {
   ...activityFields,
   societyId: v.id("societies"),
+  // Rows written before planner workspaces existed omit this field and are
+  // projected as Events by the read paths.
+  workspace: v.optional(plannerWorkspace),
+  outreachKind: v.optional(v.string()),
+  nextAction: v.optional(v.string()),
+  checklistGroup: v.optional(v.string()),
+  checklistDone: v.optional(v.boolean()),
   stage: itemStage,
   team: v.optional(v.union(plannerTeam, v.null())),
   teams: v.optional(v.array(plannerTeam)),
@@ -95,6 +105,7 @@ export const plannerItemValidator = v.object({
 export const publicActivityValidator = v.object({ id: v.id("plannerItems"), ...activityFields });
 export const calendarItemValidator = v.object({
   _id: v.id("plannerItems"), stage: itemStage,
+  workspace: v.optional(plannerWorkspace),
   team: v.optional(v.union(plannerTeam, v.null())),
   teams: v.optional(v.array(plannerTeam)),
   internalOnly: v.optional(v.boolean()),
@@ -139,7 +150,6 @@ export function cleanActivity(input: Activity, publishing = false): Activity {
     if (result.kind !== "project" && (!result.date || !result.startTime || !result.location)) {
       throw new Error("Add a date, start time and location before publishing");
     }
-    if (result.kind !== "project" && !result.registrationUrl) throw new Error("Add a booking link before publishing");
   }
   return result;
 }

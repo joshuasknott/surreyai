@@ -6,6 +6,7 @@ import schema from './schema';
 import type { Activity } from './plannerModel';
 import { plannerToday, personInitials } from './plannerModel';
 import { mentionTokens } from './lib/plannerMentions';
+import { HACK_CHECKLIST_TEMPLATE } from './plannerHackTemplate';
 
 const modules = import.meta.glob('./**/*.ts');
 const activity: Activity = { title: 'AI workshop', kind: 'event', category: 'Workshop', description: 'A beginner workshop.', date: '2026-10-29', startTime: '18:00', endTime: '20:00', location: 'Stag Hill', registrationUrl: 'https://example.test/signup' };
@@ -200,6 +201,11 @@ describe('team board workflow', () => {
     const changed = ['ready', 'ideas', 'planning'] as const;
     expect(await admin.query(api.planner.boardLayout, {})).toEqual({ order: original, revision: 0 });
     await t.run(ctx => ctx.db.insert('plannerBoardLayouts', { societyId, order: ['done', 'ready', 'ideas', 'planning'], revision: 4 }));
+    await t.run(async ctx => {
+      for (let revision = 0; revision < 25; revision++) {
+        await ctx.db.insert('plannerBoardLayouts', { societyId, workspace: 'hack2027', order: ['ideas', 'planning', 'ready'], revision });
+      }
+    });
     expect(await admin.query(api.planner.boardLayout, {})).toEqual({ order: ['ready', 'ideas', 'planning'], revision: 4 });
     await expect(t.query(api.planner.boardLayout, {})).rejects.toThrow('Committee access');
     await expect(t.mutation(api.planner.reorderBoard, { order: [...changed], revision: 0 })).rejects.toThrow('Committee access');
@@ -208,6 +214,90 @@ describe('team board workflow', () => {
     expect(await admin.query(api.planner.boardLayout, {})).toEqual({ order: changed, revision: 5 });
     await expect(admin.mutation(api.planner.reorderBoard, { order: [...original], revision: 0 })).rejects.toThrow('Someone else reordered');
     expect(await admin.query(api.planner.boardLayout, {})).toEqual({ order: changed, revision: 5 });
+  });
+
+  it('keeps Events, Outreach, and Hack workspaces isolated while defaulting legacy rows to Events', async () => {
+    const { admin, t } = await setup();
+    const outreach = await admin.mutation(api.planner.create, {
+      activity: { ...activity, title: 'Partner conversations' }, workspace: 'outreach',
+      outreachKind: 'Sponsor', nextAction: 'Send the brief',
+    });
+    const hack = await admin.mutation(api.planner.create, {
+      activity: { ...activity, title: 'Hack venue shortlist' }, workspace: 'hack2027',
+      checklistGroup: 'Venue', checklistDone: false,
+    });
+    const hackWithDone = await admin.mutation(api.planner.create, {
+      activity: { ...activity, title: 'Completed Hack decision' }, workspace: 'hack2027',
+      checklistGroup: 'Programme', checklistDone: true,
+    });
+    const legacy = await admin.mutation(api.planner.create, { activity: { ...activity, title: 'Legacy event' } });
+    await t.run(ctx => ctx.db.patch(legacy, { workspace: undefined }));
+    expect((await admin.query(api.planner.list, { workspace: 'events' })).map(item => item._id)).toContain(legacy);
+    expect((await admin.query(api.planner.list, { workspace: 'events' })).map(item => item._id)).not.toContain(outreach);
+    expect((await admin.query(api.planner.list, { workspace: 'outreach' })).map(item => item._id)).toEqual([outreach]);
+    expect((await admin.query(api.planner.list, { workspace: 'hack2027' })).map(item => item._id)).toEqual(expect.arrayContaining([hack, hackWithDone]));
+    expect(await admin.query(api.planner.get, { id: legacy })).toMatchObject({ workspace: 'events' });
+    expect(await admin.query(api.planner.get, { id: outreach })).toMatchObject({ internalOnly: true, outreachKind: 'Sponsor', nextAction: 'Send the brief' });
+    await expect(admin.mutation(api.planner.publish, { id: outreach, revision: 1 })).rejects.toThrow('Only Events');
+    await expect(admin.mutation(api.planner.setChecklistDone, { id: outreach, revision: 1, done: true })).rejects.toThrow('Hack 2027');
+    await admin.mutation(api.planner.save, {
+      id: outreach, revision: 1, activity: { ...activity, title: 'Partner conversations' }, workspace: 'events',
+      internalOnly: false, notes: '', owner: '', tasks: [],
+    });
+    expect(await admin.query(api.planner.get, { id: outreach })).toMatchObject({ workspace: 'events' });
+    expect(await admin.query(api.planner.get, { id: outreach })).not.toHaveProperty('outreachKind');
+    expect(await admin.query(api.planner.get, { id: outreach })).not.toHaveProperty('nextAction');
+    await admin.mutation(api.planner.save, {
+      id: hackWithDone, revision: 1, activity: { ...activity, title: 'Completed Hack decision' }, workspace: 'events',
+      internalOnly: false, notes: '', owner: '', tasks: [],
+    });
+    expect(await admin.query(api.planner.get, { id: hackWithDone })).toMatchObject({ workspace: 'events' });
+    expect(await admin.query(api.planner.get, { id: hackWithDone })).not.toHaveProperty('checklistGroup');
+    expect(await admin.query(api.planner.get, { id: hackWithDone })).not.toHaveProperty('checklistDone');
+    await expect(admin.mutation(api.planner.publish, { id: hack, revision: 1 })).rejects.toThrow('Only Events');
+    expect(await admin.query(api.planner.boardLayout, { workspace: 'events' })).toMatchObject({ revision: 0 });
+    expect(await admin.query(api.planner.boardLayout, { workspace: 'outreach' })).toMatchObject({ revision: 0 });
+    await admin.mutation(api.planner.reorderBoard, { workspace: 'outreach', order: ['ready', 'ideas', 'planning'], revision: 0 });
+    expect(await admin.query(api.planner.boardLayout, { workspace: 'events' })).toMatchObject({ order: ['ideas', 'planning', 'ready'], revision: 0 });
+    expect(await admin.query(api.planner.boardLayout, { workspace: 'outreach' })).toMatchObject({ order: ['ready', 'ideas', 'planning'], revision: 1 });
+  });
+
+  it('keeps legacy Events visible when more than 200 newer non-Events cards share a stage', async () => {
+    const { admin, t, societyId } = await setup();
+    const legacy = await t.run(ctx => ctx.db.insert('plannerItems', {
+      ...activity, societyId, stage: 'ideas', notes: '', owner: '', tasks: [], revision: 1, updatedAt: 1,
+    }));
+    await t.run(async ctx => {
+      for (let index = 0; index < 205; index++) {
+        await ctx.db.insert('plannerItems', {
+          ...activity, title: `Outreach ${index}`, societyId, workspace: 'outreach', internalOnly: true,
+          stage: 'ideas', notes: '', owner: '', tasks: [], revision: 1, updatedAt: index + 2,
+        });
+      }
+    });
+    const events = await admin.query(api.planner.list, { workspace: 'events' });
+    expect(events.map(item => item._id)).toContain(legacy);
+    expect(events).toHaveLength(1);
+  });
+
+  it('seeds the Hack checklist once, leaves cards unassigned, and requires committee access', async () => {
+    const { admin, t } = await setup();
+    await expect(t.mutation(api.planner.seedHackChecklist, {})).rejects.toThrow('Committee access');
+    const first = await admin.mutation(api.planner.seedHackChecklist, {});
+    expect(first).toEqual({ created: HACK_CHECKLIST_TEMPLATE.length, alreadySeeded: false });
+    const seeded = await admin.query(api.planner.list, { workspace: 'hack2027' });
+    expect(seeded).toHaveLength(HACK_CHECKLIST_TEMPLATE.length);
+    expect(seeded.every(item => item.owner === '' && item.internalOnly && item.date === '' && item.checklistDone === false)).toBe(true);
+    expect(seeded.every(item => item.tasks.every(task => task.done === false))).toBe(true);
+    const firstCard = seeded[0];
+    expect(await admin.mutation(api.planner.setChecklistDone, { id: firstCard._id, revision: firstCard.revision, done: true })).toBe(firstCard.revision + 1);
+    expect(await admin.query(api.planner.get, { id: firstCard._id })).toMatchObject({ checklistDone: true, revision: firstCard.revision + 1 });
+    await expect(admin.mutation(api.planner.setChecklistDone, { id: firstCard._id, revision: firstCard.revision, done: false })).rejects.toThrow('Someone else updated');
+    const second = await admin.mutation(api.planner.seedHackChecklist, {});
+    expect(second).toEqual({ created: 0, alreadySeeded: true });
+    expect(await admin.query(api.planner.list, { workspace: 'hack2027' })).toHaveLength(HACK_CHECKLIST_TEMPLATE.length);
+    const markerRows = await t.run(ctx => ctx.db.query('plannerSetups').take(10));
+    expect(markerRows).toHaveLength(1);
   });
   it('persists and clears teams, keeps internal work private and preserves overdue tasks', async () => {
     const { admin, t } = await setup();
@@ -333,12 +423,20 @@ describe('explicit publication and privacy', () => {
     expect(await t.query(api.planner.listPublished, {})).toEqual([]);
   });
 
-  it('requires a booking link only when publishing events and hackathons', async () => {
-    const { admin } = await setup();
+  it('publishes events and hackathons without booking links but still requires a public description', async () => {
+    const { t, admin } = await setup();
     for (const kind of ['event', 'hackathon'] as const) {
-      const id = await admin.mutation(api.planner.create, { activity: { ...activity, kind, registrationUrl: '' }, stage: 'ready' });
-      await expect(admin.mutation(api.planner.publish, { id, revision: 1 })).rejects.toThrow('booking link');
+      const withoutBookingLink = { ...activity, kind, registrationUrl: '' };
+      const id = await admin.mutation(api.planner.create, { activity: withoutBookingLink, stage: 'ready' });
+      await admin.mutation(api.planner.publish, { id, revision: 1 });
+      expect(await t.query(api.planner.getPublished, { id })).toEqual({ id, ...withoutBookingLink });
     }
+
+    const missingDescription = await admin.mutation(api.planner.create, {
+      activity: { ...activity, description: '', registrationUrl: '' }, stage: 'ready',
+    });
+    await expect(admin.mutation(api.planner.publish, { id: missingDescription, revision: 1 })).rejects.toThrow('public description');
+    expect(await t.query(api.planner.getPublished, { id: missingDescription })).toBeNull();
   });
   it('keeps Ideas, Planning and Ready private, including direct activity requests', async () => {
     const { t, admin } = await setup();

@@ -8,11 +8,25 @@ import {
   activityValidator, cleanActivity, planningStage, activePlanningStage, plannerTeam, publicFields,
   plannerItemValidator, publicActivityValidator, taskValidator, plannerAttachmentValidator, plannerFileValidator, plannerProfileValidator,
   calendarItemValidator, plannerToday,
+  plannerWorkspace, defaultPlannerWorkspace, type PlannerWorkspace,
   plannerCommentValidator, plannerActivityValidator, personInitials, type PlannerPerson, type PlannerActivity,
   plannerMentionValidator, plannerNotificationValidator, type PlannerMention, type PlannerNotification,
 } from "./plannerModel";
 import { mentionTokens } from "./lib/plannerMentions";
 import { plannerLeads, plannerTeams, type PlannerTeam } from "./plannerTeams";
+import { HACK_CHECKLIST_TEMPLATE } from "./plannerHackTemplate";
+
+const hackChecklistSeedKey = "hack2027-checklist";
+
+function workspaceFor(item: Pick<Doc<"plannerItems">, "workspace">): PlannerWorkspace {
+  return item.workspace ?? defaultPlannerWorkspace;
+}
+
+function cleanWorkspaceText(value: string, label: string, limit: number) {
+  const clean = value.trim();
+  if (clean.length > limit) throw new Error(`Keep ${label} under ${limit} characters`);
+  return clean;
+}
 
 function validateAssignment(teams?: PlannerTeam[], lead?: string | null) {
   if (teams && (teams.length > plannerTeams.length || new Set(teams).size !== teams.length)) throw new Error("Choose each team only once");
@@ -157,7 +171,12 @@ async function profileNames(ctx: QueryCtx | MutationCtx, societyId: Id<'societie
     const profile = byEmail.get(value.email);
     return profile ? { ...value, name: profile.displayName, initials: personInitials(profile.displayName, value.email) } : value;
   };
-  return { person, mention, item: (item: Doc<'plannerItems'>) => ({ ...item, ...(item.createdBy ? { createdBy: person(item.createdBy) } : {}), ...(item.contributors ? { contributors: item.contributors.map(person) } : {}) }) };
+  return { person, mention, item: (item: Doc<'plannerItems'>) => ({
+    ...item,
+    workspace: workspaceFor(item),
+    ...(item.createdBy ? { createdBy: person(item.createdBy) } : {}),
+    ...(item.contributors ? { contributors: item.contributors.map(person) } : {}),
+  }) };
 }
 
 export const profiles = query({
@@ -477,9 +496,9 @@ export const markAllNotificationsRead = mutation({
 });
 
 export const list = query({
-  args: { archived: v.optional(v.boolean()), now: v.optional(v.number()) },
+  args: { workspace: v.optional(plannerWorkspace), archived: v.optional(v.boolean()), now: v.optional(v.number()) },
   returns: v.array(plannerItemValidator),
-  handler: async (ctx, { archived, now }) => {
+  handler: async (ctx, { workspace, archived, now }) => {
     const { ai } = await requireCommittee(ctx);
     const names = await profileNames(ctx, ai._id);
     const clock = now === undefined ? new Date() : new Date(now);
@@ -503,9 +522,23 @@ export const list = query({
       }
       return [...result.values()].sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 200).map(item => names.item(archivedProjection(item)));
     }
+    const selectedWorkspace = workspace ?? defaultPlannerWorkspace;
     const stages = ["ideas", "planning", "ready", "published"] as const;
-    return (await Promise.all(stages.map(stage => ctx.db.query("plannerItems")
-      .withIndex("by_societyId_and_stage", q => q.eq("societyId", ai._id).eq("stage", stage)).order("desc").take(100)))).flat()
+    const rowsForStage = async (stage: typeof stages[number]) => {
+      const scoped = await ctx.db.query("plannerItems")
+        .withIndex("by_societyId_and_workspace_and_stage", q => q.eq("societyId", ai._id).eq("workspace", selectedWorkspace).eq("stage", stage))
+        .order("desc").take(200);
+      if (selectedWorkspace !== defaultPlannerWorkspace) return scoped;
+      // Existing rows predate workspaces and intentionally default to Events;
+      // include them alongside rows written with the durable field.
+      const legacy = await ctx.db.query("plannerItems")
+        .withIndex("by_societyId_and_workspace_and_stage", q => q.eq("societyId", ai._id).eq("workspace", undefined).eq("stage", stage))
+        .order("desc").take(200);
+      const merged = new Map<string, Doc<"plannerItems">>();
+      for (const item of [...scoped, ...legacy]) if (workspaceFor(item) === selectedWorkspace) merged.set(item._id, item);
+      return [...merged.values()].sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 200);
+    };
+    return (await Promise.all(stages.map(rowsForStage))).flat()
       .filter(item => !isEffectivelyArchived(item, clock)).map(names.item);
   },
 });
@@ -519,24 +552,43 @@ function normalizeBoardOrder(order: readonly string[]): typeof defaultBoardOrder
 }
 
 export const boardLayout = query({
-  args: {}, returns: boardLayoutValidator,
-  handler: async ctx => {
+  args: { workspace: v.optional(plannerWorkspace) }, returns: boardLayoutValidator,
+  handler: async (ctx, { workspace }) => {
     const { ai } = await requireCommittee(ctx);
-    const layout = await ctx.db.query("plannerBoardLayouts").withIndex("by_societyId", q => q.eq("societyId", ai._id)).unique();
+    const selectedWorkspace = workspace ?? defaultPlannerWorkspace;
+    const rows = await ctx.db.query("plannerBoardLayouts")
+      .withIndex("by_societyId_and_workspace", q => q.eq("societyId", ai._id).eq("workspace", selectedWorkspace))
+      .take(2);
+    let layout: Doc<"plannerBoardLayouts"> | undefined = rows[0];
+    if (!layout && selectedWorkspace === defaultPlannerWorkspace) {
+      // The old table row has no workspace field. Query that exact index key
+      // so newer Outreach/Hack layouts cannot hide or replace it.
+      const candidates = await ctx.db.query("plannerBoardLayouts")
+        .withIndex("by_societyId_and_workspace", q => q.eq("societyId", ai._id).eq("workspace", undefined)).take(2);
+      layout = candidates[0];
+    }
     return layout ? { order: normalizeBoardOrder(layout.order), revision: layout.revision } : { order: [...defaultBoardOrder], revision: 0 };
   },
 });
 
 export const reorderBoard = mutation({
-  args: { order: v.array(activePlanningStage), revision: v.number() }, returns: v.number(),
-  handler: async (ctx, { order, revision }) => {
+  args: { workspace: v.optional(plannerWorkspace), order: v.array(activePlanningStage), revision: v.number() }, returns: v.number(),
+  handler: async (ctx, { workspace, order, revision }) => {
     const { ai } = await requireCommittee(ctx);
     if (order.length !== defaultBoardOrder.length || new Set(order).size !== defaultBoardOrder.length ||
       defaultBoardOrder.some(stage => !order.includes(stage))) throw new Error("Include each active board list exactly once");
-    const layout = await ctx.db.query("plannerBoardLayouts").withIndex("by_societyId", q => q.eq("societyId", ai._id)).unique();
+    const selectedWorkspace = workspace ?? defaultPlannerWorkspace;
+    const scoped = await ctx.db.query("plannerBoardLayouts")
+      .withIndex("by_societyId_and_workspace", q => q.eq("societyId", ai._id).eq("workspace", selectedWorkspace)).take(2);
+    let layout: Doc<"plannerBoardLayouts"> | undefined = scoped[0];
+    if (!layout && selectedWorkspace === defaultPlannerWorkspace) {
+      const candidates = await ctx.db.query("plannerBoardLayouts")
+        .withIndex("by_societyId_and_workspace", q => q.eq("societyId", ai._id).eq("workspace", undefined)).take(2);
+      layout = candidates[0];
+    }
     if ((layout?.revision ?? 0) !== revision) throw new Error("Someone else reordered the lists. The latest order has been loaded.");
     if (layout) await ctx.db.patch(layout._id, { order, revision: revision + 1 });
-    else await ctx.db.insert("plannerBoardLayouts", { societyId: ai._id, order, revision: 1 });
+    else await ctx.db.insert("plannerBoardLayouts", { societyId: ai._id, workspace: selectedWorkspace, order, revision: 1 });
     return revision + 1;
   },
 });
@@ -713,7 +765,7 @@ export const calendar = query({
       .take(201);
     return {
       items: rows.slice(0, 200).map(item => ({
-        _id: item._id, stage: isEffectivelyArchived(item, clock) ? "archived" : item.stage, title: item.title, kind: item.kind, category: item.category,
+        _id: item._id, stage: isEffectivelyArchived(item, clock) ? "archived" : item.stage, workspace: workspaceFor(item), title: item.title, kind: item.kind, category: item.category,
         team: item.team, teams: item.teams, internalOnly: item.internalOnly,
         date: item.date, startTime: item.startTime, endTime: item.endTime, location: item.location,
       })),
@@ -789,24 +841,69 @@ export const archivePastEvents = internalMutation({
   },
 });
 
+/**
+ * Create the starter Hack 2027 checklist once for this society. The setup
+ * marker is written in the same transaction as the cards, so retries (and
+ * concurrent first visits) cannot create a second copy. Deleting a seeded
+ * card later is intentional and will not be undone by another visit.
+ */
+export const seedHackChecklist = mutation({
+  args: {},
+  returns: v.object({ created: v.number(), alreadySeeded: v.boolean() }),
+  handler: async ctx => {
+    const access = await requireCommittee(ctx);
+    const marker = await ctx.db.query("plannerSetups")
+      .withIndex("by_societyId_and_key", q => q.eq("societyId", access.ai._id).eq("key", hackChecklistSeedKey))
+      .unique();
+    if (marker) return { created: 0, alreadySeeded: true };
+
+    const person = await actor(ctx, access);
+    let created = 0;
+    for (const entry of HACK_CHECKLIST_TEMPLATE) {
+      const title = cleanWorkspaceText(entry.title, "checklist title", 160);
+      const description = cleanWorkspaceText(entry.description || "", "checklist description", 4000);
+      const tasks = entry.tasks.map(text => ({ text: cleanWorkspaceText(text, "checklist task", 300), done: false }));
+      validatePrivate("", "", tasks);
+      const id = await ctx.db.insert("plannerItems", {
+        title, kind: "project", category: "Hackathon planning", description,
+        date: "", startTime: "", endTime: "", location: "", registrationUrl: "",
+        societyId: access.ai._id, workspace: "hack2027", internalOnly: true,
+        checklistGroup: cleanWorkspaceText(entry.group, "checklist group", 120), checklistDone: false,
+        notes: "", owner: "", tasks, stage: "ideas", revision: 1, updatedAt: Date.now(),
+        createdBy: person, contributors: [person], commentCount: 0,
+      });
+      await audit(ctx, "create_planner_item", id, title, "Created Hack 2027 checklist card");
+      created++;
+    }
+    await ctx.db.insert("plannerSetups", { societyId: access.ai._id, key: hackChecklistSeedKey, version: 1, createdAt: Date.now() });
+    return { created, alreadySeeded: false };
+  },
+});
+
 export const create = mutation({
-  args: { activity: activityValidator, stage: v.optional(planningStage), team: v.optional(v.union(plannerTeam, v.null())), teams: v.optional(v.array(plannerTeam)), lead: v.optional(v.union(v.string(), v.null())), waitingOn: v.optional(v.string()), internalOnly: v.optional(v.boolean()), notes: v.optional(v.string()), owner: v.optional(v.string()), tasks: v.optional(v.array(taskValidator)), attachments: v.optional(v.array(plannerAttachmentValidator)) },
+  args: { activity: activityValidator, workspace: v.optional(plannerWorkspace), outreachKind: v.optional(v.string()), nextAction: v.optional(v.string()), checklistGroup: v.optional(v.string()), checklistDone: v.optional(v.boolean()), stage: v.optional(planningStage), team: v.optional(v.union(plannerTeam, v.null())), teams: v.optional(v.array(plannerTeam)), lead: v.optional(v.union(v.string(), v.null())), waitingOn: v.optional(v.string()), internalOnly: v.optional(v.boolean()), notes: v.optional(v.string()), owner: v.optional(v.string()), tasks: v.optional(v.array(taskValidator)), attachments: v.optional(v.array(plannerAttachmentValidator)) },
   returns: v.id("plannerItems"),
   handler: async (ctx, args) => {
     const access = await requireCommittee(ctx);
     const person = await actor(ctx, access);
-    const activity = cleanActivity(args.internalOnly ? { ...args.activity, kind: 'project' } : args.activity);
+    const workspace = args.workspace ?? defaultPlannerWorkspace;
+    const internalOnly = workspace !== defaultPlannerWorkspace || args.internalOnly === true;
+    const activity = cleanActivity(internalOnly ? { ...args.activity, kind: 'project' } : args.activity);
     validatePrivate(args.notes || "", args.owner || "", args.tasks || []);
     validateAssignment(args.teams, args.lead);
-    const id = await ctx.db.insert("plannerItems", { ...activity, societyId: access.ai._id, createdBy: person, contributors: [person], commentCount: 0,
-      stage: args.stage || "ideas", team: args.teams ? null : args.team, teams: args.teams, lead: args.lead, ...(args.waitingOn !== undefined ? { waitingOn: cleanWaitingOn(args.waitingOn) } : {}), internalOnly: args.internalOnly, notes: args.notes || "", owner: args.owner || "", tasks: args.tasks || [], attachments: cleanAttachments(args.attachments || []), revision: 1, updatedAt: Date.now() });
+    const outreachKind = args.outreachKind === undefined ? undefined : cleanWorkspaceText(args.outreachKind, "outreach type", 120);
+    const nextAction = args.nextAction === undefined ? undefined : cleanWorkspaceText(args.nextAction, "next action", 240);
+    const checklistGroup = args.checklistGroup === undefined ? undefined : cleanWorkspaceText(args.checklistGroup, "checklist group", 120);
+    const id = await ctx.db.insert("plannerItems", { ...activity, societyId: access.ai._id, workspace, outreachKind, nextAction, checklistGroup, checklistDone: args.checklistDone,
+      createdBy: person, contributors: [person], commentCount: 0,
+      stage: args.stage || "ideas", team: args.teams ? null : args.team, teams: args.teams, lead: args.lead, ...(args.waitingOn !== undefined ? { waitingOn: cleanWaitingOn(args.waitingOn) } : {}), internalOnly, notes: args.notes || "", owner: args.owner || "", tasks: args.tasks || [], attachments: cleanAttachments(args.attachments || []), revision: 1, updatedAt: Date.now() });
     await audit(ctx, "create_planner_item", id, activity.title, "Created this card");
     return id;
   },
 });
 
 export const save = mutation({
-  args: { id: v.id("plannerItems"), revision: v.number(), activity: activityValidator, stage: v.optional(planningStage), workflowStage: v.optional(planningStage), team: v.optional(v.union(plannerTeam, v.null())), teams: v.optional(v.array(plannerTeam)), lead: v.optional(v.union(v.string(), v.null())), waitingOn: v.optional(v.string()), internalOnly: v.optional(v.boolean()), notes: v.string(), owner: v.string(), tasks: v.array(taskValidator), attachments: v.optional(v.array(plannerAttachmentValidator)) },
+  args: { id: v.id("plannerItems"), revision: v.number(), activity: activityValidator, workspace: v.optional(plannerWorkspace), outreachKind: v.optional(v.string()), nextAction: v.optional(v.string()), checklistGroup: v.optional(v.string()), checklistDone: v.optional(v.boolean()), stage: v.optional(planningStage), workflowStage: v.optional(planningStage), team: v.optional(v.union(plannerTeam, v.null())), teams: v.optional(v.array(plannerTeam)), lead: v.optional(v.union(v.string(), v.null())), waitingOn: v.optional(v.string()), internalOnly: v.optional(v.boolean()), notes: v.string(), owner: v.string(), tasks: v.array(taskValidator), attachments: v.optional(v.array(plannerAttachmentValidator)) },
   returns: v.null(),
   handler: async (ctx, args) => {
     const access = await requireItem(ctx, args.id, args.revision);
@@ -814,15 +911,29 @@ export const save = mutation({
     const person = await actor(ctx, access);
     validatePrivate(args.notes, args.owner, args.tasks);
     validateAssignment(args.teams, args.lead);
-    const activity = cleanActivity((args.internalOnly ?? item.internalOnly) ? { ...args.activity, kind: 'project' } : args.activity);
+    const nextWorkspace = args.workspace ?? workspaceFor(item);
+    if (item.stage === "published" && nextWorkspace !== workspaceFor(item)) throw new Error("Unpublish this activity before changing its workspace");
+    const requestedInternalOnly = args.internalOnly !== undefined ? args.internalOnly : item.internalOnly;
+    const nextInternalOnly = nextWorkspace !== defaultPlannerWorkspace || requestedInternalOnly === true;
+    const activity = cleanActivity(nextInternalOnly ? { ...args.activity, kind: 'project' } : args.activity);
     const effectivelyArchived = isEffectivelyArchived(item);
     if (item.stage === "published" && args.stage && !effectivelyArchived) throw new Error("Unpublish this activity before changing its stage");
-    if (item.published && args.internalOnly) throw new Error("Unpublish this activity before making it an internal card");
+    if (item.published && nextInternalOnly && !item.internalOnly) throw new Error("Unpublish this activity before making it an internal card");
     const nextTeam = args.teams !== undefined ? null : args.team !== undefined ? args.team : item.team;
     const nextTeams = args.teams !== undefined ? args.teams : args.team !== undefined ? undefined : item.teams;
     const nextLead = args.lead !== undefined ? args.lead : item.lead;
     const nextWaitingOn = args.waitingOn !== undefined ? cleanWaitingOn(args.waitingOn) : item.waitingOn;
-    const nextInternalOnly = args.internalOnly !== undefined ? args.internalOnly : item.internalOnly;
+    const nextOutreachKind = args.outreachKind !== undefined ? cleanWorkspaceText(args.outreachKind, "outreach type", 120) : item.outreachKind;
+    const nextAction = args.nextAction !== undefined ? cleanWorkspaceText(args.nextAction, "next action", 240) : item.nextAction;
+    const nextChecklistGroup = args.checklistGroup !== undefined ? cleanWorkspaceText(args.checklistGroup, "checklist group", 120) : item.checklistGroup;
+    const nextChecklistDone = args.checklistDone !== undefined ? args.checklistDone : item.checklistDone;
+    // Workspace-specific metadata must not follow a card into an area where it
+    // no longer applies. Clearing it here also repairs rows written by older
+    // clients that did not clear fields during a workspace move.
+    const effectiveOutreachKind = nextWorkspace === "outreach" ? nextOutreachKind : undefined;
+    const effectiveNextAction = nextWorkspace === "outreach" ? nextAction : undefined;
+    const effectiveChecklistGroup = nextWorkspace === "hack2027" ? nextChecklistGroup : undefined;
+    const effectiveChecklistDone = nextWorkspace === "hack2027" ? nextChecklistDone : undefined;
     const nextAttachments = args.attachments !== undefined ? cleanAttachments(args.attachments) : item.attachments;
     const nextIsPastDue = isPastDueEvent({ ...item, ...activity, internalOnly: nextInternalOnly });
     if (effectivelyArchived && args.stage && args.stage !== "done" && nextIsPastDue) {
@@ -835,6 +946,8 @@ export const save = mutation({
     if ((item.lead ?? null) !== (nextLead ?? null)) changes.push(nextLead ? `Changed the lead to ${nextLead}` : "Removed the lead");
     if (JSON.stringify(item.tasks) !== JSON.stringify(args.tasks)) changes.push("Updated the checklist");
     if (JSON.stringify(item.attachments || []) !== JSON.stringify(nextAttachments || [])) changes.push("Updated attachments");
+    if (workspaceFor(item) !== nextWorkspace) changes.push(`Moved this card to ${nextWorkspace}`);
+    if ((item.outreachKind || '') !== (effectiveOutreachKind || '') || (item.nextAction || '') !== (effectiveNextAction || '') || (item.checklistGroup || '') !== (effectiveChecklistGroup || '') || (item.checklistDone ?? false) !== (effectiveChecklistDone ?? false)) changes.push("Updated workspace details");
     if (JSON.stringify(item.teams || []) !== JSON.stringify(nextTeams || []) || (item.team ?? null) !== (nextTeam ?? null)) changes.push("Updated teams");
     if (item.kind !== activity.kind || item.category !== activity.category || item.location !== activity.location || item.startTime !== activity.startTime || item.endTime !== activity.endTime || item.registrationUrl !== activity.registrationUrl) changes.push("Updated card details");
     const nextWorkflowStage = args.workflowStage !== undefined && item.stage === 'published' ? args.workflowStage : item.workflowStage;
@@ -842,17 +955,42 @@ export const save = mutation({
     if (item.stage === 'published' && (previousWorkflowStage || 'ready') !== (nextWorkflowStage || 'ready')) changes.push(`Moved this card from ${stageLabel(previousWorkflowStage || 'ready')} to ${stageLabel(nextWorkflowStage || 'ready')}`);
     if (item.title !== activity.title || item.description !== activity.description || item.notes !== args.notes.trim() || item.owner !== args.owner.trim() || (item.internalOnly ?? false) !== (nextInternalOnly ?? false) || (item.waitingOn || '') !== (nextWaitingOn || '')) changes.push("Updated this card");
     await ctx.db.patch(item._id, { ...activity, stage: nextStage, notes: args.notes.trim(), owner: args.owner.trim(), tasks: args.tasks,
+      ...(args.workspace !== undefined ? { workspace: nextWorkspace } : {}),
+      ...(nextWorkspace === "outreach" ? { outreachKind: effectiveOutreachKind, nextAction: effectiveNextAction } : { outreachKind: undefined, nextAction: undefined }),
+      ...(nextWorkspace === "hack2027" ? { checklistGroup: effectiveChecklistGroup, checklistDone: effectiveChecklistDone } : { checklistGroup: undefined, checklistDone: undefined }),
       ...(nextStage === "archived" || item.stage === "published" && nextStage !== "published" ? { published: undefined, publishedAt: undefined, workflowStage: undefined } : {}),
       ...(args.teams !== undefined ? { teams: args.teams, team: null } : args.team !== undefined ? { team: args.team, teams: undefined } : {}),
       ...(args.lead !== undefined ? { lead: args.lead } : {}),
       ...(args.waitingOn !== undefined ? { waitingOn: cleanWaitingOn(args.waitingOn) } : {}),
       ...(args.attachments !== undefined ? { attachments: cleanAttachments(args.attachments) } : {}),
-      ...(args.internalOnly !== undefined ? { internalOnly: args.internalOnly } : {}),
+      ...(args.internalOnly !== undefined || nextWorkspace !== workspaceFor(item) ? { internalOnly: nextInternalOnly } : {}),
       ...(args.workflowStage !== undefined && item.stage === 'published' && nextStage === 'published' ? { workflowStage: args.workflowStage } : {}),
       ...(changes.length ? { contributors: contributorsFor(item, person) } : {}),
       revision: item.revision + 1, updatedAt: changes.length ? Date.now() : item.updatedAt });
     await audit(ctx, "save_planner_draft", item._id, activity.title, changes.length ? changes.join(" · ") : undefined);
     return null;
+  },
+});
+
+/** Update a Hack checklist row without requiring the full card editor payload. */
+export const setChecklistDone = mutation({
+  args: { id: v.id("plannerItems"), revision: v.number(), done: v.boolean() },
+  returns: v.number(),
+  handler: async (ctx, args) => {
+    const access = await requireItem(ctx, args.id, args.revision);
+    const { item } = access;
+    if (workspaceFor(item) !== "hack2027") throw new Error("Checklist completion is only available for Hack 2027 cards");
+    if ((item.checklistDone ?? false) === args.done) return item.revision;
+    const person = await actor(ctx, access);
+    const revision = item.revision + 1;
+    await ctx.db.patch(item._id, {
+      checklistDone: args.done,
+      contributors: contributorsFor(item, person),
+      revision,
+      updatedAt: Date.now(),
+    });
+    await audit(ctx, "save_planner_draft", item._id, item.title, args.done ? "Marked this checklist card complete" : "Reopened this checklist card");
+    return revision;
   },
 });
 
@@ -913,6 +1051,7 @@ export const publish = mutation({
     const access = await requireItem(ctx, args.id, args.revision);
     const { item } = access;
     const person = await actor(ctx, access);
+    if (workspaceFor(item) !== defaultPlannerWorkspace) throw new Error("Only Events cards can be published to the website");
     if (item.internalOnly) throw new Error("Internal cards cannot be published to the website");
     if (item.stage !== "ready" && item.stage !== "published") throw new Error("Move this activity to Ready before publishing");
     const snapshot = cleanActivity(publicFields(item), true);
@@ -930,7 +1069,7 @@ export const listPublished = query({
     if (!ai) return [];
     const rows = await ctx.db.query("plannerItems")
       .withIndex("by_societyId_and_stage", q => q.eq("societyId", ai._id).eq("stage", "published")).order("desc").take(200);
-    return rows.flatMap(item => !isEffectivelyArchived(item) && item.published ? [{ id: item._id, ...publicFields(item.published) }] : []);
+    return rows.flatMap(item => workspaceFor(item) === defaultPlannerWorkspace && !isEffectivelyArchived(item) && item.published ? [{ id: item._id, ...publicFields(item.published) }] : []);
   },
 });
 
@@ -938,7 +1077,7 @@ export const getPublished = query({
   args: { id: v.id("plannerItems") }, returns: v.union(publicActivityValidator, v.null()),
   handler: async (ctx, { id }) => {
     const item = await ctx.db.get(id);
-    if (!item || item.stage !== "published" || !item.published || isEffectivelyArchived(item)) return null;
+    if (!item || workspaceFor(item) !== defaultPlannerWorkspace || item.stage !== "published" || !item.published || isEffectivelyArchived(item)) return null;
     const ai = await ctx.db.get(item.societyId);
     return ai?.slug === "ai" ? { id: item._id, ...publicFields(item.published) } : null;
   },
