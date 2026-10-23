@@ -22,6 +22,19 @@ interface Props {
 }
 
 const { society, committee = [] } = Astro.props;
+const linkedInProfiles = new Map([
+  ['Joshua Knott', 'https://www.linkedin.com/in/joshuasknott/'],
+  ['Poppy Holmes', 'https://www.linkedin.com/in/poppy-holmes-97072b282/'],
+  ['Vinayak Vadhera', 'https://www.linkedin.com/in/vinayakvadhera/'],
+  ["Amanda Lages O'Connor", 'https://www.linkedin.com/in/amanda-lages-o-connor/'],
+  ['Tadavarthi Kusumitha', 'https://www.linkedin.com/in/kusumitha-tadavarthi-5a1360255/'],
+  ['George Mahon', 'https://www.linkedin.com/in/george-mahon-131b73260/'],
+  ['Miguel Antonio', 'https://www.linkedin.com/in/miguelpcantonio/'],
+  ['Ibrahim Haque', 'https://www.linkedin.com/in/ibrahim-haque-5b0468307/'],
+  ['Samuel Young', 'https://www.linkedin.com/in/samuel-young-b1b04a2a1/'],
+  ['Bibek Limbu', 'https://www.linkedin.com/in/bibek-limbu-445791213/'],
+  ['Deepanshu Dariya', 'https://www.linkedin.com/in/deepanshu-dariya-424a64227/'],
+]);
 const signatoryPortraits = new Map([
   ['Joshua Knott', joshua],
   ['Poppy Holmes', poppy],
@@ -33,7 +46,7 @@ const officers = society.signatories.map(officer => {
   // Match the person, so a future roster change cannot reuse somebody else's face.
   const portrait = signatoryPortraits.get(name);
   const initials = name.split(' ').filter((_, i, parts) => i === 0 || i === parts.length - 1).map(part => part[0]).join('');
-  return { name, role: officer.role, portrait, initials };
+  return { name, role: officer.role, portrait, initials, linkedin: linkedInProfiles.get(name) };
 });
 const teams = [
   { role: 'Workshops & Learning', members: [
@@ -67,7 +80,11 @@ const teams = [
     <div class="flow-officers" role="group" aria-labelledby="signatories-title">
       {officers.map(officer => <article class="flow-officer">
         {officer.portrait
-          ? <Image class="flow-committee__portrait" src={officer.portrait} width={360} height={360} alt="" loading="lazy" decoding="async" />
+          ? officer.linkedin
+            ? <a class="flow-committee__profile" href={officer.linkedin} aria-label={`${officer.name} on LinkedIn`}>
+                <Image class="flow-committee__portrait" src={officer.portrait} width={360} height={360} alt="" loading="lazy" decoding="async" />
+              </a>
+            : <Image class="flow-committee__portrait" src={officer.portrait} width={360} height={360} alt="" loading="lazy" decoding="async" />
           : <div class="flow-committee__portrait flow-committee__initials" aria-hidden="true">{officer.initials}</div>}
         <div class="flow-officer__identity">
           <h3>{officer.name}</h3>
@@ -83,7 +100,11 @@ const teams = [
         <h3><span>{team.role.split(' & ')[0]} &amp;</span> <span>{team.role.split(' & ')[1]}</span></h3>
         <ul>
           {team.members.map(member => <li>
-            <Image class="flow-committee__portrait" src={member.portrait} width={360} height={360} alt="" loading="lazy" decoding="async" />
+            {linkedInProfiles.has(member.name)
+              ? <a class="flow-committee__profile" href={linkedInProfiles.get(member.name)} aria-label={`${member.name} on LinkedIn`}>
+                  <Image class="flow-committee__portrait" src={member.portrait} width={360} height={360} alt="" loading="lazy" decoding="async" />
+                </a>
+              : <Image class="flow-committee__portrait" src={member.portrait} width={360} height={360} alt="" loading="lazy" decoding="async" />}
             <span>{member.name}</span>
           </li>)}
         </ul>
@@ -125,6 +146,17 @@ const teams = [
     object-fit: cover;
   }
   .flow-officer .flow-committee__portrait { width: 154px; height: 154px; }
+  .flow-committee__profile {
+    display: block;
+    width: fit-content;
+    margin: 0 auto 10px;
+    border-radius: 50%;
+  }
+  .flow-committee__profile .flow-committee__portrait { margin: 0; }
+  .flow-committee__profile:focus-visible {
+    outline: 3px solid var(--flow-orange);
+    outline-offset: 5px;
+  }
   .flow-committee__initials {
     display: grid;
     place-items: center;
@@ -210,6 +242,7 @@ const teams = [
     .flow-officers { grid-template-columns: 1fr; gap: 22px; max-width: 350px; }
     .flow-officer { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 18px; align-items: center; text-align: left; }
     .flow-officer .flow-committee__portrait { width: 96px; height: 96px; margin: 0; }
+    .flow-officer .flow-committee__profile { margin: 0; }
     .flow-officer h3 { font-size: 20px; text-wrap: initial; }
     .flow-committee .flow-officer__role { margin-top: 5px; font-size: 17px; }
     .flow-teams { grid-template-columns: 1fr; gap: 32px; margin-top: 36px; }
