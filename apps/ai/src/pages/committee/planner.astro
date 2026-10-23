@@ -6,6 +6,7 @@ import { plannerTeams } from '../../../../../convex/plannerTeams';
 import { HACK_CHECKLIST_GROUPS } from '../../../../../convex/plannerHackTemplate';
 import { SOCIETIES } from '@surreysocieties/admin/config';
 import '../../styles/planner.css';
+import '../../styles/planner-outreach.css';
 import { isAIEnabled } from '../../lib/server/ai/gemini';
 
 Astro.response.headers.set('Cache-Control', 'no-store');
@@ -119,11 +120,27 @@ const convexUrl = process.env.CONVEX_URL || import.meta.env.CONVEX_URL || '';
       <div class="editor-top"><button type="button" data-close class="quiet-button"><ArrowLeft size={16} /><span id="editor-back-label">Planner</span></button><span id="item-state" class="muted">Idea · Private</span><button type="button" data-close class="icon-button" aria-label="Close activity"><X size={20} /></button></div>
       <div class="editor-actions"><h2 id="item-heading">New activity</h2><div id="editor-action-buttons"><button type="submit" form="item-form" id="save-item" class="secondary-button">Save draft</button><button type="button" id="publish-item" class="primary-button" hidden>Publish to website</button><button type="button" id="card-review" class="quiet-button" hidden>Review website details</button><button type="button" id="card-notes" class="quiet-button" hidden>Notes &amp; collaborators</button><button type="button" id="card-area" class="quiet-button" hidden>Change planning area</button><button type="button" id="card-waiting-toggle" class="quiet-button" hidden>Set waiting status</button><button type="button" id="card-people-toggle" class="quiet-button" hidden>Worked on by</button></div></div>
       <p id="item-message" role="status" class="form-message"></p>
+      <div id="outreach-stage-slot" hidden><Circle size={10} aria-hidden="true" /></div>
       <div class="editor-stage-bar"><label id="stage-field">Stage<select name="stage" form="item-form"><option value="ideas">Ideas</option><option value="planning">In progress</option><option value="ready">Ready</option></select></label><p id="stage-help" class="field-help">Start with a title and a few words. Work out the details later.</p></div>
       <div class="editor-columns">
         <div class="editor-fields">
           <label class="card-title-field">Title<textarea name="title" maxlength="160" required autocomplete="off" rows="1"></textarea></label>
           <div id="card-attribution" class="card-attribution" hidden></div>
+          <div id="outreach-primary-fields" hidden></div>
+          <div id="outreach-assignments" class="outreach-assignments" hidden>
+            <details id="outreach-lead-picker" class="outreach-picker">
+              <summary><UsersRound size={19} /><span id="outreach-lead-label">Assign lead</span></summary>
+              <div id="outreach-lead-slot" class="outreach-picker-panel"></div>
+            </details>
+            <details id="outreach-follow-up-picker" class="outreach-picker">
+              <summary><CalendarDays size={19} /><span id="outreach-follow-up-label">Add follow-up</span></summary>
+              <div id="outreach-follow-up-slot" class="outreach-picker-panel"></div>
+            </details>
+          </div>
+          <details id="outreach-more-details" class="outreach-more-details" hidden>
+            <summary><ChevronDown size={18} />More details</summary>
+            <div id="outreach-details-content" class="outreach-details-content"></div>
+          </details>
           <div class="card-metadata">
           <div class="team-picker"><span class="metadata-label">Team(s)</span><details id="team-picker-menu"><summary id="team-picker-summary" aria-label="Choose teams">Choose teams <Plus size={16} /></summary><fieldset class="team-options"><legend class="sr-only">Team(s)</legend>{plannerTeams.map(team => <label class="team-option"><input type="checkbox" name="teams" value={team.id} /><span>{team.name}</span></label>)}</fieldset></details></div>
           <label class="lead-field">Lead<div class="lead-control"><span id="lead-avatar" class="person-avatar" aria-hidden="true"></span><select name="lead"><option value="">Unassigned</option><optgroup label="Signatories">{SOCIETIES.ai.signatories.map(person => <option value={person.name}>{person.name}</option>)}</optgroup>{plannerTeams.map(team => <optgroup label={team.name}>{team.members.map(name => <option value={name}>{name}</option>)}</optgroup>)}</select></div></label>
@@ -161,6 +178,7 @@ const convexUrl = process.env.CONVEX_URL || import.meta.env.CONVEX_URL || '';
         </div>
         <aside id="editor-preview" class="editor-preview" aria-labelledby="preview-heading" hidden><h3 id="preview-heading">Website preview</h3><p class="muted">surreyaisociety.org</p><div id="public-preview" class="public-preview"></div><p id="publication-help" class="field-help">Ready stays private. Publish when the public details are confirmed.</p><ul id="publication-missing" class="publication-missing"></ul><button type="button" id="unpublish-item" class="quiet-button danger" hidden>Unpublish and move to Ready</button><p class="field-help">Collaborators, committee notes and preparation tasks stay private.</p></aside>
       </div>
+      <footer id="outreach-create-footer" class="outreach-create-footer" hidden><span><LockKeyhole size={16} />Committee only</span><div id="outreach-save-slot"></div></footer>
     </form>
   </dialog>
   <dialog id="delete-card-dialog" class="small-dialog delete-card-dialog" aria-labelledby="delete-card-heading" aria-describedby="delete-card-description">

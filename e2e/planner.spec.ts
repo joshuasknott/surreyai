@@ -213,7 +213,7 @@ async function editCard(page: Page, title: string) {
   }
   await page.getByRole('button', { name: `View ${title}`, exact: true }).click();
   await expect(page.locator('#card-dialog')).toBeVisible();
-  await expect(page.locator('#card-dialog').getByLabel('Title', { exact: true })).toHaveValue(title);
+  await expect(page.locator('#card-dialog [name=title]')).toHaveValue(title);
 }
 async function closeActivity(page: Page) {
   if (await page.locator('#item-dialog').isVisible()) await page.getByRole('button', { name: 'Close activity', exact: true }).click();
@@ -286,7 +286,12 @@ for (const width of [1440, 390]) {
     await page.mouse.move(header.x + 5, header.y + 5); await page.mouse.down(); await page.mouse.move(2, 2); await page.mouse.up();
     await expect(page.locator('#card-dialog')).toBeVisible();
     await page.getByLabel('Title', { exact: true }).fill('Saved by outside dismissal');
-    await page.mouse.click(2, 2); await expect(page.locator('#card-dialog')).toBeHidden();
+    // On mobile the card dialog intentionally fills the viewport, so (2, 2)
+    // is inside the dialog. Keep the backdrop assertion on desktop and use
+    // the accessible close control for the full-viewport layout.
+    if (width <= 720) await page.getByRole('button', { name: 'Close card', exact: true }).click();
+    else await page.mouse.click(2, 2);
+    await expect(page.locator('#card-dialog')).toBeHidden();
     const saved = await admin.query(api.planner.get, { id });
     expect(saved).toMatchObject({ title: 'Saved by outside dismissal', teams: ['events'], location: 'Lecture Theatre A', waitingOn: 'Speaker confirmation', notes: 'Keep these private notes', attachments: [{ name: 'Workshop brief', url: 'https://example.test/brief' }] });
     await noOverflow(page);
@@ -307,7 +312,11 @@ for (const width of [1440, 390]) {
     await description.evaluate(node => { node.scrollTop = node.scrollHeight; }); expect(await description.evaluate(node => node.scrollTop)).toBeGreaterThan(0);
     await screenshot(page, `adaptive-description-capped-${width}`);
     await description.fill(medium); const restored = await size(); expect(restored.height).toBeLessThan(long.height); expect(restored.scroll - restored.client).toBeLessThanOrEqual(1);
-    await page.mouse.click(2, 2); await expect(page.locator('#card-dialog')).toBeHidden();
+    // The mobile dialog covers the entire viewport; close it through its
+    // control while retaining the desktop backdrop dismissal coverage.
+    if (width <= 720) await page.getByRole('button', { name: 'Close card', exact: true }).click();
+    else await page.mouse.click(2, 2);
+    await expect(page.locator('#card-dialog')).toBeHidden();
     expect((await admin.query(api.planner.get, { id }))?.description).toBe(medium);
     await editCard(page, 'Adaptive description'); expect((await size()).scroll - (await size()).client).toBeLessThanOrEqual(1);
     await noOverflow(page);
@@ -2153,6 +2162,119 @@ test('planning areas keep Events and Outreach separate and save relationship det
   await page.goBack();
   await expect(page.locator('#workspace-title')).toHaveText('Outreach');
   await expect(page.locator('#board')).toContainText('Guest speaker conversation');
+});
+
+test('outreach company cards keep the create surface focused while preserving optional details', async ({ page, context }) => {
+  const { admin } = await fixture(context);
+  await page.goto(`${origin}/committee/planner/outreach`);
+  await expect(page.locator('#workspace')).toBeVisible();
+  await expect(page.locator('#workspace-title')).toHaveText('Outreach');
+
+  await page.getByRole('button', { name: 'New card', exact: true }).click();
+  const editor = page.locator('#item-dialog');
+  await expect(editor).toBeVisible();
+  await expect(editor.getByRole('heading', { name: 'New company', exact: true })).toBeVisible();
+  await expect(editor.getByRole('combobox', { name: 'Stage', exact: true })).toHaveValue('ideas');
+  await expect(editor).toContainText('To approach');
+  await expect(editor.locator('[name=title]')).toBeVisible();
+  await expect(editor.locator('[name=description]')).toBeVisible();
+  await expect(editor.locator('[name=nextAction]')).toBeVisible();
+  await expect(editor.locator('[name=title]')).toBeFocused();
+  await page.setViewportSize({ width: 1314, height: 1197 });
+  await noOverflow(page); await screenshot(page, 'outreach-new-company-1314');
+  for (const width of [390, 320]) {
+    await page.setViewportSize({ width, height: width === 320 ? 760 : 844 });
+    await noOverflow(page); await screenshot(page, `outreach-new-company-${width}`);
+  }
+  await page.setViewportSize({ width: 1440, height: 1024 });
+
+  // Outreach keeps relationship, team, collaborators and notes behind the
+  // secondary disclosure. The details must start collapsed for a new card.
+  const details = editor.locator('#outreach-more-details');
+  const detailsSummary = details.locator(':scope > summary');
+  await expect(detailsSummary).toContainText(/More details/i);
+  await expect(details).not.toHaveAttribute('open', '');
+  await detailsSummary.click();
+  await expect(details).toHaveAttribute('open', '');
+
+  const title = 'Northstar Robotics';
+  await editor.locator('[name=title]').fill(title);
+  await editor.locator('[name=description]').fill('Potential workshop partner for the spring programme.');
+  await editor.locator('[name=nextAction]').fill('Send the partnership brief');
+
+  const lead = editor.locator('[name=lead]');
+  if (!await lead.isVisible()) {
+    await editor.locator('#outreach-lead-picker > summary').click();
+  }
+  await lead.selectOption({ label: 'Joshua Knott' });
+
+  const dueDate = editor.locator('[name=dueDate]');
+  if (!await dueDate.isVisible()) {
+    await editor.locator('#outreach-follow-up-picker > summary').click();
+  }
+  await dueDate.fill('2026-11-15');
+  await editor.locator('[name=outreachKind]').selectOption({ label: 'Sponsorship' });
+  await editor.locator('#team-picker-summary').click();
+  await editor.locator('input[name=teams][value=industry]').check();
+  await editor.locator('[name=owner]').fill('Josh and Mosie');
+  await editor.locator('[name=notes]').fill('Ask about student workshop support and equipment loan.');
+
+  // Changing planning area reuses the same controls without clearing the draft.
+  await editor.locator('[name=workspace]').selectOption('events');
+  await expect(editor.getByLabel('Title', { exact: true })).toHaveValue(title);
+  await editor.locator('#private-options > summary').click();
+  await editor.locator('[name=workspace]').selectOption('outreach');
+  await expect(details).not.toHaveAttribute('open', '');
+  await expect(editor.getByLabel('Company', { exact: true })).toHaveValue(title);
+  await expect(editor.locator('[name=description]')).toHaveValue('Potential workshop partner for the spring programme.');
+  await expect(editor.locator('[name=outreachKind]')).toHaveValue('Sponsorship');
+  await expect(editor.locator('[name=notes]')).toHaveValue('Ask about student workshop support and equipment loan.');
+
+  await editor.getByRole('button', { name: /Create card|Save card|Save draft/i }).click();
+  await expect(editor).not.toBeVisible();
+  await expect(page.locator('#board')).toContainText(title);
+
+  const created = (await admin.query(api.planner.list, { workspace: 'outreach' })).find(item => item.title === title);
+  expect(created).toBeDefined();
+  expect(created).toMatchObject({
+    title,
+    description: 'Potential workshop partner for the spring programme.',
+    nextAction: 'Send the partnership brief',
+    lead: 'Joshua Knott',
+    date: '2026-11-15',
+    outreachKind: 'Sponsorship',
+    owner: 'Josh and Mosie',
+    notes: 'Ask about student workshop support and equipment loan.',
+  });
+  expect(created?.teams).toContain('industry');
+
+  await admin.mutation(api.planner.addComment, { id: created!._id, text: 'Existing committee note.', requestId: '00000000-0000-4000-8000-000000000017' });
+  await editCard(page, title);
+  const card = page.locator('#card-dialog');
+  await expect(card).toBeVisible();
+  await expect(card.locator('[name=title]')).toHaveValue(title);
+  await expect(card.locator('[name=description]')).toHaveValue('Potential workshop partner for the spring programme.');
+  await expect(card.locator('[name=nextAction]')).toHaveValue('Send the partnership brief');
+  await expect(card.locator('[name=lead]')).toHaveValue('Joshua Knott');
+  await expect(card.locator('[name=dueDate]')).toHaveValue('2026-11-15');
+  await expect(card.locator('#comment-list .comment')).toContainText('Existing committee note.');
+  await expect(card.locator('#card-save-status')).toHaveText('All changes saved');
+
+  await card.locator('[name=description]').fill('Updated outreach context.');
+  await card.locator('[name=description]').press('Tab');
+  await expect.poll(async () => (await admin.query(api.planner.get, { id: created!._id }))?.description).toBe('Updated outreach context.');
+  await closeActivity(page);
+
+  // The outreach-only controls must not leak into the ordinary Events editor.
+  await navigate(page, 'Events');
+  await page.getByRole('button', { name: 'New card', exact: true }).click();
+  const eventEditor = page.locator('#item-dialog');
+  await expect(eventEditor).toBeVisible();
+  await expect(eventEditor.getByRole('heading', { name: 'New company', exact: true })).toHaveCount(0);
+  await expect(eventEditor.locator('[name=nextAction]')).toBeHidden();
+  await expect(eventEditor.locator('#outreach-fields')).toBeHidden();
+  await expect(eventEditor.locator('#outreach-assignments')).toBeHidden();
+  await closeActivity(page);
 });
 
 test('Hack checklist seeds once, supports completion and retains editable task details', async ({ page, context }) => {

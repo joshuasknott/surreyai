@@ -152,6 +152,81 @@ async function start(root: HTMLElement) {
   const status = (message = '') => { $('planner-status').textContent = message; };
   const field = (name: string) => form.elements.namedItem(name) as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
   const inCard = () => form.parentElement?.id === 'card-editor-slot';
+  // Reuse the existing controls so collapsing outreach details never drops data.
+  const outreachFields = {
+    description: form.querySelector<HTMLElement>('.description-field')!,
+    nextAction: field('nextAction').closest('label')!,
+    relationship: field('outreachKind').closest('label')!,
+    teams: form.querySelector<HTMLElement>('.team-picker')!,
+    lead: form.querySelector<HTMLElement>('.lead-field')!,
+    followUp: $('internal-due-label'),
+    collaborators: $('collaborators-field'),
+    privateOptions: $('private-options'),
+    checklist: $('card-checklist'),
+    attachments: $('card-attachments'),
+    attribution: $('card-attribution'),
+  };
+  const outreachHomes = new Map<HTMLElement, Comment>();
+  for (const node of Object.values(outreachFields)) {
+    const home = document.createComment('editor field position');
+    node.before(home); outreachHomes.set(node, home);
+  }
+  $('item-heading').after($('outreach-stage-slot'));
+
+  function syncOutreachLayout() {
+    const outreach = field('workspace').value === 'outreach';
+    const compact = inCard();
+    form.dataset.workspace = field('workspace').value;
+    editor.dataset.workspace = form.dataset.workspace;
+    cardDialog.dataset.workspace = form.dataset.workspace;
+    for (const id of ['outreach-primary-fields', 'outreach-assignments', 'outreach-more-details']) $(id).hidden = !outreach;
+    $('outreach-stage-slot').hidden = !outreach || compact;
+    $('outreach-create-footer').hidden = !outreach || compact;
+    if (outreach) {
+      $('outreach-primary-fields').append(outreachFields.description, outreachFields.nextAction);
+      $('outreach-lead-slot').append(outreachFields.lead);
+      $('outreach-follow-up-slot').append(outreachFields.followUp);
+      $('outreach-details-content').append(outreachFields.relationship, outreachFields.teams, outreachFields.collaborators, outreachFields.privateOptions, outreachFields.checklist, outreachFields.attachments, outreachFields.attribution);
+      if (!compact) $('outreach-stage-slot').append($('stage-field'));
+    } else {
+      for (const id of ['outreach-more-details', 'outreach-lead-picker', 'outreach-follow-up-picker']) $<HTMLDetailsElement>(id).open = false;
+      for (const [node, home] of outreachHomes) home.after(node);
+      // Existing cards keep collaborators in their private details panel.
+      if (compact) $('card-collaborators-slot').append(outreachFields.collaborators);
+    }
+    if (!compact && !outreach) form.querySelector('.editor-stage-bar')!.prepend($('stage-field'));
+    (outreach && !compact ? $('outreach-save-slot') : $('editor-action-buttons')).prepend($('save-item'));
+    outreachFields.privateOptions.classList.toggle('card-detail-panel', !outreach);
+    $<HTMLDetailsElement>('private-options').open = outreach;
+    form.querySelector('.card-title-field')!.firstChild!.textContent = outreach ? 'Company' : 'Title';
+    field('title').setAttribute('placeholder', outreach ? 'Company name' : '');
+    outreachFields.followUp.firstChild!.textContent = outreach ? 'Follow-up' : 'Due';
+    field('dueDate').setAttribute('aria-label', outreach ? 'Follow-up date (optional)' : 'Due date (optional)');
+    field('description').setAttribute('placeholder', outreach ? 'A little context about the company or conversation…' : 'What’s the idea?');
+    field('nextAction').setAttribute('placeholder', outreach ? 'What happens next?' : 'What should happen next?');
+    $('editor-back-label').textContent = outreach ? 'Outreach' : compact ? 'Card' : 'Planner';
+    if (!current) $('item-heading').textContent = outreach ? 'New company' : 'New card';
+    $('help-description').hidden = outreach || root.dataset.ai !== 'true';
+  }
+
+  function syncOutreachAssignments() {
+    $('outreach-lead-label').textContent = field('lead').value ? plannerName(field('lead').value) : 'Assign lead';
+    $('outreach-follow-up-label').textContent = field('dueDate').value ? activityDate(field('dueDate').value, { day: 'numeric', month: 'short' }) : 'Add follow-up';
+  }
+  for (const id of ['outreach-lead-picker', 'outreach-follow-up-picker']) {
+    const picker = $<HTMLDetailsElement>(id);
+    picker.addEventListener('keydown', event => {
+      if (event.key !== 'Escape' || !picker.open) return;
+      event.preventDefault(); event.stopPropagation(); picker.open = false; picker.querySelector('summary')!.focus();
+    });
+  }
+  document.addEventListener('click', event => {
+    if (!(event.target instanceof Node)) return;
+    for (const id of ['outreach-lead-picker', 'outreach-follow-up-picker']) {
+      const picker = $<HTMLDetailsElement>(id);
+      if (!picker.contains(event.target)) picker.open = false;
+    }
+  });
   const readActivity = (): Activity => {
     const result = blankActivity();
     for (const name of Object.keys(result) as (keyof Activity)[]) (result[name] as string) = field(name).value.trim();
@@ -246,7 +321,7 @@ async function start(root: HTMLElement) {
         if (person.userId) $('comment-author').replaceChildren(avatar({ ...person, userId: person.userId }, access.name));
         $('account-avatar').textContent = initials; $('account-avatar').hidden = false;
       }
-      $('help-description').hidden = root.dataset.ai !== 'true';
+      $('help-description').hidden = field('workspace').value === 'outreach' || root.dataset.ai !== 'true';
       render();
       if (view === 'calendar') await loadCalendar(true);
       if (cardDialog.open && previewItem && !commentBusy) await refreshCard();
@@ -1219,7 +1294,7 @@ async function start(root: HTMLElement) {
   function openEditor(item: Item | null, stage: Stage = 'ideas', date = '', fromCard = false) {
     $('editor-back-label').textContent = fromCard ? 'Card' : 'Planner';
     resetDescriptionHelp(); current = item; form.reset();
-    for (const id of ['private-options', 'activity-details', 'team-picker-menu', 'card-actions', 'waiting-details']) $<HTMLDetailsElement>(id).open = false;
+    for (const id of ['private-options', 'activity-details', 'team-picker-menu', 'card-actions', 'waiting-details', 'outreach-more-details', 'outreach-lead-picker', 'outreach-follow-up-picker']) $<HTMLDetailsElement>(id).open = false;
     $('attachment-editor').hidden = true;
     const activity = item || { ...blankActivity(), date };
     for (const name of Object.keys(blankActivity())) field(name).value = activity[name as keyof Activity];
@@ -1245,7 +1320,7 @@ async function start(root: HTMLElement) {
     tasks = structuredClone(item?.tasks || []);
     attachments = structuredClone(item?.attachments || []);
     files = []; pendingUploads = []; $('file-upload-status').hidden = true; $('retry-file-upload').hidden = true; $('cancel-file-upload').hidden = true;
-    $('item-heading').textContent = item ? item.title : 'New card';
+    $('item-heading').textContent = item ? item.title : field('workspace').value === 'outreach' ? 'New company' : 'New card';
     renderAttribution(item);
     $('item-state').textContent = `${stageLabel(item ? boardStage(item) : stage, item || undefined)} · ${item?.published ? 'Public version is live' : 'Private'}`;
     $('delete-card').hidden = !item || item.stage === 'archived'; $('unpublish-item').hidden = item?.stage !== 'published';
@@ -1259,6 +1334,7 @@ async function start(root: HTMLElement) {
     $('card-workspace-label').textContent = workspaceNames[area];
     if (area !== 'events') field('purpose').value = 'internal';
     field('purpose').disabled = area !== 'events' || !!current?.published;
+    syncOutreachLayout();
     const stageField = field('stage') as HTMLSelectElement;
     for (const option of stageField.options) {
       const stage = option.value as keyof typeof labels;
@@ -1354,6 +1430,8 @@ async function start(root: HTMLElement) {
     const internal = field('purpose').value === 'internal';
     const idea = stage === 'ideas'; const review = !internal && (stage === 'ready' || !!current?.published);
     const compact = inCard();
+    const outreach = field('workspace').value === 'outreach';
+    $('outreach-stage-slot').dataset.outreachStage = stage;
     $('save-item').hidden = compact;
     field('description').title = compact ? 'Enter to save. Shift+Enter for a new line.' : '';
     $('waiting-details').querySelector('summary span')!.textContent = field('waitingOn').value.trim() ? `Waiting: ${field('waitingOn').value.trim()}` : 'Set waiting status';
@@ -1362,17 +1440,23 @@ async function start(root: HTMLElement) {
     $('activity-details').hidden = internal || (!compact && idea); $('private-options').hidden = !compact && !internal && idea; $('editor-preview').hidden = compact ? !cardReviewOpen : !review;
     if (!compact) $<HTMLDetailsElement>('activity-details').open = !idea;
     $('card-checklist').hidden = !compact && idea; $('card-attachments').hidden = !compact && idea;
+    if (outreach) {
+      $('private-options').hidden = false;
+      $('card-checklist').hidden = false; $('card-attachments').hidden = false;
+    }
     $('internal-due-label').hidden = !compact && !internal;
     for (const id of ['card-review', 'card-notes', 'card-waiting-toggle', 'card-people-toggle']) $(id).hidden = !compact;
     $('card-area').hidden = !compact || !!current?.published;
     $('card-review').hidden = !compact || internal;
     syncTeamPicker();
     updateLeadAvatar();
+    syncOutreachAssignments();
     $<HTMLInputElement>('attachment-file').disabled = !current || fileUploadBusy;
     $('file-upload-help').hidden = !!current;
     $('stage-help').textContent = idea ? 'Start with a title and a few words. Work out the details later.' : field('stage').value === 'archived' ? 'Archived events stay on the calendar. To reschedule, choose a future date and move it to In progress.' : review ? 'Check the public details here. Ready is still private.' : 'Add the practical details as they are confirmed.';
     $('save-item').textContent = idea ? 'Save idea' : field('stage').value === 'archived' ? 'Save changes' : 'Save draft';
     if (internal) { $('stage-help').textContent = 'Internal work stays on the committee board.'; $('save-item').textContent = 'Save card'; }
+    if (outreach && !compact) $('save-item').textContent = current ? 'Save card' : 'Create card';
     const activity = readActivity(); const preview = $('public-preview'); preview.replaceChildren();
     preview.append(el('p', activity.date ? activityDate(activity.date) : activity.kind === 'project' ? 'Ongoing project' : 'Date to confirm', 'preview-date'), el('h4', activity.title || 'Your activity title'));
     preview.append(el('p', [activity.startTime ? `${activity.startTime}${activity.endTime ? `–${activity.endTime}` : ''}` : '', activity.location].filter(Boolean).join(' · ')));
@@ -1481,13 +1565,14 @@ async function start(root: HTMLElement) {
   for (const [id, panel] of [['card-tab', 'card'], ['discussion-tab', 'discussion']]) $(id).onclick = () => { cardDialog.dataset.panel = panel; syncCardTabs(); resizeEditorFields(); };
   for (const id of ['card-tab', 'discussion-tab']) $(id).onkeydown = event => { if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) { event.preventDefault(); const target = event.key === 'Home' ? 'card-tab' : event.key === 'End' ? 'discussion-tab' : id === 'card-tab' ? 'discussion-tab' : 'card-tab'; $(target).click(); $(target).focus(); } };
   function closeCardOptions() { $<HTMLDetailsElement>('card-actions').open = false; }
-  $('card-notes').onclick = () => { closeCardOptions(); $<HTMLDetailsElement>('private-options').open = true; field('notes').focus(); };
-  $('card-area').onclick = () => { closeCardOptions(); $<HTMLDetailsElement>('private-options').open = true; field('workspace').focus(); };
-  $('card-waiting-toggle').onclick = () => { closeCardOptions(); $<HTMLDetailsElement>('private-options').open = true; $<HTMLDetailsElement>('waiting-details').open = true; field('waitingOn').focus(); };
+  function revealOutreachDetails() { if (field('workspace').value === 'outreach') $<HTMLDetailsElement>('outreach-more-details').open = true; }
+  $('card-notes').onclick = () => { closeCardOptions(); revealOutreachDetails(); $<HTMLDetailsElement>('private-options').open = true; field('notes').focus(); };
+  $('card-area').onclick = () => { closeCardOptions(); revealOutreachDetails(); $<HTMLDetailsElement>('private-options').open = true; field('workspace').focus(); };
+  $('card-waiting-toggle').onclick = () => { closeCardOptions(); revealOutreachDetails(); $<HTMLDetailsElement>('private-options').open = true; $<HTMLDetailsElement>('waiting-details').open = true; field('waitingOn').focus(); };
   $('card-review').onclick = () => { closeCardOptions(); cardReviewOpen = !cardReviewOpen; updatePreview(); };
   $('card-people-toggle').onclick = () => { closeCardOptions(); $<HTMLDialogElement>('card-people-dialog').showModal(); };
   document.querySelectorAll<HTMLButtonElement>('.close-card-panel').forEach(button => button.onclick = () => { const details = button.closest('details'); if (details) details.open = false; });
-  $('add-attachment').onclick = () => { $('attachment-editor').hidden = false; $('attachment-error').textContent = ''; $('attachment-url').focus(); };
+  $('add-attachment').onclick = () => { revealOutreachDetails(); $('attachment-editor').hidden = false; $('attachment-error').textContent = ''; $('attachment-url').focus(); };
   $<HTMLInputElement>('attachment-file').onchange = () => {
     if (fileUploadBusy || !current) return;
     const selected = [...($<HTMLInputElement>('attachment-file').files || [])];
@@ -1527,7 +1612,12 @@ async function start(root: HTMLElement) {
   $('stage-field').addEventListener('change', () => { updatePreview(); scheduleAutosave(); });
   form.addEventListener('submit', event => { event.preventDefault(); void (async () => {
     if (inCard()) { await saveCardNow(); return; }
-    if (busy) return; setBusy(true); try { if (await persist()) $('item-message').textContent = 'Draft saved. Public content is unchanged.'; } catch (error) { showError(error, 'item-message'); } finally { setBusy(false); }
+    if (busy) return; setBusy(true); try {
+      if (await persist()) {
+        if (field('workspace').value === 'outreach') { editor.close(); status('Company card saved.'); }
+        else $('item-message').textContent = 'Draft saved. Public content is unchanged.';
+      }
+    } catch (error) { showError(error, 'item-message'); } finally { setBusy(false); }
   })(); });
   $('publish-item').onclick = () => void (async () => {
     clearTimeout(autosaveTimer); if (autosavePromise) await autosavePromise;
