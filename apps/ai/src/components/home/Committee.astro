@@ -81,7 +81,7 @@ const teams = [
       {officers.map(officer => <article class="flow-officer">
         {officer.portrait
           ? officer.linkedin
-            ? <a class="flow-committee__profile" href={officer.linkedin} aria-label={`${officer.name} on LinkedIn`}>
+            ? <a class="flow-committee__profile" href={officer.linkedin} target="_blank" rel="noopener noreferrer" aria-label={`${officer.name} on LinkedIn (opens in a new tab)`}>
                 <Image class="flow-committee__portrait" src={officer.portrait} width={360} height={360} alt="" loading="lazy" decoding="async" />
               </a>
             : <Image class="flow-committee__portrait" src={officer.portrait} width={360} height={360} alt="" loading="lazy" decoding="async" />
@@ -101,7 +101,7 @@ const teams = [
         <ul>
           {team.members.map(member => <li>
             {linkedInProfiles.has(member.name)
-              ? <a class="flow-committee__profile" href={linkedInProfiles.get(member.name)} aria-label={`${member.name} on LinkedIn`}>
+              ? <a class="flow-committee__profile" href={linkedInProfiles.get(member.name)} target="_blank" rel="noopener noreferrer" aria-label={`${member.name} on LinkedIn (opens in a new tab)`}>
                   <Image class="flow-committee__portrait" src={member.portrait} width={360} height={360} alt="" loading="lazy" decoding="async" />
                 </a>
               : <Image class="flow-committee__portrait" src={member.portrait} width={360} height={360} alt="" loading="lazy" decoding="async" />}
