@@ -22,7 +22,7 @@ export default defineConfig({
       ...process.env,
       ASTRO_DEV_BACKGROUND: '0',
       PUBLIC_CLERK_KEYLESS_DISABLED: 'true',
-      PUBLIC_CLERK_PUBLISHABLE_KEY: 'pk_test_fixture',
+      PUBLIC_CLERK_PUBLISHABLE_KEY: 'pk_test_Zml4dHVyZS50ZXN0JA==',
       CONVEX_URL: 'https://fixture.convex.cloud',
       CONVEX_SITE_URL: 'https://fixture.convex.site',
     },
