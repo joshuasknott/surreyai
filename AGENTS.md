@@ -1,3 +1,12 @@
+# Surrey AI Hack
+
+Next.js app in src/ with public assets in public/. Use npm and package-lock.json.
+
+- `npm run dev` starts the local app; `npm run lint` and `npm run build` are the available implementation checks.
+- There is no test script currently. Verify changed interactions and responsive layout in the browser; add meaningful tests when introducing behavior that warrants them.
+- Inspect the current source and assets for event content and visual direction. Do not invent dates, sponsors, registration links, or attendance claims.
+- Keep the README aligned with actual scripts and deployment requirements when those change.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 # This is NOT the Next.js you know
