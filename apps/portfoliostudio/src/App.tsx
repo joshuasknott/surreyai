@@ -84,15 +84,21 @@ function Legal({ privacy = false }: { privacy?: boolean }) {
             <p>
               Your original uploaded CV is read in your browser. Its extracted
               text is only sent to an AI provider when you explicitly include it
-              with a request. Unsigned drafts are stored on this device.
+              with a request, including when you choose to improve extraction
+              with AI. Unsigned drafts are stored on this device.
             </p>
             <h2>What is shared</h2>
             <p>
               Publishing makes your chosen portfolio content publicly
-              accessible. AI requests send your current portfolio, instructions
-              and any included CV text to the selected provider. Avoid including
-              information you don’t want that provider to process. Their own
-              terms and retention policies apply.
+              accessible. AI requests send your current portfolio, instructions,
+              saved student information and any included CV text to the selected
+              provider. Avoid including information you don’t want that provider
+              to process. Their own terms and retention policies apply.
+            </p>
+            <p>
+              Unused student information and hidden sections are excluded from
+              published pages and website downloads. Editable source downloads
+              are private backups and include that information.
             </p>
             <h2>Account and key security</h2>
             <p>

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { studentCategories, studentProfileSchema } from "./student";
 
 export const sectionTypes = [
   "hero",
@@ -96,6 +97,7 @@ export const sectionStyleSchema = z.object({
 export const sectionSchema = z.object({
   id: z.string().max(80),
   type: z.enum(sectionTypes),
+  sourceCategory: z.enum(studentCategories).optional(),
   title: z.string().max(400),
   subtitle: z.string().max(500).default(""),
   body: z.string().max(12000).default(""),
@@ -138,6 +140,7 @@ export const portfolioSchema = z.object({
     photo: imageUrl.default(""),
     links: z.array(linkSchema).max(20).default([]),
   }),
+  student: studentProfileSchema.optional(),
   theme: themeSchema,
   sections: z.array(sectionSchema).min(1).max(30),
   seo: z.object({
@@ -146,6 +149,7 @@ export const portfolioSchema = z.object({
   }),
 });
 export type PortfolioDocument = z.infer<typeof portfolioSchema>;
+export type { StudentProfile } from "./student";
 export type PortfolioSection = z.infer<typeof sectionSchema>;
 export type PortfolioItem = z.infer<typeof itemSchema>;
 export type PortfolioTheme = z.infer<typeof themeSchema>;

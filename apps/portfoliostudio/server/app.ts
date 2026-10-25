@@ -17,7 +17,11 @@ import {
   assetStorageKey,
   type AssetRecord,
 } from "./assets";
-import { publicSecurityHeaders, renderPublicPortfolio } from "./ssr";
+import {
+  publicPortfolioDocument,
+  publicSecurityHeaders,
+  renderPublicPortfolio,
+} from "./ssr";
 import {
   base64url,
   cookie,
@@ -38,6 +42,12 @@ import {
   validPassword,
   verifyPassword,
 } from "./security";
+import {
+  extractStudentProfile,
+  sanitizeImportedStudentProfile,
+  studentProfileSchema,
+  type StudentProfile,
+} from "../shared/student";
 
 type UserRecord = {
   id: string;
@@ -497,6 +507,10 @@ const aiPatchSchema = z.object({
     .max(8),
   summary: z.string().min(1).max(600),
 });
+const studentAiResultSchema = z.object({
+  profile: z.unknown(),
+  warnings: z.array(z.string().max(240)).max(20).default([]),
+});
 const fixedProviderEndpoints: Record<string, string> = {
   openai: "https://api.openai.com/v1/chat/completions",
   openrouter: "https://openrouter.ai/api/v1/chat/completions",
@@ -574,6 +588,35 @@ function parseAiPatchResult(
       if (parsed.success) return parsed.data;
     } catch {
       /* bounded JSON extraction */
+    }
+  }
+  return null;
+}
+function parseStudentAiResult(raw: unknown): {
+  profile: StudentProfile;
+  warnings: string[];
+} | null {
+  const textValue = extractModelText(raw).trim();
+  if (!textValue) return null;
+  const candidates = [textValue];
+  const fenced = textValue.match(/```(?:json)?\s*([\s\S]*?)```/i)?.[1];
+  if (fenced) candidates.unshift(fenced.trim());
+  const start = textValue.indexOf("{");
+  const end = textValue.lastIndexOf("}");
+  if (start >= 0 && end > start)
+    candidates.push(textValue.slice(start, end + 1));
+  for (const candidate of candidates) {
+    try {
+      const parsed = studentAiResultSchema.safeParse(JSON.parse(candidate));
+      if (!parsed.success) continue;
+      const profile = studentProfileSchema.safeParse(parsed.data.profile);
+      if (!profile.success) continue;
+      return {
+        profile: profile.data,
+        warnings: parsed.data.warnings,
+      };
+    } catch {
+      /* retry with the next bounded extraction */
     }
   }
   return null;
@@ -749,27 +792,82 @@ function applySelection(
   }
   return { ...original, sections };
 }
+function preserveStudentProfile(
+  original: PortfolioDocument,
+  generated: PortfolioDocument,
+): PortfolioDocument {
+  if (original.student === undefined) {
+    const { student: _student, ...withoutStudent } = generated;
+    return withoutStudent;
+  }
+  return { ...generated, student: original.student };
+}
+function removeGeneratedStudent(value: unknown): unknown {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return value;
+  const { student: _student, ...withoutStudent } = value as Record<
+    string,
+    unknown
+  >;
+  return withoutStudent;
+}
+function parseGeneratedDocument(
+  original: PortfolioDocument,
+  value: unknown,
+): PortfolioDocument {
+  return parseProjectInput(
+    removeGeneratedStudent(restoreImagesFromPrompt(value, original)),
+  );
+}
 function aiPrompt(
   document: PortfolioDocument,
   prompt: string,
   selection: unknown,
   cv: string,
 ): string {
+  const workingDocument = removeGeneratedStudent(
+    sanitizeImagesForPrompt(document),
+  );
+  const canonicalFacts = document.student
+    ? `Canonical student facts (authoritative; the server restores these facts after generation): ${JSON.stringify(sanitizeImagesForPrompt(document.student))}`
+    : "";
   return [
     "You edit a student portfolio document for Portfolio Studio.",
     selection
       ? 'Return ONLY JSON matching {"changes":[{"sectionId":string,"field":"title"|"subtitle"|"body"|"image"|"item","itemId"?:string,"itemField"?:"title"|"subtitle"|"description"|"image","value":string}],"summary":string}. Include only the selected field.'
-      : 'Return ONLY a JSON object matching {"document": PortfolioDocument, "summary": string}. Do not return markdown, HTML, JavaScript, CSS, URLs you invented, or any additional keys.',
+      : 'Return ONLY a JSON object matching {"document": object, "summary": string}. Do not return markdown, HTML, JavaScript, CSS, URLs you invented, or any additional keys.',
+    selection
+      ? ""
+      : "Full-document JSON contract: document has version=1, name, templateId, profile{name,headline,bio,location,email,photo,links:[{id,label,url}]}, theme{background,surface,color,muted,accent,border,headingFont,bodyFont,headingWeight,radius,maxWidth,fontSize,navigation}, sections:[{id,type,title,subtitle,body,image,imageAlt,layout,visible,style,items:[{id,title,subtitle,description,image,imageAlt,url,tags,date}],buttonLabel,buttonUrl}], and seo{title,description}. Allowed section types are hero, projects, about, experience, education, skills, achievements, interests, contact, text, gallery, links. Allowed layouts are split, centered, editorial, grid, list, timeline, bento, full, columns, statement. Allowed fonts are inter, fraunces, space-grotesk, plex-mono; navigation is minimal, centered, split, or sidebar. Keep at least one section.",
     "Keep the document version and schema valid. Preserve all existing content unless the requested change requires it.",
+    selection
+      ? ""
+      : "Use six-digit hex colors such as #FFFFFF and #FA5E18, never color names or three-digit hex. Theme numbers: headingWeight 300–800, radius 0–40, maxWidth 720–1600, fontSize 14–22. Each section requires style: use {} to accept defaults, or paddingTop/paddingBottom 0–240, textAlign left|center|right, columns 1–4, imagePosition left|right|background|none, imageWidth 20–80, headingSize 24–160, and optional six-digit background/color/accent. All titles and prose are strings, tags and links are arrays. Volunteering uses type experience with sourceCategory volunteering. Keep output concise; omit optional empty fields and use style:{} for defaults instead of repeating every default value.",
+    "Canonical student facts are supplied separately and are immutable context. Do not include a student key in the returned document; the server restores the canonical value. Do not rewrite or remove these facts during portfolio generation.",
     selection
       ? `Only change the selected element: ${JSON.stringify(selection)}.`
       : "There is no selection; apply the requested change to the document.",
     `Request: ${prompt}`,
     cv ? `Optional CV context (use only as factual source): ${cv}` : "",
-    `Current document: ${JSON.stringify(sanitizeImagesForPrompt(document))}`,
+    canonicalFacts,
+    `Current document: ${JSON.stringify(workingDocument)}`,
   ]
     .filter(Boolean)
     .join("\n");
+}
+function studentExtractionPrompt(textValue: string): string {
+  const local = extractStudentProfile(textValue);
+  return [
+    "Extract a factual canonical student profile from the supplied CV text for Portfolio Studio.",
+    'Return ONLY JSON matching {"profile": StudentProfile, "warnings": string[]}. Do not return markdown, HTML, URLs you invented, or additional keys.',
+    "StudentProfile version must be 1. Keep every field bounded by the schema. Use empty strings/arrays when the source does not provide a value.",
+    "The profile object must contain these top-level keys exactly: version, name, headline, bio, location, email, photo, links, education, experience, projects, volunteering, skills, interests, achievements. Do not nest these category arrays under a categories key.",
+    "Every category entry must be an object with exactly these editable fields: {id, title, subtitle, description, image, imageAlt, url, tags, date}. Use [] for every category with no explicit source entries; never omit an array because the local hint is empty.",
+    "Do not infer or include a date of birth, full street address, phone number, demographic traits, accomplishments, employers, dates, links, or skills that are not explicitly present.",
+    "Use commonplace headings to classify education, experience, projects, volunteering, skills, interests, and achievements. Preserve source wording and uncertainty in descriptions or warnings.",
+    "Only classify facts from the supplied CV under an explicit or clearly implied CV section. Do not treat document disclaimers, QA notes, footer labels, instructions, or this prompt as skills or achievements.",
+    `Local extraction hint (source-derived only; verify against the CV): ${JSON.stringify(local.profile)}`,
+    `CV text:\n${textValue}`,
+  ].join("\n");
 }
 async function fetchWithTimeout(
   url: string,
@@ -872,6 +970,227 @@ async function callExternalProvider(
       "ai_provider_unavailable",
     );
   return response.json();
+}
+async function runAiCompletion(
+  c: { env: Bindings },
+  user: UserRecord,
+  body: Record<string, unknown>,
+  messages: Array<{ role: string; content: string }>,
+  isValidResult: (value: unknown) => boolean,
+): Promise<unknown> {
+  const settings = await c.env.DATA!.get<AiSettings>(aiSettingsKey(user.id));
+  const mode =
+    body.mode === "account" || body.mode === "key" || body.mode === "society"
+      ? body.mode
+      : (settings?.mode ?? "society");
+  const configured = await c.env.DATA!.get<AdminAiConfig>(adminAiConfigKey);
+  const providers =
+    configured?.providers ??
+    configuredSocietyProviders(c.env.SOCIETY_AI_PROVIDERS);
+  let providerId = aiProviderId(text(body.provider) || settings?.provider);
+  let model = text(body.model);
+  let maxInputTokens = configuredNumber(
+    c.env.SOCIETY_AI_MAX_INPUT_TOKENS,
+    16_384,
+    512,
+    32_768,
+  );
+  let maxOutputTokens = configuredNumber(
+    c.env.SOCIETY_AI_MAX_OUTPUT_TOKENS,
+    4_096,
+    256,
+    8_192,
+  );
+  let dailyNeurons = configuredNumber(
+    c.env.SOCIETY_AI_DAILY_NEURONS ?? c.env.SOCIETY_AI_DAILY_LIMIT,
+    9_000,
+    256,
+    2_000_000,
+  );
+  let userDailyNeurons = configuredNumber(
+    c.env.SOCIETY_AI_USER_DAILY_NEURONS ?? c.env.SOCIETY_AI_USER_DAILY_LIMIT,
+    1_500,
+    256,
+    500_000,
+  );
+  const selectedProvider = (entry: SocietyAiProvider | undefined) => {
+    if (!entry) return;
+    maxInputTokens = entry.maxInputTokens ?? maxInputTokens;
+    maxOutputTokens =
+      entry.maxOutputTokens ?? entry.maxRequestTokens ?? maxOutputTokens;
+    dailyNeurons = entry.dailyLimit ?? dailyNeurons;
+    userDailyNeurons = entry.userDailyLimit ?? userDailyNeurons;
+  };
+  const inputTokens = Math.ceil(
+    messages.reduce((sum, message) => sum + message.content.length, 0) / 4,
+  );
+  if (inputTokens > maxInputTokens)
+    throw new ApiError(
+      413,
+      "That AI request is too large. Shorten the prompt or CV and try again.",
+      "ai_request_too_large",
+    );
+  const retryMessages = [
+    ...messages,
+    {
+      role: "user",
+      content: body.selection
+        ? "Retry: output only the requested JSON patch, with no markdown."
+        : "Retry: output valid JSON only and include the complete requested result.",
+    },
+  ];
+  let rawResult: unknown;
+  if (mode === "society") {
+    const available = providers.filter(
+      (entry) => entry.enabled && entry.models.length,
+    );
+    const selected =
+      available.find(
+        (entry) =>
+          (providerId && entry.id === providerId) ||
+          (model && entry.models.includes(model)),
+      ) ?? available[0];
+    if (!selected)
+      throw new ApiError(
+        503,
+        "No society AI model is enabled yet.",
+        "society_ai_unavailable",
+      );
+    selectedProvider(selected);
+    if (inputTokens > maxInputTokens)
+      throw new ApiError(
+        413,
+        "That AI request is too large. Shorten the prompt or CV and try again.",
+        "ai_request_too_large",
+      );
+    providerId = selected.id;
+    model = model || selected.models[0];
+    if (!selected.models.includes(model))
+      throw new ApiError(
+        400,
+        "That society AI model is not enabled.",
+        "model_not_allowed",
+      );
+    const inputRate = selected.inputNeuronsPerMillion ?? 4_119;
+    const outputRate = selected.outputNeuronsPerMillion ?? 34_868;
+    const reservedNeurons =
+      Math.ceil(
+        (inputTokens * inputRate + maxOutputTokens * outputRate) / 1_000_000,
+      ) * 2;
+    await reserveUsage(c.env.DATA!, user.id, reservedNeurons, {
+      global: dailyNeurons,
+      user: userDailyNeurons,
+    });
+    if (selected.encryptedApiKey) {
+      if (!c.env.BYOK_ENCRYPTION_KEY || !fixedProviderEndpoints[selected.id])
+        throw new ApiError(
+          503,
+          "The configured society provider is unavailable.",
+          "society_ai_unavailable",
+        );
+      let providerKey: string;
+      try {
+        providerKey = await decryptSecret(
+          selected.encryptedApiKey,
+          c.env.BYOK_ENCRYPTION_KEY,
+        );
+      } catch {
+        throw new ApiError(
+          503,
+          "The configured society provider is unavailable.",
+          "society_ai_unavailable",
+        );
+      }
+      const reasoning = Boolean(
+        selected.reasoning && supportsProviderReasoning(selected.id, model),
+      );
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        rawResult = await callExternalProvider(
+          selected.id,
+          providerKey,
+          model,
+          attempt ? retryMessages : messages,
+          maxOutputTokens,
+          reasoning,
+        );
+        if (isValidResult(rawResult)) break;
+      }
+    } else {
+      if (
+        !c.env.AI ||
+        typeof (c.env.AI as { run?: unknown }).run !== "function"
+      )
+        throw new ApiError(
+          503,
+          "Society AI is temporarily unavailable.",
+          "society_ai_unavailable",
+        );
+      const ai = c.env.AI as {
+        run(modelName: string, input: unknown): Promise<unknown>;
+      };
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        rawResult = await ai.run(model, {
+          messages: attempt ? retryMessages : messages,
+          max_tokens: maxOutputTokens,
+        });
+        if (isValidResult(rawResult)) break;
+      }
+    }
+  } else if (mode === "key") {
+    const keyProvider = providerId || aiProviderId(settings?.provider);
+    const encrypted = settings?.encryptedApiKey;
+    if (!encrypted || !c.env.BYOK_ENCRYPTION_KEY)
+      throw new ApiError(
+        400,
+        "Add your provider API key in AI settings first.",
+        "api_key_required",
+      );
+    if (!fixedProviderEndpoints[keyProvider])
+      throw new ApiError(
+        400,
+        "Choose a supported AI provider.",
+        "provider_invalid",
+      );
+    const defaults: Record<string, string> = {
+      openai: "gpt-5-mini",
+      anthropic: "claude-sonnet-4-5-20250929",
+      gemini: "gemini-2.5-flash",
+      openrouter: "openai/gpt-5-mini",
+      deepseek: "deepseek-v4-flash",
+    };
+    model = model || defaults[keyProvider];
+    if (!model || model.length > 120)
+      throw new ApiError(400, "Choose a valid model.", "model_invalid");
+    let apiKey: string;
+    try {
+      apiKey = await decryptSecret(encrypted, c.env.BYOK_ENCRYPTION_KEY);
+    } catch {
+      throw new ApiError(
+        503,
+        "That API key could not be opened.",
+        "api_key_unavailable",
+      );
+    }
+    const reasoning =
+      body.reasoning === true && supportsProviderReasoning(keyProvider, model);
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      rawResult = await callExternalProvider(
+        keyProvider,
+        apiKey,
+        model,
+        attempt ? retryMessages : messages,
+        maxOutputTokens,
+        reasoning,
+      );
+      if (isValidResult(rawResult)) break;
+    }
+  } else
+    throw new ApiError(
+      503,
+      "Sign in with a supported AI provider is not connected yet.",
+      "account_connection_unavailable",
+    );
+  return rawResult;
 }
 function assertSameOrigin(request: Request): void {
   if (!originAllowed(request))
@@ -1299,10 +1618,10 @@ export function createApp(
     const document = parseProjectInput(body.document);
     const cv = text(body.cv);
     const selection = body.selection;
-    if (!prompt || prompt.length > 4000 || cv.length > 40_000)
+    if (!prompt || prompt.length > 8_000 || cv.length > 40_000)
       throw new ApiError(
         400,
-        "Describe the request in 4,000 characters or provide a smaller CV.",
+        "Describe the request in 8,000 characters or provide a smaller CV.",
         "prompt_invalid",
       );
     const settings = await c.env.DATA!.get<AiSettings>(aiSettingsKey(user.id));
@@ -1367,17 +1686,25 @@ export function createApp(
         "That AI request is too large. Shorten the prompt or CV and try again.",
         "ai_request_too_large",
       );
-    const isValidResult = (value: unknown) =>
-      selection
-        ? Boolean(parseAiPatchResult(value) || parseAiResult(value))
-        : Boolean(parseAiResult(value));
+    const isValidResult = (value: unknown) => {
+      if (selection)
+        return Boolean(parseAiPatchResult(value) || parseAiResult(value));
+      const parsed = parseAiResult(value);
+      if (!parsed) return false;
+      try {
+        parseGeneratedDocument(document, parsed.document);
+        return true;
+      } catch {
+        return false;
+      }
+    };
     const retryMessages = [
       ...messages,
       {
         role: "user",
         content: selection
           ? "Retry: output only the requested JSON patch, with no markdown."
-          : "Retry: output valid JSON only and include the complete document.",
+          : "Retry: the previous full document failed validation. Output one complete JSON document matching the contract, with every required top-level key and no student key; output JSON only with no markdown.",
       },
     ];
     if (mode === "society") {
@@ -1547,8 +1874,9 @@ export function createApp(
           "The AI returned an invalid portfolio. Try a simpler request.",
           "ai_result_invalid",
         );
-      const generated = parseProjectInput(
-        restoreImagesFromPrompt(fullResult.document, document),
+      const generated = preserveStudentProfile(
+        document,
+        parseGeneratedDocument(document, fullResult.document),
       );
       result = parseProjectInput(
         applySelection(document, generated, selection),
@@ -1556,6 +1884,56 @@ export function createApp(
       summary = fullResult.summary;
     }
     return c.json({ document: result, summary });
+  });
+  app.post("/api/ai/extract-cv", async (c) => {
+    assertSameOrigin(c.req.raw);
+    const user = requireUser(c.get("user"));
+    const body = await readJson(c);
+    const source = text(body.text);
+    if (!source || source.length > 40_000)
+      throw new ApiError(
+        400,
+        "Provide CV text up to 40,000 characters.",
+        "cv_invalid",
+      );
+    const messages = [
+      {
+        role: "system",
+        content:
+          'You extract a factual StudentProfile. Return only JSON matching {"profile": StudentProfile, "warnings": string[]}. Never invent facts or include sensitive details that are not explicitly in the CV.',
+      },
+      { role: "user", content: studentExtractionPrompt(source) },
+    ];
+    const rawResult = await runAiCompletion(c, user, body, messages, (value) =>
+      Boolean(parseStudentAiResult(value)),
+    );
+    const parsed = parseStudentAiResult(rawResult);
+    if (!parsed)
+      throw new ApiError(
+        502,
+        "The AI could not extract a valid student profile. Try again or review the CV manually.",
+        "student_result_invalid",
+      );
+    const local = extractStudentProfile(source);
+    const profile = sanitizeImportedStudentProfile(parsed.profile);
+    const redacted = JSON.stringify(profile) !== JSON.stringify(parsed.profile);
+    const reviewWarning = "Review AI-imported facts before publishing.";
+    return c.json({
+      profile,
+      warnings: [
+        ...new Set([
+          ...local.warnings,
+          ...parsed.warnings,
+          ...(redacted
+            ? [
+                "Sensitive address or birth-date text was removed from the import.",
+              ]
+            : []),
+          reviewWarning,
+        ]),
+      ].slice(0, 20),
+      method: "ai" as const,
+    });
   });
   app.get("/api/admin/ai/config", async (c) => {
     requireAdmin(c.get("user"), c.env.ADMIN_USER_IDS);
@@ -2326,7 +2704,10 @@ export function createApp(
     );
     if (!project?.publishedDocument || !project.publishedAt || project.archived)
       throw new ApiError(404, "Portfolio not found.", "public_not_found");
-    return c.json({ name: project.name, document: project.publishedDocument });
+    return c.json({
+      name: project.name,
+      document: publicPortfolioDocument(project.publishedDocument),
+    });
   });
   app.get("/p/:slug", async (c) => {
     const slug = safeSlug(c.req.param("slug"));
@@ -2370,7 +2751,10 @@ export function createApp(
     )
       throw new ApiError(404, "Portfolio not found.", "public_not_found");
     c.header("Cache-Control", "public, max-age=300, s-maxage=300");
-    return c.json({ name: project.name, document: project.publishedDocument });
+    return c.json({
+      name: project.name,
+      document: publicPortfolioDocument(project.publishedDocument),
+    });
   });
   return app;
 }

@@ -5,17 +5,18 @@ import type { Society } from '@surreysocieties/admin/types';
 import ContactForm from '@surreysocieties/ui/components/ContactForm';
 import SocialIcon from '@surreysocieties/ui/components/SocialIcon';
 import Committee from './Committee.astro';
-import glassLoop from '../../assets/generated/flow/glass-loop.webp';
-import glassOrb from '../../assets/generated/flow/glass-orb.webp';
-import orangeCube from '../../assets/generated/flow/orange-cube.webp';
-import orangeStar from '../../assets/generated/flow/orange-star.webp';
+import book from '../../assets/generated/illustrated/book.webp';
+import speech from '../../assets/generated/illustrated/speech.webp';
+import blocks from '../../assets/generated/illustrated/blocks.webp';
+import ticket from '../../assets/generated/illustrated/ticket.webp';
+import contactArt from '../../assets/generated/illustrated/contact.webp';
 
 interface Props { society: Society; committee?: Array<{ name: string; role?: string }>; }
 const { society, committee = [] } = Astro.props;
 const activities = [
-  { title: 'Workshops', text: 'Learn new skills, hands-on and together.', image: orangeCube, href: society.socials.instagram, label: 'Find workshops on Instagram' },
-  { title: 'Projects & challenges', text: 'Turn ideas into real projects with a supportive community.', image: glassOrb, href: society.socials.discord, label: 'Talk projects with us on Discord', id: 'projects' },
-  { title: 'Talks & socials', text: 'Fresh perspectives, interesting people, great conversations.', image: orangeStar, href: society.socials.whatsapp, label: 'Find talks and socials on WhatsApp' },
+  { title: 'Workshops', text: 'Learn new skills, hands-on and together.', image: book, href: society.socials.instagram, label: 'Workshops on Instagram' },
+  { title: 'Projects & challenges', text: 'Turn ideas into real projects with a supportive community.', image: blocks, href: society.socials.discord, label: 'Projects on Discord', id: 'projects' },
+  { title: 'Talks & socials', text: 'Fresh perspectives, interesting people, great conversations.', image: speech, href: society.socials.whatsapp, label: 'Talks on WhatsApp' },
 ];
 const socials = [ ['instagram', 'Instagram'], ['linkedin', 'LinkedIn'], ['discord', 'Discord'], ['linktree', 'Linktree'] ];
 ---
@@ -27,37 +28,32 @@ const socials = [ ['instagram', 'Instagram'], ['linkedin', 'LinkedIn'], ['discor
       <p>A student-run community exploring what AI can do,<br class="flow-desktop-break" /> and what it should do.</p>
     </div>
     <div class="flow-about__art" aria-hidden="true">
-      <Image src={glassLoop} width={600} alt="" loading="lazy" />
-      <p class="flow-note">Ideas<br />people<br />possibilities</p>
+      <Image src={book} width={300} alt="" loading="lazy" /><Image src={blocks} width={200} alt="" loading="lazy" />
     </div>
   </div>
 </section>
 
 <section id="activities" class="flow-section flow-activities" aria-labelledby="activities-title">
   <div class="flow-shell">
-    <p class="flow-note flow-activities__note" aria-hidden="true">Bigger<br />questions.<br />Brighter<br />people.</p>
     <h2 id="activities-title" class="flow-heading">Find your thing.</h2>
-    <p class="flow-note flow-activities__note-right" aria-hidden="true">Learn<br />build<br />connect</p>
     <div class="flow-activity-grid">
       {activities.map(activity => <article id={activity.id} class="flow-activity">
-        <Image src={activity.image} width={320} height={320} alt="" loading="lazy" />
+        <Image src={activity.image} width={320} alt="" loading="lazy" />
         <h3>{activity.title}</h3>
         <p>{activity.text}</p>
-        <a href={activity.href} target="_blank" rel="noopener noreferrer" aria-label={activity.label}><ArrowRight aria-hidden="true" size={24} strokeWidth={1.8} /></a>
+        <a href={activity.href} target="_blank" rel="noopener noreferrer" aria-label={activity.label}><span>{activity.label}</span><ArrowUpRight aria-hidden="true" size={18} /></a>
       </article>)}
     </div>
-    <a class="flow-button flow-button--paper flow-events-link" href="#programme">Explore events <ArrowRight size={22} aria-hidden="true" /></a>
-    <Image class="flow-activities__orb" src={glassOrb} width={180} alt="" loading="lazy" />
+    <a class="flow-button flow-button--ink flow-events-link" href="#programme">Explore events <ArrowRight size={22} aria-hidden="true" /></a>
   </div>
 </section>
 
 <Committee society={society} committee={committee} />
 
 <section id="join" class="flow-section flow-join" aria-labelledby="join-title">
-  <Image class="flow-join__loop" src={glassLoop} width={620} alt="" loading="lazy" />
-  <Image class="flow-join__orb" src={glassOrb} width={380} alt="" loading="lazy" />
+  <Image class="flow-join__ticket" src={ticket} width={320} alt="" loading="lazy" />
+  <Image class="flow-join__speech" src={speech} width={320} alt="" loading="lazy" />
   <div class="flow-shell">
-    <p class="flow-note flow-join__note" aria-hidden="true">Same<br />curiosity.<br />A brighter<br />tomorrow.</p>
     <h2 id="join-title" class="flow-heading">Come and join us<span>.</span></h2>
     <p class="flow-join__intro">Every degree. Every level. Everyone welcome.</p>
     <ol class="flow-join__steps">
@@ -74,7 +70,6 @@ const socials = [ ['instagram', 'Instagram'], ['linkedin', 'LinkedIn'], ['discor
         <a class="flow-button flow-button--paper" href={society.socials.whatsapp} target="_blank" rel="noopener noreferrer">Join our WhatsApp <ArrowUpRight size={22} aria-hidden="true" /></a>
       </li>
     </ol>
-    <p class="flow-note flow-join__note-right" aria-hidden="true">More<br />than AI.<br />A community.</p>
   </div>
 </section>
 
@@ -83,7 +78,7 @@ const socials = [ ['instagram', 'Instagram'], ['linkedin', 'LinkedIn'], ['discor
     <div class="flow-contact__intro">
       <h2 id="contact-title" class="flow-heading">Get in <span>touch.</span></h2>
       <p>Have a question, an idea or just want to say hi?<br />We’d love to hear from you.</p>
-      <Image src={glassOrb} width={520} alt="" loading="lazy" />
+      <Image src={contactArt} width={520} alt="" loading="lazy" />
     </div>
     <div class="flow-contact__form"><ContactForm society={society} /></div>
     <div class="flow-contact__socials">
@@ -91,7 +86,6 @@ const socials = [ ['instagram', 'Instagram'], ['linkedin', 'LinkedIn'], ['discor
       <nav class="community-socials" aria-label="Society social channels">
         {socials.map(([key, label]) => <a class={`flow-social flow-social--${key}`} href={society.socials[key as keyof typeof society.socials]} target="_blank" rel="noopener noreferrer" aria-label={`${label} (opens in a new tab)`}><SocialIcon name={key} /><span>{label}</span><span class="flow-social-arrow" aria-hidden="true">↗</span></a>)}
       </nav>
-      <p class="flow-note" aria-hidden="true">Let’s<br />stay connected.</p>
     </div>
   </div>
 </section>

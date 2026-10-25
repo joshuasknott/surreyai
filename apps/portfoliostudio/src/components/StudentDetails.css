@@ -1,0 +1,149 @@
+.student-details {
+  display: grid;
+  gap: 22px;
+  margin-top: 24px;
+}
+
+.student-details-intro {
+  padding: 16px 18px;
+  border: 1px solid #e8e5de;
+  background: #fbfaf7;
+}
+
+.student-details-intro .eyebrow {
+  display: block;
+  margin-bottom: 7px;
+}
+.student-details-intro p {
+  margin: 0;
+  color: #655f57;
+  font-size: 12px;
+  line-height: 1.55;
+}
+.student-details-fields,
+.student-details-list {
+  display: grid;
+  gap: 15px;
+}
+.student-details-two-up {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15px;
+}
+.student-details label {
+  display: grid;
+  gap: 7px;
+}
+.student-extra {
+  border-top: 1px solid #e5e2dc;
+  padding-top: 14px;
+}
+.student-extra summary {
+  color: #625b52;
+  cursor: pointer;
+  font-size: 12px;
+}
+.student-extra summary span {
+  float: right;
+  color: #9a9388;
+  font-size: 11px;
+}
+.student-extra[open] summary {
+  margin-bottom: 14px;
+}
+.student-details input,
+.student-details textarea {
+  width: 100%;
+}
+.student-links,
+.student-category {
+  border-top: 1px solid #e5e2dc;
+  border-bottom: 1px solid #e5e2dc;
+}
+.student-links summary,
+.student-category summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 15px 2px;
+  color: #2e2b28;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  list-style-position: inside;
+}
+.student-links summary span,
+.student-category summary span {
+  margin-left: auto;
+  color: #8a8378;
+  font-size: 11px;
+  font-weight: 400;
+}
+.student-links[open] summary,
+.student-category[open] summary {
+  margin-bottom: 14px;
+}
+.student-link-row {
+  display: grid;
+  grid-template-columns: minmax(110px, 0.7fr) minmax(0, 1.3fr) auto;
+  align-items: end;
+  gap: 12px;
+}
+.student-remove {
+  width: 36px;
+  height: 36px;
+  margin-bottom: 1px;
+}
+.student-category + .student-category {
+  border-top: 0;
+}
+.student-entry {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  margin: 0;
+  padding: 16px;
+  border: 1px solid #e5e2dc;
+  background: #fff;
+}
+.student-entry legend {
+  max-width: 90%;
+  padding: 0 5px;
+  color: #48433d;
+  font-size: 11px;
+  font-weight: 600;
+}
+.student-entry-extras {
+  border-top: 1px solid #ece9e3;
+  padding-top: 12px;
+}
+.student-entry-extras summary {
+  color: #625b52;
+  cursor: pointer;
+  font-size: 11px;
+}
+.student-entry-extras summary span {
+  float: right;
+  color: #9a9388;
+}
+.student-entry-extras[open] summary {
+  margin-bottom: 14px;
+}
+.student-add,
+.student-delete-entry,
+.ai-extract-button {
+  justify-self: start;
+}
+.student-delete-entry {
+  color: #7c5048;
+}
+
+@media (max-width: 720px) {
+  .student-details-two-up,
+  .student-link-row {
+    grid-template-columns: 1fr;
+  }
+  .student-remove {
+    margin-top: -7px;
+  }
+}

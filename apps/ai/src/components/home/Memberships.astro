@@ -1,6 +1,8 @@
 ---
 import { ArrowRight, ArrowUpRight, Check } from 'lucide-astro';
+import { Image } from 'astro:assets';
 import type { Society } from '@surreysocieties/admin/types';
+import ticket from '../../assets/generated/illustrated/ticket.webp';
 import '../../styles/memberships.css';
 
 interface Props { society: Society; }
@@ -34,8 +36,13 @@ const premiumGroups = [
 <section id="memberships" class="memberships" aria-labelledby="memberships-title">
   <div class="memberships-shell">
     <div class="memberships-heading">
-      <h2 id="memberships-title">Memberships</h2>
-      <p class="memberships-year">2026–27 academic year</p>
+      <div class="memberships-heading-row">
+        <Image class="memberships-heading-art" src={ticket} width={96} height={80} alt="" loading="lazy" />
+        <div>
+          <h2 id="memberships-title">Memberships</h2>
+          <p class="memberships-year">2026–27 academic year</p>
+        </div>
+      </div>
       <p>Find your people. Build your skills. Every degree welcome.</p>
     </div>
     <div class="membership-grid">
@@ -48,9 +55,9 @@ const premiumGroups = [
         <ul class="membership-benefits membership-benefits--free">
           {freeBenefits.map(benefit => <li><span class="membership-check"><Check size={18} aria-hidden="true" /></span><span>{benefit}</span></li>)}
         </ul>
-        <a class="membership-action membership-action--free" href={society.membershipUrl} target="_blank" rel="noopener noreferrer">
+        <div class="membership-card-footer"><a class="membership-action membership-action--free" href={society.membershipUrl} target="_blank" rel="noopener noreferrer">
           Join for free <ArrowUpRight size={23} aria-hidden="true" />
-        </a>
+        </a></div>
       </article>
       <article class="membership-card membership-card--plus" aria-labelledby="plus-membership-title">
         <header class="membership-card-heading">
@@ -64,9 +71,9 @@ const premiumGroups = [
             {group.benefits.map(benefit => <li><span class="membership-check"><Check size={18} aria-hidden="true" /></span><span>{benefit}</span></li>)}
           </ul>
         </div>)}
-        <a class="membership-action membership-action--plus" href="/resources?access=ai-plus">
+        <div class="membership-card-footer"><a class="membership-action membership-action--plus" href="/resources?access=ai-plus">
           Explore AI+ <ArrowRight size={23} aria-hidden="true" />
-        </a>
+        </a></div>
       </article>
     </div>
     <a class="memberships-resources" href="/resources">Explore our resources <ArrowUpRight size={22} aria-hidden="true" /></a>

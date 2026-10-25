@@ -1,8 +1,10 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import type { PortfolioDocument } from "../shared/portfolio";
+import { publicPortfolioDocument } from "../shared/public-portfolio";
 import { PortfolioRenderer } from "../src/portfolio/PortfolioRenderer";
 import portfolioCss from "../src/portfolio/portfolio.css?raw";
+export { publicPortfolioDocument } from "../shared/public-portfolio";
 
 const escapeHtml = (value: unknown): string =>
   String(value ?? "").replace(
@@ -22,12 +24,15 @@ export function renderPublicPortfolio(
   document: PortfolioDocument,
   canonicalUrl: string,
 ): string {
+  const publicDocument = publicPortfolioDocument(document);
   const markup = renderToStaticMarkup(
-    createElement(PortfolioRenderer, { document, preview: true }),
+    createElement(PortfolioRenderer, { document: publicDocument, preview: true }),
   );
-  const title = document.seo.title || document.name;
+  const title = publicDocument.seo.title || publicDocument.name;
   const description =
-    document.seo.description || document.profile.headline || document.name;
+    publicDocument.seo.description ||
+    publicDocument.profile.headline ||
+    publicDocument.name;
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(title)}</title><meta name="description" content="${escapeHtml(description)}"><link rel="canonical" href="${escapeHtml(canonicalUrl)}"><link rel="stylesheet" href="/portfolio-fonts.css"><style>${portfolioCss}</style></head><body>${markup}</body></html>`;
 }
 

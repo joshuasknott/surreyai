@@ -50,6 +50,10 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Canvas } from "../components/Canvas";
+import {
+  PortfolioDesignDialog,
+  PortfolioInformationDialog,
+} from "../components/PortfolioContentDialogs";
 import { Loading, Modal, Notice } from "../components/ui";
 import { WorkshopSteps } from "../components/WorkshopSteps";
 import { useProject } from "../lib/useProject";
@@ -254,6 +258,12 @@ export function Editor() {
     item: PortfolioItem;
   } | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [libraryOpen, setLibraryOpen] = useState(false);
+  const [informationOpen, setInformationOpen] = useState(false);
+  const [contentNotice, setContentNotice] = useState("");
+  const latestDocument = useRef(project?.document);
+  latestDocument.current = project?.document;
+  const proposalBase = useRef("");
   const input = useRef<HTMLTextAreaElement>(null);
   const imageInput = useRef<HTMLInputElement>(null);
   const sensors = useSensors(
@@ -390,7 +400,7 @@ export function Editor() {
     setAddSection(false);
   };
   const askAi = async () => {
-    if (!document || !prompt.trim() || busy) return;
+    if (!document || !prompt.trim() || busy || proposal) return;
     if (!user) {
       try {
         sessionStorage.setItem(
@@ -411,6 +421,7 @@ export function Editor() {
     setBusy(true);
     setError("");
     const request = prompt.trim();
+    const base = JSON.stringify(document);
     setChat((c) => [...c, { role: "user", text: request }]);
     setPrompt("");
     try {
@@ -430,6 +441,12 @@ export function Editor() {
         }),
       });
       const valid = portfolioSchema.parse(result.document);
+      if (JSON.stringify(latestDocument.current) !== base) {
+        throw new Error(
+          "Your portfolio changed while AI was working. Your edits are safe. Send the request again to work from the latest version.",
+        );
+      }
+      proposalBase.current = base;
       setProposal({ document: valid, summary: result.summary });
       setChat((c) => [...c, { role: "assistant", text: result.summary }]);
     } catch (e) {
@@ -621,9 +638,37 @@ export function Editor() {
           </Notice>
         </div>
       )}
+      {contentNotice && (
+        <div className="editor-notice">
+          <Notice success>
+            {contentNotice}
+            <button
+              className="icon-button"
+              aria-label="Dismiss update notice"
+              onClick={() => setContentNotice("")}
+            >
+              <X />
+            </button>
+          </Notice>
+        </div>
+      )}
       <div className="editor-body">
         {!preview && sidebar && (
           <aside className="editor-sidebar">
+            <div className="editor-library-actions">
+              <button
+                disabled={busy || !!proposal}
+                onClick={() => setInformationOpen(true)}
+              >
+                Your information
+              </button>
+              <button
+                disabled={busy || !!proposal}
+                onClick={() => setLibraryOpen(true)}
+              >
+                Browse designs
+              </button>
+            </div>
             <div className="editor-tabs">
               <button
                 className={tab === "chat" ? "active" : ""}
@@ -667,15 +712,23 @@ export function Editor() {
                         {project.aiMode === "society"
                           ? "Society AI is ready to help. "
                           : "Your assistant is ready to help. "}
-                        Describe a change, or select part of your page to focus
-                        on it.
+                        {document.student
+                          ? "Your information is already available. Build a whole page, add a section, or select something to refine."
+                          : "Describe a change, or select part of your page to focus on it."}
                       </p>
                       <div className="suggestions">
-                        {[
-                          "Help me improve my introduction",
-                          "Make my project descriptions clearer",
-                          "Give my design a more personal feel",
-                        ].map((p) => (
+                        {(document.templateId === "student-canvas"
+                          ? [
+                              "Build my portfolio using my information",
+                              "Add my education and experience",
+                              "Create a minimalist design with bold typography",
+                            ]
+                          : [
+                              "Help me improve my introduction",
+                              "Make my project descriptions clearer",
+                              "Give my design a more personal feel",
+                            ]
+                        ).map((p) => (
                           <button
                             key={p}
                             onClick={() => {
@@ -714,6 +767,16 @@ export function Editor() {
                         <button
                           className="button primary small"
                           onClick={() => {
+                            if (
+                              JSON.stringify(latestDocument.current) !==
+                              proposalBase.current
+                            ) {
+                              setProposal(null);
+                              setError(
+                                "Your page changed after this preview was created. Send the request again to keep your latest edits.",
+                              );
+                              return;
+                            }
                             change(proposal.document);
                             setProposal(null);
                             setIncludeCv(false);
@@ -770,7 +833,7 @@ export function Editor() {
                         : "What would you like to create?"
                     }
                     value={prompt}
-                    maxLength={4000}
+                    maxLength={8000}
                     onChange={(e) => setPrompt(e.target.value)}
                     onKeyDown={(e) => {
                       if (
@@ -1314,9 +1377,10 @@ export function Editor() {
                       />
                       <button
                         className="button secondary"
-                        onClick={() => void saveAndGo(`/settings/${id}`)}
+                        disabled={busy || !!proposal}
+                        onClick={() => setInformationOpen(true)}
                       >
-                        Your details & links <ArrowRight />
+                        Your information <ArrowRight />
                       </button>
                     </div>
                   </>
@@ -1380,7 +1444,7 @@ export function Editor() {
           <Canvas
             width={width}
             document={proposal?.document || document}
-            editable={!preview && !proposal}
+            editable={!preview && !proposal && !busy}
             selected={selected}
             onSelect={(s) => {
               setSelected(s);
@@ -1448,6 +1512,35 @@ export function Editor() {
           e.target.value = "";
         }}
       />
+      {libraryOpen && (
+        <PortfolioDesignDialog
+          document={document}
+          onClose={() => setLibraryOpen(false)}
+          onApply={(next) => {
+            change(next);
+            setSelected(null);
+            setLibraryOpen(false);
+            setContentNotice(
+              "Design updated. Your writing and images are preserved. You can undo this change.",
+            );
+          }}
+        />
+      )}
+      {informationOpen && (
+        <PortfolioInformationDialog
+          document={document}
+          onClose={() => setInformationOpen(false)}
+          onApply={(next, conflicts) => {
+            change(next);
+            setInformationOpen(false);
+            setContentNotice(
+              conflicts.length
+                ? "Information updated. Your customised writing was kept; it can be revised on the canvas or with AI."
+                : "Your information and connected sections are updated.",
+            );
+          }}
+        />
+      )}
       {addSection && (
         <Modal
           title="What would you like to add?"

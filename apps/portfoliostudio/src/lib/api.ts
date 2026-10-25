@@ -5,6 +5,7 @@ import type {
   ProjectVersion,
   User,
 } from "../../shared/portfolio";
+import { studentCategories } from "../../shared/student";
 
 export class ApiError extends Error {
   status: number;
@@ -86,6 +87,24 @@ export const projectsApi = {
           inline.push({ object: item, field: "image", data: item.image });
           item.image = "";
         }
+    }
+    if (cleaned.student) {
+      if (copyableImage(cleaned.student.photo)) {
+        inline.push({
+          object: cleaned.student,
+          field: "photo",
+          data: cleaned.student.photo,
+        });
+        cleaned.student.photo = "";
+      }
+      for (const category of studentCategories) {
+        for (const item of cleaned.student[category]) {
+          if (copyableImage(item.image)) {
+            inline.push({ object: item, field: "image", data: item.image });
+            item.image = "";
+          }
+        }
+      }
     }
     const { project } = await api<{ project: Project }>("/projects", {
       method: "POST",

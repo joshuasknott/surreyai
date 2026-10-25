@@ -17,7 +17,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { Header, Loading, Notice } from "../components/ui";
 import { api, loadProject, message, projectsApi, saveDraft } from "../lib/api";
 import { useAuth } from "../lib/auth";
-import { syncProfileSections } from "../lib/profile";
+import { mergeStudentProfile, studentFromDocument } from "../data/personalize";
 import type {
   AiMode,
   PortfolioDocument,
@@ -208,30 +208,29 @@ export function Settings() {
       const safePortfolioName = portfolioName.trim() || project.document.name;
       const safeProfileName =
         profileName.trim() || project.document.profile.name;
+      const nextProfile = {
+        ...project.document.profile,
+        name: safeProfileName,
+        headline: headline.trim(),
+        bio,
+        location: location.trim(),
+        email: email.trim(),
+        links: links
+          .filter((link) => link.label.trim() || link.url.trim())
+          .map((link) => ({
+            ...link,
+            label: link.label.trim(),
+            url: link.url.trim(),
+          })),
+      };
+      const updated = mergeStudentProfile(project.document, {
+        ...studentFromDocument(project.document),
+        ...nextProfile,
+      });
       const document: PortfolioDocument = {
-        ...project.document,
+        ...updated.document,
         name: safePortfolioName,
-        profile: {
-          ...project.document.profile,
-          name: safeProfileName,
-          headline: headline.trim(),
-          bio,
-          location: location.trim(),
-          email: email.trim(),
-          links: links
-            .filter((link) => link.label.trim() || link.url.trim())
-            .map((link) => ({
-              ...link,
-              label: link.label.trim(),
-              url: link.url.trim(),
-            })),
-        },
-        sections: syncProfileSections(project.document, {
-          name: safeProfileName,
-          headline,
-          bio,
-          email,
-        }),
+        profile: nextProfile,
         seo: {
           title: seoTitle.trim() || `${safeProfileName} — Portfolio`,
           description: seoDescription.trim() || bio.slice(0, 400),
@@ -257,7 +256,11 @@ export function Settings() {
             })
           ).project;
       setProject(saved);
-      setNotice("Portfolio settings saved.");
+      setNotice(
+        updated.conflicts.length
+          ? "Portfolio settings saved. Your customised page writing has been preserved."
+          : "Portfolio settings saved.",
+      );
     } catch (e) {
       setError(message(e));
     } finally {

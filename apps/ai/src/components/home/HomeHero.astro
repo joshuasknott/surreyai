@@ -1,95 +1,65 @@
 ---
-import { getImage } from 'astro:assets';
+import { Image } from 'astro:assets';
 import { ArrowRight } from 'lucide-astro';
 import { getSocietyById } from '@surreysocieties/admin/config';
-import artwork from '../../assets/generated/ai-curious-forms-background.webp';
-import mobileArtwork from '../../assets/generated/ai-curious-forms-mobile.webp';
-
+import book from '../../assets/generated/illustrated/book.webp';
+import speech from '../../assets/generated/illustrated/speech.webp';
+import blocks from '../../assets/generated/illustrated/blocks.webp';
 const society = getSocietyById('ai')!;
-const desktopImage = await getImage({ src: artwork, width: 1672, format: 'webp', quality: 90 });
-const mobileImage = await getImage({ src: mobileArtwork, width: 750, format: 'webp', quality: 86 });
-const tabletImage = await getImage({ src: mobileArtwork, width: 941, format: 'webp', quality: 90 });
-const lines = ['Learn it.', 'Build it.', 'Question it.'];
-// Static letter placement follows the playful typesetting in the selected concept.
-const tilts = [[-10, -4, 1, 3, 5, 0, 8, 9, 0], [-8, -4, 0, 3, 6, 0, 7, 7, 0], [-8, -5, -2, 0, 3, 5, 7, 0, 7, 8, 0, 0]];
-const lifts = [[8, 0, -4, -5, -2, 0, 0, 8, 16], [9, 0, -6, -5, -1, 0, 6, 13, 17], [5, 0, -4, -6, -7, -5, 0, 0, 6, 13, 18, 20]];
 ---
-
 <section class="home-hero" aria-labelledby="home-hero-title">
-  <picture class="home-hero__artwork" aria-hidden="true">
-    <source media="(min-width: 761px) and (max-width: 1100px) and (orientation: portrait)" srcset={tabletImage.src} width={tabletImage.attributes.width} height={tabletImage.attributes.height} />
-    <source media="(max-width: 760px)" srcset={mobileImage.src} width={mobileImage.attributes.width} height={mobileImage.attributes.height} />
-    <img src={desktopImage.src} alt="" width={desktopImage.attributes.width} height={desktopImage.attributes.height} loading="eager" fetchpriority="high" decoding="async" />
-  </picture>
-  <div class="home-hero__copy">
-    <h1 id="home-hero-title" class="home-hero__title" aria-label="Learn it. Build it. Question it.">
-      {lines.map((line, lineIndex) => (
-        <span class="home-hero__line" aria-hidden="true">
-          {[...line].map((letter, index) => (
-            <span class:list={['home-hero__letter', letter === ' ' && 'home-hero__space']} style={`--tilt: ${tilts[lineIndex][index] ?? 0}deg; --lift: ${(lifts[lineIndex][index] ?? 0) / 170}em`}>{letter === ' ' ? '\u00a0' : letter}</span>
-          ))}
-        </span>
-      ))}
-    </h1>
-    <p class="home-hero__intro">Explore AI with other Surrey students. Every degree welcome.</p>
-    <div class="home-hero__actions" data-hero-actions>
-      <a class="home-hero__join" href={society.studentsUnionUrl} target="_blank" rel="noopener noreferrer">Join the society <ArrowRight aria-hidden="true" /></a>
-      <a class="home-hero__events" href="#programme">Explore events <ArrowRight aria-hidden="true" /></a>
+  <div class="home-hero__inner">
+    <Image class="home-hero__book" src={book} width={420} alt="" loading="eager" />
+    <Image class="home-hero__speech" src={speech} width={360} alt="" loading="eager" />
+    <Image class="home-hero__blocks" src={blocks} width={280} alt="" loading="eager" />
+    <div class="home-hero__copy">
+      <h1 id="home-hero-title" class="home-hero__title"><span>Learn it.</span><span>Build it.</span><span>Question it.</span></h1>
+      <p class="home-hero__intro">Explore AI with other Surrey students. Every degree welcome.</p>
+      <div class="home-hero__actions" data-hero-actions>
+        <a class="flow-button flow-button--orange" href={society.studentsUnionUrl} target="_blank" rel="noopener noreferrer">Join the society <ArrowRight aria-hidden="true" size={21} /></a>
+        <a class="flow-button flow-button--paper" href="#programme">Explore events <ArrowRight aria-hidden="true" size={21} /></a>
+      </div>
     </div>
   </div>
 </section>
-
 <style>
-  @font-face {
-    font-family: 'Baloo 2';
-    src: url('/fonts/baloo-extra-bold.woff') format('woff');
-    font-style: normal;
-    font-weight: 800;
-    font-display: swap;
-  }
-  .home-hero {
-    position: relative;
-    isolation: isolate;
-    overflow: clip;
-    width: 100%;
-    background: var(--ai-paper);
-    color: var(--ai-fg);
-  }
-  .home-hero__artwork { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; }
-  .home-hero__artwork img { display: block; width: 100%; height: 100%; object-fit: cover; }
-  .home-hero__copy { position: relative; margin-inline: auto; padding-block: clamp(64px, 7vw, 120px) clamp(90px, 9vw, 150px); width: 90%; text-align: center; }
-  .home-hero__title { margin: 0; font-family: 'Baloo 2', ui-rounded, sans-serif; font-size: min(10.3vw, 198px); font-weight: 800; line-height: .78; letter-spacing: -.045em; -webkit-text-stroke: .018em currentColor; paint-order: stroke fill; transform: translateX(min(1vw, 19px)); }
-  .home-hero__line { display: block; white-space: nowrap; }
-  .home-hero__line:last-child { color: var(--ai-accent); transform: scaleX(.96); }
-  .home-hero__line:last-child .home-hero__letter:first-child { scale: 1.12; }
-  .home-hero__letter { display: inline-block; transform: translateY(var(--lift)) rotate(var(--tilt)); transform-origin: 50% 70%; }
-  .home-hero__space { width: .23em; }
-  .home-hero__intro { margin: 1.6vw 0 0; font-size: clamp(16px, 1.56vw, 30px); line-height: 1.4; letter-spacing: -.035em; }
-  .home-hero__actions { display: flex; justify-content: center; align-items: center; gap: 1.05vw; margin-top: 1.75vw; }
-  .home-hero__actions a { display: inline-flex; align-items: center; justify-content: center; gap: 1.3vw; min-height: 44px; padding: 1.07vw 2.45vw; border: 1.5px solid var(--ai-fg); border-radius: 100px; color: var(--ai-fg); font-size: clamp(16px, 1.3vw, 25px); font-weight: 550; line-height: 1.3; letter-spacing: -.03em; text-decoration: none; }
-  .home-hero__actions .home-hero__join { background: var(--ai-accent); border-color: var(--ai-accent); }
-  .home-hero__events { background: transparent; }
-  .home-hero__actions a:hover { background: var(--ai-fg); border-color: var(--ai-fg); color: var(--ai-paper); }
-  .home-hero__actions a:focus-visible { outline: 3px solid var(--ai-fg); outline-offset: 5px; }
-  .home-hero__actions :global(svg) { width: clamp(22px, 1.7vw, 30px); height: auto; stroke-width: 1.8; flex-shrink: 0; }
-  @media (max-width: 760px), (max-width: 1100px) and (orientation: portrait) {
-    .home-hero__artwork img { object-fit: cover; }
-    .home-hero__copy { width: 94%; padding-top: 200px; padding-bottom: 110px; }
-    .home-hero__title { font-size: clamp(50px, 16.5vw, 88px); line-height: .9; letter-spacing: -.045em; transform: none; }
-    .home-hero__intro { max-width: 31ch; margin: 28px auto 0; padding-inline: 14px; font-size: 16px; line-height: 1.55; letter-spacing: -.025em; }
-    .home-hero__actions { flex-wrap: wrap; gap: 12px; margin-top: 24px; }
-    .home-hero__actions a { padding: 13px 20px; gap: 12px; font-size: 15px; min-height: 48px; }
-  }
-  @media (min-width: 761px) and (max-width: 1100px) and (orientation: portrait) {
-    .home-hero__copy { padding-top: 240px; }
-    .home-hero__title { font-size: 13vw; }
-    .home-hero__intro { max-width: 38ch; font-size: 20px; }
-    .home-hero__actions a { padding: 16px 28px; font-size: 18px; }
-  }
-  @media (max-width: 380px) {
-    .home-hero__copy { padding-top: 180px; }
-    .home-hero__actions { flex-direction: column; }
-    .home-hero__actions a { min-width: 220px; }
-    .home-hero__title { font-size: 16.4vw; }
-  }
+.home-hero { background:#111; color:#faf8f3; border-radius:0 0 50% 50% / 0 0 54px 54px; }
+.home-hero__inner { position:relative; width:min(1360px,96%); margin:auto; padding:22px 0 50px; }
+.home-hero__copy { position:relative; z-index:1; text-align:center; }
+.home-hero__title { margin:0; font:800 clamp(76px,7.7vw,110px)/.78 'Baloo 2',ui-rounded,sans-serif; letter-spacing:-.045em; }
+.home-hero__title span { display:block; }
+.home-hero__title span:first-child { transform:rotate(-3deg); }
+.home-hero__title span:nth-child(2) { transform:rotate(2deg); }
+.home-hero__title span:last-child { color:#ff4a00; margin-top:4px; }
+.home-hero__intro { margin:22px 0 0; font-size:20px; line-height:1.5; letter-spacing:-.025em; }
+.home-hero__actions { display:flex; justify-content:center; gap:16px; margin-top:20px; }
+.home-hero__inner > img { position:absolute; height:auto; pointer-events:none; }
+.home-hero__book { width:25%; left:0; top:30px; transform:rotate(-8deg); }
+.home-hero__speech { width:22%; right:0; top:8px; transform:rotate(5deg); }
+.home-hero__blocks { width:17%; right:1%; bottom:40px; }
+@media (max-width:1100px) and (min-width:701px) {
+ .home-hero__title { font-size:9.6vw; }
+ .home-hero__intro { font-size:17px; }
+ .home-hero__inner { padding-top:42px; }
+ .home-hero__book { top:74px; width:23%; }
+ .home-hero__blocks { width:15%; bottom:60px; }
+}
+@media (max-width:700px) {
+ .home-hero { border-bottom-left-radius:50% 24px; border-bottom-right-radius:50% 24px; }
+ .home-hero__inner { width:calc(100% - 32px); padding:148px 0 48px; }
+ .home-hero__title { font-size:clamp(52px,12.8vw,88px); line-height:.94; }
+ .home-hero__intro { max-width:32ch; margin:22px auto 0; font-size:16px; }
+ .home-hero__book { width:150px; left:calc(50% - 155px); top:8px; }
+ .home-hero__speech { width:142px; right:calc(50% - 150px); top:8px; }
+ .home-hero__blocks { width:70px; right:calc(50% - 155px); top:85px; bottom:auto; }
+ .home-hero__actions { gap:10px; margin-top:22px; }
+ .home-hero__actions :global(.flow-button) { padding:12px; font-size:14px; gap:8px; white-space:nowrap; }
+}
+@media (max-width:380px) {
+ .home-hero__actions { flex-direction:column; width:min(280px,100%); margin-inline:auto; }
+ .home-hero__title { font-size:12.8vw; }
+ .home-hero__book { width:130px; left:calc(50% - 134px); }
+ .home-hero__speech { width:122px; right:calc(50% - 130px); }
+ .home-hero__blocks { width:60px; right:calc(50% - 130px); }
+}
 </style>

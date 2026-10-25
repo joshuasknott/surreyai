@@ -1,0 +1,66 @@
+.content-dialog-intro {
+  max-width: 720px;
+  color: #66645f;
+  font-size: 14px;
+}
+.information-dialog {
+  max-width: 760px;
+  margin-inline: auto;
+}
+.information-dialog > .button {
+  margin-bottom: 24px;
+}
+.content-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  position: sticky;
+  bottom: -28px;
+  z-index: 3;
+  padding: 18px 0;
+  margin-top: 24px;
+  background: #fff;
+  border-top: 1px solid var(--line);
+}
+.information-notes {
+  margin: 20px 0;
+  padding: 16px;
+  background: #faf8f4;
+  border-left: 2px solid var(--orange);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.information-notes ul {
+  padding-left: 20px;
+}
+.information-notes p:last-child {
+  margin-bottom: 0;
+}
+.editor-library-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid var(--line);
+}
+.editor-library-actions button {
+  padding: 14px 8px;
+  border: 0;
+  background: #fff;
+  font-size: 12px;
+  text-align: center;
+}
+.editor-library-actions button + button {
+  border-left: 1px solid var(--line);
+}
+.editor-library-actions button:hover {
+  background: var(--surface);
+}
+@media (max-width: 600px) {
+  .content-dialog-actions {
+    flex-wrap: wrap;
+    bottom: -20px;
+  }
+  .content-dialog-actions .button {
+    flex: 1;
+    white-space: normal;
+  }
+}

@@ -64,6 +64,49 @@ describe("portfolio exports", () => {
     vi.unstubAllGlobals();
   });
 
+  it("keeps canonical CV facts out of the public site export", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = String(input);
+        if (url.includes("/fonts/"))
+          return new Response(new Uint8Array([1, 2, 3]), { status: 200 });
+        return new Response(new Uint8Array([137, 80, 78, 71]), {
+          status: 200,
+          headers: { "content-type": "image/png" },
+        });
+      }),
+    );
+    const document = structuredClone(getTemplate("cobalt").document);
+    document.student = {
+      version: 1,
+      name: "Private Student",
+      headline: "Private CV facts",
+      bio: "Do not publish this summary.",
+      location: "Guildford",
+      email: "private@example.com",
+      photo: "",
+      links: [],
+      education: [],
+      experience: [],
+      projects: [],
+      volunteering: [],
+      skills: [],
+      interests: [],
+      achievements: [],
+    };
+    document.sections[1].visible = false;
+    const archive = await JSZip.loadAsync(
+      await (await exportPortfolioSite(document)).arrayBuffer(),
+    );
+    const json = await archive.file("portfolio.json")?.async("string");
+    const html = await archive.file("index.html")?.async("string");
+    expect(json).not.toContain("Private CV facts");
+    expect(html).not.toContain("Do not publish this summary.");
+    expect(html).not.toContain("Selected work");
+    vi.unstubAllGlobals();
+  });
+
   it("fails clearly when a bundled font cannot be downloaded", async () => {
     vi.stubGlobal(
       "fetch",

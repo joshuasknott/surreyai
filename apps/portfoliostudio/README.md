@@ -8,9 +8,11 @@ Portfolio Studio is maintained in the [`surreyai`](https://github.com/joshuaskno
 
 ## Features
 
-- Ten editable portfolio designs with independent visual identities.
+- Ten CV-adaptable designs from the approved mockups: Signal, Field Notes, Cobalt, Portrait, Offset, Ledger, Nightfall, Open Studio, First Light and Colourblock. Existing saved portfolios keep their original template support.
 - Local drafts, account sign-in, cloud saves and saved versions.
-- CV text import from PDF, DOCX and TXT, processed in the browser.
+- CV import from PDF, DOCX and TXT with local structured extraction, editable education/experience/projects/skills and optional authenticated AI extraction.
+- Personalised previews of all ten designs, with recommendations based on available content. Design switching preserves writing, images, links and section visibility.
+- Shared student information for preset and blank-canvas creation; AI can compose a whole page or refine a selected element. Information updates preserve customised page writing.
 - Guided creation from details to design, personalisation and publishing, with session-only onboarding recovery.
 - Direct text editing, section reordering, images, typography, colours and responsive previews.
 - AI-assisted editing with a review step and changes scoped to a selected element.
@@ -70,6 +72,8 @@ The workshop publishing path needs no domain or DNS setup: students sign in to P
 ## Ownership and data
 
 Students retain their content and exported websites. The export contains static HTML, styles, fonts, images where download is permitted, and an editable `portfolio.json`. It contains no credentials. Third-party images and fonts retain their own licences. Importing a CV does not upload the original file; extracted text is only sent with an explicitly included AI request.
+
+Saved student information is available to AI when the student requests an edit. Canonical student facts and hidden sections are excluded from public responses and website exports. Editable source exports retain them as a private backup. Extraction is best-effort: students review the fields before choosing a design; unsupported or ambiguous content can be corrected or organised with AI. Local previews do not require an AI request or account, while AI and managed publishing keep their existing sign-in and quota controls.
 
 Uploaded images are compressed in the browser and kept private until included in a published snapshot. Current limits are 400 KB per image, 40 images per portfolio and 5 MB of uploaded media per account. Accounts can keep up to 20 active portfolios; cloud history retains the ten most recent versions. Downloaded `portfolio.json` files can be imported from the dashboard. Public URLs remain managed by this instance until the student exports and moves their website.
 

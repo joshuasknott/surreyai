@@ -7,6 +7,8 @@ import {
   portfolioSchema,
   type PortfolioDocument,
 } from "../../shared/portfolio";
+import { publicPortfolioDocument } from "../../shared/public-portfolio";
+import { studentCategories } from "../../shared/student";
 
 const fontFiles = [
   {
@@ -529,6 +531,26 @@ function replaceImageFields(
 ): PortfolioDocument {
   return {
     ...document,
+    ...(document.student
+      ? {
+          student: {
+            ...document.student,
+            photo:
+              document.student.photo === original
+                ? replacement
+                : document.student.photo,
+            ...Object.fromEntries(
+              studentCategories.map((category) => [
+                category,
+                document.student![category].map((item) => ({
+                  ...item,
+                  image: item.image === original ? replacement : item.image,
+                })),
+              ]),
+            ),
+          },
+        }
+      : {}),
     profile: {
       ...document.profile,
       photo:
@@ -552,6 +574,14 @@ async function collectImages(portfolioDocument: PortfolioDocument) {
     ...new Set(
       [
         portfolioDocument.profile.photo,
+        ...(portfolioDocument.student
+          ? [
+              portfolioDocument.student.photo,
+              ...studentCategories.flatMap((category) =>
+                portfolioDocument.student![category].map((item) => item.image),
+              ),
+            ]
+          : []),
         ...portfolioDocument.sections.flatMap((section) => [
           section.image,
           ...section.items.map((item) => item.image),
@@ -677,8 +707,11 @@ async function buildExport(
   portfolioDocument: PortfolioDocument,
   source: boolean,
 ): Promise<Blob> {
+  const exportDocument = source
+    ? portfolioDocument
+    : publicPortfolioDocument(portfolioDocument);
   const [imageResult, fonts] = await Promise.all([
-    collectImages(portfolioDocument),
+    collectImages(exportDocument),
     collectFonts(),
   ]);
   const imageRefs = imageResult.files.map(({ original, path }) => ({
@@ -693,7 +726,11 @@ async function buildExport(
       .filter((note) => !localOriginals.has(note.url))
       .map((note) => [note.url, fallbackUrl(note.url)]),
   );
-  const html = staticHtml(portfolioDocument, imageRefs, fallbacks);
+  const html = staticHtml(
+    publicPortfolioDocument(exportDocument),
+    imageRefs,
+    fallbacks,
+  );
   const zip = new JSZip();
   zip.file("index.html", html);
   zip.file("assets/portfolio.css", portfolioCss);
@@ -732,7 +769,10 @@ async function buildExport(
   );
   zip.file(
     "README.md",
-    readme(imageResult.document, source, imageResult.notes),
+    readme(imageResult.document, source, imageResult.notes) +
+      (source
+        ? "\n## Private editing backup\n\nThis source archive includes your saved student information and hidden sections. Keep it private. Use the website export when uploading to public hosting.\n"
+        : ""),
   );
   if (source)
     zip.file(
