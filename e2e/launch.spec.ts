@@ -395,7 +395,7 @@ for (const site of sites.filter(site => site.key === 'ai')) {
       const toggle = page.locator('[data-assistant-widget] .assistant-toggle');
       await expect(toggle).toBeVisible();
       const siteLogo = await page.locator('.society-header .society-brand img').getAttribute('src');
-      const assistantImage = site.key === 'business' ? '/images/business-assistant-fawn.webp' : site.key === 'neurotech' ? '/images/neurotech-assistant-neuron-gold.webp' : '/images/flow-assistant.webp';
+      const assistantImage = site.key === 'business' ? '/images/business-assistant-fawn.webp' : site.key === 'neurotech' ? '/images/neurotech-assistant-neuron-gold.webp' : '/images/illustrated-speech.webp';
       await expect(toggle.locator('img')).toHaveAttribute('src', assistantImage);
       await expect.poll(() => toggle.locator('img').evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0)).toBe(true);
       await toggle.click();
@@ -522,8 +522,8 @@ for (const site of sites.filter(site => site.key === 'ai')) {
         await expect(hero.locator('canvas, video')).toHaveCount(0);
         for (const [width, height] of [[1672, 941], [1440, 900], [1024, 1366], [768, 1024], [390, 844], [320, 740]]) {
           await page.setViewportSize({ width, height });
-          const image = hero.locator('img');
-          await expect.poll(() => image.evaluate((element: HTMLImageElement) => element.complete && element.naturalWidth > 0)).toBe(true);
+          const images = hero.locator('img');
+          await expect.poll(() => images.evaluateAll((elements) => elements.every((element) => element instanceof HTMLImageElement && element.complete && element.naturalWidth > 0))).toBe(true);
           await expectNoHorizontalOverflow(page);
           await expectAccessibilityBasics(page);
           const heroBox = await hero.boundingBox();
@@ -554,15 +554,11 @@ for (const site of sites.filter(site => site.key === 'ai')) {
         await page.setViewportSize({ width: 390, height: 844 });
         const requestedUrls: string[] = [];
         page.on('request', (request) => requestedUrls.push(request.url()));
-        const mobileHeroResponse = page.waitForResponse(
-          (response) => response.url().includes('/_image') && response.url().includes('ai-curious-forms-mobile') && response.url().includes('w=750'),
-        );
-
         await page.goto(site.origin, { waitUntil: 'load' });
         await page.locator('.home-hero').waitFor();
-        await mobileHeroResponse;
+        await expect.poll(() => page.locator('.home-hero__speech').evaluate((element: HTMLImageElement) => element.complete && element.naturalWidth > 0)).toBe(true);
 
-        expect(requestedUrls.some((requestUrl) => requestUrl.includes('w=750'))).toBe(true);
+        expect(requestedUrls.some((requestUrl) => requestUrl.includes('/_image') && requestUrl.includes('illustrated') && requestUrl.includes('speech'))).toBe(true);
         expect(requestedUrls.some((requestUrl) => requestUrl.includes('ai-curious-forms-background'))).toBe(false);
         await expect(page.locator('.home-hero canvas')).toHaveCount(0);
         expect(requestedUrls.some((requestUrl) => requestUrl.includes('w=1800'))).toBe(false);
