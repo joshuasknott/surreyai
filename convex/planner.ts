@@ -3,12 +3,12 @@ import { paginationOptsValidator } from "convex/server";
 import { query, mutation, internalMutation, internalQuery, type QueryCtx, type MutationCtx } from "./_generated/server";
 import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
-import { OWNER_EMAIL, getUserByIdentity, ensureUser, logAction } from "./permissions";
+import { OWNER_EMAIL, getUserByIdentity, ensureUser } from "./permissions";
 import {
-  activityValidator, cleanActivity, planningStage, plannerTeam, publicFields,
+  activityValidator, cleanActivity, planningStage, activePlanningStage, plannerTeam, publicFields,
   plannerItemValidator, publicActivityValidator, taskValidator, plannerAttachmentValidator, plannerFileValidator, plannerProfileValidator,
   calendarItemValidator, plannerToday,
-  plannerCommentValidator, personInitials, type PlannerPerson,
+  plannerCommentValidator, plannerActivityValidator, personInitials, type PlannerPerson, type PlannerActivity,
   plannerMentionValidator, plannerNotificationValidator, type PlannerMention, type PlannerNotification,
 } from "./plannerModel";
 import { mentionTokens } from "./lib/plannerMentions";
@@ -73,10 +73,62 @@ async function requireItem(ctx: MutationCtx, id: Id<"plannerItems">, revision: n
   return { ...access, item };
 }
 
-async function audit(ctx: MutationCtx, action: string, targetId: string, title: string) {
+async function audit(ctx: MutationCtx, action: string, targetId: string, title: string, plannerMessage?: string) {
   const access = await requireCommittee(ctx);
   const user = await ensureUser(ctx, access.identity);
-  await logAction(ctx, access.ai._id, user._id, action, targetId, "plannerItem", title);
+  await ctx.db.insert("auditLogs", {
+    societyId: access.ai._id, userId: user._id, action, targetId, targetType: "plannerItem", details: title,
+    ...(plannerMessage ? { plannerMessage } : {}),
+  });
+}
+
+const plannerActivityActions = new Set([
+  "create_planner_item", "save_planner_draft", "move_planner_item", "publish_planner_item", "unpublish_planner_item",
+  "attach_planner_file", "remove_planner_file",
+]);
+
+function stageLabel(stage: string) {
+  return ({ ideas: "Ideas", planning: "In progress", ready: "Ready", done: "Done", published: "Published", archived: "Archived" } as Record<string, string>)[stage] || stage;
+}
+
+/**
+ * A dated public event is considered finished after its London-local date.
+ * When an end time is present, it can also finish during today's local date;
+ * date-only cards retain the whole due day for committee work and calendar
+ * visibility. Internal work and projects never enter the automatic archive.
+ */
+function isPastDueEvent(item: Pick<Doc<"plannerItems">, "date" | "kind" | "endTime" | "internalOnly">, now = new Date()) {
+  if (item.internalOnly || (item.kind !== "event" && item.kind !== "hackathon") || !item.date) return false;
+  const today = plannerToday(now);
+  if (item.date < today) return true;
+  if (item.date > today || !item.endTime) return false;
+  const londonTime = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/London", hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+  }).format(now);
+  return item.endTime <= londonTime;
+}
+
+function isLegacyDone(item: Pick<Doc<"plannerItems">, "stage" | "workflowStage">) {
+  return item.stage === "done" || (item.stage === "published" && item.workflowStage === "done");
+}
+
+function isEffectivelyArchived(item: Doc<"plannerItems">, now = new Date()) {
+  return item.stage === "archived" || isLegacyDone(item) || isPastDueEvent(item, now);
+}
+
+/** Project legacy/due rows as archived for read paths before the cron persists them. */
+function archivedProjection(item: Doc<"plannerItems">): Doc<"plannerItems"> {
+  if (item.stage === "archived") return item;
+  const { published: _published, publishedAt: _publishedAt, workflowStage: _workflowStage, ...rest } = item;
+  return { ...rest, stage: "archived" };
+}
+
+async function auditAuthor(ctx: QueryCtx, societyId: Id<"societies">, userId: Id<"users">): Promise<PlannerPerson | null> {
+  const user = await ctx.db.get(userId);
+  if (!user) return null;
+  const profile = await ctx.db.query("plannerProfiles").withIndex("by_societyId_and_userId", q => q.eq("societyId", societyId).eq("userId", userId)).unique();
+  const name = (profile?.displayName || user.name || user.email.split("@")[0]).trim();
+  return { userId, name, email: user.email, initials: personInitials(name, user.email) };
 }
 
 async function actor(ctx: MutationCtx, access: Awaited<ReturnType<typeof requireCommittee>>): Promise<PlannerPerson> {
@@ -147,8 +199,13 @@ export const listFiles = query({
   handler: async (ctx, { id }) => {
     const { ai } = await requireCommittee(ctx); const item = await ctx.db.get(id);
     if (!item || item.societyId !== ai._id) throw new Error('Activity not found');
-    return (await ctx.db.query('plannerFiles').withIndex('by_itemId', q => q.eq('itemId', id)).take(10))
-      .map(file => ({ _id: file._id, name: file.name, contentType: file.contentType, size: file.size }));
+    const files = await ctx.db.query('plannerFiles').withIndex('by_itemId', q => q.eq('itemId', id)).take(10);
+    const result = [];
+    for (const file of files) {
+      const uploadedBy = await auditAuthor(ctx, ai._id, file.uploadedBy);
+      result.push({ _id: file._id, _creationTime: file._creationTime, name: file.name, contentType: file.contentType, size: file.size, ...(uploadedBy ? { uploadedBy } : {}) });
+    }
+    return result;
   },
 });
 
@@ -182,6 +239,7 @@ export const attachUploadedFile = internalMutation({
     if (!metadata || metadata.size > 10 * 1024 * 1024 || metadata.size === 0) throw new Error('Choose a file up to 10 MB');
     const id = await ctx.db.insert('plannerFiles', { societyId: access.ai._id, itemId: item._id, storageId: args.storageId, name: args.name, contentType: args.contentType, size: metadata.size, uploadedBy: person.userId, requestId: args.requestId });
     await ctx.db.patch(item._id, { contributors: contributorsFor(item, person), updatedAt: Date.now() });
+    await audit(ctx, "attach_planner_file", item._id, item.title, `Attached ${args.name}`);
     return { id, reused: false };
   },
 });
@@ -200,11 +258,15 @@ export const fileDownloadAccess = internalQuery({
 export const removeFile = mutation({
   args: { id: v.id('plannerFiles') }, returns: v.null(),
   handler: async (ctx, { id }) => {
-    const { ai } = await requireCommittee(ctx); const file = await ctx.db.get(id);
+    const access = await requireCommittee(ctx); const { ai } = access; const file = await ctx.db.get(id);
     if (!file) return null;
     const item = await ctx.db.get(file.itemId);
     if (file.societyId !== ai._id || !item || item.societyId !== ai._id) throw new Error('Attachment not found');
-    await ctx.storage.delete(file.storageId); await ctx.db.delete(id); return null;
+    const person = await actor(ctx, access);
+    await ctx.storage.delete(file.storageId); await ctx.db.delete(id);
+    await ctx.db.patch(item._id, { contributors: contributorsFor(item, person), updatedAt: Date.now() });
+    await audit(ctx, "remove_planner_file", item._id, item.title, `Removed ${file.name}`);
+    return null;
   },
 });
 
@@ -263,6 +325,61 @@ async function syncMentionNotifications(ctx: MutationCtx, item: Doc<"plannerItem
   // including edited/deleted/read notifications beyond the first history page.
   for (const email of new Set([...recipients, ...existing.map(notification => notification.recipientEmail)])) await notifyInboxChanged(ctx, item.societyId, email);
 }
+
+const archivedDeleteBatchSize = 100;
+
+/**
+ * Delete the private children of a card in bounded transactions. The card row
+ * is removed by the public mutation first; scheduled continuations only need
+ * the opaque item id and society id to finish the sweep.
+ */
+async function deleteArchivedChildren(ctx: MutationCtx, itemId: Id<"plannerItems">, societyId: Id<"societies">) {
+  let hasMore = false;
+
+  const files = await ctx.db.query("plannerFiles")
+    .withIndex("by_itemId", q => q.eq("itemId", itemId))
+    .take(archivedDeleteBatchSize + 1);
+  if (files.length > archivedDeleteBatchSize) hasMore = true;
+  for (const file of files.slice(0, archivedDeleteBatchSize)) {
+    await ctx.storage.delete(file.storageId);
+    await ctx.db.delete(file._id);
+  }
+
+  const notifications = await ctx.db.query("plannerNotifications")
+    .withIndex("by_itemId", q => q.eq("itemId", itemId))
+    .take(archivedDeleteBatchSize + 1);
+  if (notifications.length > archivedDeleteBatchSize) hasMore = true;
+  const recipients = new Set<string>();
+  for (const notification of notifications.slice(0, archivedDeleteBatchSize)) {
+    recipients.add(notification.recipientEmail);
+    await ctx.db.delete(notification._id);
+  }
+  for (const email of recipients) await notifyInboxChanged(ctx, societyId, email);
+
+  const comments = await ctx.db.query("plannerComments")
+    .withIndex("by_itemId", q => q.eq("itemId", itemId))
+    .take(archivedDeleteBatchSize + 1);
+  if (comments.length > archivedDeleteBatchSize) hasMore = true;
+  for (const comment of comments.slice(0, archivedDeleteBatchSize)) await ctx.db.delete(comment._id);
+
+  const activity = await ctx.db.query("auditLogs")
+    .withIndex("by_societyId_and_targetId", q => q.eq("societyId", societyId).eq("targetId", itemId))
+    .take(archivedDeleteBatchSize + 1);
+  if (activity.length > archivedDeleteBatchSize) hasMore = true;
+  for (const row of activity.slice(0, archivedDeleteBatchSize)) await ctx.db.delete(row._id);
+
+  return hasMore;
+}
+
+export const continueDeleteArchived = internalMutation({
+  args: { id: v.id("plannerItems"), societyId: v.id("societies") }, returns: v.null(),
+  handler: async (ctx, { id, societyId }) => {
+    if (await deleteArchivedChildren(ctx, id, societyId)) {
+      await ctx.scheduler.runAfter(0, internal.planner.continueDeleteArchived, { id, societyId });
+    }
+    return null;
+  },
+});
 
 export const emailPreference = query({
   args: {}, returns: v.boolean(),
@@ -360,37 +477,62 @@ export const markAllNotificationsRead = mutation({
 });
 
 export const list = query({
-  args: { archived: v.optional(v.boolean()) },
+  args: { archived: v.optional(v.boolean()), now: v.optional(v.number()) },
   returns: v.array(plannerItemValidator),
-  handler: async (ctx, { archived }) => {
+  handler: async (ctx, { archived, now }) => {
     const { ai } = await requireCommittee(ctx);
     const names = await profileNames(ctx, ai._id);
-    if (archived) return (await ctx.db.query("plannerItems")
-      .withIndex("by_societyId_and_stage", q => q.eq("societyId", ai._id).eq("stage", "archived")).order("desc").take(200)).map(names.item);
-    const stages = ["ideas", "planning", "ready", "done", "published"] as const;
+    const clock = now === undefined ? new Date() : new Date(now);
+    const today = plannerToday(clock);
+    if (archived) {
+      // The archive view must not wait for the hourly sweep. Include rows that
+      // are already due directly from the date index, then dedupe against rows
+      // the sweep has persisted as archived. Legacy `done` rows are included
+      // here so removing the board column cannot hide existing cards.
+      const [persisted, legacyDone, published, due] = await Promise.all([
+        ctx.db.query("plannerItems").withIndex("by_societyId_and_stage", q => q.eq("societyId", ai._id).eq("stage", "archived")).order("desc").take(200),
+        ctx.db.query("plannerItems").withIndex("by_societyId_and_stage", q => q.eq("societyId", ai._id).eq("stage", "done")).order("desc").take(200),
+        ctx.db.query("plannerItems").withIndex("by_societyId_and_stage", q => q.eq("societyId", ai._id).eq("stage", "published")).order("desc").take(200),
+        Promise.all((["ideas", "planning", "ready", "published"] as const).flatMap(stage => (["event", "hackathon"] as const).map(kind =>
+          ctx.db.query("plannerItems").withIndex("by_societyId_and_stage_and_kind_and_date", q => q.eq("societyId", ai._id)
+            .eq("stage", stage).eq("kind", kind).lte("date", today)).order("desc").take(50)))),
+      ]);
+      const result = new Map<string, Doc<"plannerItems">>();
+      for (const item of [...persisted, ...legacyDone, ...published, ...due.flat()]) {
+        if (isEffectivelyArchived(item, clock)) result.set(item._id, item);
+      }
+      return [...result.values()].sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 200).map(item => names.item(archivedProjection(item)));
+    }
+    const stages = ["ideas", "planning", "ready", "published"] as const;
     return (await Promise.all(stages.map(stage => ctx.db.query("plannerItems")
-      .withIndex("by_societyId_and_stage", q => q.eq("societyId", ai._id).eq("stage", stage)).order("desc").take(100)))).flat().map(names.item);
+      .withIndex("by_societyId_and_stage", q => q.eq("societyId", ai._id).eq("stage", stage)).order("desc").take(100)))).flat()
+      .filter(item => !isEffectivelyArchived(item, clock)).map(names.item);
   },
 });
 
-const defaultBoardOrder = ["ideas", "planning", "ready", "done"] as const;
-const boardLayoutValidator = v.object({ order: v.array(planningStage), revision: v.number() });
+const defaultBoardOrder = ["ideas", "planning", "ready"] as const;
+const boardLayoutValidator = v.object({ order: v.array(activePlanningStage), revision: v.number() });
+
+function normalizeBoardOrder(order: readonly string[]): typeof defaultBoardOrder[number][] {
+  const active = order.filter((stage): stage is typeof defaultBoardOrder[number] => stage !== "done" && defaultBoardOrder.includes(stage as typeof defaultBoardOrder[number]));
+  return [...active, ...defaultBoardOrder.filter(stage => !active.includes(stage))];
+}
 
 export const boardLayout = query({
   args: {}, returns: boardLayoutValidator,
   handler: async ctx => {
     const { ai } = await requireCommittee(ctx);
     const layout = await ctx.db.query("plannerBoardLayouts").withIndex("by_societyId", q => q.eq("societyId", ai._id)).unique();
-    return layout ? { order: layout.order, revision: layout.revision } : { order: [...defaultBoardOrder], revision: 0 };
+    return layout ? { order: normalizeBoardOrder(layout.order), revision: layout.revision } : { order: [...defaultBoardOrder], revision: 0 };
   },
 });
 
 export const reorderBoard = mutation({
-  args: { order: v.array(planningStage), revision: v.number() }, returns: v.number(),
+  args: { order: v.array(activePlanningStage), revision: v.number() }, returns: v.number(),
   handler: async (ctx, { order, revision }) => {
     const { ai } = await requireCommittee(ctx);
     if (order.length !== defaultBoardOrder.length || new Set(order).size !== defaultBoardOrder.length ||
-      defaultBoardOrder.some(stage => !order.includes(stage))) throw new Error("Include each board list exactly once");
+      defaultBoardOrder.some(stage => !order.includes(stage))) throw new Error("Include each active board list exactly once");
     const layout = await ctx.db.query("plannerBoardLayouts").withIndex("by_societyId", q => q.eq("societyId", ai._id)).unique();
     if ((layout?.revision ?? 0) !== revision) throw new Error("Someone else reordered the lists. The latest order has been loaded.");
     if (layout) await ctx.db.patch(layout._id, { order, revision: revision + 1 });
@@ -400,11 +542,12 @@ export const reorderBoard = mutation({
 });
 
 export const get = query({
-  args: { id: v.id("plannerItems") }, returns: v.union(plannerItemValidator, v.null()),
-  handler: async (ctx, { id }) => {
+  args: { id: v.id("plannerItems"), now: v.optional(v.number()) }, returns: v.union(plannerItemValidator, v.null()),
+  handler: async (ctx, { id, now }) => {
     const { ai } = await requireCommittee(ctx);
     const item = await ctx.db.get(id);
-    return item?.societyId === ai._id ? (await profileNames(ctx, ai._id)).item(item) : null;
+    const clock = now === undefined ? new Date() : new Date(now);
+    return item?.societyId === ai._id ? (await profileNames(ctx, ai._id)).item(isEffectivelyArchived(item, clock) ? archivedProjection(item) : item) : null;
   },
 });
 
@@ -421,6 +564,49 @@ export const listComments = query({
     return { page: result.page.map(comment => ({ ...comment, author: names.person(comment.author), ...(comment.mentions ? { mentions: comment.mentions.map(names.mention) } : {}) })), isDone: result.isDone, continueCursor: result.continueCursor };
   },
 });
+
+/**
+ * Private, card-scoped activity for the committee card detail view. General
+ * audit rows and comment rows are deliberately excluded from this projection.
+ */
+export const listActivity = query({
+  args: { id: v.id("plannerItems"), paginationOpts: paginationOptsValidator },
+  returns: v.object({ page: v.array(plannerActivityValidator), isDone: v.boolean(), continueCursor: v.string() }),
+  handler: async (ctx, { id, paginationOpts }) => {
+    const { ai } = await requireCommittee(ctx);
+    const item = await ctx.db.get(id);
+    if (!item || item.societyId !== ai._id) throw new Error("Activity not found");
+    const result = await ctx.db.query("auditLogs")
+      .withIndex("by_societyId_and_targetId", q => q.eq("societyId", ai._id).eq("targetId", id))
+      .order("desc")
+      .paginate({ ...paginationOpts, numItems: Math.min(30, Math.max(1, paginationOpts.numItems)) });
+    const page: PlannerActivity[] = [];
+    for (const row of result.page) {
+      if (row.targetType !== "plannerItem" || !plannerActivityActions.has(row.action)) continue;
+      const author = await auditAuthor(ctx, ai._id, row.userId);
+      if (!author) continue;
+      const text = row.plannerMessage || legacyPlannerMessage(row.action, row.details || item.title);
+      if (!text) continue;
+      page.push({ _id: row._id, _creationTime: row._creationTime, author, text });
+    }
+    return { page, isDone: result.isDone, continueCursor: result.continueCursor };
+  },
+});
+
+function legacyPlannerMessage(action: string, title: string) {
+  switch (action) {
+    case "create_planner_item": return "Created this card";
+    case "move_planner_item": return "Moved this card";
+    case "publish_planner_item": return "Published this card";
+    case "unpublish_planner_item": return "Unpublished this card";
+    case "attach_planner_file": return `Attached ${title}`;
+    case "remove_planner_file": return `Removed ${title}`;
+    // Legacy save rows are retained for attribution backfills but are not
+    // presented as activity because their old details field was only a title.
+    case "save_planner_draft": return null;
+    default: return null;
+  }
+}
 
 export const addComment = mutation({
   args: { id: v.id("plannerItems"), text: v.string(), requestId: v.string() },
@@ -514,10 +700,11 @@ export const backfillAttribution = internalMutation({
 
 /** Calendar history is independent of the board's active/archive limits. */
 export const calendar = query({
-  args: { month: v.string() },
+  args: { month: v.string(), now: v.optional(v.number()) },
   returns: v.object({ items: v.array(calendarItemValidator), hasMore: v.boolean() }),
-  handler: async (ctx, { month }) => {
+  handler: async (ctx, { month, now }) => {
     const { ai } = await requireCommittee(ctx);
+    const clock = now === undefined ? new Date() : new Date(now);
     if (!/^[1-9]\d{3}-(0[1-9]|1[0-2])$/.test(month)) throw new Error("Choose a valid calendar month");
     const last = new Date(Date.UTC(Number(month.slice(0, 4)), Number(month.slice(5)), 0)).toISOString().slice(0, 10);
     const rows = await ctx.db.query("plannerItems")
@@ -526,7 +713,7 @@ export const calendar = query({
       .take(201);
     return {
       items: rows.slice(0, 200).map(item => ({
-        _id: item._id, stage: item.stage, title: item.title, kind: item.kind, category: item.category,
+        _id: item._id, stage: isEffectivelyArchived(item, clock) ? "archived" : item.stage, title: item.title, kind: item.kind, category: item.category,
         team: item.team, teams: item.teams, internalOnly: item.internalOnly,
         date: item.date, startTime: item.startTime, endTime: item.endTime, location: item.location,
       })),
@@ -543,18 +730,55 @@ export const archivePastEvents = internalMutation({
     if (!ai) return 0;
     const today = plannerToday();
     let count = 0;
-    for (const stage of ["ideas", "planning", "ready", "done", "published"] as const) {
+    // Cards created before the Done column was removed may still be published
+    // with workflowStage=done. Persist those as archived so they disappear
+    // from the public event feed as well as the committee board.
+    const legacyPublished = await ctx.db.query("plannerItems")
+      .withIndex("by_societyId_and_stage", q => q.eq("societyId", ai._id).eq("stage", "published"))
+      .order("desc").take(100);
+    for (const item of legacyPublished) {
+      if (item.workflowStage !== "done") continue;
+      await ctx.db.patch(item._id, { stage: "archived", published: undefined, publishedAt: undefined,
+        workflowStage: undefined, revision: item.revision + 1, updatedAt: Date.now() });
+      count++;
+    }
+    if (count === 100) {
+      await ctx.scheduler.runAfter(0, internal.planner.archivePastEvents, {});
+      return count;
+    }
+    const stages = ["ideas", "planning", "ready", "published"] as const;
+    const archive = async (rows: Doc<"plannerItems">[]) => {
+      for (const item of rows) {
+        if (count >= 100 || !isPastDueEvent(item, new Date())) continue;
+        await ctx.db.patch(item._id, { stage: "archived", published: undefined, publishedAt: undefined,
+          revision: item.revision + 1, updatedAt: Date.now() });
+        count++;
+      }
+    };
+    // Historical dates are the common path and remain index-bounded.
+    for (const stage of stages) {
       for (const kind of ["event", "hackathon"] as const) {
         const rows = await ctx.db.query("plannerItems")
           .withIndex("by_societyId_and_stage_and_kind_and_date", q => q.eq("societyId", ai._id)
             .eq("stage", stage).eq("kind", kind).gt("date", "").lt("date", today))
           .take(100 - count);
-        for (const item of rows) {
-          if (item.internalOnly) continue;
-          await ctx.db.patch(item._id, { stage: "archived", published: undefined, publishedAt: undefined,
-            revision: item.revision + 1, updatedAt: Date.now() });
-          count++;
+        await archive(rows);
+        if (count === 100) {
+          await ctx.scheduler.runAfter(0, internal.planner.archivePastEvents, {});
+          return count;
         }
+      }
+    }
+    // An event with an end time can finish during today's London-local date.
+    // Query today's bucket separately so a large historical backlog cannot
+    // hide these rows behind the bounded historical read above.
+    for (const stage of stages) {
+      for (const kind of ["event", "hackathon"] as const) {
+        const rows = await ctx.db.query("plannerItems")
+          .withIndex("by_societyId_and_stage_and_kind_and_date", q => q.eq("societyId", ai._id)
+            .eq("stage", stage).eq("kind", kind).eq("date", today))
+          .take(100 - count);
+        await archive(rows);
         if (count === 100) {
           await ctx.scheduler.runAfter(0, internal.planner.archivePastEvents, {});
           return count;
@@ -576,7 +800,7 @@ export const create = mutation({
     validateAssignment(args.teams, args.lead);
     const id = await ctx.db.insert("plannerItems", { ...activity, societyId: access.ai._id, createdBy: person, contributors: [person], commentCount: 0,
       stage: args.stage || "ideas", team: args.teams ? null : args.team, teams: args.teams, lead: args.lead, ...(args.waitingOn !== undefined ? { waitingOn: cleanWaitingOn(args.waitingOn) } : {}), internalOnly: args.internalOnly, notes: args.notes || "", owner: args.owner || "", tasks: args.tasks || [], attachments: cleanAttachments(args.attachments || []), revision: 1, updatedAt: Date.now() });
-    await audit(ctx, "create_planner_item", id, activity.title);
+    await audit(ctx, "create_planner_item", id, activity.title, "Created this card");
     return id;
   },
 });
@@ -591,17 +815,43 @@ export const save = mutation({
     validatePrivate(args.notes, args.owner, args.tasks);
     validateAssignment(args.teams, args.lead);
     const activity = cleanActivity((args.internalOnly ?? item.internalOnly) ? { ...args.activity, kind: 'project' } : args.activity);
-    if (item.stage === "published" && args.stage) throw new Error("Unpublish this activity before changing its stage");
+    const effectivelyArchived = isEffectivelyArchived(item);
+    if (item.stage === "published" && args.stage && !effectivelyArchived) throw new Error("Unpublish this activity before changing its stage");
     if (item.published && args.internalOnly) throw new Error("Unpublish this activity before making it an internal card");
-    await ctx.db.patch(item._id, { ...activity, stage: args.stage || item.stage, notes: args.notes.trim(), owner: args.owner.trim(), tasks: args.tasks,
+    const nextTeam = args.teams !== undefined ? null : args.team !== undefined ? args.team : item.team;
+    const nextTeams = args.teams !== undefined ? args.teams : args.team !== undefined ? undefined : item.teams;
+    const nextLead = args.lead !== undefined ? args.lead : item.lead;
+    const nextWaitingOn = args.waitingOn !== undefined ? cleanWaitingOn(args.waitingOn) : item.waitingOn;
+    const nextInternalOnly = args.internalOnly !== undefined ? args.internalOnly : item.internalOnly;
+    const nextAttachments = args.attachments !== undefined ? cleanAttachments(args.attachments) : item.attachments;
+    const nextIsPastDue = isPastDueEvent({ ...item, ...activity, internalOnly: nextInternalOnly });
+    if (effectivelyArchived && args.stage && args.stage !== "done" && nextIsPastDue) {
+      throw new Error("Choose a future date before restoring this event");
+    }
+    const nextStage = nextIsPastDue ? "archived" : args.stage || (effectivelyArchived ? "archived" : item.stage);
+    const changes: string[] = [];
+    if (item.stage !== nextStage) changes.push(`Moved this card from ${stageLabel(item.stage)} to ${stageLabel(nextStage)}`);
+    if (item.date !== activity.date) changes.push(item.date && !activity.date ? "Removed the due date" : `Changed the due date to ${activity.date}`);
+    if ((item.lead ?? null) !== (nextLead ?? null)) changes.push(nextLead ? `Changed the lead to ${nextLead}` : "Removed the lead");
+    if (JSON.stringify(item.tasks) !== JSON.stringify(args.tasks)) changes.push("Updated the checklist");
+    if (JSON.stringify(item.attachments || []) !== JSON.stringify(nextAttachments || [])) changes.push("Updated attachments");
+    if (JSON.stringify(item.teams || []) !== JSON.stringify(nextTeams || []) || (item.team ?? null) !== (nextTeam ?? null)) changes.push("Updated teams");
+    if (item.kind !== activity.kind || item.category !== activity.category || item.location !== activity.location || item.startTime !== activity.startTime || item.endTime !== activity.endTime || item.registrationUrl !== activity.registrationUrl) changes.push("Updated card details");
+    const nextWorkflowStage = args.workflowStage !== undefined && item.stage === 'published' ? args.workflowStage : item.workflowStage;
+    const previousWorkflowStage = item.workflowStage || (item.stage === 'published' ? 'ready' : undefined);
+    if (item.stage === 'published' && (previousWorkflowStage || 'ready') !== (nextWorkflowStage || 'ready')) changes.push(`Moved this card from ${stageLabel(previousWorkflowStage || 'ready')} to ${stageLabel(nextWorkflowStage || 'ready')}`);
+    if (item.title !== activity.title || item.description !== activity.description || item.notes !== args.notes.trim() || item.owner !== args.owner.trim() || (item.internalOnly ?? false) !== (nextInternalOnly ?? false) || (item.waitingOn || '') !== (nextWaitingOn || '')) changes.push("Updated this card");
+    await ctx.db.patch(item._id, { ...activity, stage: nextStage, notes: args.notes.trim(), owner: args.owner.trim(), tasks: args.tasks,
+      ...(nextStage === "archived" || item.stage === "published" && nextStage !== "published" ? { published: undefined, publishedAt: undefined, workflowStage: undefined } : {}),
       ...(args.teams !== undefined ? { teams: args.teams, team: null } : args.team !== undefined ? { team: args.team, teams: undefined } : {}),
       ...(args.lead !== undefined ? { lead: args.lead } : {}),
       ...(args.waitingOn !== undefined ? { waitingOn: cleanWaitingOn(args.waitingOn) } : {}),
       ...(args.attachments !== undefined ? { attachments: cleanAttachments(args.attachments) } : {}),
       ...(args.internalOnly !== undefined ? { internalOnly: args.internalOnly } : {}),
-      ...(args.workflowStage !== undefined && item.stage === 'published' ? { workflowStage: args.workflowStage } : {}),
-      contributors: contributorsFor(item, person), revision: item.revision + 1, updatedAt: Date.now() });
-    await audit(ctx, "save_planner_draft", item._id, activity.title);
+      ...(args.workflowStage !== undefined && item.stage === 'published' && nextStage === 'published' ? { workflowStage: args.workflowStage } : {}),
+      ...(changes.length ? { contributors: contributorsFor(item, person) } : {}),
+      revision: item.revision + 1, updatedAt: changes.length ? Date.now() : item.updatedAt });
+    await audit(ctx, "save_planner_draft", item._id, activity.title, changes.length ? changes.join(" · ") : undefined);
     return null;
   },
 });
@@ -614,11 +864,12 @@ export const moveOnBoard = mutation({
     const { item } = access;
     if (item.stage === 'archived') throw new Error('Restore this card before moving it');
     const person = await actor(ctx, access);
+    const previousStage = item.stage === 'published' ? (item.workflowStage || 'ready') : item.stage;
     await ctx.db.patch(item._id, {
       ...(item.stage === 'published' ? { workflowStage: args.stage } : { stage: args.stage }),
       contributors: contributorsFor(item, person), revision: item.revision + 1, updatedAt: Date.now(),
     });
-    await audit(ctx, 'move_planner_item', item._id, item.title);
+    if (previousStage !== args.stage) await audit(ctx, 'move_planner_item', item._id, item.title, `Moved this card from ${stageLabel(previousStage)} to ${stageLabel(args.stage)}`);
     return null;
   },
 });
@@ -629,10 +880,28 @@ export const move = mutation({
   handler: async (ctx, args) => {
     const access = await requireItem(ctx, args.id, args.revision);
     const { item } = access;
+    if (args.stage !== "archived" && isPastDueEvent(item)) {
+      throw new Error("Choose a future date before restoring this event");
+    }
     const person = await actor(ctx, access);
     await ctx.db.patch(item._id, { stage: args.stage, published: undefined, publishedAt: undefined, workflowStage: undefined,
       contributors: contributorsFor(item, person), revision: item.revision + 1, updatedAt: Date.now() });
-    await audit(ctx, item.stage === "published" ? "unpublish_planner_item" : "move_planner_item", item._id, item.title);
+    const action = item.stage === "published" ? "unpublish_planner_item" : "move_planner_item";
+    if (item.stage !== args.stage) await audit(ctx, action, item._id, item.title, action === "unpublish_planner_item" ? "Unpublished this card" : `Moved this card from ${stageLabel(item.stage)} to ${stageLabel(args.stage)}`);
+    return null;
+  },
+});
+
+/** Permanently delete a card that is already archived (including legacy/due rows). */
+export const deleteArchived = mutation({
+  args: { id: v.id("plannerItems"), revision: v.number() }, returns: v.null(),
+  handler: async (ctx, { id, revision }) => {
+    const access = await requireItem(ctx, id, revision);
+    const { item } = access;
+    if (!isEffectivelyArchived(item)) throw new Error("Archive this card before deleting it");
+    const hasMore = await deleteArchivedChildren(ctx, item._id, access.ai._id);
+    await ctx.db.delete(item._id);
+    if (hasMore) await ctx.scheduler.runAfter(0, internal.planner.continueDeleteArchived, { id: item._id, societyId: access.ai._id });
     return null;
   },
 });
@@ -649,7 +918,7 @@ export const publish = mutation({
     const snapshot = cleanActivity(publicFields(item), true);
     await ctx.db.patch(item._id, { stage: "published", workflowStage: item.workflowStage || 'ready', published: snapshot, publishedAt: Date.now(),
       contributors: contributorsFor(item, person), revision: item.revision + 1, updatedAt: Date.now() });
-    await audit(ctx, "publish_planner_item", item._id, item.title);
+    await audit(ctx, "publish_planner_item", item._id, item.title, "Published this card");
     return null;
   },
 });
@@ -661,7 +930,7 @@ export const listPublished = query({
     if (!ai) return [];
     const rows = await ctx.db.query("plannerItems")
       .withIndex("by_societyId_and_stage", q => q.eq("societyId", ai._id).eq("stage", "published")).order("desc").take(200);
-    return rows.flatMap(item => item.published ? [{ id: item._id, ...publicFields(item.published) }] : []);
+    return rows.flatMap(item => !isEffectivelyArchived(item) && item.published ? [{ id: item._id, ...publicFields(item.published) }] : []);
   },
 });
 
@@ -669,7 +938,7 @@ export const getPublished = query({
   args: { id: v.id("plannerItems") }, returns: v.union(publicActivityValidator, v.null()),
   handler: async (ctx, { id }) => {
     const item = await ctx.db.get(id);
-    if (!item || item.stage !== "published" || !item.published) return null;
+    if (!item || item.stage !== "published" || !item.published || isEffectivelyArchived(item)) return null;
     const ai = await ctx.db.get(item.societyId);
     return ai?.slug === "ai" ? { id: item._id, ...publicFields(item.published) } : null;
   },

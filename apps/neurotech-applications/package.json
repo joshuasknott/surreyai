@@ -1,0 +1,17 @@
+{
+  "name": "@surreysocieties/neurotech-applications",
+  "private": true,
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/vercel": "^11.0.5",
+    "@vercel/blob": "^2.8.0",
+    "astro": "^7.2.2"
+  }
+}

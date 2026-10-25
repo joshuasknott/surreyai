@@ -1,0 +1,38 @@
+---
+interface Props {
+  title: string;
+  description: string;
+}
+const { title, description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url);
+---
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#071a39" />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>{title} · Surrey Neurotech Society</title>
+  </head>
+  <body>
+    <header class="standalone-header">
+      <a class="brand" href="/" aria-label="Surrey Neurotech Society committee applications home">
+        <img src="/logos/brand/surrey-neurotech-logo.png" width="156" height="54" alt="Surrey Neurotech Society" />
+      </a>
+      <p class="header-note">Committee applications · 2026–27</p>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer class="standalone-footer">
+      <div>
+        <p class="footer-title">Surrey Neurotech Society</p>
+        <p class="footer-copy">A student community exploring the science, technology and people behind neurotechnology.</p>
+      </div>
+      <a class="footer-link" href="/">All roles <span aria-hidden="true">↗</span></a>
+    </footer>
+  </body>
+</html>

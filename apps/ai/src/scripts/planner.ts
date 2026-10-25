@@ -1,7 +1,7 @@
 import { ConvexClient, ConvexHttpClient } from 'convex/browser';
 import { api } from '../../../../convex/_generated/api';
 import type { Doc, Id } from '../../../../convex/_generated/dataModel';
-import type { Activity, PlannerCalendarItem, PlannerPerson, PlannerMention, PlannerNotification, PlannerProfile, PlannerFile } from '../../../../convex/plannerModel';
+import type { Activity, PlannerCalendarItem, PlannerPerson, PlannerMention, PlannerNotification, PlannerProfile, PlannerFile, PlannerActivity } from '../../../../convex/plannerModel';
 import { activityDate, activityKind, blankActivity, londonToday } from '../lib/programme';
 import { createPlannerSignIn, type ClerkSDK, type ClerkSession } from './plannerSignIn';
 import { appendMentionText, createMentionPicker } from './plannerMentions';
@@ -9,7 +9,7 @@ import { plannerTeams, type PlannerTeam } from '../../../../convex/plannerTeams'
 import { SOCIETIES } from '@surreysocieties/admin/config';
 
 type Item = Doc<'plannerItems'>;
-type Stage = 'ideas' | 'planning' | 'ready' | 'done';
+type Stage = 'ideas' | 'planning' | 'ready';
 type Access = { name: string; email: string; userId: Id<'users'> | null; canManageAccess: boolean };
 declare global { interface Window { Clerk?: ClerkSDK } }
 
@@ -22,14 +22,17 @@ async function start(root: HTMLElement) {
   const editor = $<HTMLDialogElement>('item-dialog');
   const settingsDialog = $<HTMLDialogElement>('settings-dialog');
   const cardDialog = $<HTMLDialogElement>('card-dialog');
+  const deleteCardDialog = $<HTMLDialogElement>('delete-card-dialog');
   const notificationsDialog = $<HTMLDialogElement>('notifications-dialog');
   const commentForm = $<HTMLFormElement>('comment-form');
   const commentText = $<HTMLTextAreaElement>('comment-text');
-  const stages = ['ideas', 'planning', 'ready', 'done'] as const;
+  const stages = ['ideas', 'planning', 'ready'] as const;
   const stageMime = 'application/x-planner-stage';
   const cardMime = 'application/x-planner-card';
-  const labels = { ideas: 'Ideas', planning: 'In progress', ready: 'Ready', done: 'Done', published: 'Ready', archived: 'Archived' };
-  const boardStage = (item: Item) => item.stage === 'published' ? item.workflowStage || 'ready' : item.stage;
+  const labels = { ideas: 'Ideas', planning: 'In progress', ready: 'Ready', done: 'Archived', published: 'Ready', archived: 'Archived' };
+  const boardStage = (item: Item) => item.stage === 'done' || item.stage === 'published' && item.workflowStage === 'done' ? 'archived' : item.stage === 'published' ? item.workflowStage || 'ready' : item.stage;
+  const activeOrder = (order: Item['stage'][]) => order.filter((stage): stage is Stage => stages.includes(stage as Stage));
+  const timeBucket = () => Math.floor(Date.now() / 60000) * 60000;
   let selectedTeam: PlannerTeam | 'all' = 'all';
   let search = '';
   let workScope: 'everyone' | 'mine' = 'everyone';
@@ -48,6 +51,11 @@ async function start(root: HTMLElement) {
   let boardOrderSaving = false;
   let draggedStage: Stage | null = null;
   let archived: Item[] = [];
+  let archiveLoadedAt = 0;
+  let archiveLoading = false;
+  let archiveError = '';
+  let archiveVersion = 0;
+  let archiveRequest: Promise<void> | null = null;
   let current: Item | null = null;
   let tasks: Item['tasks'] = [];
   let attachments: NonNullable<Item['attachments']> = [];
@@ -61,6 +69,9 @@ async function start(root: HTMLElement) {
   let autosaveTimer: ReturnType<typeof setTimeout> | undefined;
   let autosavePromise: Promise<boolean> | null = null;
   let cardReviewOpen = false;
+  let deleteRequest: { item: Item; permanent: boolean } | null = null;
+  let deleteBusy = false;
+  let deleteAttempt = 0;
   let baseline = '';
   let busy = false;
   let view: 'board' | 'calendar' | 'archive' = 'board';
@@ -83,7 +94,15 @@ async function start(root: HTMLElement) {
   let commentsCursor: string | null = null;
   let commentsDone = true;
   let commentsLoading = false;
+  let commentsError = false;
   let commentPages = 1;
+  let activity: PlannerActivity[] = [];
+  let activityCursor: string | null = null;
+  let activityDone = true;
+  let activityLoading = false;
+  let activityRefreshPending = false;
+  let activityPages = 1;
+  let activityFilter: 'all' | 'comments' = 'all';
   let commentBusy = false;
   let commentRequest: { text: string; id: string } | null = null;
   let commentEdit: { id: Id<'plannerComments'>; text: string; original: string; revision: number } | null = null;
@@ -141,11 +160,12 @@ async function start(root: HTMLElement) {
     $<HTMLInputElement>('attachment-file').value = ''; $<HTMLFormElement>('planner-profile-form').reset(); $('planner-profile-message').textContent = '';
     stopLiveNotifications();
     access = null; items = []; archived = []; boardOrder = [...stages]; boardRevision = 0; boardOrderSaving = false;
+    archiveVersion++; archiveLoadedAt = 0; archiveLoading = false; archiveError = ''; archiveRequest = null;
     notificationsVersion++; notifications = []; mentionPeople = []; notificationsLoading = false; notificationsBusy = false; notificationsCursor = null; notificationsPages = 1; notificationsDone = true; unreadNotifications = 0; highlightedComment = null;
     commentMentionPicker.close(); editMentionPicker?.destroy(); editMentionPicker = null;
     $('open-notifications').hidden = true; $('notification-count').hidden = true; $('open-notifications').setAttribute('aria-label', 'Notifications');
     for (const id of ['notification-list', 'notifications-status', 'notification-count']) $(id).replaceChildren();
-    previewVersion++; previewItem = null; comments = []; commentDrafts.clear(); commentsCursor = null; commentBusy = false; commentRequest = null; commentEdit = null; commentDelete = null; commentsLoading = false; commentForm.reset(); commentText.disabled = false; $<HTMLButtonElement>('post-comment').disabled = false;
+    previewVersion++; previewItem = null; comments = []; activity = []; activityCursor = null; activityDone = true; activityLoading = false; activityRefreshPending = false; commentDrafts.clear(); commentsCursor = null; commentBusy = false; commentRequest = null; commentEdit = null; commentDelete = null; commentsLoading = false; commentsError = false; commentForm.reset(); commentText.disabled = false; $<HTMLButtonElement>('post-comment').disabled = false;
     calendarVersion++; calendarItems = []; calendarLoadedMonth = ''; calendarError = ''; calendarLoading = false;
     $('workspace').hidden = true;
     for (const id of ['workspace-nav', 'open-members', 'sidebar-account']) $(id).hidden = true;
@@ -153,9 +173,13 @@ async function start(root: HTMLElement) {
     selectedTeam = 'all'; search = ''; workScope = 'everyone'; mobileStage = 'ideas'; dueThisWeek = false; waitingOnly = false; $<HTMLInputElement>('card-search').value = ''; syncTeamFilters(); syncBoardFilters(); $('board-stage-tabs').replaceChildren();
     $('open-settings').hidden = true; $('committee-settings').hidden = true; $('settings-account').textContent = '';
     clearTimeout(autosaveTimer);
-    for (const id of ['board', 'calendar', 'archive', 'access-list', 'public-preview', 'task-list', 'card-people', 'attachment-list', 'comment-list', 'comments-status', 'comment-message', 'comment-count', 'comment-author', 'account-avatar']) $(id).replaceChildren();
+    for (const id of ['board', 'calendar', 'archive', 'access-list', 'public-preview', 'task-list', 'card-people', 'card-attribution', 'attachment-list', 'comment-list', 'comments-status', 'activity-status', 'comment-message', 'comment-count', 'comment-author', 'account-avatar']) $(id).replaceChildren();
     $('account-avatar').hidden = true;
-    for (const dialog of [editor, settingsDialog, cardDialog, notificationsDialog, membersDialog, $<HTMLDialogElement>('card-people-dialog'), $<HTMLDialogElement>('planner-profile-dialog')]) if (dialog.open) dialog.close();
+    deleteRequest = null; deleteAttempt++;
+    if (deleteBusy) setBusy(false);
+    deleteBusy = false;
+    for (const id of ['confirm-delete-card', 'cancel-delete-card', 'close-delete-card']) $<HTMLButtonElement>(id).disabled = false;
+    for (const dialog of [deleteCardDialog, editor, settingsDialog, cardDialog, notificationsDialog, membersDialog, $<HTMLDialogElement>('card-people-dialog'), $<HTMLDialogElement>('planner-profile-dialog')]) if (dialog.open) dialog.close();
     resetDescriptionHelp(); form.reset(); $<HTMLFormElement>('access-form').reset();
     $('item-heading').textContent = 'New activity'; $('item-state').textContent = ''; $('item-message').textContent = '';
     tasks = []; attachments = []; current = null;
@@ -170,16 +194,20 @@ async function start(root: HTMLElement) {
   }
   async function refresh() {
     if (!clerk?.session || refreshing || busy) return;
+    const requestSession = sessionId;
     refreshing = true; profileRefreshPending = false;
     try {
       await authenticated();
-      access = await client.query(api.planner.access, {});
+      const latestAccess = await client.query(api.planner.access, {});
+      if (requestSession !== sessionId) return;
+      access = latestAccess;
       if (!access) { showAccess('This board is for the AI Society committee. Ask Josh to add your sign-in email.'); return; }
-      const [latestItems, layout, latestProfiles] = await Promise.all([client.query(api.planner.list, {}), client.query(api.planner.boardLayout, {}), client.query(api.planner.profiles, {})]);
+      void loadArchive(true);
+      const [latestItems, layout, latestProfiles] = await Promise.all([client.query(api.planner.list, { now: timeBucket() }), client.query(api.planner.boardLayout, {}), client.query(api.planner.profiles, {})]);
+      if (requestSession !== sessionId || !access) return;
       profiles = latestProfiles; syncProfileLabels();
       items = latestItems;
-      if (!boardOrderSaving) { boardOrder = layout.order; boardRevision = layout.revision; }
-      if (view === 'archive') archived = await client.query(api.planner.list, { archived: true });
+      if (!boardOrderSaving) { boardOrder = activeOrder(layout.order); boardRevision = layout.revision; }
       $('access-state').hidden = true; $('workspace').hidden = false;
       $('workspace-nav').hidden = false; $('sidebar-account').hidden = false; $('account-name').textContent = access.name || access.email;
       renderMembers();
@@ -202,7 +230,7 @@ async function start(root: HTMLElement) {
         const version = notificationsVersion;
         try {
           if (![link.get('item'), link.get('comment') || 'unused'].every(value => value && /^[a-zA-Z0-9_-]{1,100}$/.test(value))) throw new Error('Invalid comment link');
-          const item = await client.query(api.planner.get, { id: link.get('item') as Id<'plannerItems'> });
+          const item = await client.query(api.planner.get, { id: link.get('item') as Id<'plannerItems'>, now: timeBucket() });
           if (version !== notificationsVersion || !access) return;
           if (!item) throw new Error('This card is no longer available.');
           await openPreview(item, link.get('comment') as Id<'plannerComments'> || undefined);
@@ -211,10 +239,12 @@ async function start(root: HTMLElement) {
         } catch { status('This linked comment is no longer available. You can still browse the board.'); }
       }
     } catch (error) {
+      if (requestSession !== sessionId) return;
+      if (error instanceof Error && error.message.includes('Committee access required')) { showAccess('Committee access is no longer available. Ask Josh to check your email access.'); return; }
       if (!access) showAccess('Could not check committee access. Try again, or sign out and back in.');
       showError(error);
       $('retry-access').hidden = false;
-    } finally { refreshing = false; if (profileRefreshPending && access && !busy) void refresh(); }
+    } finally { refreshing = false; if (!busy && (profileRefreshPending && access || requestSession !== sessionId && clerk.session)) void refresh(); }
   }
 
   function stopLiveNotifications() {
@@ -342,7 +372,7 @@ async function start(root: HTMLElement) {
   async function openNotification(notification: PlannerNotification) {
     if (notificationsBusy) return; const version = notificationsVersion; notificationsBusy = true; renderNotifications();
     try {
-      await authenticated(); const item = await client.query(api.planner.get, { id: notification.itemId });
+      await authenticated(); const item = await client.query(api.planner.get, { id: notification.itemId, now: timeBucket() });
       if (version !== notificationsVersion || !access) return;
       if (!item) throw new Error('This activity is no longer available.');
       notificationsDialog.close(); await openPreview(item, notification.commentId);
@@ -371,7 +401,7 @@ async function start(root: HTMLElement) {
       boardRevision = await client.mutation(api.planner.reorderBoard, { order: next, revision: boardRevision });
       status('List order saved for the committee.');
     } catch (error) {
-      try { const layout = await client.query(api.planner.boardLayout, {}); boardOrder = layout.order; boardRevision = layout.revision; }
+      try { const layout = await client.query(api.planner.boardLayout, {}); boardOrder = activeOrder(layout.order); boardRevision = layout.revision; }
       catch { boardOrder = [...stages]; boardRevision = 0; }
       render(); showError(error);
     } finally { boardOrderSaving = false; }
@@ -393,7 +423,7 @@ async function start(root: HTMLElement) {
     if (!dueThisWeek) return true;
     const today = londonToday();
     const end = new Date(`${today}T12:00:00Z`); end.setUTCDate(end.getUTCDate() + (7 - (end.getUTCDay() || 7)));
-    return boardStage(item) !== 'done' && !!item.date && item.date >= today && item.date <= end.toISOString().slice(0, 10);
+    return !!item.date && item.date >= today && item.date <= end.toISOString().slice(0, 10);
   }
   function syncMobileBoard() {
     const mobile = window.matchMedia('(max-width: 720px)').matches;
@@ -548,18 +578,35 @@ async function start(root: HTMLElement) {
     fillPeople($('card-people'), previewItem);
     $('comment-count').textContent = String(previewItem.commentCount ?? comments.length);
     $('item-heading').textContent = previewItem.title;
+    renderAttribution(previewItem);
+  }
+  function cardTime(value: number) {
+    const node = el('time', new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/London' }).format(new Date(value)));
+    node.dateTime = new Date(value).toISOString(); node.title = `${node.textContent} (Europe/London)`;
+    return node;
+  }
+  function renderAttribution(item: Item | null) {
+    const container = $('card-attribution'); container.replaceChildren(); container.hidden = !item;
+    if (!item) return;
+    const created = el('span', undefined, 'card-created-by'); created.id = 'card-created-by';
+    created.append(document.createTextNode(item.createdBy ? `Created by ${item.createdBy.name} · ` : 'Created '), cardTime(item._creationTime));
+    const updated = el('span', undefined, 'card-updated-at'); updated.id = 'card-updated-at';
+    updated.append(document.createTextNode('Updated '), cardTime(item.updatedAt));
+    container.append(created, updated);
   }
   async function openPreview(item: Item, targetComment?: Id<'plannerComments'>) {
-    previewVersion++; previewItem = item; comments = []; commentsCursor = null; commentsDone = true; commentsLoading = false; commentPages = 1; commentRequest = null; commentEdit = null; commentDelete = null;
+    previewVersion++; previewItem = item; comments = []; commentsCursor = null; commentsDone = true; commentsLoading = false; commentsError = false; commentPages = 1; commentRequest = null; commentEdit = null; commentDelete = null;
+    activity = []; activityCursor = null; activityDone = true; activityLoading = false; activityRefreshPending = false; activityPages = 1; activityFilter = 'all'; syncActivityFilter();
     commentForm.reset(); commentText.value = commentDrafts.get(item._id) || ''; $('comment-message').textContent = ''; $('comments-status').textContent = 'Loading comments…';
     highlightedComment = targetComment || null; commentMentionPicker.close();
-    $('comment-list').replaceChildren(); $('older-comments').hidden = true; renderCardPreview();
+    $('comment-list').replaceChildren(); $('older-comments').hidden = true; $('older-activity').hidden = true; $('activity-status').textContent = ''; renderCardPreview();
     $('card-editor-slot').append(form); $('card-stage-slot').append($('stage-field')); $('card-actions-slot').append($('editor-action-buttons'));
     $('editor-action-buttons').append($('unpublish-item'));
     $('card-collaborators-slot').append($('collaborators-field'));
     cardReviewOpen = false; cardDialog.dataset.panel = targetComment ? 'discussion' : 'card'; syncCardTabs();
-    openEditor(item, 'ideas', '', true); setSaveStatus('All changes saved'); cardDialog.showModal(); resizeTitle();
+    openEditor(item, 'ideas', '', true); setSaveStatus('All changes saved'); cardDialog.showModal(); resizeEditorFields();
     void loadFiles(item._id);
+    void loadActivity('initial');
     const version = previewVersion;
     if (!await loadComments('initial')) return;
     while (targetComment && version === previewVersion && !comments.some(comment => comment._id === targetComment) && !commentsDone) {
@@ -582,22 +629,23 @@ async function start(root: HTMLElement) {
   cardDialog.addEventListener('close', () => {
     if (cardDialog.open) return;
     if (previewItem && access) { if (commentText.value.trim()) commentDrafts.set(previewItem._id, commentText.value); else commentDrafts.delete(previewItem._id); }
-    previewVersion++; previewItem = null; comments = []; commentsLoading = false; commentEdit = null; commentDelete = null; commentText.value = '';
+    previewVersion++; previewItem = null; comments = []; activity = []; activityLoading = false; activityRefreshPending = false; commentsLoading = false; commentsError = false; commentEdit = null; commentDelete = null; commentText.value = '';
     highlightedComment = null; commentMentionPicker.close(); editMentionPicker?.destroy(); editMentionPicker = null;
     clearTimeout(autosaveTimer); editor.append(form); form.querySelector('.editor-stage-bar')!.prepend($('stage-field')); form.querySelector('.editor-actions')!.append($('editor-action-buttons'));
     $('collaborators-home').append($('collaborators-field'));
     $('editor-preview').append($('unpublish-item'));
     resetDescriptionHelp(); current = null; cardReviewOpen = false; files = []; pendingUploads = [];
-    for (const id of ['card-people', 'attachment-list', 'comment-list', 'comments-status', 'comment-message', 'comment-count']) $(id).replaceChildren();
+    for (const id of ['card-people', 'card-attribution', 'attachment-list', 'comment-list', 'comments-status', 'activity-status', 'comment-message', 'comment-count']) $(id).replaceChildren();
   });
   async function refreshCard() {
     if (!previewItem || !cardDialog.open) return;
     const id = previewItem._id; const version = previewVersion;
-    await authenticated(); const item = await client.query(api.planner.get, { id });
+    await authenticated(); const item = await client.query(api.planner.get, { id, now: timeBucket() });
     if (version !== previewVersion || !access || !cardDialog.open) return;
     if (!item) { closeCard(); return; } previewItem = item; renderCardPreview();
     await loadFiles(id);
     if (!commentEdit && !commentDelete) await loadComments('refresh');
+    if (!commentEdit && !commentDelete) await loadActivity('refresh');
   }
   function commentControls() {
     const blocked = commentBusy || commentsLoading;
@@ -610,16 +658,35 @@ async function start(root: HTMLElement) {
     }
     for (const input of $('comment-list').querySelectorAll<HTMLTextAreaElement>('textarea')) input.disabled = commentBusy;
     for (const summary of $('comment-list').querySelectorAll<HTMLElement>('summary')) summary.setAttribute('aria-disabled', String(blocked || !!commentEdit || !!commentDelete));
+    for (const button of $('card-activity-filter').querySelectorAll<HTMLButtonElement>('button')) button.disabled = commentBusy || !!commentEdit || !!commentDelete;
   }
   function renderComments() {
     editMentionPicker?.destroy(); editMentionPicker = null;
     const list = $('comment-list'); list.replaceChildren();
-    for (const comment of comments) {
+    const entries = [
+      ...comments.map(value => ({ kind: 'comment' as const, value })),
+      ...(activityFilter === 'all' ? activity.map(value => ({ kind: 'activity' as const, value })) : []),
+    ].sort((a, b) => b.value._creationTime - a.value._creationTime || b.value._id.localeCompare(a.value._id));
+    let lastDay = '';
+    const today = londonDateKey(Date.now()); const yesterday = new Date(`${today}T12:00:00Z`); yesterday.setUTCDate(yesterday.getUTCDate() - 1);
+    const yesterdayKey = yesterday.toISOString().slice(0, 10);
+    for (const entry of entries) {
+      const day = londonDateKey(entry.value._creationTime);
+      if (day !== lastDay) {
+        const date = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/London' }).format(new Date(entry.value._creationTime));
+        const heading = el('li', undefined, 'card-activity-day'); heading.append(el('span', `${day === today ? 'Today · ' : day === yesterdayKey ? 'Yesterday · ' : ''}${date}`)); list.append(heading); lastDay = day;
+      }
+      if (entry.kind === 'activity') {
+        const event = entry.value; const row = el('li', undefined, 'card-activity-entry'); row.dataset.activity = event._id;
+        const message = event.text.charAt(0).toLowerCase() + event.text.slice(1);
+        const marker = el('span', undefined, 'card-activity-marker'); marker.setAttribute('aria-hidden', 'true'); marker.append(icon(message.startsWith('created') ? 'plus' : message.startsWith('moved') ? 'external' : 'waiting'));
+        const content = el('div', undefined, 'card-activity-content'); const text = el('div'); text.append(el('strong', event.author.name), document.createTextNode(` ${message}`)); content.append(text, cardTime(event._creationTime)); row.append(marker, content); list.append(row); continue;
+      }
+      const comment = entry.value;
       const row = el('li', undefined, 'comment'); row.dataset.comment = comment._id; row.append(avatar(comment.author, comment.author.name));
       if (comment._id === highlightedComment) row.classList.add('comment-highlight');
       const content = el('div', undefined, 'comment-content'); const heading = el('div', undefined, 'comment-heading');
-      const time = el('time', new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/London' }).format(new Date(comment._creationTime)));
-      time.dateTime = new Date(comment._creationTime).toISOString(); heading.append(el('strong', comment.author.name), time);
+      heading.append(el('strong', comment.author.name), cardTime(comment._creationTime));
       if (comment.editedAt) { const edited = el('span', 'Edited', 'comment-edited'); edited.title = `Edited ${new Date(comment.editedAt).toLocaleString('en-GB', { timeZone: 'Europe/London' })}`; heading.append(edited); }
       content.append(heading);
       if (commentEdit?.id === comment._id) {
@@ -653,8 +720,14 @@ async function start(root: HTMLElement) {
       }
       row.append(content); list.append(row);
     }
-    $('comments-status').textContent = comments.length ? '' : 'No comments yet.';
+    renderCommentStatus();
     $('older-comments').hidden = commentsDone; commentControls();
+    $('older-activity').hidden = activityFilter === 'comments' || activityDone;
+    $<HTMLButtonElement>('older-activity').disabled = activityLoading || !!commentEdit || !!commentDelete || commentBusy;
+  }
+  function renderCommentStatus() {
+    if (commentsError) return;
+    $('comments-status').textContent = comments.length || (activityFilter === 'all' && activity.length) ? '' : commentsLoading ? 'Loading comments…' : activityFilter === 'comments' ? 'No comments yet.' : activityLoading || $('activity-status').textContent ? '' : 'No activity yet.';
   }
   function rowFocus(id: Id<'plannerComments'>, label: string) {
     const row = $('comment-list').querySelector<HTMLElement>(`[data-comment="${id}"]`);
@@ -686,7 +759,8 @@ async function start(root: HTMLElement) {
   }
   async function loadComments(mode: 'initial' | 'older' | 'refresh') {
     if (!previewItem || commentsLoading || commentEdit || commentDelete) return false;
-    const id = previewItem._id; const version = previewVersion; commentsLoading = true;
+    const id = previewItem._id; const version = previewVersion; commentsLoading = true; commentsError = false;
+    renderCommentStatus();
     commentControls();
     try {
       await authenticated();
@@ -703,11 +777,57 @@ async function start(root: HTMLElement) {
       renderComments();
       return true;
     } catch (error) {
-      if (version === previewVersion) { $('comments-status').textContent = 'Could not load comments. '; const retry = el('button', 'Try again', 'quiet-button'); retry.onclick = () => void loadComments(mode); $('comments-status').append(retry); }
+      if (version === previewVersion) { commentsError = true; $('comments-status').textContent = 'Could not load comments. '; const retry = el('button', 'Try again', 'quiet-button'); retry.onclick = () => void loadComments(mode); $('comments-status').append(retry); }
       return false;
-    } finally { if (version === previewVersion) { commentsLoading = false; commentControls(); } }
+    } finally { if (version === previewVersion) { commentsLoading = false; commentControls(); renderCommentStatus(); } }
   }
   $('older-comments').onclick = () => void loadComments('older');
+  async function loadActivity(mode: 'initial' | 'older' | 'refresh') {
+    if (!previewItem || commentEdit || commentDelete) return;
+    if (activityLoading) { if (mode === 'refresh') activityRefreshPending = true; return; }
+    const id = previewItem._id; const version = previewVersion; activityLoading = true;
+    $<HTMLButtonElement>('older-activity').disabled = true;
+    if (mode === 'initial') $('activity-status').textContent = 'Loading activity…';
+    try {
+      await authenticated();
+      let cursor = mode === 'older' ? activityCursor : null; let done = true; let pages = 0;
+      const loaded: PlannerActivity[] = [];
+      do {
+        const result = await client.query(api.planner.listActivity, { id, paginationOpts: { numItems: 30, cursor } });
+        if (version !== previewVersion || !access || !cardDialog.open) return;
+        loaded.push(...result.page); cursor = result.continueCursor; done = result.isDone; pages++;
+      } while (!done && ((loaded.length === 0 && pages < 6) || (mode === 'refresh' && pages < activityPages)));
+      const merged = new Map((mode === 'older' ? activity : []).map(entry => [entry._id, entry]));
+      for (const entry of loaded) merged.set(entry._id, entry);
+      activity = [...merged.values()]; activityCursor = cursor; activityDone = done;
+      activityPages = mode === 'older' ? activityPages + pages : pages;
+      $('activity-status').textContent = '';
+      if (!commentEdit && !commentDelete) renderComments();
+    } catch (error) {
+      if (version === previewVersion && access) {
+        if (error instanceof Error && error.message.includes('Committee access required')) { showAccess('Committee access is no longer available.'); return; }
+        $('activity-status').textContent = 'Could not load card activity. ';
+        const retry = el('button', 'Try again', 'quiet-button'); retry.type = 'button'; retry.onclick = () => void loadActivity(mode); $('activity-status').append(retry);
+      }
+    } finally {
+      if (version === previewVersion) {
+        activityLoading = false; $<HTMLButtonElement>('older-activity').disabled = commentBusy || !!commentEdit || !!commentDelete;
+        renderCommentStatus();
+        if (activityRefreshPending) { activityRefreshPending = false; void loadActivity('refresh'); }
+      }
+    }
+  }
+  function londonDateKey(timestamp: number) {
+    const parts = new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'Europe/London' }).formatToParts(timestamp);
+    return ['year', 'month', 'day'].map(type => parts.find(part => part.type === type)!.value).join('-');
+  }
+  function syncActivityFilter() {
+    for (const button of $('card-activity-filter').querySelectorAll<HTMLButtonElement>('button')) button.setAttribute('aria-pressed', String(button.dataset.activityFilter === activityFilter));
+    $('activity-status').hidden = activityFilter === 'comments';
+  }
+  for (const button of $('card-activity-filter').querySelectorAll<HTMLButtonElement>('button')) button.onclick = () => { activityFilter = button.dataset.activityFilter as typeof activityFilter; syncActivityFilter(); renderComments(); };
+  $('older-activity').onclick = () => void loadActivity('older');
+  $('attach-comment-file').onclick = () => { $('card-tab').click(); $('add-attachment').click(); };
   commentForm.onsubmit = event => { event.preventDefault(); void (async () => {
     if (!previewItem || commentBusy || commentsLoading || commentEdit || commentDelete || !commentText.value.trim()) return;
     const id = previewItem._id; const version = previewVersion; const text = commentText.value.trim();
@@ -732,14 +852,32 @@ async function start(root: HTMLElement) {
     }
     commentText.focus(); commentText.dispatchEvent(new Event('input', { bubbles: true }));
   };
-  cardDialog.addEventListener('click', event => {
-    for (const menu of cardDialog.querySelectorAll<HTMLDetailsElement>('.comment-menu[open]')) {
-      if (!menu.contains(event.target as Node)) menu.open = false;
+  // Capture before a trigger opens its panel, so the opening click only dismisses older panels.
+  document.addEventListener('click', event => {
+    if (!(event.target instanceof Node) || (!cardDialog.open && !editor.open)) return;
+    const target = event.target;
+    for (const menu of form.querySelectorAll<HTMLDetailsElement>('#team-picker-menu[open]')) {
+      if (!menu.contains(target)) menu.open = false;
     }
-  });
+    for (const panel of cardDialog.querySelectorAll<HTMLDetailsElement>('.card-detail-panel[open], #card-actions[open], .comment-menu[open]')) {
+      if (!panel.contains(target)) {
+        panel.open = false;
+        panel.querySelectorAll<HTMLDetailsElement>('details[open]').forEach(details => { details.open = false; });
+      }
+    }
+    const attachments = $('attachment-editor');
+    if (!attachments.contains(target)) attachments.hidden = true;
+    if (cardReviewOpen && !$('editor-preview').contains(target)) { cardReviewOpen = false; updatePreview(); }
+  }, true);
   cardDialog.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && !$('attachment-editor').hidden) { event.preventDefault(); event.stopPropagation(); $('attachment-editor').hidden = true; $('add-attachment').focus(); return; }
     const panel = cardDialog.querySelector<HTMLDetailsElement>('.card-detail-panel[open], #team-picker-menu[open], #card-actions[open]');
-    if (event.key === 'Escape' && panel) { event.preventDefault(); event.stopPropagation(); panel.open = false; return; }
+    if (event.key === 'Escape' && panel) {
+      event.preventDefault(); event.stopPropagation(); panel.open = false;
+      panel.querySelectorAll<HTMLDetailsElement>('details[open]').forEach(details => { details.open = false; });
+      (panel.id === 'private-options' ? $('card-actions').querySelector('summary') : panel.querySelector('summary'))?.focus();
+      return;
+    }
     if (event.key === 'Escape' && cardReviewOpen) { event.preventDefault(); event.stopPropagation(); cardReviewOpen = false; updatePreview(); return; }
     const menu = cardDialog.querySelector<HTMLDetailsElement>('.comment-menu[open]');
     if (event.key === 'Escape' && menu) {
@@ -750,34 +888,42 @@ async function start(root: HTMLElement) {
   function card(item: Item) {
     const node = el('article', undefined, 'planner-card'); node.draggable = true; node.dataset.item = item._id;
     node.addEventListener('dragstart', event => { event.dataTransfer?.setData(cardMime, item._id); event.dataTransfer?.setData('text/plain', item._id); });
-    const open = el('button', undefined, 'card-open'); open.setAttribute('aria-label', `View ${item.title}`);
-    if (selectedTeam === 'all') {
-      const teams = assignedTeams(item);
-      for (const id of teams.slice(0, 2)) {
-        const team = plannerTeams.find(team => team.id === id);
-        if (team) { const badge = el('span', team.name, 'team-badge'); badge.dataset.team = team.id; open.append(badge); }
-      }
-      if (teams.length > 2) { const more = el('span', `+${teams.length - 2} teams`, 'team-badge'); more.title = teams.slice(2).map(id => plannerTeams.find(team => team.id === id)?.name).filter(Boolean).join(', '); open.append(more); }
-    }
+    const open = el('button', undefined, 'card-open'); open.setAttribute('aria-label', `View ${item.title}`); open.title = item.title;
     open.append(el('strong', item.title));
-    if (item.waitingOn) {
-      const waiting = el('span', `Waiting: ${item.waitingOn}`, 'card-waiting'); waiting.prepend(icon('waiting')); open.append(waiting);
-    } else if (boardStage(item) !== 'done') {
-      const next = item.tasks.find(task => !task.done);
-      if (next) open.append(el('span', `Next: ${next.text}`, 'card-next-action'));
-    }
-    if (item.published) { const live = el('span', 'Live on website', 'card-live'); live.prepend(icon('external')); open.append(live); }
-    const lead = el('span', undefined, 'card-lead');
-    if (item.lead) {
-      const name = plannerName(item.lead); const initials = el('span', nameInitials(name), 'person-avatar'); initials.setAttribute('aria-hidden', 'true');
-      lead.append(initials, el('span', name, 'card-lead-name')); lead.setAttribute('aria-label', `Lead: ${name}`);
-    } else lead.append(el('span', 'Unassigned', 'card-unassigned'));
     const footer = el('span', undefined, 'card-footer');
-    footer.append(lead);
-    if (item.tasks.length) { const progress = el('span', `${item.tasks.filter(task => task.done).length}/${item.tasks.length}`, 'card-stat'); progress.prepend(icon('checklist')); footer.append(progress); }
-    if (item.date) { const date = el('span', `${item.internalOnly ? '' : item.kind === 'project' ? 'Date · ' : 'Event · '}${activityDate(item.date, { weekday: 'short', day: 'numeric', month: 'short' })}`, 'card-date'); date.prepend(icon('calendar')); footer.append(date); }
-    if (item.commentCount) { const count = el('span', String(item.commentCount), 'card-stat'); count.prepend(icon('comments')); footer.append(count); }
+    const summary: string[] = [];
+    const teams = assignedTeams(item);
+    const teamNames = teams.map(id => plannerTeams.find(team => team.id === id)?.name).filter(Boolean).join(', ');
+    if (teamNames) summary.push(teamNames);
+    if (selectedTeam === 'all') {
+      const team = teams[0];
+      if (team) {
+        const names: Record<PlannerTeam, string> = { learning: 'Learning', events: 'Events', industry: 'Industry', projects: 'Projects', careers: 'Careers' };
+        const badge = el('span', `${names[team]}${teams.length > 1 ? ` +${teams.length - 1}` : ''}`, 'team-badge');
+        badge.dataset.team = team; badge.title = teamNames; footer.append(badge);
+      }
+    }
+    if (item.date) {
+      const fullDate = `Due ${activityDate(item.date, { weekday: 'long', day: 'numeric', month: 'long' })}`;
+      const date = el('span', activityDate(item.date, { day: 'numeric', month: 'short' }), 'card-date'); date.title = fullDate; date.prepend(icon('calendar')); footer.append(date); summary.push(fullDate);
+    }
+    if (item.tasks.length) {
+      const complete = item.tasks.filter(task => task.done).length;
+      const progress = el('span', `${complete}/${item.tasks.length}`, 'card-stat'); progress.title = `${complete} of ${item.tasks.length} checklist items complete`; progress.prepend(icon('checklist')); footer.append(progress); summary.push(progress.title);
+    }
+    if (item.waitingOn) {
+      const waiting = el('span', undefined, 'card-waiting'); waiting.title = `Waiting: ${item.waitingOn}`; waiting.append(icon('waiting'), el('span', waiting.title, 'sr-only')); footer.append(waiting); summary.push(waiting.title);
+    }
+    if (item.published) {
+      const live = el('span', undefined, 'card-live'); live.title = 'Live on website'; live.append(icon('external'), el('span', live.title, 'sr-only')); footer.append(live); summary.push(live.title);
+    }
+    if (item.lead) {
+      const lead = el('span', undefined, 'card-lead');
+      const name = plannerName(item.lead); const initials = el('span', nameInitials(name), 'person-avatar'); initials.setAttribute('aria-hidden', 'true');
+      lead.append(initials, el('span', name, 'card-lead-name sr-only')); lead.title = `Lead: ${name}`; lead.setAttribute('aria-label', lead.title); footer.append(lead); summary.push(lead.title);
+    } else summary.push('No lead assigned');
     if (footer.childElementCount) open.append(footer);
+    open.setAttribute('aria-description', summary.join('. '));
     open.onclick = () => openPreview(item); node.append(open);
     const menu = el('details', undefined, 'card-menu'); const trigger = el('summary'); trigger.setAttribute('aria-label', `Actions for ${item.title}`); trigger.append(icon('more'));
     const actions = el('div', undefined, 'card-menu-actions');
@@ -807,7 +953,7 @@ async function start(root: HTMLElement) {
     calendarLoading = true; calendarError = ''; renderCalendar();
     try {
       await authenticated();
-      const result = await client.query(api.planner.calendar, { month });
+      const result = await client.query(api.planner.calendar, { month, now: timeBucket() });
       if (version !== calendarVersion || !access) return;
       calendarItems = result.items; calendarHasMore = result.hasMore; calendarLoadedMonth = month;
     } catch (error) {
@@ -819,7 +965,7 @@ async function start(root: HTMLElement) {
 
   async function openCalendarItem(item: PlannerCalendarItem) {
     const requestSession = sessionId;
-    try { await authenticated(); const fullItem = await client.query(api.planner.get, { id: item._id });
+    try { await authenticated(); const fullItem = await client.query(api.planner.get, { id: item._id, now: timeBucket() });
       if (requestSession !== sessionId || !access) return;
       if (!fullItem) throw new Error('This activity is no longer available.');
       openPreview(fullItem);
@@ -895,12 +1041,48 @@ async function start(root: HTMLElement) {
     if (focused) document.getElementById(focused)?.focus({ preventScroll: true });
   }
 
+  async function loadArchive(force = false): Promise<void> {
+    if (!access) return;
+    if (!force && archiveRequest) return archiveRequest;
+    if (!force && archiveLoadedAt && Date.now() - archiveLoadedAt < 30000) { renderArchive(); return; }
+    const version = ++archiveVersion;
+    archiveLoading = true; archiveError = ''; renderArchive();
+    archiveRequest = (async () => {
+      try {
+        await authenticated();
+        if (version !== archiveVersion || !access) return;
+        const latest = await client.query(api.planner.list, { archived: true, now: timeBucket() });
+        if (version !== archiveVersion || !access) return;
+        archived = latest; archiveLoadedAt = Date.now();
+      } catch (error) {
+        if (version !== archiveVersion || !access) return;
+        if (error instanceof Error && error.message.includes('Committee access required')) showAccess('Committee access is no longer available. Ask Josh to check your email access.');
+        else archiveError = 'Could not load archived cards. Please try again.';
+      } finally {
+        if (version === archiveVersion) { archiveLoading = false; archiveRequest = null; renderArchive(); }
+      }
+    })();
+    return archiveRequest;
+  }
+
   function renderArchive() {
     const container = $('archive'); container.replaceChildren();
-    if (!archived.some(matches)) container.append(el('p', 'No archived cards in this view.', 'muted'));
+    container.setAttribute('aria-busy', String(archiveLoading));
+    if (archiveLoading || archiveError) {
+      const feedback = el('p', archiveError || 'Loading archived cards…', 'archive-feedback muted'); feedback.setAttribute('role', 'status');
+      if (archiveError) { const retry = el('button', 'Try again', 'quiet-button'); retry.onclick = () => void loadArchive(true); feedback.append(retry); }
+      container.append(feedback);
+    }
+    if (archiveLoadedAt && !archiveLoading && !archiveError && !archived.some(matches)) container.append(el('p', 'No archived cards in this view.', 'muted'));
     for (const item of archived.filter(matches)) {
       const row = el('div', undefined, 'archive-row'); const open = el('button', undefined, 'archive-open'); open.append(el('strong', item.title), el('span', `${item.internalOnly ? 'Internal work' : activityKind(item)}${item.date ? ` · ${activityDate(item.date)}` : ''}`)); open.onclick = () => openPreview(item); row.append(open);
-      const restore = el('button', 'Restore to Ideas', 'quiet-button'); restore.onclick = () => void move(item, 'ideas'); row.append(restore); container.append(row);
+      const needsNewDate = !item.internalOnly && item.kind !== 'project' && !!item.date && item.date <= londonToday();
+      const restore = el('button', needsNewDate ? 'Reschedule' : 'Restore to Ideas', 'quiet-button');
+      restore.onclick = () => { if (needsNewDate) { void openPreview(item); field('dueDate').focus(); } else void move(item, 'ideas'); };
+      const remove = el('button', undefined, 'icon-button danger'); remove.type = 'button'; remove.append(icon('delete')); remove.setAttribute('aria-label', `Permanently delete ${item.title}`); remove.title = 'Permanently delete card';
+      remove.onclick = () => requestCardDeletion(item, true);
+      const actions = el('div', undefined, 'archive-row-actions'); actions.append(restore, remove);
+      row.append(actions); container.append(row);
     }
   }
 
@@ -927,10 +1109,11 @@ async function start(root: HTMLElement) {
     attachments = structuredClone(item?.attachments || []);
     files = []; pendingUploads = []; $('file-upload-status').hidden = true; $('retry-file-upload').hidden = true; $('cancel-file-upload').hidden = true;
     $('item-heading').textContent = item ? item.title : 'New card';
+    renderAttribution(item);
     $('item-state').textContent = `${labels[item ? boardStage(item) : stage]} · ${item?.published ? 'Public version is live' : 'Private'}`;
-    $('archive-item').hidden = !item || item.stage === 'archived'; $('unpublish-item').hidden = item?.stage !== 'published';
+    $('delete-card').hidden = !item || item.stage === 'archived'; $('unpublish-item').hidden = item?.stage !== 'published';
     $('item-message').textContent = '';
-    renderTasks(); renderAttachments(); updatePreview(); baseline = signature(); if (!fromCard) { editor.showModal(); resizeTitle(); field('title').focus(); }
+    renderTasks(); renderAttachments(); updatePreview(); baseline = signature(); if (!fromCard) { editor.showModal(); resizeEditorFields(); field('title').focus(); }
   }
 
   function renderTasks() {
@@ -945,17 +1128,23 @@ async function start(root: HTMLElement) {
     updateTaskProgress();
   }
 
-  function updateTaskProgress() { $('task-progress').textContent = tasks.length ? `${tasks.filter(task => task.done).length} / ${tasks.length}` : ''; }
+  function updateTaskProgress() {
+    const completed = tasks.filter(task => task.done).length;
+    $('task-progress').textContent = tasks.length ? `${completed} / ${tasks.length}` : '';
+    const progress = $<HTMLProgressElement>('task-progress-bar'); progress.hidden = !tasks.length; progress.max = tasks.length || 1; progress.value = completed;
+  }
 
   function renderAttachments() {
     const list = $('attachment-list'); list.replaceChildren();
     for (const file of files) {
       const row = el('div', undefined, 'attachment-row file-attachment-row'); const download = el('button', undefined, 'attachment-download'); download.type = 'button'; download.setAttribute('aria-label', `Download ${file.name}`);
-      const text = el('span'); text.append(el('strong', file.name), el('small', `${file.contentType === 'application/pdf' ? 'PDF' : 'Image'} · ${formatFileSize(file.size)}`));
+      const text = el('span'); text.append(el('strong', file.name));
+      const details = el('small', `${file.contentType === 'application/pdf' ? 'PDF' : 'Image'} · ${formatFileSize(file.size)}`);
+      if (file.uploadedBy) { const credit = el('small', `Added by ${file.uploadedBy.name} · `); credit.append(cardTime(file._creationTime)); text.append(credit, details); } else text.append(details);
       download.append(icon(file.contentType.startsWith('image/') ? 'image-attachment' : 'attachment'), text);
       download.onclick = () => void downloadFile(file, download);
       const remove = el('button', undefined, 'icon-button'); remove.type = 'button'; remove.append(icon('close')); remove.setAttribute('aria-label', `Remove file: ${file.name}`);
-      remove.onclick = () => void (async () => { if (!window.confirm(`Remove ${file.name} from this card? The uploaded file will be deleted.`)) return; remove.disabled = true; try { await authenticated(); await client.mutation(api.planner.removeFile, { id: file._id }); files = files.filter(value => value._id !== file._id); renderAttachments(); } catch (error) { fileStatus(error instanceof Error ? error.message : 'Could not remove file'); remove.disabled = false; } })();
+      remove.onclick = () => void (async () => { if (!window.confirm(`Remove ${file.name} from this card? The uploaded file will be deleted.`)) return; remove.disabled = true; try { await authenticated(); await client.mutation(api.planner.removeFile, { id: file._id }); files = files.filter(value => value._id !== file._id); renderAttachments(); await refreshCard(); } catch (error) { fileStatus(error instanceof Error ? error.message : 'Could not remove file'); remove.disabled = false; } })();
       row.append(download, remove); list.append(row);
     }
     for (const [index, attachment] of attachments.entries()) {
@@ -1002,7 +1191,7 @@ async function start(root: HTMLElement) {
         if (version !== previewVersion || !access) return;
         await loadFiles(id);
       }
-      fileStatus('Files attached'); $('attachment-editor').hidden = true; await refresh();
+      fileStatus('Files attached'); $('attachment-editor').hidden = true; await refresh(); await refreshCard();
     } catch (error) {
       if (version === previewVersion && access) { fileStatus(fileAbort?.signal.aborted ? 'Upload cancelled' : error instanceof Error ? error.message : 'Upload failed. Try again'); $('retry-file-upload').hidden = !pendingUploads.length || !!fileAbort?.signal.aborted; }
     } finally {
@@ -1015,8 +1204,10 @@ async function start(root: HTMLElement) {
     const internal = field('purpose').value === 'internal';
     const idea = stage === 'ideas'; const review = !internal && (stage === 'ready' || !!current?.published);
     const compact = inCard();
+    $('save-item').hidden = compact;
+    field('description').title = compact ? 'Enter to save. Shift+Enter for a new line.' : '';
     $('waiting-details').querySelector('summary span')!.textContent = field('waitingOn').value.trim() ? `Waiting: ${field('waitingOn').value.trim()}` : 'Set waiting status';
-    resizeTitle();
+    resizeEditorFields();
     editor.classList.toggle('has-preview', review);
     $('activity-details').hidden = internal || (!compact && idea); $('private-options').hidden = !compact && !internal && idea; $('editor-preview').hidden = compact ? !cardReviewOpen : !review;
     if (!compact) $<HTMLDetailsElement>('activity-details').open = !idea;
@@ -1028,7 +1219,7 @@ async function start(root: HTMLElement) {
     updateLeadAvatar();
     $<HTMLInputElement>('attachment-file').disabled = !current || fileUploadBusy;
     $('file-upload-help').hidden = !!current;
-    $('stage-help').textContent = idea ? 'Start with a title and a few words. Work out the details later.' : field('stage').value === 'archived' ? 'Archived events stay on the calendar. To reschedule, choose a future date and move it to Planning.' : review ? 'Check the public details here. Ready is still private.' : 'Add the practical details as they are confirmed.';
+    $('stage-help').textContent = idea ? 'Start with a title and a few words. Work out the details later.' : field('stage').value === 'archived' ? 'Archived events stay on the calendar. To reschedule, choose a future date and move it to In progress.' : review ? 'Check the public details here. Ready is still private.' : 'Add the practical details as they are confirmed.';
     $('save-item').textContent = idea ? 'Save idea' : field('stage').value === 'archived' ? 'Save changes' : 'Save draft';
     if (internal) { $('stage-help').textContent = 'Internal work stays on the committee board.'; $('save-item').textContent = 'Save card'; }
     const activity = readActivity(); const preview = $('public-preview'); preview.replaceChildren();
@@ -1057,17 +1248,25 @@ async function start(root: HTMLElement) {
       id = savingItem._id;
       await client.mutation(api.planner.save, { id, revision: savingItem.revision, ...payload, ...(savingItem.stage === 'published' ? { workflowStage: stage as Stage } : stage !== 'archived' ? { stage: stage as Stage } : {}) });
     } else id = await client.mutation(api.planner.create, { ...payload, stage: stage as Stage });
-    const [savedItems, savedItem] = await Promise.all([client.query(api.planner.list, {}), client.query(api.planner.get, { id })]);
+    const [savedItems, savedItem] = await Promise.all([client.query(api.planner.list, { now: timeBucket() }), client.query(api.planner.get, { id, now: timeBucket() })]);
     if (!access || version !== previewVersion) return false;
     items = savedItems; current = savedItem;
     if (!current) throw new Error('Activity saved but could not be reloaded. Close and reopen the board.');
-    if (cardDialog.open) { previewItem = current; renderCardPreview(); }
-    baseline = savedSignature; $('archive-item').hidden = current.stage === 'archived';
+    baseline = savedSignature;
+    if (signature() === savedSignature) {
+      const stageField = field('stage') as HTMLSelectElement;
+      const archivedOption = stageField.querySelector('[value=archived]');
+      if (current.stage !== 'archived') archivedOption?.remove();
+      else if (!archivedOption) { const option = el('option', labels.archived); option.value = 'archived'; stageField.append(option); }
+      stageField.value = boardStage(current); baseline = signature();
+    }
+    if (cardDialog.open) { previewItem = current; renderCardPreview(); void loadActivity('refresh'); }
+    $('delete-card').hidden = current.stage === 'archived';
     $('item-state').textContent = `${labels[boardStage(current)]} · ${current.published ? 'Public version is live' : 'Private'}`;
-    updatePreview(); render(); if (view === 'calendar') void loadCalendar(true); return true;
+    updatePreview(); render(); void loadArchive(true); if (view === 'calendar') void loadCalendar(true); return true;
   }
 
-  function setBusy(value: boolean) { busy = value; form.inert = value; field('stage').disabled = value; for (const id of ['save-item', 'publish-item', 'archive-item', 'unpublish-item']) $<HTMLButtonElement>(id).disabled = value; $<HTMLButtonElement>('help-description').disabled = value || aiBusy; updatePreview(); if (!value && profileRefreshPending && access) void refresh(); }
+  function setBusy(value: boolean) { busy = value; form.inert = value; field('stage').disabled = value; for (const id of ['save-item', 'publish-item', 'delete-card', 'unpublish-item']) $<HTMLButtonElement>(id).disabled = value; $<HTMLButtonElement>('help-description').disabled = value || aiBusy; updatePreview(); if (!value && profileRefreshPending && access) void refresh(); }
   function syncTeamPicker() {
     const summary = $('team-picker-summary'); summary.replaceChildren();
     for (const id of selectedTeams()) { const team = plannerTeams.find(team => team.id === id)!; const badge = el('span', team.name, 'team-badge'); badge.dataset.team = team.id; summary.append(badge); }
@@ -1085,6 +1284,7 @@ async function start(root: HTMLElement) {
     autosaveTimer = setTimeout(() => void saveCardNow(), 700);
   }
   async function saveCardNow(): Promise<boolean> {
+    clearTimeout(autosaveTimer);
     if (!cardDialog.open || !current) return true;
     if (autosavePromise) { if (!await autosavePromise) return false; return saveCardNow(); }
     if (!dirty()) return true;
@@ -1113,13 +1313,17 @@ async function start(root: HTMLElement) {
     $('card-tab').tabIndex = cardDialog.dataset.panel === 'discussion' ? -1 : 0;
     $('discussion-tab').tabIndex = cardDialog.dataset.panel === 'discussion' ? 0 : -1;
   }
-  function resizeTitle() {
+  function resizeEditorFields() {
     const title = field('title') as HTMLTextAreaElement;
     if (!title.offsetWidth) return;
     title.style.height = 'auto'; title.style.height = `${title.scrollHeight + 2}px`;
+    const description = field('description') as HTMLTextAreaElement;
+    const scroll = description.scrollTop;
+    description.style.height = '0px'; description.style.height = `${description.scrollHeight + 2}px`;
+    description.scrollTop = scroll;
   }
-  window.addEventListener('resize', resizeTitle);
-  for (const [id, panel] of [['card-tab', 'card'], ['discussion-tab', 'discussion']]) $(id).onclick = () => { cardDialog.dataset.panel = panel; syncCardTabs(); };
+  window.addEventListener('resize', resizeEditorFields);
+  for (const [id, panel] of [['card-tab', 'card'], ['discussion-tab', 'discussion']]) $(id).onclick = () => { cardDialog.dataset.panel = panel; syncCardTabs(); resizeEditorFields(); };
   for (const id of ['card-tab', 'discussion-tab']) $(id).onkeydown = event => { if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) { event.preventDefault(); const target = event.key === 'Home' ? 'card-tab' : event.key === 'End' ? 'discussion-tab' : id === 'card-tab' ? 'discussion-tab' : 'card-tab'; $(target).click(); $(target).focus(); } };
   function closeCardOptions() { $<HTMLDetailsElement>('card-actions').open = false; }
   $('card-notes').onclick = () => { closeCardOptions(); $<HTMLDetailsElement>('private-options').open = true; field('notes').focus(); };
@@ -1157,6 +1361,13 @@ async function start(root: HTMLElement) {
   };
   const changed = (event: Event) => { if (event.target === field('date') && inCard()) field('dueDate').value = field('date').value; updatePreview(); scheduleAutosave(); };
   form.addEventListener('input', changed); form.addEventListener('change', changed);
+  form.addEventListener('focusout', event => {
+    if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement || event.target instanceof HTMLSelectElement) void saveCardNow();
+  });
+  form.addEventListener('keydown', event => {
+    if (!inCard() || event.defaultPrevented || event.isComposing || event.key !== 'Enter' || event.shiftKey || event.ctrlKey || event.metaKey || event.altKey || (event.target !== field('description') && event.target !== field('title'))) return;
+    event.preventDefault(); void saveCardNow();
+  });
   $('stage-field').addEventListener('change', () => { updatePreview(); scheduleAutosave(); });
   form.addEventListener('submit', event => { event.preventDefault(); void (async () => {
     if (inCard()) { await saveCardNow(); return; }
@@ -1172,12 +1383,71 @@ async function start(root: HTMLElement) {
   $('unpublish-item').onclick = () => void (async () => { clearTimeout(autosaveTimer); if (inCard() && !await saveCardNow()) return; if (!current || !window.confirm('Remove this activity from the public website? Your draft and committee notes will stay on the private board.')) return;
     setBusy(true); try { await authenticated(); await client.mutation(api.planner.move, { id: current._id, revision: current.revision, stage: 'ready' }); if (cardDialog.open) cardDialog.close(); else editor.close(); status('Unpublished. The activity is private in Ready.'); } catch (error) { showError(error, 'item-message'); } finally { setBusy(false); await refresh(); }
   })();
-  $('archive-item').onclick = () => void (async () => { clearTimeout(autosaveTimer); if (inCard() && !await saveCardNow()) return; if (!current || !window.confirm('Archive this activity? It will be removed from the public website if published.')) return;
-    setBusy(true); try { await authenticated(); await client.mutation(api.planner.move, { id: current._id, revision: current.revision, stage: 'archived' }); if (cardDialog.open) cardDialog.close(); else editor.close(); status('Activity archived.'); } catch (error) { showError(error, 'item-message'); } finally { setBusy(false); await refresh(); }
+  function requestCardDeletion(item: Item, permanent = false) {
+    if (busy || deleteBusy) return;
+    if (fileUploadBusy) { fileStatus('Finish or cancel the upload before deleting this card.'); return; }
+    deleteRequest = { item, permanent }; closeCardOptions();
+    $('delete-card-heading').textContent = permanent ? 'Permanently delete card?' : 'Delete card?';
+    $('delete-card-title').textContent = item.title;
+    $('delete-card-description').textContent = permanent
+      ? 'This will permanently delete this card, its comments and uploaded files. This cannot be undone.'
+      : `This card will move to Archive. You can restore it from there.${item.published ? ' It will also be removed from the public website.' : ''}`;
+    $('confirm-delete-card').textContent = permanent ? 'Delete permanently' : 'Yes, delete';
+    $('delete-card-message').textContent = ''; deleteCardDialog.showModal();
+  }
+  const dismissDeleteCard = () => { if (!deleteBusy) deleteCardDialog.close(); };
+  $('delete-card').onclick = () => { if (current) requestCardDeletion(current); };
+  $('cancel-delete-card').onclick = dismissDeleteCard; $('close-delete-card').onclick = dismissDeleteCard;
+  deleteCardDialog.addEventListener('cancel', event => { if (deleteBusy) event.preventDefault(); });
+  deleteCardDialog.addEventListener('close', () => { if (!deleteCardDialog.open) deleteRequest = null; });
+  $('confirm-delete-card').onclick = () => void (async () => {
+    const request = deleteRequest; if (!request || deleteBusy || busy) return;
+    const requestSession = sessionId; const attempt = ++deleteAttempt; deleteBusy = true;
+    for (const id of ['confirm-delete-card', 'cancel-delete-card', 'close-delete-card']) $<HTMLButtonElement>(id).disabled = true;
+    $('delete-card-message').textContent = request.permanent ? 'Deleting card…' : 'Moving card to Archive…';
+    try {
+      let item = request.item;
+      if (cardDialog.open && current?._id === item._id) {
+        if (!await saveCardNow()) throw new Error('Could not save your latest edits. Close this confirmation and retry the save.');
+        item = current!;
+      }
+      if (deleteRequest !== request || sessionId !== requestSession || !access) return;
+      setBusy(true); await authenticated();
+      if (deleteRequest !== request || sessionId !== requestSession || !access) return;
+      if (request.permanent) await client.mutation(api.planner.deleteArchived, { id: item._id, revision: item.revision });
+      else await client.mutation(api.planner.move, { id: item._id, revision: item.revision, stage: 'archived' });
+      if (deleteRequest !== request || sessionId !== requestSession || !access) return;
+      if (previewItem?._id === item._id) cardDialog.close();
+      if (request.permanent) commentDrafts.delete(item._id);
+      deleteCardDialog.close(); archiveLoadedAt = 0;
+      items = items.filter(value => value._id !== item._id); archived = archived.filter(value => value._id !== item._id); render();
+      status(request.permanent ? 'Card permanently deleted.' : 'Card moved to Archive. You can restore it there.');
+    } catch (error) { if (deleteRequest === request && sessionId === requestSession && access) showError(error, 'delete-card-message'); }
+    finally {
+      if (attempt === deleteAttempt) {
+        deleteBusy = false; setBusy(false);
+        for (const id of ['confirm-delete-card', 'cancel-delete-card', 'close-delete-card']) $<HTMLButtonElement>(id).disabled = false;
+        if (sessionId === requestSession && access) await refresh();
+      }
+    }
   })();
   $('add-task').onclick = () => { const input = $<HTMLInputElement>('task-text'); if (!input.value.trim() || tasks.length >= 30) return; tasks.push({ text: input.value.trim(), done: false }); input.value = ''; renderTasks(); scheduleAutosave(); };
   $('task-text').onkeydown = event => { if (event.key === 'Enter') { event.preventDefault(); $('add-task').click(); } };
   document.querySelectorAll<HTMLButtonElement>('[data-close]').forEach(button => button.onclick = () => { const dialog = button.closest('dialog'); if (dialog === editor) closeEditor(); else if (dialog === cardDialog) closeCard(); else dialog?.close(); });
+  function dismissOnBackdrop(dialog: HTMLDialogElement, close: () => unknown) {
+    const outside = (event: MouseEvent) => {
+      const bounds = dialog.getBoundingClientRect();
+      return event.target === dialog && (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom);
+    };
+    let pressedOutside = false;
+    dialog.addEventListener('pointerdown', event => { pressedOutside = event.button === 0 && outside(event); });
+    dialog.addEventListener('pointercancel', () => { pressedOutside = false; });
+    dialog.addEventListener('click', event => { const dismiss = pressedOutside && outside(event); pressedOutside = false; if (dismiss) close(); });
+  }
+  dismissOnBackdrop(cardDialog, closeCard);
+  dismissOnBackdrop(deleteCardDialog, dismissDeleteCard);
+  const peopleDialog = $<HTMLDialogElement>('card-people-dialog');
+  dismissOnBackdrop(peopleDialog, () => peopleDialog.close());
   editor.addEventListener('cancel', event => { event.preventDefault(); closeEditor(); });
   editor.addEventListener('close', resetDescriptionHelp);
   window.addEventListener('beforeunload', event => { if (dirty()) event.preventDefault(); });
@@ -1228,14 +1498,15 @@ async function start(root: HTMLElement) {
   $('toggle-sidebar').onclick = () => { setSidebar(false, true); if (mobileNav()) $('collapse-sidebar').focus(); };
   $('sidebar-scrim').onclick = () => { setSidebar(true); $('toggle-sidebar').focus(); };
   document.addEventListener('keydown', event => { if (event.key === 'Escape' && document.body.classList.contains('sidebar-mobile-open')) { setSidebar(true); $('toggle-sidebar').focus(); } });
-  window.matchMedia('(max-width: 720px)').addEventListener('change', () => { let collapsed = false; try { collapsed = localStorage.getItem('ai-planner-sidebar') === 'collapsed'; } catch {} setSidebar(mobileNav() || collapsed); syncMobileBoard(); resizeTitle(); });
+  window.matchMedia('(max-width: 720px)').addEventListener('change', () => { let collapsed = false; try { collapsed = localStorage.getItem('ai-planner-sidebar') === 'collapsed'; } catch {} setSidebar(mobileNav() || collapsed); syncMobileBoard(); resizeEditorFields(); });
   document.querySelectorAll<HTMLButtonElement>('[data-view]').forEach(button => button.onclick = () => { view = button.dataset.view as typeof view;
     document.querySelectorAll<HTMLButtonElement>('[data-view]').forEach(tab => tab.setAttribute('aria-pressed', String(tab === button)));
     for (const name of ['board', 'calendar', 'archive']) $(name).hidden = name !== view;
     $('board-scope').hidden = view !== 'board'; $('board-filters').hidden = view !== 'board'; $<HTMLDetailsElement>('board-filters').open = false; syncMobileBoard();
     $('workspace-title').textContent = view === 'board' ? 'Committee board' : view === 'calendar' ? 'Calendar' : 'Archive';
     if (mobileNav()) { setSidebar(true); $('toggle-sidebar').focus(); }
-    void refresh();
+    if (view === 'archive') { renderArchive(); void loadArchive(); }
+    else void refresh();
   });
   function resetDescriptionHelp() {
     aiVersion++; aiRequest?.abort(); aiRequest = null; aiBusy = false; suggestedDescription = '';

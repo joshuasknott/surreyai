@@ -13,7 +13,11 @@ export const activityFields = {
 };
 export const activityValidator = v.object(activityFields);
 export type Activity = Infer<typeof activityValidator>;
-export const planningStage = v.union(v.literal("ideas"), v.literal("planning"), v.literal("ready"), v.literal("done"));
+// `done` remains accepted for existing documents and published workflow
+// metadata, but it is a legacy stage and is no longer part of the active board.
+export const activePlanningStage = v.union(v.literal("ideas"), v.literal("planning"), v.literal("ready"));
+export type ActivePlanningStage = Infer<typeof activePlanningStage>;
+export const planningStage = v.union(activePlanningStage, v.literal("done"));
 export const plannerTeam = v.union(v.literal('learning'), v.literal('events'), v.literal('industry'), v.literal('projects'), v.literal('careers'));
 export const itemStage = v.union(planningStage, v.literal("published"), v.literal("archived"));
 export const taskValidator = v.object({ text: v.string(), done: v.boolean() });
@@ -22,15 +26,16 @@ export const plannerFileFields = {
   societyId: v.id('societies'), itemId: v.id('plannerItems'), storageId: v.id('_storage'),
   name: v.string(), contentType: v.string(), size: v.number(), uploadedBy: v.id('users'), requestId: v.string(),
 };
+export const plannerPersonValidator = v.object({
+  userId: v.id("users"), name: v.string(), email: v.string(), initials: v.string(),
+});
 export const plannerFileValidator = v.object({
-  _id: v.id('plannerFiles'), name: v.string(), contentType: v.string(), size: v.number(),
+  _id: v.id('plannerFiles'), _creationTime: v.number(), name: v.string(), contentType: v.string(), size: v.number(),
+  uploadedBy: v.optional(plannerPersonValidator),
 });
 export type PlannerFile = Infer<typeof plannerFileValidator>;
 export const plannerProfileValidator = v.object({ userId: v.id('users'), email: v.string(), name: v.string(), initials: v.string(), rosterName: v.optional(v.string()) });
 export type PlannerProfile = Infer<typeof plannerProfileValidator>;
-export const plannerPersonValidator = v.object({
-  userId: v.id("users"), name: v.string(), email: v.string(), initials: v.string(),
-});
 export type PlannerPerson = Infer<typeof plannerPersonValidator>;
 export const plannerMentionValidator = v.object({ email: v.string(), name: v.string(), initials: v.string() });
 export type PlannerMention = Infer<typeof plannerMentionValidator>;
@@ -50,6 +55,11 @@ export const plannerCommentFields = {
 export const plannerCommentValidator = v.object({
   ...plannerCommentFields, _id: v.id("plannerComments"), _creationTime: v.number(),
 });
+export const plannerActivityValidator = v.object({
+  _id: v.id("auditLogs"), _creationTime: v.number(),
+  author: plannerPersonValidator, text: v.string(),
+});
+export type PlannerActivity = Infer<typeof plannerActivityValidator>;
 export const plannerNotificationValidator = v.object({
   _id: v.id("plannerNotifications"), _creationTime: v.number(), read: v.boolean(),
   itemId: v.id("plannerItems"), commentId: v.id("plannerComments"), title: v.string(),

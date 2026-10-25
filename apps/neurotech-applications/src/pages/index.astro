@@ -1,0 +1,43 @@
+---
+import { getSecret } from 'astro:env/server';
+import Layout from '../layouts/Layout.astro';
+import { committeeRoles } from '../data/committeeRoles';
+import { applicationsClosed } from '../lib/applicationWindow';
+import '../styles/global.css';
+import '../styles/committeeApplications.css';
+
+export const prerender = false;
+Astro.response.headers.set('Cache-Control', 'no-store, max-age=0');
+const closed = applicationsClosed();
+const applicationsOpen = !closed && Boolean(getSecret('RESEND_API_KEY') && (getSecret('COMMITTEE_FROM_EMAIL') || getSecret('CONTACT_FROM_EMAIL')));
+---
+
+<Layout
+  title="Committee applications 2026–27"
+  description="Apply to join the Surrey Neurotech Society committee for 2026–27. Explore three open roles in events, workshops and partnerships."
+>
+  <div class="committee-page">
+    <div class="committee-shell">
+      <section class="committee-intro" aria-labelledby="committee-title">
+        <p class="committee-kicker">Surrey Neurotech Society · 2026–27</p>
+        <h1 id="committee-title">Join the committee.</h1>
+        <p class="committee-year">Bring the next chapter to life.</p>
+        <p class="committee-lede">Help shape a welcoming, curious neurotech community at Surrey.</p>
+      </section>
+
+      <section class="committee-roles" aria-labelledby="roles-title">
+        <div class="committee-section-label">
+          <h2 id="roles-title">Choose your role</h2>
+          <p>Three ways to make a useful difference.</p>
+        </div>
+        <div class="committee-card-grid">
+          {committeeRoles.map((role, index) => <a class="committee-role-card" href={`/${role.slug}`} aria-label={`View ${role.title} application`}>
+            <span class="committee-card-top"><span>{String(index + 1).padStart(2, '0')}</span><span class="committee-card-arrow" aria-hidden="true">↗</span></span>
+            <span class="committee-card-copy"><strong>{role.title}</strong><span>{role.summary}</span></span>
+          </a>)}
+        </div>
+        {!applicationsOpen && <p class="committee-status" role="status">{closed ? 'Applications have closed. You can still explore the role briefs.' : 'Applications are being prepared. You can explore the roles now; submissions will open once email delivery is connected.'}</p>}
+      </section>
+    </div>
+  </div>
+</Layout>
