@@ -10,10 +10,20 @@ import {
 } from "@phosphor-icons/react";
 import { Brand, Notice } from "../components/ui";
 import { WorkshopSteps } from "../components/WorkshopSteps";
+import { StudentDetails } from "../components/StudentDetails";
 import { DesignGallery } from "./Designs";
-import { blankPortfolio, createFromTemplate } from "../data/templates";
-import { createDraft, message, removeDraft } from "../lib/api";
+import {
+  createStudentCanvas,
+  createPersonalizedPortfolio,
+} from "../data/personalize";
+import { createDraft, api, message, removeDraft } from "../lib/api";
+import { useAuth } from "../lib/auth";
 import { readCv } from "../lib/import";
+import {
+  extractStudentProfile,
+  studentProfileSchema,
+  type StudentProfile,
+} from "../../shared/student";
 import {
   entryIntentFromParams,
   matchesEntryIntent,
@@ -23,6 +33,22 @@ import {
 import type { PortfolioDocument } from "../../shared/portfolio";
 import "./onboarding.css";
 const onboardingStorageKey = "portfolio-studio:onboarding:v1";
+const legacyDesignAliases: Record<string, string> = {
+  cobalt: "cobalt-v2",
+  form: "open-studio",
+  fieldnotes: "field-notes",
+  signal: "signal-v2",
+  studio: "open-studio",
+  bloom: "field-notes",
+  frame: "offset",
+  archive: "ledger",
+  patch: "open-studio",
+  current: "field-notes",
+};
+function normalizeDesignId(value: string): string {
+  const id = value.trim().toLowerCase();
+  return legacyDesignAliases[id] || id || "first-light";
+}
 type OnboardingSnapshot = {
   version: 1;
   entryIntent: OnboardingEntryIntent;
@@ -37,6 +63,7 @@ type OnboardingSnapshot = {
   design: string;
   scratch: boolean;
   prompt: string;
+  student?: StudentProfile;
 };
 function boundedString(value: unknown, max: number): string {
   return typeof value === "string" ? value.slice(0, max) : "";
@@ -58,9 +85,12 @@ function readOnboardingSnapshot(): OnboardingSnapshot | null {
       workedOn: boundedString(value.workedOn, 240),
       cv: boundedString(value.cv, 40_000),
       filename: boundedString(value.filename, 240),
-      design: boundedString(value.design, 80) || "cobalt",
+      design: normalizeDesignId(boundedString(value.design, 80)),
       scratch: value.scratch === true,
-      prompt: boundedString(value.prompt, 5000),
+      prompt: boundedString(value.prompt, 8000),
+      student: studentProfileSchema.safeParse(value.student).success
+        ? studentProfileSchema.parse(value.student)
+        : undefined,
     };
   } catch {
     return null;
@@ -69,6 +99,7 @@ function readOnboardingSnapshot(): OnboardingSnapshot | null {
 export function Onboarding() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [restored] = useState(readOnboardingSnapshot);
   const entryIntent = entryIntentFromParams(params);
   const canRestore = restored
@@ -84,20 +115,43 @@ export function Onboarding() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const input = useRef<HTMLInputElement>(null);
-  const [name, setName] = useState(resume?.name || "");
-  const [headline, setHeadline] = useState(resume?.headline || "");
-  const [bio, setBio] = useState(resume?.bio || "");
-  const [workedOn, setWorkedOn] = useState(resume?.workedOn || "");
+  const [student, setStudent] = useState<StudentProfile>(
+    () =>
+      resume?.student ||
+      studentProfileSchema.parse({
+        version: 1,
+        name: resume?.name || "",
+        headline: resume?.headline || "",
+        bio: resume?.bio || "",
+        projects: resume?.workedOn
+          ? [
+              {
+                id: "onboarding-work",
+                title: resume.workedOn,
+                subtitle: "",
+                description: "",
+                image: "",
+                imageAlt: "",
+                url: "",
+                tags: [],
+                date: "",
+              },
+            ]
+          : [],
+      }),
+  );
   const [cv, setCv] = useState(resume?.cv || "");
   const [filename, setFilename] = useState(resume?.filename || "");
   const [design, setDesign] = useState(
-    params.get("design")?.trim().toLowerCase() || resume?.design || "cobalt",
+    normalizeDesignId(params.get("design") || resume?.design || "first-light"),
   );
   const [scratch, setScratch] = useState(
     entryIntent === "scratch" ||
       (entryIntent === "default" && resume?.scratch === true),
   );
   const [prompt, setPrompt] = useState(resume?.prompt || "");
+  const [warnings, setWarnings] = useState<string[]>([]);
+  const [aiBusy, setAiBusy] = useState(false);
   useEffect(() => {
     try {
       sessionStorage.setItem(
@@ -107,15 +161,16 @@ export function Onboarding() {
           entryIntent: snapshotIntent,
           step,
           manual,
-          name,
-          headline,
-          bio,
-          workedOn,
+          name: student.name,
+          headline: student.headline,
+          bio: student.bio,
+          workedOn: student.projects[0]?.title || "",
           cv,
           filename,
           design,
           scratch,
           prompt,
+          student,
         } satisfies OnboardingSnapshot),
       );
     } catch {
@@ -124,10 +179,7 @@ export function Onboarding() {
   }, [
     step,
     manual,
-    name,
-    headline,
-    bio,
-    workedOn,
+    student,
     cv,
     filename,
     design,
@@ -151,11 +203,9 @@ export function Onboarding() {
       const text = await readCv(file);
       setCv(text);
       setFilename(file.name);
-      const guessedName = text
-        .split(/\n/)
-        .map((s) => s.trim())
-        .find((s) => s.length > 2 && s.length < 60);
-      if (!name && guessedName) setName(guessedName);
+      const extracted = extractStudentProfile(text);
+      setStudent(extracted.profile);
+      setWarnings(extracted.warnings);
       setManual(true);
     } catch (e) {
       setError(message(e));
@@ -163,83 +213,67 @@ export function Onboarding() {
       setBusy(false);
     }
   };
+  const improveWithAi = async () => {
+    if (!cv.trim()) return;
+    if (!user) {
+      navigate("/auth?next=/new");
+      return;
+    }
+    setAiBusy(true);
+    setError("");
+    try {
+      const result = await api<{
+        profile: StudentProfile;
+        warnings?: string[];
+        method: "ai";
+      }>("/ai/extract-cv", {
+        method: "POST",
+        body: JSON.stringify({ text: cv }),
+      });
+      const parsed = studentProfileSchema.safeParse(result.profile);
+      if (!parsed.success)
+        throw new Error(
+          "The AI returned details that need a little more review.",
+        );
+      setStudent(parsed.data);
+      setWarnings(result.warnings || []);
+    } catch (e) {
+      setError(message(e));
+    } finally {
+      setAiBusy(false);
+    }
+  };
   const finish = () => {
     setError("");
     try {
-      const profile = {
-        name: name.trim() || "Your name",
-        headline: headline.trim() || "A little about what you do.",
-        bio: bio.trim(),
-        location: "",
-        email: "",
-        photo: "",
-        links: [],
-      };
+      const normalizedStudent = studentProfileSchema.parse({
+        ...student,
+        name: student.name.trim() || "Your name",
+        headline: student.headline.trim(),
+      });
       let document: PortfolioDocument = scratch
-        ? blankPortfolio(profile)
-        : createFromTemplate(design, profile);
-      // Example work belongs in the gallery, never in a student's new portfolio.
+        ? createStudentCanvas(normalizedStudent)
+        : createPersonalizedPortfolio(design, normalizedStudent);
       document = {
         ...document,
-        sections: document.sections.map((section) => {
-          if (section.type === "hero")
-            return {
-              ...section,
-              title: profile.headline,
-              subtitle: profile.name,
-              body: profile.bio,
-              image: scratch ? "" : section.image,
-              imageAlt: scratch ? "" : section.imageAlt,
-            };
-          if (section.type === "about")
-            return {
-              ...section,
-              title: "A little about me",
-              body: profile.bio || "Tell your story here.",
-              items: [],
-            };
-          if (section.type === "projects" || section.type === "gallery")
-            return {
-              ...section,
-              title: workedOn.trim() ? "Selected work" : section.title,
-              body: "",
-              image: "",
-              imageAlt: "",
-              visible: Boolean(workedOn.trim()),
-              items: workedOn.trim()
-                ? [
-                    {
-                      id: "my-work",
-                      title: workedOn.trim(),
-                      subtitle: "",
-                      description: "",
-                      image: "",
-                      imageAlt: "",
-                      url: "",
-                      tags: [],
-                      date: "",
-                    },
-                  ]
-                : [],
-            };
-          if (section.type === "contact")
-            return {
-              ...section,
-              title: "Let’s connect.",
-              body: "Add your email and links in the editor.",
-              items: [],
-              buttonLabel: "",
-              buttonUrl: "",
-            };
-          return {
-            ...section,
-            items: [],
-            body: "",
-            image: "",
-            imageAlt: "",
-            visible: false,
-          };
-        }),
+        student: normalizedStudent,
+        profile: {
+          ...document.profile,
+          name: normalizedStudent.name,
+          headline: normalizedStudent.headline,
+          bio: normalizedStudent.bio,
+          location: normalizedStudent.location,
+          email: normalizedStudent.email,
+          photo: normalizedStudent.photo,
+          links: normalizedStudent.links,
+        },
+        seo: {
+          title: [normalizedStudent.name, normalizedStudent.headline]
+            .filter(Boolean)
+            .join(" — ")
+            .slice(0, 160),
+          description: normalizedStudent.bio.slice(0, 400),
+        },
       };
       const project = createDraft(document, "society");
       const brief = cv || (scratch && prompt);
@@ -355,48 +389,17 @@ export function Onboarding() {
                     </span>
                   )}
                 </div>
-                <label>
-                  Your name
-                  <input
-                    autoComplete="name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    maxLength={120}
-                    placeholder="e.g. Amina Patel"
-                  />
-                </label>
-                <label>
-                  What do you do?
-                  <input
-                    value={headline}
-                    onChange={(e) => setHeadline(e.target.value)}
-                    maxLength={240}
-                    placeholder="e.g. Computer science student & creative developer"
-                  />
-                </label>
-                <label>
-                  One thing you’ve worked on{" "}
-                  <span className="optional">optional</span>
-                  <input
-                    value={workedOn}
-                    onChange={(e) => setWorkedOn(e.target.value)}
-                    maxLength={240}
-                    placeholder="e.g. a society event, coursework or a part-time job"
-                  />
-                  <small className="help-text">
-                    Coursework, volunteering and part-time work all count.
-                  </small>
-                </label>
-                <label>
-                  A little about you <span className="optional">optional</span>
-                  <textarea
-                    value={bio}
-                    onChange={(e) => setBio(e.target.value)}
-                    maxLength={6000}
-                    rows={4}
-                    placeholder="Your interests, what you’re working on, and where you want to go."
-                  />
-                </label>
+                <StudentDetails value={student} onChange={setStudent} />
+                {warnings.length > 0 && (
+                  <div className="student-import-warnings" role="status">
+                    <strong>Worth checking</strong>
+                    <ul>
+                      {warnings.map((warning) => (
+                        <li key={warning}>{warning}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
                 {cv && (
                   <details>
                     <summary>Review imported text</summary>
@@ -407,9 +410,23 @@ export function Onboarding() {
                       onChange={(e) => setCv(e.target.value)}
                     />
                     <p className="help-text">
-                      AI can help organise this in the editor. Only include
-                      details you want to share.
+                      This text stays on your device unless you choose to
+                      improve the extraction with AI. Only include details you
+                      want to share.
                     </p>
+                    <button
+                      className="text-button ai-extract-button"
+                      type="button"
+                      disabled={aiBusy}
+                      onClick={() => void improveWithAi()}
+                    >
+                      <Sparkle />
+                      {aiBusy
+                        ? "Improving extraction…"
+                        : user
+                          ? "Improve extraction with AI"
+                          : "Sign in to improve with AI"}
+                    </button>
                   </details>
                 )}
                 <button
@@ -455,7 +472,7 @@ export function Onboarding() {
                     rows={6}
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
-                    maxLength={5000}
+                    maxLength={8000}
                     placeholder="A clean, editorial portfolio for a design student. Big typography, warm colours and space for photography…"
                   />
                 </label>
@@ -465,7 +482,11 @@ export function Onboarding() {
                 </p>
               </div>
             ) : (
-              <DesignGallery selected={design} onChoose={setDesign} />
+              <DesignGallery
+                selected={design}
+                student={student}
+                onChoose={(id) => setDesign(id)}
+              />
             )}
           </>
         )}
@@ -479,7 +500,9 @@ export function Onboarding() {
           </button>
           <button
             className="button primary"
-            disabled={busy || (step === 0 && manual && !name.trim())}
+            disabled={
+              busy || aiBusy || (step === 0 && manual && !student.name.trim())
+            }
             onClick={() => {
               if (step === 0 && !manual) {
                 setManual(true);

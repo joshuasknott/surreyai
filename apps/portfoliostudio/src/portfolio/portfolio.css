@@ -116,12 +116,13 @@ body {
   position: relative;
   z-index: 1;
   max-width: 700px;
+  min-width: 0;
 }
 .pf-section-title {
   display: block;
   margin: 0;
   color: inherit;
-  overflow-wrap: normal;
+  overflow-wrap: anywhere;
   font-family: var(--pf-heading-font);
   font-size: var(--pf-section-heading-size, clamp(2.7rem, 7vw, 6.2rem));
   font-weight: var(--pf-heading-weight);
@@ -636,6 +637,193 @@ body {
 .pf-template-current .pf-item-description {
   margin: 0;
 }
+
+/* Final ten directions: each selector changes the layout system, not the
+ * student's content. Sections remain ordinary canvas-editable blocks. */
+.pf-template-signal-v2 .pf-site-nav { border-bottom: 1px solid #111; }
+.pf-template-signal-v2 .pf-site-mark { color: #111; font-size: 1.3rem; }
+.pf-template-signal-v2 .pf-site-nav nav { color: #111; font-size: .95rem; }
+.pf-template-signal-v2 .pf-hero-content { min-height: 520px; align-items: end; }
+.pf-template-signal-v2 .pf-hero-copy { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 48px; max-width: none; align-items: end; }
+.pf-template-signal-v2 .pf-hero-copy .pf-section-subtitle { grid-column: 1; grid-row: 1; margin: 0 0 16px; color: #111; font-size: 1.1rem; letter-spacing: 0; text-transform: none; font-weight: 700; }
+.pf-template-signal-v2 .pf-hero-copy .pf-section-title { grid-column: 1; grid-row: 2 / span 2; }
+.pf-template-signal-v2 .pf-hero-copy .pf-section-body { grid-column: 2; grid-row: 2; margin: 0; font-size: clamp(1.5rem, 2.5vw, 2.5rem); color: #111; }
+.pf-template-signal-v2 .pf-items { gap: 0; }
+.pf-template-signal-v2 .pf-type-experience .pf-section-intro { margin-bottom: 20px; }
+.pf-template-signal-v2 .pf-type-experience .pf-items { grid-template-columns: 1fr; }
+.pf-template-signal-v2 .pf-type-experience .pf-item { display: grid; grid-template-columns: minmax(240px, .9fr) 1fr; gap: 48px; padding: 28px 0; border-top: 1px solid color-mix(in srgb, #111 55%, transparent); }
+.pf-template-signal-v2 .pf-type-experience .pf-item-title { font-size: clamp(1.35rem, 2vw, 2rem); }
+.pf-template-signal-v2 .pf-type-experience .pf-item-description { margin: 0; font-size: 1.15rem; color: inherit; }
+.pf-template-signal-v2 .pf-type-skills .pf-section-intro { display: block; margin: 0; }
+.pf-template-signal-v2 .pf-type-skills .pf-section-title { max-width: none; }
+.pf-template-signal-v2 .pf-type-skills .pf-section-body { margin-top: 34px; font-size: 1.55rem; color: inherit; }
+.pf-template-signal-v2 .pf-type-contact .pf-section-inner { display: flex; justify-content: space-between; align-items: center; gap: 30px; }
+
+.pf-template-field-notes .pf-site-nav { border-bottom: 1px solid var(--pf-border); }
+.pf-template-field-notes .pf-hero-content { display: block; text-align: center; }
+.pf-template-field-notes .pf-hero-copy { max-width: 940px; margin: 0 auto 54px; }
+.pf-template-field-notes .pf-hero-copy .pf-section-body { max-width: 700px; margin-inline: auto; font-size: 1.2rem; }
+.pf-template-field-notes .pf-hero-content > .pf-section-image { width: 100%; min-height: 0; border-radius: 0; }
+.pf-template-field-notes .pf-hero-content > .pf-section-image img { min-height: 0; aspect-ratio: 3 / 1; }
+.pf-template-field-notes .pf-type-projects .pf-section-inner { display: grid; grid-template-columns: minmax(210px, .4fr) 1fr; gap: 60px; }
+.pf-template-field-notes .pf-type-projects .pf-section-intro { display: block; margin: 0; }
+.pf-template-field-notes .pf-type-projects .pf-section-intro .pf-section-title { font-size: clamp(2.5rem, 4.5vw, 5rem); }
+.pf-template-field-notes .pf-type-projects .pf-items { display: block; }
+.pf-template-field-notes .pf-type-projects .pf-item { padding: 0 0 26px; margin-bottom: 26px; border-bottom: 1px solid var(--pf-border); }
+.pf-template-field-notes .pf-type-experience .pf-items { gap: 50px; }
+.pf-template-field-notes .pf-type-experience .pf-item-description { color: inherit; }
+.pf-template-field-notes .pf-type-about .pf-section-inner { border-top: 1px solid var(--pf-border); border-bottom: 1px solid var(--pf-border); }
+
+.pf-template-cobalt-v2 { --pf-cobalt-rail: 26%; }
+.pf-template-cobalt-v2 .pf-site-nav { position: fixed; inset: 0 auto 0 0; z-index: 4; display: block; width: var(--pf-cobalt-rail); max-width: 360px; height: 100vh; margin: 0; padding: 56px 44px; background: var(--pf-accent); color: #fff; border: 0; }
+.pf-template-cobalt-v2 .pf-site-mark { display: block; max-width: 6ch; color: #fff; font-size: clamp(2rem, 3.2vw, 4rem); line-height: .92; white-space: normal; }
+.pf-template-cobalt-v2 .pf-site-nav nav { display: grid; gap: 20px; margin-top: 80px; color: #fff; font-size: 1rem; }
+.pf-template-cobalt-v2 .pf-site-nav nav a { max-width: none; white-space: normal; }
+.pf-template-cobalt-v2 .pf-site-content, .pf-template-cobalt-v2 .pf-site-footer { width: calc(100% - var(--pf-cobalt-rail)); margin-left: var(--pf-cobalt-rail); }
+.pf-template-cobalt-v2 .pf-site-content .pf-section-inner { width: min(100% - 80px, var(--pf-max)); }
+.pf-template-cobalt-v2 .pf-hero-content { min-height: 510px; }
+.pf-template-cobalt-v2 .pf-type-projects .pf-items { grid-template-columns: 1fr; gap: 0; counter-reset: cobalt-items; }
+.pf-template-cobalt-v2 .pf-type-projects .pf-item { display: grid; grid-template-columns: 120px 1fr; gap: 26px; padding: 30px 0; border-top: 1px solid var(--pf-border); }
+.pf-template-cobalt-v2 .pf-type-projects .pf-item::before { counter-increment: cobalt-items; content: counter(cobalt-items, decimal-leading-zero); color: var(--pf-accent); font-size: clamp(2.6rem, 4vw, 4.8rem); font-weight: 700; line-height: 1; }
+.pf-template-cobalt-v2 .pf-type-projects .pf-item-copy { grid-column: 2; }
+.pf-template-cobalt-v2 .pf-type-experience .pf-items { grid-template-columns: 1fr; gap: 0; }
+.pf-template-cobalt-v2 .pf-type-experience .pf-item { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; padding: 24px 0; border-top: 1px solid var(--pf-border); }
+.pf-template-cobalt-v2 .pf-type-contact .pf-section-inner { background: var(--pf-accent); color: #fff; padding: 80px; }
+
+.pf-template-portrait .pf-hero-content { padding: 22px 28px; background: var(--pf-surface); border-radius: var(--pf-radius); }
+.pf-template-portrait .pf-hero-content > .pf-section-image, .pf-template-portrait .pf-hero-content > .pf-section-image img { min-height: 0; aspect-ratio: 1 / 1; }
+.pf-template-portrait .pf-type-about .pf-section-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; }
+.pf-template-portrait .pf-type-experience .pf-items { grid-template-columns: 1fr; gap: 0; }
+.pf-template-portrait .pf-type-experience .pf-item { display: grid; grid-template-columns: 180px 220px 1fr; gap: 26px; padding: 22px 0; border-top: 1px solid var(--pf-border); }
+.pf-template-portrait .pf-type-experience .pf-item-date { margin: 0; color: inherit; font-size: 1rem; letter-spacing: 0; text-transform: none; }
+.pf-template-portrait .pf-type-experience .pf-item-description { margin: 0; }
+.pf-template-portrait .pf-type-education .pf-items { grid-template-columns: 1fr 1fr; }
+.pf-template-portrait .pf-type-contact .pf-section-inner { background: var(--pf-color); color: var(--pf-background); }
+
+.pf-template-offset .pf-site-nav { border-bottom: 2px solid var(--pf-border); }
+.pf-template-offset .pf-hero-content { display: grid; min-height: 520px; grid-template-columns: 2fr 1fr; gap: 0; align-items: stretch; }
+.pf-template-offset .pf-hero-copy { display: flex; flex-direction: column; justify-content: center; padding-right: 60px; }
+.pf-template-offset .pf-hero-copy .pf-section-body { margin-top: 0; padding: 70px 48px; border-left: 2px solid var(--pf-border); font-size: 1.35rem; }
+.pf-template-offset .pf-type-projects .pf-items { gap: 0; border: 2px solid var(--pf-border); }
+.pf-template-offset .pf-type-projects .pf-item { padding: 38px; border-right: 2px solid var(--pf-border); border-bottom: 2px solid var(--pf-border); background: var(--pf-section-accent, transparent); }
+.pf-template-offset .pf-type-projects .pf-item:nth-child(2) { background: var(--pf-bg); }
+.pf-template-offset .pf-type-projects .pf-item:nth-child(3) { grid-column: 1 / -1; background: #fff; }
+.pf-template-offset .pf-type-experience .pf-items { grid-template-columns: 1fr; }
+.pf-template-offset .pf-type-experience .pf-item { padding: 28px 0; border-top: 2px solid var(--pf-border); }
+.pf-template-offset .pf-type-contact .pf-section-inner { display: flex; align-items: center; justify-content: space-between; }
+
+.pf-template-ledger .pf-hero-content { display: block; text-align: center; border-top: 3px double var(--pf-border); border-bottom: 3px double var(--pf-border); padding: 55px 0; }
+.pf-template-ledger .pf-hero-copy { max-width: 800px; margin-inline: auto; }
+.pf-template-ledger .pf-type-education .pf-section-inner, .pf-template-ledger .pf-type-experience .pf-section-inner, .pf-template-ledger .pf-type-projects .pf-section-inner { display: grid; grid-template-columns: 1.35fr .65fr; gap: 58px; }
+.pf-template-ledger .pf-type-education .pf-section-intro, .pf-template-ledger .pf-type-experience .pf-section-intro, .pf-template-ledger .pf-type-projects .pf-section-intro { display: block; margin: 0; }
+.pf-template-ledger .pf-type-projects .pf-items, .pf-template-ledger .pf-type-experience .pf-items { display: block; }
+.pf-template-ledger .pf-type-projects .pf-item, .pf-template-ledger .pf-type-experience .pf-item { padding: 22px 0; border-top: 1px solid var(--pf-border); }
+.pf-template-ledger .pf-type-skills .pf-section-inner, .pf-template-ledger .pf-type-interests .pf-section-inner { width: min(100% - 64px, 420px); margin-left: auto; margin-right: max(32px, calc((100% - var(--pf-max)) / 2)); }
+.pf-template-ledger .pf-type-skills .pf-section-intro, .pf-template-ledger .pf-type-interests .pf-section-intro { display: block; margin: 0; }
+.pf-template-ledger .pf-type-skills .pf-section-body, .pf-template-ledger .pf-type-interests .pf-section-body { max-width: none; margin-top: 24px; }
+.pf-template-ledger .pf-type-contact .pf-section-inner { border: 1px solid var(--pf-border); padding: 34px; }
+
+.pf-template-nightfall .pf-site-nav { border-bottom: 1px solid var(--pf-border); }
+.pf-template-nightfall .pf-site-mark { color: var(--pf-color); }
+.pf-template-nightfall .pf-hero-content { display: block; text-align: center; }
+.pf-template-nightfall .pf-hero-copy { max-width: 800px; margin-inline: auto; }
+.pf-template-nightfall .pf-type-projects .pf-items { grid-template-columns: 1fr; gap: 0; }
+.pf-template-nightfall .pf-type-projects .pf-item { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; padding: 26px 0; border-top: 1px solid var(--pf-border); }
+.pf-template-nightfall .pf-type-projects .pf-item:first-child { background: var(--pf-accent); color: #10191c; padding: 52px; }
+.pf-template-nightfall .pf-type-projects .pf-item:first-child .pf-item-description { color: inherit; }
+.pf-template-nightfall .pf-type-education .pf-section-inner { display: block; border-top: 1px solid var(--pf-accent); }
+.pf-template-nightfall .pf-type-education .pf-section-intro { display: grid; grid-template-columns: .45fr 1fr; gap: 60px; margin: 0; }
+.pf-template-nightfall .pf-type-education .pf-section-intro .pf-section-body { max-width: 52ch; margin: 0; }
+.pf-template-nightfall .pf-type-contact .pf-section-inner { background: var(--pf-accent); color: #10191c; padding: 48px; }
+
+.pf-template-open-studio .pf-site-mark { color: #111; }
+.pf-template-open-studio .pf-hero-content { display: block; }
+.pf-template-open-studio .pf-hero-copy { max-width: none; }
+.pf-template-open-studio .pf-hero-copy .pf-section-title { font-size: clamp(3.6rem, 12vw, 12rem); white-space: nowrap; }
+.pf-template-open-studio .pf-hero-copy .pf-section-body { border-top: 3px solid var(--pf-accent); padding-top: 22px; max-width: none; }
+.pf-template-open-studio .pf-type-projects .pf-items { gap: 0; }
+.pf-template-open-studio .pf-type-projects .pf-item { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; padding: 28px 0; border-top: 1px solid var(--pf-border); }
+.pf-template-open-studio .pf-type-projects .pf-item:nth-child(2) .pf-item-media { order: 2; }
+.pf-template-open-studio .pf-type-projects .pf-item:nth-child(2) .pf-item-copy { order: 1; }
+.pf-template-open-studio .pf-type-projects .pf-item:nth-child(3) { display: block; padding: 46px; background: var(--pf-surface); }
+.pf-template-open-studio .pf-type-experience .pf-items { gap: 0; }
+.pf-template-open-studio .pf-type-experience .pf-item { padding: 20px 0; border-right: 1px solid var(--pf-border); }
+
+.pf-template-first-light .pf-section-inner { width: min(100% - 48px, var(--pf-max)); }
+.pf-template-first-light .pf-hero-content { padding: 58px; border-radius: var(--pf-radius); background: var(--pf-surface); }
+.pf-template-first-light .pf-hero-copy { max-width: none; }
+.pf-template-first-light .pf-hero-copy .pf-section-title { font-size: clamp(4rem, 11vw, 10rem); }
+.pf-template-first-light .pf-type-education .pf-section-inner { padding: 58px; border-radius: var(--pf-radius); background: var(--pf-color); color: #fffdf5; }
+.pf-template-first-light .pf-type-experience .pf-items { grid-template-columns: 1fr; gap: 0; }
+.pf-template-first-light .pf-type-experience .pf-item { position: relative; padding: 28px 0 28px 54px; border: 0; }
+.pf-template-first-light .pf-type-experience .pf-item::before { position: absolute; left: 0; top: 34px; width: 16px; height: 16px; border-radius: 50%; background: var(--pf-accent); content: ""; }
+.pf-template-first-light .pf-type-experience .pf-item:not(:last-child)::after { position: absolute; left: 7px; top: 50px; bottom: -18px; width: 2px; background: var(--pf-accent); content: ""; }
+.pf-template-first-light .pf-type-about .pf-section-inner, .pf-template-first-light .pf-type-interests .pf-section-inner { padding: 34px; border: 1px solid var(--pf-border); border-radius: var(--pf-radius); }
+.pf-template-first-light .pf-type-contact .pf-section-inner { background: var(--pf-surface); border-radius: var(--pf-radius); }
+
+.pf-template-colourblock .pf-site-nav { border-bottom: 1px solid var(--pf-border); }
+.pf-template-colourblock .pf-hero-content { display: grid; grid-template-columns: 2fr 1fr; gap: 0; align-items: stretch; }
+.pf-template-colourblock .pf-hero-copy { padding: 58px; background: var(--pf-surface); max-width: none; }
+.pf-template-colourblock .pf-hero-copy .pf-section-body { margin-top: 0; padding: 56px; background: var(--pf-color); color: #fff; font-size: 1.5rem; }
+.pf-template-colourblock .pf-type-education .pf-section-inner, .pf-template-colourblock .pf-type-experience .pf-section-inner { display: grid; grid-template-columns: .4fr .6fr; gap: 40px; }
+.pf-template-colourblock .pf-type-experience .pf-items { display: block; }
+.pf-template-colourblock .pf-type-experience .pf-item { display: grid; grid-template-columns: .7fr 1fr; gap: 28px; padding: 24px 0; border-top: 1px solid var(--pf-border); }
+.pf-template-colourblock .pf-type-projects .pf-section-inner { padding: 58px; background: var(--pf-accent); color: #fff; }
+.pf-template-colourblock .pf-type-projects .pf-items { grid-template-columns: 1fr; }
+.pf-template-colourblock .pf-type-skills .pf-section-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+.pf-template-colourblock .pf-type-contact .pf-section-inner { background: var(--pf-color); color: #fff; padding: 58px; }
+
+/* Final direction fidelity fixes: these target the actual nested renderer
+ * markup, keeping every concept visible in the first composition. */
+.pf-template-signal-v2 .pf-type-hero { padding-top: 72px; padding-bottom: 72px; }
+.pf-template-signal-v2 .pf-hero-content { min-height: 300px; align-items: center; }
+.pf-template-signal-v2 .pf-hero-copy { padding-block: 36px; }
+.pf-template-signal-v2 .pf-type-experience .pf-item { display: block; }
+.pf-template-signal-v2 .pf-type-experience .pf-item-copy { display: grid; grid-template-columns: minmax(220px, .9fr) 1fr; gap: 10px 48px; align-items: start; }
+.pf-template-signal-v2 .pf-type-experience .pf-item-date { grid-column: 1; grid-row: 1; }
+.pf-template-signal-v2 .pf-type-experience .pf-item-title { grid-column: 1; grid-row: 2; }
+.pf-template-signal-v2 .pf-type-experience .pf-item-description { grid-column: 2; grid-row: 1 / span 2; }
+.pf-template-signal-v2 .pf-type-experience .pf-item-tags { grid-column: 1; }
+
+.pf-template-cobalt-v2 .pf-type-experience .pf-item { display: block; }
+.pf-template-cobalt-v2 .pf-type-experience .pf-item-copy { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 30px; }
+.pf-template-cobalt-v2 .pf-type-experience .pf-item-title { grid-column: 1; }
+.pf-template-cobalt-v2 .pf-type-experience .pf-item-description { grid-column: 2; grid-row: 1 / span 2; }
+
+.pf-template-portrait .pf-type-experience .pf-item { display: block; }
+.pf-template-portrait .pf-type-experience .pf-item-copy { display: grid; grid-template-columns: 180px 220px minmax(0, 1fr); gap: 8px 26px; align-items: start; }
+.pf-template-portrait .pf-type-experience .pf-item-date { grid-column: 1; grid-row: 1 / span 2; }
+.pf-template-portrait .pf-type-experience .pf-item-title { grid-column: 2; grid-row: 1; }
+.pf-template-portrait .pf-type-experience .pf-item-description { grid-column: 3; grid-row: 1 / span 2; margin: 0; }
+
+.pf-template-nightfall .pf-type-projects .pf-item { display: block; }
+.pf-template-nightfall .pf-type-projects .pf-item-copy { max-width: 70ch; }
+.pf-template-nightfall .pf-type-projects .pf-item:first-child .pf-item-copy { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 42px; max-width: none; }
+.pf-template-nightfall .pf-type-projects .pf-item:first-child .pf-item-title { grid-column: 1; }
+.pf-template-nightfall .pf-type-projects .pf-item:first-child .pf-item-description { grid-column: 2; grid-row: 1 / span 3; margin: 0; }
+
+.pf-template-colourblock .pf-type-experience .pf-item { display: block; }
+.pf-template-colourblock .pf-type-experience .pf-item-copy { display: grid; grid-template-columns: .7fr 1fr; gap: 8px 28px; }
+.pf-template-colourblock .pf-type-experience .pf-item-title { grid-column: 1; }
+.pf-template-colourblock .pf-type-experience .pf-item-description { grid-column: 2; grid-row: 1 / span 2; margin: 0; }
+
+.pf-template-offset .pf-hero-content,
+.pf-template-colourblock .pf-hero-content { display: block; }
+.pf-template-offset .pf-hero-copy,
+.pf-template-colourblock .pf-hero-copy { display: grid; grid-template-columns: minmax(0, 2fr) minmax(240px, 1fr); gap: 0; align-items: stretch; max-width: none; }
+.pf-template-offset .pf-hero-copy .pf-section-subtitle,
+.pf-template-offset .pf-hero-copy .pf-section-title,
+.pf-template-colourblock .pf-hero-copy .pf-section-subtitle,
+.pf-template-colourblock .pf-hero-copy .pf-section-title { grid-column: 1; }
+.pf-template-offset .pf-hero-copy .pf-section-title,
+.pf-template-colourblock .pf-hero-copy .pf-section-title { grid-row: 1 / span 3; }
+.pf-template-offset .pf-hero-copy .pf-section-body,
+.pf-template-colourblock .pf-hero-copy .pf-section-body { grid-column: 2; grid-row: 1 / span 3; margin: 0; align-self: stretch; }
+.pf-template-offset .pf-hero-copy .pf-section-subtitle { color: var(--pf-color); }
+.pf-template-offset .pf-hero-copy .pf-section-body { border-left: 2px solid var(--pf-border); }
+.pf-template-colourblock .pf-hero-copy .pf-section-body { background: var(--pf-color); color: #fff; }
+.pf-template-open-studio .pf-hero-copy .pf-section-title { white-space: normal; overflow-wrap: anywhere; }
+.pf-template-open-studio .pf-type-projects .pf-item:not(:has(.pf-item-media)) .pf-item-copy { grid-column: 1 / -1; }
 .pf-align-center .pf-hero-content,
 .pf-align-center .pf-text-content {
   justify-items: center;
@@ -767,6 +955,70 @@ body {
   .pf-template-current .pf-item-description {
     grid-column: 2;
   }
+  .pf-template-signal-v2 .pf-hero-copy,
+  .pf-template-signal-v2 .pf-type-experience .pf-item,
+  .pf-template-cobalt-v2 .pf-type-experience .pf-item,
+  .pf-template-portrait .pf-type-experience .pf-item,
+  .pf-template-colourblock .pf-type-experience .pf-item { grid-template-columns: 1fr; }
+  .pf-template-signal-v2 .pf-hero-copy .pf-section-subtitle,
+  .pf-template-signal-v2 .pf-hero-copy .pf-section-title,
+  .pf-template-signal-v2 .pf-hero-copy .pf-section-body { grid-column: 1; grid-row: auto; }
+  .pf-template-signal-v2 .pf-type-experience .pf-item-copy,
+  .pf-template-cobalt-v2 .pf-type-experience .pf-item-copy,
+  .pf-template-portrait .pf-type-experience .pf-item-copy,
+  .pf-template-nightfall .pf-type-projects .pf-item:first-child .pf-item-copy,
+  .pf-template-colourblock .pf-type-experience .pf-item-copy,
+  .pf-template-offset .pf-hero-copy,
+  .pf-template-colourblock .pf-hero-copy { grid-template-columns: 1fr; }
+  .pf-template-signal-v2 .pf-type-experience .pf-item-date,
+  .pf-template-signal-v2 .pf-type-experience .pf-item-title,
+  .pf-template-signal-v2 .pf-type-experience .pf-item-description,
+  .pf-template-signal-v2 .pf-type-experience .pf-item-tags { grid-column: 1; grid-row: auto; }
+  .pf-template-cobalt-v2 .pf-type-experience .pf-item-title,
+  .pf-template-cobalt-v2 .pf-type-experience .pf-item-description,
+  .pf-template-portrait .pf-type-experience .pf-item-date,
+  .pf-template-portrait .pf-type-experience .pf-item-title,
+  .pf-template-portrait .pf-type-experience .pf-item-description,
+  .pf-template-nightfall .pf-type-projects .pf-item:first-child .pf-item-title,
+  .pf-template-nightfall .pf-type-projects .pf-item:first-child .pf-item-description,
+  .pf-template-colourblock .pf-type-experience .pf-item-title,
+  .pf-template-colourblock .pf-type-experience .pf-item-description { grid-column: 1; grid-row: auto; }
+  .pf-template-signal-v2 .pf-type-contact .pf-section-inner,
+  .pf-template-offset .pf-type-contact .pf-section-inner { display: block; }
+  .pf-template-field-notes .pf-type-projects .pf-section-inner,
+  .pf-template-ledger .pf-type-education .pf-section-inner,
+  .pf-template-ledger .pf-type-experience .pf-section-inner,
+  .pf-template-ledger .pf-type-projects .pf-section-inner,
+  .pf-template-nightfall .pf-type-education .pf-section-inner,
+  .pf-template-colourblock .pf-type-education .pf-section-inner,
+  .pf-template-colourblock .pf-type-experience .pf-section-inner,
+  .pf-template-colourblock .pf-type-skills .pf-section-inner { display: block; }
+  .pf-template-nightfall .pf-type-education .pf-section-intro { grid-template-columns: 1fr; gap: 18px; }
+  .pf-template-cobalt-v2 { --pf-cobalt-rail: 0px; }
+  .pf-template-cobalt-v2 .pf-site-nav { position: relative; width: 100%; max-width: none; height: auto; padding: 24px 18px; }
+  .pf-template-cobalt-v2 .pf-site-mark { max-width: none; font-size: 2.3rem; }
+  .pf-template-cobalt-v2 .pf-site-nav nav { display: flex; flex-wrap: wrap; gap: 10px 16px; margin-top: 24px; }
+  .pf-template-cobalt-v2 .pf-site-content, .pf-template-cobalt-v2 .pf-site-footer { width: 100%; margin-left: 0; }
+  .pf-template-cobalt-v2 .pf-site-content .pf-section-inner { width: min(100% - 36px, var(--pf-max)); }
+  .pf-template-cobalt-v2 .pf-type-projects .pf-item { grid-template-columns: 62px 1fr; }
+  .pf-template-cobalt-v2 .pf-type-contact .pf-section-inner,
+  .pf-template-first-light .pf-hero-content,
+  .pf-template-first-light .pf-type-education .pf-section-inner,
+  .pf-template-colourblock .pf-type-projects .pf-section-inner,
+  .pf-template-colourblock .pf-type-contact .pf-section-inner { padding: 32px 24px; }
+  .pf-template-portrait .pf-type-about .pf-section-inner { display: block; }
+  .pf-template-portrait .pf-type-education .pf-items { grid-template-columns: 1fr; }
+  .pf-template-offset .pf-hero-content,
+  .pf-template-colourblock .pf-hero-content { display: block; }
+  .pf-template-offset .pf-hero-copy { padding-right: 0; }
+  .pf-template-offset .pf-hero-copy .pf-section-body,
+  .pf-template-colourblock .pf-hero-copy .pf-section-body { border-left: 0; padding: 24px 0; }
+  .pf-template-offset .pf-type-projects .pf-item { grid-column: auto; }
+  .pf-template-open-studio .pf-hero-copy .pf-section-title { white-space: normal; font-size: clamp(3.5rem, 18vw, 8rem); }
+  .pf-template-open-studio .pf-type-projects .pf-item { display: block; }
+  .pf-template-open-studio .pf-type-projects .pf-item:nth-child(2) .pf-item-media,
+  .pf-template-open-studio .pf-type-projects .pf-item:nth-child(2) .pf-item-copy { order: initial; }
+  .pf-template-nightfall .pf-type-projects .pf-item { display: block; }
   .pf-template-studio .pf-hero-content,
   .pf-template-frame .pf-hero-content,
   .pf-template-studio .pf-hero-copy,

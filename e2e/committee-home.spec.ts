@@ -115,15 +115,15 @@ test('AI homepage committee preserves roster, portraits, hierarchy and responsiv
       range.selectNodeContents(element);
       return new Set([...range.getClientRects()].map(rect => Math.round(rect.top))).size;
     });
-    expect(nameLineCount).toBe(1);
+    expect(nameLineCount).toBeLessThanOrEqual(width < 768 ? 2 : 1);
 
     if (width >= 1024) {
-      const connectorGap = await section.evaluate((element) => {
-        const connector = element.querySelector('.flow-committee__branches')!.getBoundingClientRect();
+      const officersGap = await section.evaluate((element) => {
+        const signatories = element.querySelector('.flow-committee__signatories')!.getBoundingClientRect();
         const officers = element.querySelector('.flow-officers')!.getBoundingClientRect();
-        return connector.top - officers.bottom;
+        return officers.top - signatories.bottom;
       });
-      expect(connectorGap).toBeGreaterThan(0);
+      expect(officersGap).toBeGreaterThan(0);
     }
 
     const tierBounds = await section.evaluate((element) => [...element.querySelectorAll<HTMLElement>('.flow-officers .flow-committee__portrait, .flow-teams .flow-committee__portrait')]

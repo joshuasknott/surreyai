@@ -175,10 +175,32 @@ function toIndex(value: AssetOwnerIndex | null): AssetOwnerIndex {
 }
 
 function referencesAsset(document: unknown, assetId: string): boolean {
-  return (
-    typeof document !== "undefined" &&
-    JSON.stringify(document).includes(assetPath(assetId))
-  );
+  if (!document || typeof document !== "object") return false;
+  const path = assetPath(assetId);
+  const value = document as Record<string, unknown>;
+  const profile = value.profile;
+  if (
+    profile &&
+    typeof profile === "object" &&
+    (profile as Record<string, unknown>).photo === path
+  )
+    return true;
+
+  if (!Array.isArray(value.sections)) return false;
+  return value.sections.some((section) => {
+    if (!section || typeof section !== "object") return false;
+    const current = section as Record<string, unknown>;
+    // Older documents omitted `visible`; sectionSchema defaults that to true.
+    if (current.visible === false) return false;
+    if (current.image === path) return true;
+    if (!Array.isArray(current.items)) return false;
+    return current.items.some(
+      (item) =>
+        item &&
+        typeof item === "object" &&
+        (item as Record<string, unknown>).image === path,
+    );
+  });
 }
 
 function base64FromDataUrl(dataUrl: string): Uint8Array {

@@ -1,5 +1,7 @@
 ---
 import { Image } from 'astro:assets';
+import SocialIcon from '@surreysocieties/ui/components/SocialIcon';
+import { BookOpen, Users, Handshake, Laptop, Briefcase } from 'lucide-astro';
 import type { Society } from '@surreysocieties/admin/types';
 import joshua from '../../assets/committee/joshua-refined.webp';
 import poppy from '../../assets/committee/poppy-refined.webp';
@@ -49,25 +51,25 @@ const officers = society.signatories.map(officer => {
   return { name, role: officer.role, portrait, initials, linkedin: linkedInProfiles.get(name) };
 });
 const teams = [
-  { role: 'Workshops & Learning', members: [
+  { role: 'Workshops & Learning', icon: BookOpen, members: [
     { name: "Amanda Lages O'Connor", portrait: amanda },
     { name: 'Samuel Joyson Rekala', portrait: samuelJoyson },
     { name: 'Tadavarthi Kusumitha', portrait: kusumitha },
   ] },
-  { role: 'Events & Socials', members: [
+  { role: 'Events & Socials', icon: Users, members: [
     { name: 'Fatima Waheed', portrait: fatima },
     { name: 'George Mahon', portrait: george },
     { name: 'Miguel Antonio', portrait: miguel },
   ] },
-  { role: 'Industry & Partnerships', members: [
+  { role: 'Industry & Partnerships', icon: Handshake, members: [
     { name: 'Ibrahim Haque', portrait: ibrahim },
     { name: 'Samuel Young', portrait: samuelYoung },
   ] },
-  { role: 'Projects & Hackathons', members: [
+  { role: 'Projects & Hackathons', icon: Laptop, members: [
     { name: 'Bibek Limbu', portrait: bibek },
     { name: 'Muhammad Zain Khan', portrait: zain },
   ] },
-  { role: 'Careers & Opportunities', members: [
+  { role: 'Careers & Opportunities', icon: Briefcase, members: [
     { name: 'Deepanshu Dariya', portrait: deepanshu },
   ] },
 ];
@@ -83,7 +85,7 @@ const teams = [
           ? officer.linkedin
             ? <a class="flow-committee__profile" href={officer.linkedin} target="_blank" rel="noopener noreferrer" aria-label={`${officer.name} on LinkedIn (opens in a new tab)`}>
                 <Image class="flow-committee__portrait" src={officer.portrait} width={360} height={360} alt="" loading="lazy" decoding="async" />
-              </a>
+              <span class="flow-committee__linkedin" aria-hidden="true"><SocialIcon name="linkedin" /></span></a>
             : <Image class="flow-committee__portrait" src={officer.portrait} width={360} height={360} alt="" loading="lazy" decoding="async" />
           : <div class="flow-committee__portrait flow-committee__initials" aria-hidden="true">{officer.initials}</div>}
         <div class="flow-officer__identity">
@@ -92,18 +94,15 @@ const teams = [
         </div>
       </article>)}
     </div>
-    <svg class="flow-committee__branches" viewBox="0 0 1000 40" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-      <path d="M1 40V11Q1 1 11 1H989Q999 1 999 11V40M250 1V40M500 1V40M750 1V40" fill="none" stroke="currentColor" stroke-width="2" vector-effect="non-scaling-stroke" />
-    </svg>
     <div class="flow-teams">
       {teams.map(team => <article class="flow-team">
-        <h3><span>{team.role.split(' & ')[0]} &amp;</span> <span>{team.role.split(' & ')[1]}</span></h3>
+        <h3><span class="flow-team__icon"><team.icon size={20} aria-hidden="true" /></span><span>{team.role}</span></h3>
         <ul>
           {team.members.map(member => <li>
             {linkedInProfiles.has(member.name)
               ? <a class="flow-committee__profile" href={linkedInProfiles.get(member.name)} target="_blank" rel="noopener noreferrer" aria-label={`${member.name} on LinkedIn (opens in a new tab)`}>
                   <Image class="flow-committee__portrait" src={member.portrait} width={360} height={360} alt="" loading="lazy" decoding="async" />
-                </a>
+                <span class="flow-committee__linkedin" aria-hidden="true"><SocialIcon name="linkedin" /></span></a>
               : <Image class="flow-committee__portrait" src={member.portrait} width={360} height={360} alt="" loading="lazy" decoding="async" />}
             <span>{member.name}</span>
           </li>)}
@@ -114,42 +113,45 @@ const teams = [
 </section>
 
 <style>
-  .flow-committee { padding: 60px 0 150px; }
-  .flow-committee > .flow-shell { width: min(1280px, calc(100% - 32px)); }
+  .flow-committee {
+    padding: 34px 0 40px;
+    background: #faf8f3;
+  }
+  .flow-committee > .flow-shell { width: min(1180px, 90%); }
   .flow-committee .flow-heading {
     text-align: center;
-    font-size: clamp(40px, 7.7vw, 104px);
+    font-size: clamp(42px, 5vw, 60px);
+    line-height: 1;
     transform: none;
   }
   .flow-committee .flow-committee__signatories {
-    margin: 26px 0 16px;
+    margin: 8px 0 18px;
     color: var(--flow-ink);
-    font-size: 28px;
-    font-weight: 750;
-    line-height: 1.25;
+    font: 800 22px/1.1 var(--flow-display);
     text-align: center;
   }
   .flow-officers {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 20px;
-    width: min(700px, 85%);
+    gap: 28px;
+    width: min(720px, 100%);
     margin-inline: auto;
   }
   .flow-officer { min-width: 0; text-align: center; }
   .flow-committee__portrait {
     display: block;
-    width: 144px;
-    height: 144px;
-    margin: 0 auto 10px;
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 8px;
     border-radius: 50%;
     object-fit: cover;
   }
-  .flow-officer .flow-committee__portrait { width: 154px; height: 154px; }
+  .flow-officer .flow-committee__portrait { width: 140px; height: 140px; }
   .flow-committee__profile {
+    position: relative;
     display: block;
     width: fit-content;
-    margin: 0 auto 10px;
+    margin: 0 auto 8px;
     border-radius: 50%;
   }
   .flow-committee__profile .flow-committee__portrait { margin: 0; }
@@ -165,91 +167,117 @@ const teams = [
   }
   .flow-officer h3 {
     margin: 0;
-    font-size: 22px;
-    font-weight: 700;
-    line-height: 1.2;
-    letter-spacing: -.03em;
+    font-size: 17px;
+    font-weight: 750;
+    line-height: 1.15;
+    letter-spacing: -.025em;
     text-wrap: balance;
     overflow-wrap: anywhere;
   }
   .flow-committee .flow-officer__role {
     margin: 4px 0 0;
     color: #cc3b00;
-    font-size: 21px;
-    font-weight: 550;
-    line-height: 1.3;
-  }
-  .flow-committee__branches {
-    display: block;
-    width: 80%;
-    height: 40px;
-    margin: 55px auto 16px;
-    color: var(--flow-orange);
+    font-size: 15px;
+    font-weight: 650;
+    line-height: 1.2;
   }
   .flow-teams {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 0;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 20px 24px;
+    margin-top: 24px;
     text-align: center;
   }
-  .flow-team { min-width: 0; padding-inline: 8px; }
+  .flow-team {
+    grid-column: span 2;
+    min-width: 0;
+    padding: 14px 12px 16px;
+    border: 1px solid #e1dbd1;
+    border-top: 3px solid var(--flow-orange);
+    border-radius: 18px;
+    background: #fffdf8;
+  }
+  .flow-team:nth-child(4) { grid-column: 2 / span 2; }
+  .flow-team:nth-child(5) { grid-column: 4 / span 2; }
   .flow-team h3 {
-    max-width: 180px;
-    min-height: 55px;
-    margin: 0 auto 22px;
-    font-size: 22px;
-    font-weight: 700;
-    line-height: 1.25;
+    min-height: 24px;
+    margin: 0 0 12px;
+    font: 800 22px/1.05 var(--flow-display);
     letter-spacing: -.035em;
     text-wrap: balance;
   }
-  .flow-team h3 > span { display: block; }
-  .flow-team ul { display: grid; grid-auto-rows: 206px; gap: 8px; padding: 0; margin: 0; list-style: none; }
-  .flow-team li { min-width: 0; min-height: 194px; }
+  .flow-team h3 > span { display: inline; }
+  .flow-team ul {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 10px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+  .flow-team li {
+    display: flex;
+    min-width: 0;
+    flex: 1 1 0;
+    flex-direction: column;
+    align-items: center;
+  }
+  .flow-team .flow-committee__profile { margin: 0 auto 8px; }
   .flow-team li > span {
     display: block;
-    max-width: 180px;
+    max-width: 12ch;
     margin-inline: auto;
-    font-size: 20px;
-    font-weight: 600;
-    line-height: 1.3;
-    letter-spacing: -.025em;
+    font-size: 15px;
+    font-weight: 650;
+    line-height: 1.15;
+    letter-spacing: -.02em;
     text-wrap: balance;
     overflow-wrap: anywhere;
   }
+  .flow-committee__linkedin { position:absolute; right:-3px; bottom:0; display:grid; place-items:center; width:24px; height:24px; background:white; color:#111; border:1px solid #e1dbd1; border-radius:50%; }
+  .flow-committee__linkedin :global(.social-icon) { width:14px; height:14px; flex-basis:14px; }
+  .flow-team h3 { display:flex; align-items:center; justify-content:center; gap:8px; font-size:20px; }
+  .flow-team h3 > .flow-team__icon { display:grid; place-items:center; flex:0 0 30px; height:30px; color:white; background:#ff4a00; border-radius:7px; }
   @media (max-width: 1023px) {
-    .flow-committee { padding-bottom: 120px; }
-    .flow-committee > .flow-shell { width: calc(100% - 48px); }
-    .flow-committee__branches { display: none; }
-    .flow-officers { width: min(700px, 100%); }
+    .flow-committee { padding-bottom: 40px; }
+    .flow-committee > .flow-shell { width: min(920px, calc(100% - 48px)); }
+    .flow-officers { width: min(680px, 100%); gap: 20px; }
     .flow-officer .flow-committee__portrait { width: 120px; height: 120px; }
-    .flow-officer h3 { font-size: 20px; }
-    .flow-committee .flow-officer__role { font-size: 18px; }
-    .flow-teams { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px 32px; margin-top: 44px; }
-    .flow-team { border-top: 2px solid var(--flow-orange); padding: 22px 0 0; }
-    .flow-team h3 { max-width: none; min-height: 0; margin-bottom: 22px; font-size: 23px; }
-    .flow-team h3 > span { display: inline; }
-    .flow-team ul { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: auto; gap: 20px 12px; }
-    .flow-team li { min-height: 0; }
-    .flow-team .flow-committee__portrait { width: 112px; height: 112px; }
-    .flow-team li > span { font-size: 18px; }
+    .flow-teams { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; margin-top: 26px; }
+    .flow-team,
+    .flow-team:nth-child(4),
+    .flow-team:nth-child(5) { grid-column: span 2; }
+    .flow-team:nth-child(4) { grid-column: span 2; }
+    .flow-team:nth-child(5) { grid-column: 2 / span 2; }
+    .flow-team { padding-inline: 8px; }
+    .flow-team .flow-committee__portrait { width: 72px; height: 72px; }
+    .flow-team ul { gap: 6px; }
+    .flow-team li > span { font-size: 14px; }
   }
-  @media (max-width: 599px) {
-    .flow-committee { padding: 36px 0 105px; }
+  @media (max-width: 760px) {
+    .flow-committee { padding: 32px 0 36px; }
     .flow-committee > .flow-shell { width: calc(100% - 40px); }
-    .flow-committee .flow-heading { font-size: clamp(36px, 9.5vw, 52px); }
-    .flow-committee .flow-committee__signatories { margin-top: 26px; font-size: 23px; }
-    .flow-officers { grid-template-columns: 1fr; gap: 22px; max-width: 350px; }
-    .flow-officer { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 18px; align-items: center; text-align: left; }
-    .flow-officer .flow-committee__portrait { width: 96px; height: 96px; margin: 0; }
-    .flow-officer .flow-committee__profile { margin: 0; }
-    .flow-officer h3 { font-size: 20px; text-wrap: initial; }
-    .flow-committee .flow-officer__role { margin-top: 5px; font-size: 17px; }
-    .flow-teams { grid-template-columns: 1fr; gap: 32px; margin-top: 36px; }
-    .flow-team h3 { font-size: 22px; }
-    .flow-team ul { gap: 22px 16px; }
-    .flow-team .flow-committee__portrait { width: 96px; height: 96px; }
-    .flow-team li > span { max-width: 155px; font-size: 17px; }
-    .flow-team li:last-child:nth-child(odd) { grid-column: 1 / -1; width: calc(50% - 8px); justify-self: center; }
+    .flow-committee .flow-heading { font-size: clamp(38px, 9vw, 56px); }
+    .flow-committee .flow-committee__signatories { margin: 12px 0 20px; font-size: 21px; }
+    .flow-officers { width: 100%; gap: 12px; }
+    .flow-officer .flow-committee__portrait { width: 80px; height: 80px; }
+    .flow-officer h3 { font-size: 15px; }
+    .flow-committee .flow-officer__role { margin-top: 4px; font-size: 14px; }
+    .flow-teams { grid-template-columns: 1fr; gap: 16px; margin-top: 30px; }
+    .flow-team,
+    .flow-team:nth-child(4),
+    .flow-team:nth-child(5) { grid-column: auto; padding: 16px 14px 18px; }
+    .flow-team h3 { min-height: 0; margin-bottom: 14px; font-size: 22px; }
+    .flow-team .flow-committee__portrait { width: 76px; height: 76px; }
+    .flow-team ul { gap: 10px; }
+    .flow-team li > span { max-width: 13ch; font-size: 14px; }
+  }
+  @media (max-width: 380px) {
+    .flow-committee > .flow-shell { width: calc(100% - 28px); }
+    .flow-officers { gap: 6px; }
+    .flow-officer .flow-committee__portrait { width: 76px; height: 76px; }
+    .flow-team .flow-committee__portrait { width: 68px; height: 68px; }
+    .flow-team ul { gap: 5px; }
   }
 </style>

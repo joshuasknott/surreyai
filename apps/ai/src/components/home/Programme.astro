@@ -1,4 +1,6 @@
 ---
+import { Image } from 'astro:assets';
+import laptop from '../../assets/generated/illustrated/laptop.webp';
 import { ArrowRight } from 'lucide-astro';
 import type { PublicActivity } from '../../lib/programme';
 import { activityDate, activityKind, upcomingActivities } from '../../lib/programme';
@@ -10,13 +12,14 @@ const events = upcomingActivities(activities).slice(0, 4);
 <section id="programme" class="programme" aria-labelledby="programme-title" data-programme>
   <div class="programme-shell">
     <div class="programme-heading"><div><h2 id="programme-title">Coming <span>up.</span></h2><p>Meet people. Build things. Try something new.</p></div></div>
-      <div class="programme-events" data-programme-events>
+      <div class="programme-layout"><div class="programme-events" data-programme-events>
         {events.map(item => <article class="programme-event">
           <time class="programme-date" datetime={item.date}><span>{activityDate(item.date, { weekday: 'short' })}</span><strong>{activityDate(item.date, { day: 'numeric' })}</strong><span>{activityDate(item.date, { month: 'short' })}</span></time>
           <div><h3>{item.title}</h3><p class="programme-meta">{[activityKind(item), item.startTime ? `${item.startTime}${item.endTime ? `–${item.endTime}` : ''}` : '', item.location].filter(Boolean).join(' · ')}</p><p class="programme-summary">{item.description}</p><a class="programme-link" href={`/activities/${item.id}`}>View {item.kind === 'hackathon' ? 'hackathon' : 'event'} <ArrowRight size={18} aria-hidden="true" /></a></div>
         </article>)}
         {!events.length && <div class="programme-empty"><h3>The next date is taking shape.</h3><p>We’ll post confirmed workshops, talks and hackathons here. Join our WhatsApp for society updates.</p><a class="programme-link" href="https://chat.whatsapp.com/HUQ8KayHBwXJsFYaRFk9Ge" target="_blank" rel="noopener noreferrer">Join the WhatsApp <ArrowRight size={18} aria-hidden="true" /></a></div>}
       </div>
+    <Image class="programme-art" src={laptop} width={460} alt="" loading="lazy" /></div>
     <div class="programme-bottom"><a href="/activities">All activities <ArrowRight size={16} aria-hidden="true" /></a></div>
   </div>
 </section>

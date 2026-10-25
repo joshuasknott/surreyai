@@ -77,7 +77,15 @@ const navigationLabel = (section: PortfolioSection) => {
     text: "Notes",
     links: "Links",
   };
-  const label = labels[section.type] || section.title.trim() || "Explore";
+  const label =
+    (section.sourceCategory === "volunteering" ||
+    (!section.sourceCategory &&
+      section.type === "experience" &&
+      /^volunteer(?:ing)?$/i.test(section.title.trim()))
+      ? "Volunteering"
+      : labels[section.type]) ||
+    section.title.trim() ||
+    "Explore";
   return label.length > 14 ? `${label.slice(0, 13).trimEnd()}…` : label;
 };
 

@@ -540,6 +540,11 @@ export function Publish() {
                           Download editable source
                         </button>
                       </div>
+                      <p className="help-text">
+                        The editable source is a private backup, including saved
+                        CV details and hidden sections. Use the website download
+                        for public hosting.
+                      </p>
                     </div>
                   </section>
                   <section className="settings-card domain-card">

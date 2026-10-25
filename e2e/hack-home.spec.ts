@@ -46,7 +46,7 @@ test.describe('AI Hack homepage promotion', () => {
 
       await expectNoHorizontalOverflow(page);
       await promotion.locator('h2').click();
-      await expect.poll(() => promotion.locator('img').evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0)).toBe(true);
+      await expect.poll(() => promotion.locator('img[alt*="Surrey AI Hack" i]').evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0)).toBe(true);
       await page.evaluate(() => document.fonts.ready);
       await promotion.screenshot({ path: `output/hack-homepage/section-${viewport.name}.png` });
       await page.screenshot({ path: `output/hack-homepage/home-${viewport.name}.png`, fullPage: true });

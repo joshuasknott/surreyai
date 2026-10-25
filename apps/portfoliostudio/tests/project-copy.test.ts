@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { getTemplate } from "../src/data/templates";
+import { studentProfileSchema } from "../shared/student";
 import {
   createDraft,
   getDrafts,
@@ -55,6 +56,13 @@ describe("cloud project duplication", () => {
     const original = structuredClone(getTemplate("cobalt").document);
     original.profile.photo = "/api/assets/asset_original";
     original.sections[0].image = original.profile.photo;
+    original.student = studentProfileSchema.parse({
+      name: "Taylor",
+      photo: original.profile.photo,
+      projects: [
+        { id: "work", title: "My work", image: original.profile.photo },
+      ],
+    });
     const requests: Array<{ path: string; method: string; body: any }> = [];
     vi.stubGlobal(
       "fetch",
@@ -83,6 +91,15 @@ describe("cloud project duplication", () => {
       "/api/assets/asset_independent",
     );
     expect(original.sections[0].image).toBe("/api/assets/asset_original");
+    expect(project.document.student?.photo).toBe(
+      "/api/assets/asset_independent",
+    );
+    expect(project.document.student?.projects[0].image).toBe(
+      "/api/assets/asset_independent",
+    );
+    expect(original.student.projects[0].image).toBe(
+      "/api/assets/asset_original",
+    );
   });
 
   it("removes an incomplete copy and preserves its source when an image is unavailable", async () => {

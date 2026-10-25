@@ -131,6 +131,54 @@ describe("AssetService", () => {
     ).toBe(true);
   });
 
+  it("only exposes media from the public profile and visible sections", async () => {
+    const service = new AssetService(new MemoryStore());
+    const profile = await service.upload("owner_1", "project_1", dataUrl("png"));
+    const visibleSection = await service.upload(
+      "owner_1",
+      "project_1",
+      dataUrl("jpeg"),
+    );
+    const hiddenSection = await service.upload(
+      "owner_1",
+      "project_1",
+      dataUrl("webp"),
+    );
+    const privateStudent = await service.upload(
+      "owner_1",
+      "project_1",
+      dataUrl("png", [1]),
+    );
+    const published: PublishedAssetProject = {
+      projectId: "project_1",
+      publishedAt: "2026-10-22T12:00:00.000Z",
+      publishedDocument: {
+        profile: { photo: profile.url },
+        student: {
+          photo: privateStudent.url,
+          projects: [{ image: privateStudent.url }],
+        },
+        sections: [
+          {
+            // Omitted `visible` is public for legacy documents.
+            image: visibleSection.url,
+            items: [{ image: visibleSection.url }],
+          },
+          { visible: false, image: hiddenSection.url },
+        ],
+      },
+    };
+
+    for (const asset of [profile, visibleSection])
+      expect(
+        await service.read(asset.assetId, { publishedProject: published }),
+      ).not.toBeNull();
+    for (const asset of [hiddenSection, privateStudent])
+      expect(
+        await service.read(asset.assetId, { publishedProject: published }),
+      ).toBeNull();
+  });
+
   it("deletes all assets for one project and leaves another project intact", async () => {
     const service = new AssetService(new MemoryStore());
     const first = await service.upload("owner_1", "project_1", dataUrl("png"));

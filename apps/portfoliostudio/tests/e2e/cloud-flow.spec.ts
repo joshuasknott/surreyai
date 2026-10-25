@@ -70,8 +70,21 @@ async function createLocalDraft(
   await page
     .locator('input[placeholder*="Computer science"]')
     .fill("Software engineering student");
-  await page.locator('input[placeholder*="society event"]').fill(workedOn);
-  await page.locator("textarea").fill("Testing the saved portfolio flow.");
+  await page
+    .getByLabel("About you optional")
+    .fill("Testing the saved portfolio flow.");
+  const projects = page
+    .locator("details.student-category")
+    .filter({ hasText: "Projects" })
+    .first();
+  await projects.locator(":scope > summary").click();
+  await projects.getByRole("button", { name: /Add project/i }).click();
+  await projects
+    .locator("fieldset")
+    .last()
+    .locator("input")
+    .first()
+    .fill(workedOn);
   await page.getByRole("button", { name: "Continue" }).click();
   await expect(page.getByText("Choose a starting point.")).toBeVisible();
   await expect(page.getByText("Choose your AI.")).toHaveCount(0);
@@ -146,7 +159,8 @@ test("signup, cloud persistence, publishing, recovery and ownership flow", async
   await expect(
     canvas.getByRole("heading", { name: "Cloud product engineer" }),
   ).toBeVisible();
-  await canvas.locator(".pf-section-image").first().click();
+  await page.getByRole("button", { name: "Edit style", exact: true }).click();
+  await page.getByRole("button", { name: "Add image", exact: true }).click();
   await page
     .locator(
       'input[type="file"][accept="image/jpeg,image/png,image/webp,image/gif"]',
