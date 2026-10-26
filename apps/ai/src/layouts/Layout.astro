@@ -2,6 +2,7 @@
 import SocietyLayout from '@surreysocieties/ui/components/SocietyLayout';
 import JoinMenu from '../components/JoinMenu.astro';
 import { getSocietyById } from '@surreysocieties/admin/config';
+import '../styles/navigation.css';
 interface Props { title: string; description: string; ogImage?: string; bodyClass?: string; hideCTA?: boolean; }
 const { title, description, ogImage, bodyClass = 'bg-ai-bg text-ai-fg font-sans min-h-screen' } = Astro.props;
 ---

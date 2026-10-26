@@ -13,36 +13,9 @@
   --resources-orange: #ff4a00;
   --resources-muted: #5b5752;
   --resources-line: #ded8ce;
+  --ai-nav-background: var(--resources-paper);
   background: var(--resources-paper);
   color: var(--resources-ink);
-}
-
-.ai-resources-page .society-header {
-  background: var(--resources-paper);
-  color: var(--resources-ink);
-  border-bottom-color: var(--resources-line);
-}
-
-.ai-resources-page .ai-page-nav a[aria-current='page'] {
-  text-decoration: underline;
-  text-decoration-color: var(--resources-orange);
-  text-decoration-thickness: 2px;
-  text-underline-offset: 8px;
-}
-
-.ai-resources-page .society-nav-join,
-.ai-resources-page .ai-join-trigger {
-  background: var(--resources-orange);
-  color: var(--resources-ink);
-  border-radius: 999px;
-}
-
-.ai-resources-page .society-header .society-brand img {
-  width: 56px;
-  height: 56px;
-  object-fit: cover;
-  object-position: left center;
-  border-radius: 0;
 }
 
 .ai-resources-page .society-footer .society-brand img {
@@ -251,19 +224,8 @@
   .ai-resources-page .resources-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-@media (max-width: 760px) {
-  .ai-resources-page .society-header__inner { flex-wrap: wrap; padding: 16px 20px; gap: 8px; }
-  .ai-resources-page .society-header__actions { display: contents; }
-  .ai-resources-page .society-header .society-brand { font-size: 17px; gap: 8px; }
-  .ai-resources-page .society-header .society-brand span { font-size: inherit; white-space: nowrap; }
-  .ai-resources-page .society-header .society-brand img { width: 42px; height: 42px; }
-  .ai-resources-page .ai-page-nav { order: 1; width: 100%; justify-content: center; gap: 12px; flex-wrap: wrap; }
-  .ai-resources-page .ai-page-nav a { display: inline-flex; font-size: 15px; }
-}
-
 @media (max-width: 620px) {
   .ai-resources-page .resources-shell { width: min(100% - 32px, 1240px); }
-  .ai-resources-page .society-header .society-brand img { width: 42px; height: 42px; }
   .ai-resources-page .resources-hero__inner { padding-block: 58px 42px; }
   .ai-resources-page .resources-hero h1 { font-size: clamp(4.2rem, 20vw, 6.4rem); }
   .ai-resources-page .resources-hero__lead { margin-top: 16px; font-size: clamp(1.65rem, 7.5vw, 2rem); line-height: 1.3; }
@@ -278,10 +240,6 @@
 }
 
 @media (max-width: 380px) {
-  .ai-resources-page .society-header__inner { padding-inline: 12px; }
-  .ai-resources-page .society-header .society-brand { font-size: 15px; gap: 5px; }
-  .ai-resources-page .society-header .society-brand img { width: 36px; height: 36px; }
-  .ai-resources-page .ai-page-nav a { font-size: 14px; }
   .ai-resources-page .resources-hero h1 { font-size: 58px; }
 }
 

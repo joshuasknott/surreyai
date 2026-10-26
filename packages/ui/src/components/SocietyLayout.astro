@@ -21,6 +21,7 @@ const society = getSocietyById(societyKey)!;
 const committeeDeadline = societyKey === 'neurotech' ? NEUROTECH_COMMITTEE_APPLICATIONS_CLOSE_AT : COMMITTEE_APPLICATIONS_CLOSE_AT;
 const curiousHome = societyKey === 'ai' && bodyClass.split(' ').includes('ai-curious-home');
 const resourcesPage = societyKey === 'ai' && bodyClass.split(' ').includes('ai-resources-page');
+const capsuleHeader = curiousHome || resourcesPage;
 const socialNames: Record<string, string> = { whatsapp: 'WhatsApp', instagram: 'Instagram', linkedin: 'LinkedIn', discord: 'Discord', tiktok: 'TikTok' };
 const socialLinks = Object.entries(socialNames).filter(([key]) => society.socials[key as keyof typeof society.socials]);
 ---
@@ -34,7 +35,7 @@ const socialLinks = Object.entries(socialNames).filter(([key]) => society.social
   extraFontHrefs={extraFontHrefs}
 >
   <a class="society-skip" href="#main-content">Skip to content</a>
-  <header class="society-header">
+  <header class:list={['society-header', capsuleHeader && 'ai-capsule-header']}>
     <div class="society-header__inner">
       <a class="society-brand" href="/" aria-label={`${society.name} home`}>
         <img src={curiousHome || resourcesPage ? '/logos/brand/surrey-ai-logo-transparent.png' : society.logo} alt="" width="56" height="56" fetchpriority="high" />
@@ -42,13 +43,13 @@ const socialLinks = Object.entries(socialNames).filter(([key]) => society.social
       </a>
       <div class="society-header__actions">
       <slot name="header-actions" />
-      {curiousHome && <nav class="ai-home-nav" aria-label="Main navigation">
-        <a href="#about">About</a>
-        <a href="#programme">Events</a>
-        <a href="#committee">Committee</a>
-        <a href="/resources">Resources</a>
+      {capsuleHeader && <nav class="ai-home-nav" aria-label="Main navigation">
+        <a href={curiousHome ? '#about' : '/#about'}>About</a>
+        <a href={curiousHome ? '#programme' : '/#programme'}>Events</a>
+        <a href={curiousHome ? '#committee' : '/#committee'}>Committee</a>
+        <a href="/resources" aria-current={resourcesPage ? 'page' : undefined}>Resources</a>
       </nav>}
-      {!curiousHome && societyKey === 'ai' && <nav class="ai-page-nav" aria-label="Main navigation">
+      {!capsuleHeader && societyKey === 'ai' && <nav class="ai-page-nav" aria-label="Main navigation">
         <a href="/#about">About</a>
         <a href="/#programme">Events</a>
         <a href="/#committee">Committee</a>
