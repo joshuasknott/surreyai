@@ -2,15 +2,15 @@
 
 The committee planner is the private board at `/committee/planner` on the AI Society site. It uses the root Convex deployment for authenticated access, planner records, comments, notifications, files and published activity snapshots. Public activity pages read only the explicitly published snapshot.
 
-The planner frontend lives in `apps/ai/src/pages/committee/planner.astro` and its API routes are under `apps/ai/src/pages/api/planner`. Backend functions and validators live in `convex/planner.ts`, `convex/plannerSignIn.ts`, `convex/plannerEmail.ts`, `convex/plannerFiles.ts`, `convex/plannerModel.ts` and `convex/schema.ts`.
+The planner frontend lives in `apps/ai/src/pages/committee/planner.astro`, with workspace routes handled by `apps/ai/src/pages/committee/planner/[workspace].astro`. Astro API routes live under `apps/ai/src/pages/api/planner/` and in `apps/ai/src/pages/api/planner-mention-email.ts`. File upload/download uses the Convex HTTP routes in `convex/http.ts`. Backend functions and validators live in `convex/planner.ts`, `convex/plannerSignIn.ts`, `convex/plannerEmail.ts`, `convex/plannerFiles.ts`, `convex/plannerModel.ts` and `convex/schema.ts`.
 
-Committee access is granted by email. The owner can add or revoke committee addresses from the planner settings; other members need an active grant. The sign-in form checks access before requesting a Clerk email code. Access checks and mention-email relays use server-only signing secrets. Do not add credentials, tokens or hosted member data to fixtures.
+Committee access is granted by email. The owner is determined by comparing the authenticated email with the fixed `OWNER_EMAIL` in `convex/permissions.ts`. The owner can add or revoke committee addresses from the planner settings; other members need an active grant. Granting access also prepares an email-only Clerk account using `CLERK_SECRET_KEY`; the grant is written only after account preparation succeeds. The sign-in form checks access before requesting a Clerk email code. Access checks and mention-email relays use server-only secrets. Do not add credentials, tokens or hosted member data to fixtures.
 
-Planner cards move through Ideas, Planning and Ready before an explicit publish action creates a public activity snapshot. Draft details, private notes, comments, collaborators, checklists and audit history remain private. Archiving dated events and hackathons is handled by the existing Europe/London scheduled job; projects and undated ideas remain active.
+Planner cards move through Ideas, In progress and Ready before an explicit publish action creates a public activity snapshot. Draft details, private notes, comments, collaborators, checklists and audit history remain private. Archiving dated events and hackathons is handled by the existing Europe/London scheduled job; projects and undated ideas remain active.
 
 Publishing requires a public description. Events and hackathons also need a date, start time and location; booking and registration links are optional. Any supplied link must use HTTPS. Public activity pages show a registration button only when a link is provided.
 
-Mentions are canonicalised to committee email addresses, notify recipients in the private planner inbox and can queue a delayed email. Self-mentions do not notify. Email delivery rechecks access, the comment, the mention and the recipient preference before sending. Planner comments and notifications never enter public snapshots.
+Mentions are canonicalised to committee email addresses, notify recipients in the private planner inbox and can queue a delayed email. Self-mentions do not notify. Email delivery rechecks access, the comment, the mention and the recipient preference before sending. Mention emails are always relayed through `https://surreyaisociety.org/api/planner-mention-email`, regardless of the frontend preview origin. Planner comments and notifications never enter public snapshots.
 
 Run the focused regression suite with:
 
@@ -19,6 +19,17 @@ npm run test:planner
 ```
 
 The suite uses temporary test data and Convex test utilities. It does not prove production inbox delivery or an authenticated production committee session; verify those separately when a release requires them.
+
+## Environment
+
+Use `.env.example` as the variable-name reference. Keep local Astro settings in `apps/ai/.env.local` and configure the corresponding server settings on the frontend deployment:
+
+- `CONVEX_URL`, `PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` for the backend connection, sign-in and account preparation.
+- `PLANNER_SIGN_IN_SECRET` and `PLANNER_EMAIL_SECRET` for the sign-in gate and mention-email relay.
+- `RESEND_API_KEY` and `COMMITTEE_FROM_EMAIL` for mention-email delivery.
+- Optional AI drafting uses `GEMINI_API_KEY` and `AI_FEATURES_ENABLED`; the other AI settings are listed in `.env.example`.
+
+On the connected Convex deployment, configure `CLERK_JWT_ISSUER_DOMAIN`, `CONVEX_SITE_URL`, `PLANNER_SIGN_IN_SECRET` and `PLANNER_EMAIL_SECRET`. `CONVEX_SITE_URL` supplies the file-service origin. Each planner secret must be at least 32 characters and match its counterpart on the Astro server; the email secret must match the production relay even when using a preview frontend. Keep Convex CLI deployment settings in the private root `.env.local`, separate from Astro's app-local file. Never commit populated environment files or secrets.
 
 ## Planning areas
 

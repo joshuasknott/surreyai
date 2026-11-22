@@ -4,7 +4,7 @@ Production source for the selected yellow and ultramarine design. The public pag
 
 ## Preview
 
-Use Node 24 and run `npm ci`, `npm test`, then `npm run build`. The build copies public HTML, CSS, JavaScript and assets into `dist`. Vercel discovers `api/waitlist.mjs` separately; server code and package files are not public assets. A static HTTP server can preview the design; it cannot save signups. Use a Vercel preview deployment for the complete flow.
+Use Node 24 and run `npm ci --ignore-scripts`, `npm test`, then `npm run build`. The build copies public HTML, CSS, JavaScript and assets into `dist`. Vercel discovers `api/waitlist.mjs` separately; server code and package files are not public assets. A static HTTP server can preview the design; it cannot save signups. Use a Vercel preview deployment for the complete flow.
 
 ## Waitlist and contact
 

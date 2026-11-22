@@ -76,9 +76,9 @@ glTF Transform is superior to a Blender-only export for this stage because its m
 
 | Measurement | Raw normalized | Desktop | Mobile |
 | --- | ---: | ---: | ---: |
-| File bytes | 122,987,332 | 23,357,144 | 14,729,788 |
-| Brotli transfer bytes (quality 6) | — | 20,256,145 | 12,604,441 |
-| Triangles | 1,982,008 | 1,381,881 | 867,071 |
+| File bytes | 122,987,332 | 23,357,144 | 16,062,180 |
+| Brotli transfer bytes (quality 6) | — | 20,256,145 | 13,686,278 |
+| Triangles | 1,982,008 | 1,381,881 | 989,971 |
 | Draw calls / material primitives | 3 | 3 | 3 |
 | Texture resolution | 2 × 8192² | 2 × 4096² | 2 × 2048² |
 | Decoded texture memory, including mip estimates | ~512 MiB before mips | ~170.7 MiB | ~42.7 MiB |
@@ -90,7 +90,7 @@ Runtime initialization time and approximate frame rate are recorded by the live 
 
 ## Supported movement and defect treatment
 
-The supported route is the central ground-floor nave, approximately 10.4 m wide by 32.3 m long after player-radius clearance. It includes long views to both ends and multiple viewpoints below the whale. A fixed ground plane and capsule-equivalent horizontal collider prevent falls through scan holes. Expanded collision boxes block the south central display and the north side boundaries. Stairs and landings are not enabled.
+The supported route is the central ground-floor nave, with bounds 7.82 m wide by 20.52 m long after player-radius clearance, before subtracting blocked areas. It includes long views to both ends and multiple viewpoints below the whale. A fixed ground plane and capsule-equivalent horizontal collider prevent falls through scan holes. Expanded collision boxes block the south central display and the north side boundaries. Stairs and landings are not enabled.
 
 The incomplete north-east exhibit is outside the route, has a dedicated collision volume, a restrained physical barrier marker, and a contextual “unavailable in this scan” notice. No fake gorilla or invented room is present.
 
@@ -100,7 +100,7 @@ There are no secondary models, generated façades, panoramas, people, museum pho
 
 ## Required visible credit
 
-The modal and standalone experience display:
+The standalone page at `/projects/hintze-hall` displays:
 
 > Hintze Hall photogrammetry by David Fletcher / artfletch, licensed under Creative Commons Attribution.
 

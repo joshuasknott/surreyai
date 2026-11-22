@@ -39,6 +39,8 @@ Local D1 data lives in the ignored `.wrangler/` directory. Copy the relevant set
 
 ## Checks
 
+Local browser tests use an installed Google Chrome. With `CI=1`, they use Playwright Chromium instead; install it with `npx playwright install chromium`. CI uses `npx playwright install --with-deps chromium` to include system dependencies.
+
 ```sh
 npm run typecheck
 npm test
@@ -87,5 +89,9 @@ Published websites have no compulsory Surrey AI Society branding. The Studio its
 - `migrations/` — D1 schema
 - `public/` — maintained brand, font and portfolio assets
 - `tests/` — export, domain and browser coverage
+- `scripts/` — build, test and deployment helpers:
+  - `build-worker.mjs` — bundles the Pages advanced-mode Worker into `dist/_worker.js`.
+  - `test-server.mjs` — starts the isolated local Wrangler/D1 browser-test server.
+  - `deploy-pages.mjs` — checks required build output and deploys it to the Portfolio Studio Pages project.
 
 Report problems through [GitHub issues](https://github.com/joshuasknott/surreyai/issues).
