@@ -481,7 +481,7 @@ export function Editor() {
           >
             <ArrowLeft />
           </button>
-          <img src="/brand/ai-monogram.png" alt="Surrey AI Society" />
+          <img src="/brand/ai-monogram-32.webp" srcSet="/brand/ai-monogram-64.webp 2x" alt="Surrey AI Society" width="26" height="26" />
           <input
             aria-label="Portfolio name"
             value={document.name}

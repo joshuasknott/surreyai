@@ -13,7 +13,7 @@ import type { PortfolioDocument } from "../../shared/portfolio";
 export function Brand() {
   return (
     <Link to="/" className="brand" aria-label="Portfolio Studio home">
-      <img src="/brand/ai-monogram.png" alt="" />
+      <img src="/brand/ai-monogram-32.webp" srcSet="/brand/ai-monogram-64.webp 2x" alt="" width="31" height="31" />
       <span>Portfolio Studio</span>
     </Link>
   );
@@ -67,7 +67,7 @@ export function Footer() {
         >
           Source code
         </a>
-        <img src="/brand/surrey-ai-logo.png" alt="Surrey AI Society" />
+        <img src="/brand/surrey-ai-logo-100.webp" srcSet="/brand/surrey-ai-logo-200.webp 2x" alt="Surrey AI Society" width="100" height="27" />
       </span>
     </footer>
   );

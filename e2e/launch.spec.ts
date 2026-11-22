@@ -139,7 +139,7 @@ for (const site of sites.filter(site => site.key === 'ai')) {
         .filter(id => !document.getElementById(id)));
       expect(broken).toEqual([]);
       await expect(page.locator('header a[href="/events"], main a[href="/events"], footer a[href="/events"]')).toHaveCount(0);
-      await expect(page.locator('.society-header .society-brand img')).toHaveAttribute('src', site.key === 'ai' ? '/logos/brand/surrey-ai-logo-transparent.png' : '/logos/society.png');
+      await expect(page.locator('.society-header .society-brand img')).toHaveAttribute('src', site.key === 'ai' ? '/logos/optimized/surrey-ai-capsule-44.webp' : '/logos/optimized/society-112.webp');
       for (const path of ['/logos/society.png', '/social-cover.png', '/favicon.png', '/apple-touch-icon.png']) {
         const response = await request.get(`${site.origin}${path}`);
         expect(response.status()).toBe(200);

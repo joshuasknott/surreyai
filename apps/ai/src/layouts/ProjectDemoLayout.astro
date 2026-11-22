@@ -20,15 +20,12 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
   canonicalUrl={canonicalUrl}
   siteName="Surrey Artificial Intelligence Society"
   ogImage={new URL('/social-cover.png', Astro.site).href}
+  favicon={{ href: "/logos/optimized/surrey-ai-avatar-light-32.png", sizes: "32x32" }}
   bodyClass="bg-ai-bg text-ai-fg font-sans min-h-screen"
   extraFontHrefs={[
     "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
   ]}
 >
-  <Fragment slot="head">
-    <link rel="icon" type="image/png" href="/logos/brand/surrey-ai-avatar-light.png" />
-  </Fragment>
-
   {!embed && (
     <header class="project-demo-nav">
       <a href="/#activities" class="project-demo-back" aria-label="Back to projects">
