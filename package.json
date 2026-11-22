@@ -4,7 +4,7 @@
   "type": "module",
   "version": "0.0.1",
   "engines": {
-    "node": ">=22.12.0"
+    "node": ">=22.23.4"
   },
   "workspaces": [
     "apps/ai",
@@ -32,13 +32,15 @@
     "test:hack": "npm --prefix apps/hack test"
   },
   "overrides": {
+    "@vercel/cli-config": {
+      "zod": "^4.6.6"
+    },
     "esbuild": "0.28.1",
     "ws": "8.21.0",
     "astro": {
       "esbuild": "0.28.1"
     },
     "vite": {
-      ".": "^7.3.2",
       "esbuild": "0.28.1"
     }
   },
@@ -49,8 +51,8 @@
     "@edge-runtime/vm": "^5.0.0",
     "@playwright/test": "^1.60.0",
     "convex-test": "^0.0.54",
-    "sharp": "^0.35.3",
+    "sharp": "^0.35.5",
     "typescript": "^5.9.3",
-    "vitest": "^4.1.10"
+    "vitest": "~4.1.12"
   }
 }
