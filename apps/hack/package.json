@@ -8,5 +8,10 @@
     "test": "node --test tests/*.test.mjs"
   },
   "engines": { "node": "24.x" },
-  "dependencies": { "@vercel/blob": "2.8.2" }
+  "dependencies": { "@vercel/blob": "2.9.0" },
+  "overrides": {
+    "@vercel/cli-config": {
+      "zod": "^4.6.6"
+    }
+  }
 }
