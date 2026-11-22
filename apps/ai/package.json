@@ -10,18 +10,18 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/vercel": "^11.0.5",
+    "@astrojs/vercel": "~11.0.22",
     "@google/genai": "^1.0.0",
     "@surreysocieties/admin": "*",
     "@surreysocieties/assistant": "*",
     "@surreysocieties/ui": "*",
     "@tailwindcss/vite": "^4.2.4",
-    "@vercel/blob": "^2.8.0",
+    "@vercel/blob": "^2.9.0",
     "animejs": "^4.4.1",
-    "astro": "^7.2.2",
+    "astro": "~7.4.13",
     "convex": "^1.37.0",
     "lucide-astro": "^0.556.0",
-    "sharp": "^0.35.3",
+    "sharp": "^0.35.5",
     "tailwindcss": "^4.2.4",
     "three": "^0.172.0"
   }
