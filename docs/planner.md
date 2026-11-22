@@ -29,7 +29,7 @@ Use `.env.example` as the variable-name reference. Keep local Astro settings in 
 - `RESEND_API_KEY` and `COMMITTEE_FROM_EMAIL` for mention-email delivery.
 - Optional AI drafting uses `GEMINI_API_KEY` and `AI_FEATURES_ENABLED`; the other AI settings are listed in `.env.example`.
 
-On the connected Convex deployment, configure `CLERK_JWT_ISSUER_DOMAIN`, `CONVEX_SITE_URL`, `PLANNER_SIGN_IN_SECRET` and `PLANNER_EMAIL_SECRET`. `CONVEX_SITE_URL` supplies the file-service origin. Each planner secret must be at least 32 characters and match its counterpart on the Astro server; the email secret must match the production relay even when using a preview frontend. Keep Convex CLI deployment settings in the private root `.env.local`, separate from Astro's app-local file. Never commit populated environment files or secrets.
+On the connected Convex deployment, configure `CLERK_JWT_ISSUER_DOMAIN`, `PLANNER_SIGN_IN_SECRET` and `PLANNER_EMAIL_SECRET`. Convex provides the built-in `CONVEX_SITE_URL`, which supplies the file-service origin. Each planner secret must be at least 32 characters and match its counterpart on the Astro server; the email secret must match the production relay even when using a preview frontend. Keep Convex CLI deployment settings in the private root `.env.local`, separate from Astro's app-local file. Never commit populated environment files or secrets.
 
 ## Planning areas
 
