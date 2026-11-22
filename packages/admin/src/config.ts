@@ -8,7 +8,7 @@ export const SOCIETIES: Record<string, Society> = {
     slug: 'ai',
     domain: 'surreyaisociety.org',
     establishedYear: 2025,
-    logo: '/logos/society.png',
+    logo: '/logos/optimized/society-112.webp',
     contactEmail: 'ussu.aianddatascience@surrey.ac.uk',
     socials: {
       instagram: 'https://www.instagram.com/surreyaisociety/',
@@ -33,7 +33,7 @@ export const SOCIETIES: Record<string, Society> = {
     slug: 'neurotech',
     domain: 'surreyneurotechsociety.org',
     establishedYear: 2024,
-    logo: '/logos/society.png',
+    logo: '/logos/optimized/society-112.webp',
     contactEmail: 'ussu.neurotechsoc@surrey.ac.uk',
     socials: {
       instagram: 'https://www.instagram.com/surreyneurotech/',
@@ -57,7 +57,7 @@ export const SOCIETIES: Record<string, Society> = {
     slug: 'business',
     domain: 'surreybusinesssociety.org',
     establishedYear: 2021,
-    logo: '/logos/society.png',
+    logo: '/logos/optimized/society-112.webp',
     contactEmail: 'ussu.bizsoc@surrey.ac.uk',
     socials: {
       instagram: 'https://www.instagram.com/surreybusinesssociety',

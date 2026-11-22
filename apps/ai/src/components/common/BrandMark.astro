@@ -6,13 +6,16 @@ interface Props {
 const { size = "default" } = Astro.props;
 
 const pixelSize = size === "large" ? 80 : size === "small" ? 36 : 48;
+const assetSize = size === "small" ? 40 : pixelSize;
+const assetBase = "/logos/optimized/surrey-ai-avatar-light";
 const loading = size === "small" ? "lazy" : "eager";
 ---
 
 <span class:list={["brand-mark", `brand-mark--${size}`]} aria-hidden="true">
   <img
     class="brand-mark__img"
-    src="/logos/brand/surrey-ai-avatar-light.png"
+    src={`${assetBase}-${assetSize}.webp`}
+    srcset={`${assetBase}-${assetSize * 2}.webp 2x`}
     alt=""
     width={pixelSize}
     height={pixelSize}

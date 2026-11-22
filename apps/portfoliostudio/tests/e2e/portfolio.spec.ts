@@ -1,6 +1,25 @@
 import { test, expect, type Page, type TestInfo } from "@playwright/test";
 import { writeFile } from "node:fs/promises";
 
+test.describe("Retina public branding", () => {
+  test.use({ deviceScaleFactor: 2 });
+
+  test("loads small header and footer assets", async ({ page }) => {
+    await page.goto("/");
+    for (const [selector, filename] of [
+      [".app-header .brand img", "/brand/ai-monogram-64.webp"],
+      [".site-footer img", "/brand/surrey-ai-logo-200.webp"],
+    ]) {
+      const logo = page.locator(selector);
+      await expect(logo).toBeVisible();
+      await expect.poll(() => logo.evaluate(async (image: HTMLImageElement) => {
+        await image.decode();
+        return new URL(image.currentSrc).pathname;
+      })).toBe(filename);
+    }
+  });
+});
+
 async function completeManualOnboarding(page: Page, name = "Jordan Lee") {
   await page.goto("/new");
   await page
